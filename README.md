@@ -20,23 +20,21 @@ To install and use ClusterCockpit you need the following packages:
 
 On Ubuntu systems you usually need an additional
 [repository](https://launchpad.net/~ondrej/+archive/ubuntu/php) to install newer
-PHP version. ClusterCockpit can be installed on any operating system where you
-can install PHP.
+PHP version. ClusterCockpit can be installed on any operating system where PHP
+is available.
 
 --------------------------------------------------------------------------------
 Setup project
 --------------------------------------------------------------------------------
 
-Symfony application can be operated in different environments. For
-development there is a `dev` environment which turns off caching and
-enables profiling support, this is usually used together with the builtin
-PHP web server listening in a local port to enable a easy development
-environment without the need to setup a web server. For production the
-environment is switched from dev to prod. This enables performance
-optimisations and is intended to be used together with a web server as,
-e.g. Apache. Below instructions apply to a development setup and are intended to be used
-to someone developing or testing ClusterCockpit.  Please refer to the Wiki if
-you want to install ClusterCockpit for a production environment.
+Symfony application can be operated in so called environments.  A `dev`
+environment is used for development and testing and is usually used together
+with the builtin PHP web server listening on a local port. For production the
+environment is switched from `dev` to `prod`. This enables performance
+optimisations and is intended to be used together with a web server, as e.g.
+Apache. Below instructions apply to a development setup and are intended to be
+used by someone developing or testing ClusterCockpit. Please refer to the Wiki
+if you want to install ClusterCockpit in a production environment.
 
 1. Clone repository
 ```
