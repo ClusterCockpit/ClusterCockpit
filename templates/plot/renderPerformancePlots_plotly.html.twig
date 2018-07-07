@@ -1,0 +1,76 @@
+{% set metrics = job.cluster.metricLists[mode].metrics %}
+{% set jobdata = job.jobCache %}
+{% set jobId = job.id %}
+
+{% if mode == 'view' %}
+{% set margin = 'mt-4' %}
+{% else %}
+{% set margin = 'px-1 py-1' %}
+{% endif %}
+
+<div class="row">
+{% for metric in metrics %}
+    {% set plot = jobdata.plots[metric.name]%}
+    <div class="col-sm {{ margin }}" id="{{ jobId }}_{{ plot.name }}"></div>
+{% endfor %}
+</div>
+
+<script>
+    {{ include("util/setPlotSize.html.twig") }}
+
+{% if mode == 'view' %}
+{% set viewRoofline = config['view.roofline.show'].value|default('true') %}
+{% if viewRoofline is same as('true')  %}
+        {% set plot = jobdata.plots['roofline']%}
+
+        var options_{{ jobId }}_{{ plot.name }} = {{ plot.options|raw }};
+        var data_{{ jobId }}_{{ plot.name }} = {{ plot.data|raw }};
+
+        options_{{ jobId }}_{{ plot.name }}['height'] = 250;
+        options_{{ jobId }}_{{ plot.name }}['width'] = p_width;
+
+        Plotly.newPlot(
+            'roofline',
+            data_{{ jobId }}_{{ plot.name }},
+            options_{{ jobId }}_{{ plot.name }},
+            {staticPlot: true});
+{% endif %}
+
+{% set viewPolarplot = config['view.polarplot.show'].value|default('true') %}
+{% if  viewPolarplot is same as('true') %}
+        {% set plot = jobdata.plots['polarplot']%}
+
+        var options_{{ jobId }}_{{ plot.name }} = {{ plot.options|raw }};
+        var data_{{ jobId }}_{{ plot.name }} = {{ plot.data|raw }};
+
+        options_{{ jobId }}_{{ plot.name }}['height'] = 250;
+        options_{{ jobId }}_{{ plot.name }}['width'] = 400;
+
+        Plotly.newPlot(
+            'polarplot',
+            data_{{ jobId }}_{{ plot.name }},
+            options_{{ jobId }}_{{ plot.name }});
+{% endif %}
+{% endif %}
+
+    {% for metric in metrics %}
+        {% set plot = jobdata.plots[metric.name]%}
+
+        var options_{{ jobId }}_{{ plot.name }} = {{ plot.options|raw }};
+        var data_{{ jobId }}_{{ plot.name }} = {{ plot.data|raw }};
+
+        options_{{ jobId }}_{{ plot.name }}['height'] = p_height;
+        options_{{ jobId }}_{{ plot.name }}['width'] = p_width;
+
+        Plotly.newPlot(
+            '{{ jobId }}_{{ plot.name }}',
+            data_{{ jobId }}_{{ plot.name }},
+            options_{{ jobId }}_{{ plot.name }},
+{% if mode == 'list' or  mode == 'listtable' %}
+            {staticPlot: true});
+{% else %}
+    );
+{% endif %}
+    {% endfor %}
+</script>
+

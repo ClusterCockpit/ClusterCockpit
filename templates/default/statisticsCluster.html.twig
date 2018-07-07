@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Job DB
+{% endblock %}
+
+{% block body %}
+    <script src="{{ asset('js/plotly-basic.min.js') }}"/></script>
+
+{{ include('renderStatForm.html.twig') }}
+{{ include('renderHistograms.html.twig') }}
+
+<h2>Recent 20 largest Jobs:</h2>
+{% for job in jobs %}
+    {% set jobmeta = job.jobmeta %}
+    {% set jobdata = job.jobdata %}
+    {% set jobId = jobmeta.id %}
+
+    <div class="row">
+        <div class="col">
+            <div class="alert alert-secondary" role="alert">
+                <strong>{{ jobmeta.jobId }}</strong>
+                (
+                <a href="{{ path('show_user', { 'id':jobmeta.user.id }) }}">
+                    {{ jobmeta.user.userId }}
+                </a>
+                ): {{ jobmeta.numNodes }} nodes, Runtime: {{ "%5.2f hours"|format(jobmeta.duration / 3600) }}
+            </div>
+        </div>
+    </div>
+
+    <a href="{{ path('show_job', { 'id':jobmeta.id }) }}">
+        <div class="row">
+            {% for plot in jobdata.metrics %}
+                {% set nodes = plot.nodes %}
+                {{ include('renderPerformancePlots.html.twig') }}
+            {% endfor %}
+        </div>
+    </a>
+{% endfor %}
+{% endblock %}

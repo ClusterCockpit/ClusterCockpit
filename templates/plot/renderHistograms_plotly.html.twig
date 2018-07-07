@@ -1,0 +1,24 @@
+
+<div class="row">
+    <div class="col" id="histo_plot_runtime" style="width:400px;height:400px;" > </div>
+    <div class="col" id="histo_plot_numnodes" style="width:400px;height:400px;" > </div>
+</div>
+<script>
+    {% set histoRuntime = stat.plots['histoPlotRuntime'] %}
+    {% set histoNumnodes = stat.plots['histoPlotNumnodes'] %}
+
+var options_histo_runtime = {{ histoRuntime.options|raw }};
+var data_histo_runtime = {{ histoRuntime.data|raw }};
+
+Plotly.newPlot('histo_plot_runtime',
+    data_histo_runtime,
+    options_histo_runtime);
+
+var options_histo_numnodes = {{ histoNumnodes.options|raw }};
+var data_histo_numnodes =  {{ histoNumnodes.data|raw }};
+
+Plotly.newPlot('histo_plot_numnodes',
+    data_histo_numnodes,
+    options_histo_numnodes);
+</script>
+

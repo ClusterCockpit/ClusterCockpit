@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Job DB: Error
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-10 offset-1 mt-5">
+            {{ include('util/printError.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

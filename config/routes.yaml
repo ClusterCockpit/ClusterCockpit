@@ -1,0 +1,90 @@
+user:
+    type:     rest
+    resource: App\Controller\API\UsersController
+    prefix:  "api"
+job:
+    type:     rest
+    resource: App\Controller\API\JobsController
+    prefix:  "api"
+joblist:
+    type:     rest
+    resource: App\Controller\API\JobListController
+    prefix:  "web"
+index:
+    path: /
+    controller:  App\Controller\IndexViewController::home
+list_jobs:
+    path: /monitoring/listjobs/
+    controller:  App\Controller\JobViewController::list
+search_jobs:
+    path: /monitoring/job/search
+    controller:  App\Controller\JobViewController::search
+show_job:
+    path: /monitoring/job/{id}
+    controller:  App\Controller\JobViewController::show
+show_running_job:
+    path: /monitoring/running_job/{id}
+    controller:  App\Controller\JobViewController::showRunning
+search_id:
+    path: /monitoring/searchId
+    controller:  App\Controller\JobViewController::searchId
+cluster_stat:
+    path: /monitoring/cluster/statistics/
+    controller:  App\Controller\StatisticsViewController::clusters
+user_stat:
+    path: /monitoring/user/statistics/
+    controller:  App\Controller\StatisticsViewController::users
+group_stat:
+    path: /monitoring/group/statistics
+    controller:  App\Controller\StatisticsViewController::groups
+show_user:
+    path: /monitoring/user/{id}
+    controller:  App\Controller\UserViewController::show
+show_group:
+    path: /monitoring/group/show/{id}
+    controller:  App\Controller\UserViewController::showGroup
+edit_group:
+    path: /monitoring/group/edit/{id}
+    controller:  App\Controller\UserViewController::editGroup
+config_index:
+    path: /admin
+    controller:  App\Controller\ConfigViewController::index
+init_config:
+    path: /admin/init
+    controller:  App\Controller\ConfigViewController::init
+plot_list:
+    path: /admin/plot/list
+    controller:  App\Controller\ConfigViewController::plotList
+plot_view:
+    path: /admin/plot/view
+    controller:  App\Controller\ConfigViewController::plotView
+list_api_keys:
+    path: /admin/apiKeys/
+    controller:  App\Controller\ConfigViewController::listApiKeys
+edit_api_key:
+    path: /admin/apiKeys/{id}
+    controller:  App\Controller\ConfigViewController::editApiKey
+delete_api_key:
+    path: /admin/delete_apiKey/{id}
+    controller:  App\Controller\ConfigViewController::deleteApiKey
+create_api_key:
+    path: /admin/create_apiKey/
+    controller:  App\Controller\ConfigViewController::createApiKey
+list_user_accounts:
+    path: /admin/userAccounts/
+    controller:  App\Controller\ConfigViewController::listUserAccounts
+edit_user_account:
+    path: /admin/userAccounts/{id}
+    controller:  App\Controller\ConfigViewController::editUserAccount
+delete_user_account:
+    path: /admin/delete_userAccount/{id}
+    controller:  App\Controller\ConfigViewController::deleteUserAccount
+create_user_account:
+    path: /admin/create_userAccount/
+    controller:  App\Controller\ConfigViewController::createUserAccount
+security_login:
+    path: /login
+    controller:  App\Controller\SecurityController::login
+security_logout:
+    path:  /logout
+

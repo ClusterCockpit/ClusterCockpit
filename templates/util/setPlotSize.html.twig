@@ -1,0 +1,13 @@
+var window_width = $(window).width();
+{% if mode == 'list' %}
+{% set count = metrics|length %}
+var size = (window_width/{{ count }})*0.8;
+var p_width = size;
+var p_height = size;
+{% elseif mode == 'view' %}
+var size = (window_width/3)*0.9;
+var p_width = size;
+var p_height = size*0.6;
+{% endif %}
+
+

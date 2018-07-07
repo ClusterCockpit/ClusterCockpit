@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Group Statistics
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('css/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+    <script src="{{ asset('js/datatables.min.js') }}"/></script>
+    <script>
+$(document).ready( function () {
+    var table =  $('#stat').DataTable(
+        {
+            paging: false
+        }
+    );
+
+    table
+        .order( [ 3, 'desc' ] )
+        .draw();
+} );
+    </script>
+
+{% endblock %}
+
+
+
+{% block body %}
+    {{ include('renderStatForm.html.twig') }}
+
+    <div class="row">
+        <div class="col-md-10 offset-md-1">
+            <table class="table table-striped" id="stat">
+                <thead>
+                    <tr>
+                        <th scope="col">Group</th>
+                        <th scope="col">Total jobs</th>
+                        <th scope="col">Total walltime [h]</th>
+                        <th scope="col">Core hours [h]</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    {% for group in groups %}
+                        {% if group.stat.stat.totalCoreHours > 0  %}
+                            <tr>
+                                <td class="text-left">
+                                    <a href="{{ path('show_group',{ 'id':group.groupId }) }}?year={{ control.year }}&month={{ control.month }}&cluster={{ control.cluster }}">
+                                        {{ group.groupName }}</a>
+                                </td>
+                                <td> {{ group.stat.stat.jobCount }} </td>
+                                <td> {{ group.stat.stat.totalWalltime }} </td>
+                                <td> {{ group.stat.stat.totalCoreHours }} </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

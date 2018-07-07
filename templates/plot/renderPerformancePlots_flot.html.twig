@@ -1,0 +1,31 @@
+{% set jobdata = job.jobCache %}
+{% set jobId = job.id %}
+
+<div class="row">
+    {% for metric in metrics %}
+        {% set plot = jobdata.plots[metric.name]%}
+        <div class="col-sm">
+            <div id="{{ jobId }}_{{ plot.name }}"> </div>
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+    {{ include("util/setPlotSize.html.twig") }}
+
+    {% for metric in metrics %}
+        {% set plot = jobdata.plots[metric.name]%}
+        $("#{{ jobId }}_{{ plot.name }}").height( p_height ).width( p_width );
+        {% if plot.name != 'roofline' %}
+
+        var options_{{ jobId }}_{{ plot.name }} = {{ plot.options|raw }};
+        var data_{{ jobId }}_{{ plot.name }} = {{ plot.data|raw }};
+
+        var plot_{{ jobId }}_{{ plot.name }} = $.plot(
+            $("#{{ jobId }}_{{ plot.name }}"),
+            data_{{ jobId }}_{{ plot.name }},
+            options_{{ jobId }}_{{ plot.name }});
+    {% endif %}
+    {% endfor %}
+</script>
+

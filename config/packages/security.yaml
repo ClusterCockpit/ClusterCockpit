@@ -1,0 +1,43 @@
+security:
+    encoders:
+        App\Entity\UserAccount:
+            algorithm: bcrypt
+
+    providers:
+        api_key_user_provider:
+            id: App\Security\ApiKeyUserProvider
+        our_db_provider:
+            entity:
+                class: App\Entity\UserAccount
+                property: username
+
+    firewalls:
+        rest_api:
+            pattern: ^/api
+            stateless: true
+            simple_preauth:
+                authenticator: App\Security\ApiKeyAuthenticator
+            provider: api_key_user_provider
+
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+            pattern: ^/
+            anonymous: ~
+            provider: our_db_provider
+            form_login:
+                check_path: security_login
+                login_path: security_login
+                default_target_path:  /monitoring/listjobs/
+            logout:
+                path:   /logout
+                target: /
+
+    access_control:
+        - { path: ^/monitoring, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/api, roles: ROLE_API }
+        - { path: ^/web, roles: ROLE_ADMIN }
+
