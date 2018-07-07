@@ -1,7 +1,6 @@
 *~
 *.swp
 *.swo
-*.lock
 ###> symfony/framework-bundle ###
 /.env
 /public/bundles/
