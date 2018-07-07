@@ -4,7 +4,7 @@ NOTICE
 
 ClusterCockpit is currently still work in progress and not yet ready for
 general production use. One main component which is not yet finalized is
-a generic way to map to metric lists to different profling database backends. If you want to help develop ClusterCockpit. You
+a generic way to map to metric lists to different profling database backends. If you want to help develop ClusterCockpit you
 may want to take a look at [open issues](https://github.com/ClusterCockpit/ClusterCockpit/issues?q=is%3Aopen+is%3Aissue).
 
 
