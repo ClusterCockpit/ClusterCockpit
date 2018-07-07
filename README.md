@@ -1,20 +1,30 @@
 --------------------------------------------------------------------------------
+NOTICE
+--------------------------------------------------------------------------------
+
+ClusterCockpit is currently still work and progress and not yet ready for
+general production use. One main component which is not yet finalized are
+different database backends for the profiling data and a generic way to map to
+available metrics. Contact me if you want to help develop ClusterCockpit. You
+may want to take a look at (open issues)[https://github.com/ClusterCockpit/ClusterCockpit/issues?q=is%3Aopen+is%3Aissue].
+
+
+--------------------------------------------------------------------------------
 Introduction
 --------------------------------------------------------------------------------
 
 This is a web frontend for job specific performance monitoring. It is based on
-the [Symfony](https://symfony.com) PHP Framework. Documentation for Symfony in
-general is found [here](https://symfony.com/doc/current/index.html).  The web
-application uses the [bootstrap 4](http://getbootstrap.com) frontend component
-for layout and styling, [DataTables](https://datatables.net) for interactive
-tables and [plotly.js](https://plot.ly/javascript/) for graph generation.
+the [Symfony](https://symfony.com) PHP Framework. The application uses
+[Bootstrap 4](http://getbootstrap.com) for layout and styling,
+[DataTables](https://datatables.net) for interactive Ajax tables and
+[plotly.js](https://plot.ly/javascript/) for graph generation.
 
 --------------------------------------------------------------------------------
 Dependencies
 --------------------------------------------------------------------------------
 
 To install and use ClusterCockpit you need the following packages:
-- PHP 7.1 or higher
+- PHP 7.1 or newer
 - MySQL 5.7
 - [Composer](https://getcomposer.org) - PHP package manager
 
@@ -27,14 +37,14 @@ is available.
 Setup project
 --------------------------------------------------------------------------------
 
-Symfony application can be operated in so called environments.  A `dev`
-environment is used for development and testing and is usually used together
-with the builtin PHP web server listening on a local port. For production the
-environment is switched from `dev` to `prod`. This enables performance
-optimisations and is intended to be used together with a web server, as e.g.
-Apache. Below instructions apply to a development setup and are intended to be
-used by someone developing or testing ClusterCockpit. Please refer to the Wiki
-if you want to install ClusterCockpit in a production environment.
+Symfony applications are operated in so called environments.  The `dev`
+environment is for development and testing and is usually used together with
+the builtin PHP web server listening on a local port. For production the
+environment is should be switched from `dev` to `prod`. This enables
+performance optimisations and is usually used together with a web server, as
+e.g. Apache. Below instructions apply to a development setup and are intended
+to be used by someone developing or testing ClusterCockpit. Please refer to the
+Wiki if you want to install ClusterCockpit in a production environment.
 
 1. Clone repository
 ```
@@ -53,13 +63,15 @@ $ apt-get install php7.1 php7.1-xml php7.1-mysql
 3. Setup MySQL
 
 At the moment all development was done using a MySQL server. MariaDB or
-PostgresSQL where not tested bu should also work. On Ubuntu you need to install
-the following packages to install MySQL:
+PostgresSQL where not tested but should also work. On Ubuntu you need to
+install the following packages to install MySQL:
+
 ```
 $ apt-get install mysql-server mysql-client
 ```
 
 Create symfony database user and database:
+
 ```
 $ mysql -u root  -p
 $mysql> CREATE USER 'username'@'localhost' IDENTIFIED BY 'mypass';
@@ -80,12 +92,13 @@ $ composer install
 
 5. Configure Symfony access to MySQL:
 
-Everything is currently in one database.
-Symfony uses the [Doctrine](https://www.doctrine-project.org) ORM for mapping PHP classes on database tables.
-Database access for Doctrine is configured in the local only .env file. This file is not
-committed.
+Everything is currently in one database. Symfony uses the
+[Doctrine](https://www.doctrine-project.org) ORM for mapping PHP classes on
+database tables. Database access for Doctrine is configured in the local only
+.env file. This file is not committed.
 
 To configure mysql credentials open the existing .env file in you project root and add the following line (enter above username and password for the placeholders):
+
 ```
 DATABASE_URL=mysql://<username>:<mypass>@127.0.0.1:3306/ClusterCockpit
 
