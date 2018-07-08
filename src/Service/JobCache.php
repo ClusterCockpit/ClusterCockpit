@@ -36,8 +36,13 @@ use App\Entity\MetricStat;
 use App\Repository\DoctrineMetricDataRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Stopwatch\Stopwatch;
 
+/**
+ * Class: JobCache
+ *
+ * @author Jan Eitzinger
+ * @version 0.1
+ */
 class JobCache
 {
     private $_logger;
@@ -353,11 +358,19 @@ class JobCache
     }
 
 
-    public function buildCache( $job )
+    /**
+     * Builds and persists job cache
+     *
+     * This routine checks if a job cache exists. If there is no cache
+     * metric plots are build in a view and list resolution.
+     *
+     * @param Job $job
+     */
+    public function buildCache( Job $job )
     {
         if ( $job->isRunning()) {
-            /* $job->stopTime = time(); */
-            $job->stopTime = 1521057932;
+            $job->stopTime = time();
+            /* $job->stopTime = 1521057932; */
             $job->duration = $job->stopTime - $job->startTime;
         }
 
@@ -441,11 +454,50 @@ class JobCache
         }
     }
 
-    public function checkCache( $job, $options, $config)
+    /**
+     * Check if job cache exists and initialize job metric data if required
+     *
+     * For running job set stoptime to current time and compute duration.
+     * Check if cache exists: In case there is no cache check if metric
+     * data is available for job and initialize data for following modes:
+     *
+     * * ```view```: Single job including roofline, polarplot and node
+     *               statistic table
+     * * ```list```: Job list
+     * * ```data```: Initialize data only, do not build plot jsons
+     *
+     * After the call the metric data is initilized according to the mode
+     * in the jobs JobCache object.
+     *
+     * Example usage:
+     * ```
+     * foreach ( $jobs as $job ) {
+     *     $this->_jobCache->checkCache(
+     *               $job,
+     *               array(
+     *                   'mode' => 'data'
+     *               ),
+     *               $config
+     *           );
+     *  }
+     * ```
+     *
+     * @param Job $job
+     * @param mixed $options
+     * @param mixed $config
+     * @uses App\Repository\MetricDataRepository
+     * @uses App\Service\PlotGenerator
+     * @api
+     */
+    public function checkCache(
+        Job $job,
+        $options,
+        $config
+    )
     {
         if ( $job->isRunning()) {
-            /* $job->stopTime = time(); */
-            $job->stopTime = 1521057932;
+            $job->stopTime = time();
+            /* $job->stopTime = 1521057932; */
             $job->duration = $job->stopTime - $job->startTime;
         }
 
@@ -482,12 +534,6 @@ class JobCache
             } else if ( $options['mode'] === 'list' ) { /* Job list  */
                 $options['sample'] = 150;
                 $options['legend'] = false;
-
-                /* $job->memUsedAvg = $stats['mem_used_avg']; */
-                /* $job->memBwAvg = $stats['mem_bw_avg']; */
-                /* $job->flopsAnyAvg = $stats['flops_any_avg']; */
-                /* $job->trafficTotalIbAvg = $stats['traffic_total_ib_avg']; */
-                /* $job->trafficTotalLustreAvg = $stats['traffic_total_lustre_avg']; */
 
             } else if ( $options['mode'] === 'data' ) { /* Extract data only, do not build plot jsons  */
                 $this->buildData($job);
