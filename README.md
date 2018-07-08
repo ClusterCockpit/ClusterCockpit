@@ -6,8 +6,11 @@ ClusterCockpit is currently still work in progress and not yet ready for
 general production use. One main component which is not yet finalized is
 a generic way to map to metric lists to different profling database backends. If you want to help develop ClusterCockpit you
 may want to take a look at [open issues](https://github.com/ClusterCockpit/ClusterCockpit/issues?q=is%3Aopen+is%3Aissue).
+A good starting point about the software design of ClusterCockpit are the Wiki
+pages about the [overall structure](https://github.com/ClusterCockpit/ClusterCockpit/wiki/DEV-Software-structure)
+and [naming conventions](https://github.com/ClusterCockpit/ClusterCockpit/wiki/DEV-Conventions) used.
 
-This does not mean ClusterCockpit cannot be used, yet. If you are brave and
+This does not mean ClusterCockpit cannot be used. If you are brave and
 accept that you may need to migrate the metric database in the future you can
 already install and test ClusterCockpit helping to make it a mature and robust
 solution for job-specific performance monitoring in HPC environments.
