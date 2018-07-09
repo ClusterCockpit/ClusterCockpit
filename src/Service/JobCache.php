@@ -28,6 +28,8 @@ namespace App\Service;
 use App\Entity\Job;
 use App\Entity\RunningJob;
 use App\Entity\Plot;
+use App\Entity\TraceResolution;
+use App\Entity\Trace;
 use App\Entity\Data;
 use App\Entity\StatisticControl;
 use App\Entity\StatisticCache;
@@ -51,10 +53,12 @@ class JobCache
     private $_plotGenerator;
     private $_configuration;
     private $_traceRepository;
+    private $_tsHelper;
     private $_metricDataRepository;
 
     public function __construct(
         LoggerInterface $logger,
+        TimeseriesHelper $tsHelper,
         EntityManagerInterface $em,
         PlotGenerator $plotGenerator,
         DoctrineMetricDataRepository $metricRepo,
@@ -62,6 +66,7 @@ class JobCache
     )
     {
         $this->_logger = $logger;
+        $this->_tsHelper = $tsHelper;
         $this->_em = $em;
         $this->_plotGenerator = $plotGenerator;
         $this->_config =  $configuration->getConfig();
@@ -234,18 +239,18 @@ class JobCache
 
         foreach ($nodes as $node){
             $nodeId = $node->getNodeId();
-            $x = $data[$metricName][$nodeId]['x'];
-            $y = $data[$metricName][$nodeId]['y'];
+            $x = $perfData[$metricName][$nodeId]['x'];
+            $y = $perfData[$metricName][$nodeId]['y'];
 
             /* get max y for axis range */
             $maxVal = max($maxVal,max($y));
             /* adjust x axis time unit */
-            $xAxis = $this->_dataModifier->scaleTime($x);
+            $xAxis = $this->_tsHelper->scaleTime($x);
             $trace = new Trace();
             $trace->setName($nodeId);
 
             if ($options['sample'] > 0){
-                $this->_dataModifier->downsampleData($x,$y,$options['sample']);
+                $this->_tsHelper->downsampleData($x,$y,$options['sample']);
             }
 
             $trace->setJson(json_encode(array(
@@ -320,15 +325,13 @@ class JobCache
 
     public function buildData( $job )
     {
-        $options = array();
-
-        if ( is_null( $job->jobCache ) ) {
-            $jobCache = new JobCache();
+        $options = array(
+            'sample' => 0
+        );
 
             $metrics = $job->getCluster()->getMetricList('view')->getMetrics();
             $data = $this->_metricDataRepository->getMetricData( $job, $metrics);
-            $plots = $jobCache->getPlots();
-            $options['sample'] = 0;
+            $plots = $job->jobCache->getPlots();
 
             foreach ($metrics as $metric){
 
@@ -339,8 +342,7 @@ class JobCache
                 } else {
                     $plot = new Plot();
                     $plot->name = $metricName;
-                    $jobCache->addPlot($plot);
-                    $plot->setJobCache($jobCache);
+                    $job->jobCache->addPlot($plot);
                 }
 
                 $this->_generateMetricPlotCache(
@@ -350,11 +352,7 @@ class JobCache
                     'view',
                     $data,
                     $options);
-
             }
-
-            $job->jobCache = $jobCache;
-        }
     }
 
 
@@ -364,9 +362,9 @@ class JobCache
      * This routine checks if a job cache exists. If there is no cache
      * metric plots are build in a view and list resolution.
      *
-     * @param Job $job
+     * @param mixed $job
      */
-    public function buildCache( Job $job )
+    public function buildCache( $job )
     {
         if ( $job->isRunning()) {
             $job->stopTime = time();
@@ -482,7 +480,7 @@ class JobCache
      *  }
      * ```
      *
-     * @param Job $job
+     * @param mixed $job
      * @param mixed $options
      * @param mixed $config
      * @uses App\Repository\MetricDataRepository
@@ -490,9 +488,9 @@ class JobCache
      * @api
      */
     public function checkCache(
-        Job $job,
+        $job,
         $options,
-        $config
+        $config= null
     )
     {
         if ( $job->isRunning()) {

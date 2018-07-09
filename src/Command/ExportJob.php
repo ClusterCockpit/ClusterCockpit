@@ -45,6 +45,13 @@ use App\Entity\TraceResolution;
 use App\Entity\Trace;
 use \DateInterval;
 
+/**
+ * Class: ExportJob
+ *
+ * @see Command
+ * @author Jan Eitzinger
+ * @version 0.1
+ */
 class ExportJob extends Command
 {
     private $_em;
@@ -71,10 +78,10 @@ class ExportJob extends Command
     {
         $this
             ->setName('app:job:export')
-            ->setDescription('Export a job')
-            ->setHelp('This command builds or rebuild the job severity metric.')
+            ->setDescription('Export a job to disk')
+            ->setHelp('.')
             ->addArgument('id', InputArgument::REQUIRED, 'The jobID for the job to export.')
-            ;
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -83,15 +90,12 @@ class ExportJob extends Command
         $repository = $this->_em->getRepository(\App\Entity\Job::class);
 
         $output->writeln([
-            'Job Exporter',
+            'Job File Export',
             '===============',
             '',
         ]);
 
-        $jobs = $repository->findRunningJobs();
-        /* $job = $repository->findOneBy(['jobId' => $id]); */
-
-        foreach ( $jobs as $job ){
+        $job = $repository->findOneBy(['jobId' => $id]);
 
         $rows = array();
         $rows[] = array("Job id",$job->getJobId());
@@ -108,12 +112,13 @@ class ExportJob extends Command
             ->setRows($rows);
         $table->render();
 
+        $this->_jobCache->checkCache(
+            $job,
+            array(
+                'mode' => 'data'
+            )
+        );
 
-        $this->_jobCache->checkCache($job, array(
-            'mode' => 'view'
-        ));
-
-        /* if job has profiling data */
         if ( $job->hasProfile ) {
             try {
                 $this->_filesystem->mkdir($this->_root.$job->getJobId());
@@ -122,7 +127,6 @@ class ExportJob extends Command
             }
 
             $jobCache = $job->jobCache;
-            $metrics = $job->getCluster()->getMetricList('view')->getMetrics();
 
             /* dump meta information */
             $nodestring = implode(", ",$job->getNodeIdArray());
@@ -138,35 +142,35 @@ duration: {$job->getDuration()}
 nodes: [$nodestring]
 EOT;
 
+            $output->writeln(['Export to ',
+                $this->_root.$job->getJobId()]);
+
             $this->_filesystem->dumpFile($this->_root.$job->getJobId().'/meta.yml', $meta);
+            $plots = $jobCache->getPlots();
 
-/*             foreach ( $metrics as $metric ) { */
-/*                 $plot = $jobCache->getPlot($metric->name); */
-/*                 $this->_jobCache->getResolution($plot, 'view'); */
-/*                 $nodes = $plot->traceResolution->getTraces(); */
+            foreach ( $plots as $plot ) {
+                $nodes = $plot->traceResolution->getTraces();
 
-/*                 $nodeCache; */
-/*                 $data = $nodes->first()->getCache(); */
-/*                 $length = count($data['x']); */
+                $nodeCache;
+                $data = $nodes->first()->getData();
+                $length = count($data['x']);
 
-/*                 for ($j=0; $j<$length; $j++) { */
-/*                     $nodeCache[$j] = "{$data['x'][$j]}"; */
-/*                 } */
+                for ($j=0; $j<$length; $j++) {
+                    $nodeCache[$j] = "{$data['x'][$j]}";
+                }
 
-/*                 foreach ($nodes as $node){ */
-/*                     $data = $node->getCache(); */
+                foreach ($nodes as $node){
+                    $data = $node->getData();
 
-/*                     for ($j=0; $j<$length; $j++) { */
-/*                         $nodeCache[$j] .= " {$data['y'][$j]}"; */
-/*                     } */
-/*                 } */
+                    for ($j=0; $j<$length; $j++) {
+                        $nodeCache[$j] .= " {$data['y'][$j]}";
+                    }
+                }
 
-/*                 $datastring = implode("\n",$nodeCache); */
-/*                 $this->_filesystem->dumpFile($this->_root.$job->getJobId()."/{$metric->name}.dat", $datastring); */
-/*             } */
-        }
+                $datastring = implode("\n",$nodeCache);
+                $this->_filesystem->dumpFile($this->_root.$job->getJobId()."/{$plot->name}.dat", $datastring);
+            }
         }
     }
 }
-
 

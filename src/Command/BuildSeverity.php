@@ -27,11 +27,13 @@ namespace App\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 use App\Repository\JobRepository;
+use App\Repository\RunningJobRepository;
 use App\Service\JobCache;
 use App\Service\ColorMap;
 use Doctrine\ORM\EntityManagerInterface;
@@ -42,6 +44,13 @@ use App\Entity\TraceResolution;
 use App\Entity\Trace;
 use \DateInterval;
 
+/**
+ * Class: BuildSeverity
+ *
+ * @see Command
+ * @author Jan Eitzinger
+ * @version 0.1
+ */
 class BuildSeverity extends Command
 {
     private $_em;
@@ -63,31 +72,48 @@ class BuildSeverity extends Command
         $this
             ->setName('app:job:severity')
             ->setDescription('Rebuild job severity metric')
-            ->setHelp('This command builds or rebuild the job severity metric.')
-            ->addArgument('day', InputArgument::OPTIONAL, 'Generate plotly jsons for specific day.')
+            ->setHelp('This command builds or rebuild the job severity metric and stores it in the job database.')
+            ->addArgument('month', InputArgument::OPTIONAL, 'Apply for month. Month is e.g. 2018-05.')
+            ->addOption( 'running', 'r', InputOption::VALUE_NONE, 'Apply for all running jobs. Month argument is ignored.')
             ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $day = $input->getArgument('day');
-        $repository = $this->_em->getRepository(\App\Entity\Job::class);
+        $jobs;
+        $month = $input->getArgument('month');
+        $running = $input->getOption('running');
 
         $output->writeln([
-            'Build severity ',
-            '===============',
-            "$day",
+            'Build job severity',
+            '==================',
             '',
         ]);
+
+        if ( $running ){
+            $repository = $this->_em->getRepository(\App\Entity\RunningJob::class);
+            $jobs = $repository->findAvgTodo();
+        } else {
+            $repository = $this->_em->getRepository(\App\Entity\Job::class);
+
+            if (empty($month)) {
+                $month = date('Y-m');
+            }
+
+            $starttime = strtotime("$month");
+            $stoptime = strtotime("+1 month $month");
+            $output->writeln([
+                "Search jobs from $starttime to $stoptime",
+                '',
+            ]);
+        }
+
 
         $search = new JobSearch();
         $search->setNumNodesFrom(1);
         $search->setNumNodesTo(64);
         $search->setDurationFrom(new DateInterval('PT1H'));
         $search->setDurationTo(new DateInterval('PT24H'));
-
-        $starttime = strtotime("$day");
-        $stoptime = strtotime("+1 month $day");
         $search->setDateFrom($starttime);
         $search->setDateTo($stoptime);
 
@@ -99,10 +125,10 @@ class BuildSeverity extends Command
 
         $jobCount = count($jobs);
         $progressBar = new ProgressBar($output, $jobCount);
-        $progressBar->setRedrawFrequency(50);
+        $progressBar->setRedrawFrequency(25);
 
         $output->writeln([
-            "$starttime to $stoptime: $jobCount jobs",
+            "Processing $jobCount jobs!",
             '',
         ]);
 
@@ -116,69 +142,60 @@ class BuildSeverity extends Command
         foreach ( $jobs as $job ) {
             $progressBar->advance();
 
-                $jobId = $job->getJobId();
-                $jobStart = $job->getStartTime();
+            $this->_jobCache->checkCache(
+                $job,
+                array(
+                    'mode' => 'data'
+                )
+            );
 
-        /* $output->writeln([ */
-        /*     "$jobId $jobStart", */
-        /*     '', */
-        /* ]); */
+            if ( $job->hasProfile ) {
+                $severity = 0;
+                /* get thresholds for metrics */
+                $metricsStat = $job->getCluster()->getMetricList('stat')->getMetrics();
+                $jobCache = $job->jobCache;
 
-                $this->_jobCache->checkCache(
-                    $job,
-                    array(
-                        'mode' => 'data'
-                    ),
-                    $repository
-                );
+                foreach ( $metrics as $metric ) {
+                    $plots[$metric] = $jobCache->getPlot($metric);
+                    $nodes[$metric] = $plots[$metric]->traceResolution->getTraces()->toArray();
+                    $thresholds[$metric] = array(
+                        'caution' => $metricsStat[$metric]->caution,
+                        'alert' => $metricsStat[$metric]->alert
+                    );
+                }
 
-                /* if job has profiling data */
-                if ( $job->hasProfile ) {
-                    $jobId = $job->getJobId();
-                    $severity = 0;
-                    /* get thresholds for metrics */
-                    $metricsStat = $job->getCluster()->getMetricList('stat')->getMetrics();
-                    $jobCache = $job->jobCache;
+                /* iterate over nodes */
+                for ($i=0; $i<count($nodes['flops_any']); $i++) {
+                    $dataFlops = $nodes['flops_any'][$i]->getData();
+                    $dataMemBw = $nodes['mem_bw'][$i]->getData();
 
-                    foreach ( $metrics as $metric ) {
-                        $plots[$metric] = $jobCache->getPlot($metric);
-                        $nodes[$metric] = $plots[$metric]->traceResolution->getTraces()->toArray();
-                        $thresholds[$metric] = array(
-                            'caution' => $metricsStat[$metric]->caution,
-                            'alert' => $metricsStat[$metric]->alert
-                        );
-                    }
+                    /* iterate over time */
+                    for ($j=0; $j<count($dataFlops['x']); $j++) {
 
-                    /* iterate over nodes */
-                    for ($i=0; $i<count($nodes['flops_any']); $i++) {
-                        $dataFlops = $nodes['flops_any'][$i]->getData();
-                        $dataMemBw = $nodes['mem_bw'][$i]->getData();
+                        if ( $dataFlops['y'][$j] < $thresholds['flops_any']['alert'] ){
+                            $severity += 10;
+                        } elseif ( $dataFlops['y'][$j] < $thresholds['flops_any']['caution'] ) {
+                            $severity += 5;
+                        }
 
-                        /* iterate over time */
-                        for ($j=0; $j<count($dataFlops['x']); $j++) {
-
-                            if ( $dataFlops['y'][$j] < $thresholds['flops_any']['alert'] ){
-                                $severity += 10;
-                            } elseif ( $dataFlops['y'][$j] < $thresholds['flops_any']['caution'] ) {
-                                $severity += 5;
-                            }
-
-                            if ( $dataMemBw['y'][$j] < $thresholds['mem_bw']['alert'] ){
-                                $severity += 10;
-                            } elseif ( $dataMemBw['y'][$j] < $thresholds['mem_bw']['caution'] ) {
-                                $severity += 5;
-                            }
+                        if ( $dataMemBw['y'][$j] < $thresholds['mem_bw']['alert'] ){
+                            $severity += 10;
+                        } elseif ( $dataMemBw['y'][$j] < $thresholds['mem_bw']['caution'] ) {
+                            $severity += 5;
                         }
                     }
-
-                    $job->severity = $severity;
-                    $repository->persistJobSeverity($job);
-                    /* $output->writeln([ */
-                    /*     "Job: $jobId", */
-                    /*     "Severity: $severity", */
-                    /*     '', */
-                    /* ]); */
                 }
+
+                $job->severity = $severity;
+                $repository->persistJobSeverity($job);
+
+                /* $jobId = $job->getJobId(); */
+                /* $output->writeln([ */
+                /*     "Job: $jobId", */
+                /*     "Severity: $severity", */
+                /*     '', */
+                /* ]); */
+            }
         }
         $progressBar->finish();
     }

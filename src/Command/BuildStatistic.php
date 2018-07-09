@@ -33,11 +33,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 
 use App\Repository\JobRepository;
+use App\Repository\RunningJobRepository;
 use App\Service\JobCache;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\StatisticsControl;
 use \DateInterval;
 
+/**
+ * Class: BuildStatistic
+ *
+ * @see Command
+ * @author Jan Eitzinger
+ * @version 0.1
+ */
 class BuildStatistic extends Command
 {
     private $_em;
