@@ -222,7 +222,7 @@ class Job
         return $this->nodes;
     }
 
-    public function addNode(Node $node)
+    public function addNode($node)
     {
         if ($this->nodes->contains($node)) {
             return $node;
@@ -231,7 +231,7 @@ class Job
         $this->nodes[] = $node;
     }
 
-    public function removeNode(Node $node)
+    public function removeNode($node)
     {
         $this->nodes->removeElement($node);
     }
