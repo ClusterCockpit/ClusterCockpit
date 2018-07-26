@@ -86,17 +86,7 @@ $mysql> GRANT ALL PRIVILEGES ON ClusterCockpit.* TO 'username'@'localhost';
 $mysql> quit
 ```
 
-4. Install Symfony packages
-
-It is recommended to install a recent composer locally as described [here](https://getcomposer.org/download/).
-All packages will be installed locally in the Symfony project tree.
-
-```
-$ cd ClusterCockpit
-$ composer install
-```
-
-5. Configure Symfony access to MySQL:
+4. Configure Symfony access to MySQL:
 
 Everything is currently in one database. Symfony uses the
 [Doctrine](https://www.doctrine-project.org) ORM for mapping PHP classes on
@@ -115,6 +105,25 @@ Please contact me to get recent test DB dumps. You can import the sql dumps with
 ```
 $ mysql -h localhost -u <username> -p  ClusterCockpit < dump.sql
 ```
+
+5. Install Symfony packages
+
+It is recommended to install a recent composer locally as described [here](https://getcomposer.org/download/).
+All packages will be installed locally in the Symfony project tree.
+
+```
+$ cd ClusterCockpit
+$ composer install
+```
+
+If you did not import a database dump before with the correct schema this
+command will end with an error. In this case you have to execute
+
+```
+$ php bin/console doctrine:schema:update --force
+```
+
+first to create the database schema. A subsequent call to composer install should then run through cleanly.
 
 6. Sanity checks
 
