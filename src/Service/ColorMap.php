@@ -25,8 +25,7 @@
 
 namespace App\Service;
 
-include "colormaps/Dark2.php";
-include "colormaps/thomas.php";
+include "colormaps/Rainbow_black.php";
 
 class ColorMap
 {
@@ -34,7 +33,7 @@ class ColorMap
 
     public function __construct()
     {
-        $this->_color = COLOR_Dark2;
+        $this->_color = COLOR_Rainbow_black;
     }
 
     private function _interpolateColor($color1, $color2, $factor=0.5)

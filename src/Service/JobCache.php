@@ -363,18 +363,27 @@ class JobCache
      * metric plots are build in a view and list resolution.
      *
      * @param mixed $job
+     * @param mixed $config
      */
-    public function buildCache( $job )
+    public function buildCache(
+        $job,
+        $config = null
+    )
     {
         if ( $job->isRunning()) {
             $job->stopTime = time();
-            /* $job->stopTime = 1521057932; */
             $job->duration = $job->stopTime - $job->startTime;
         }
 
+        if ( $job->duration/60 < $config['points'] ){
+            return;
+        }
+
         if ( is_null( $job->jobCache ) ) {
+
             $job->jobCache = new JobCache();
             $this->_buildViewPlots($job);
+
             $options['sample'] = 0;
             $this->_buildMetricPlots(
                 $job,
@@ -401,6 +410,8 @@ class JobCache
                 }
             }
             $this->_em->flush();
+        } else if ( $job->isRunning() ) {
+
         }
     }
 
@@ -490,7 +501,7 @@ class JobCache
     public function checkCache(
         $job,
         $options,
-        $config= null
+        $config = null
     )
     {
         if ( $job->isRunning()) {

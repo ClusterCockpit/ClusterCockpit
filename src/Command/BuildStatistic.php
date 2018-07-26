@@ -118,13 +118,11 @@ class BuildStatistic extends Command
 
         foreach ( $jobs as $job ){
             $this->_jobCache->updateJobAverage($job);
+
             $this->_em->persist($job);
             $this->_em->flush();
             $progressBar->advance();
         }
-
         $progressBar->finish();
     }
 }
-
-

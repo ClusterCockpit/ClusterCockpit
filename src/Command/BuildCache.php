@@ -39,6 +39,13 @@ use App\Entity\JobSearch;
 use App\Entity\Job;
 use \DateInterval;
 
+/**
+ * Class: BuildCache
+ *
+ * @see Command
+ * @author Jan Eitzinger
+ * @version 0.1
+ */
 class BuildCache extends Command
 {
     private $_em;
@@ -58,64 +65,69 @@ class BuildCache extends Command
     protected function configure()
     {
         $this
-            ->setName('app:cache:build')
-            ->setDescription('Build job cache')
-            ->setHelp('This command builds the Job cache for view and list mode.')
-            ->addArgument('jobId', InputArgument::OPTIONAL, 'Drop job cache specific Job Id.')
-            ->addOption( 'numnodes', null, InputOption::VALUE_REQUIRED,
-                'Range of number of nodes in jobs', '7-64')
-                ->addOption( 'duration', null, InputOption::VALUE_REQUIRED,
-                    'Range of job duration in hours', '4-24')
-                    ;
+            ->setName('app:job:cache')
+            ->setDescription('Manage job cache')
+            ->setHelp('This command enables to build and drop job caches.')
+            ->addArgument('cmd', InputArgument::REQUIRED, 'Command: build or drop.')
+            ->addArgument('month', InputArgument::OPTIONAL, 'Apply for month. Month is e.g. 2018-05.')
+            ->addOption( 'running', 'r', InputOption::VALUE_NONE, 'Apply for all running jobs. Month argument is ignored.')
+            ->addOption( 'numpoints', 'n', InputOption::VALUE_REQUIRED, 'Cache is build for jobs with more points than numpoints.', '5000')
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $repository = $this->_em->getRepository(\App\Entity\RunningJob::class);
         $jobs;
-
-        $nodeRange = explode('-', $input->getOption('numnodes'));
-        $duration = explode('-', $input->getOption('duration'));
-
-        if (count($nodeRange)!=2 or count($duration)!=2){
-            $output->writeln([
-                'ERROR',
-            ]);
-            exit;
-        }
-        $fromDuration =  sprintf('PT%dH',$duration[0]);
-        $toDuration =  sprintf('PT%dH',$duration[1]);
+        $month = $input->getArgument('month');
+        $running = $input->getOption('running');
+        $numpoints = $input->getOption('numpoints');
 
         $output->writeln([
-            'Job cache: BUILD',
+            "Job cache: $cmd",
             '================',
-            "Nodes: $nodeRange[0] to $nodeRange[1]",
-            "Duration: $duration[0] to $duration[1] h",
             ''
         ]);
 
-        $repository = $this->_em->getRepository(\App\Entity\RunningJob::class);
-        /* $startTime = time() - 600; */
-        $startTime = 1521057932;
-        $jobs = $repository->findRunningJobs($startTime);
+        if ( $running ){
+            $repository = $this->_em->getRepository(\App\Entity\RunningJob::class);
+            $jobs = $repository->findAll();
+        } else {
+            $repository = $this->_em->getRepository(\App\Entity\Job::class);
+
+            if (empty($month)) {
+                $month = date('Y-m');
+            }
+
+            $starttime = strtotime("$month");
+            $stoptime = strtotime("+1 month $month");
+            $output->writeln([
+                "Search jobs from $starttime to $stoptime",
+                '',
+            ]);
+
+            $jobs = $repository->findAvgTodo($starttime, $stoptime);
+        }
 
         $jobCount = count($jobs);
         $progressBar = new ProgressBar($output, $jobCount);
         $progressBar->setRedrawFrequency(10);
 
         $output->writeln([
-            "$jobCount jobs match.",
+            "Processing $jobCount jobs!",
             '',
         ]);
 
         $progressBar->start();
 
         foreach ( $jobs as $job ){
-            $progressBar->advance();
-            $this->_jobCache->buildCacheRunning($job);
-            $this->_jobCache->updateJobAverage($job, $repository);
+            if ( $job->isRunning() ){
+                $this->_jobCache->updateJobAverage($job);
+            }
+            $this->_jobCache->buildCache($job, array('point' => $numpoints));
+
             $this->_em->persist($job);
             $this->_em->flush();
+            $progressBar->advance();
         }
         $progressBar->finish();
     }
