@@ -6,6 +6,14 @@ job:
     type:     rest
     resource: App\Controller\API\JobsController
     prefix:  "api"
+configuration:
+    type:     rest
+    resource: App\Controller\API\ConfigurationController
+    prefix:  "web"
+cluster:
+    type:     rest
+    resource: App\Controller\API\ClusterController
+    prefix:  "web"
 joblist:
     type:     rest
     resource: App\Controller\API\JobListController
@@ -49,9 +57,15 @@ edit_group:
 config_index:
     path: /admin
     controller:  App\Controller\ConfigViewController::index
-init_config:
-    path: /admin/init
-    controller:  App\Controller\ConfigViewController::init
+user_options:
+    path: /admin/user
+    controller:  App\Controller\ConfigViewController::userOptions
+default_options:
+    path: /admin/default
+    controller:  App\Controller\ConfigViewController::defaultOptions
+cache_options:
+    path: /admin/cache
+    controller:  App\Controller\ConfigViewController::cacheOptions
 plot_list:
     path: /admin/plot/list
     controller:  App\Controller\ConfigViewController::plotList
@@ -82,6 +96,18 @@ delete_user_account:
 create_user_account:
     path: /admin/create_userAccount/
     controller:  App\Controller\ConfigViewController::createUserAccount
+list_clusters:
+    path: /admin/clusters/
+    controller:  App\Controller\ConfigViewController::listClusters
+edit_cluster:
+    path: /admin/clusters/{id}
+    controller:  App\Controller\ConfigViewController::editCluster
+delete_cluster:
+    path: /admin/delete_cluster/{id}
+    controller:  App\Controller\ConfigViewController::deleteCluster
+create_cluster:
+    path: /admin/create_cluster/
+    controller:  App\Controller\ConfigViewController::createCluster
 security_login:
     path: /login
     controller:  App\Controller\SecurityController::login

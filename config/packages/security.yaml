@@ -36,8 +36,9 @@ security:
                 target: /
 
     access_control:
-        - { path: ^/monitoring, roles: ROLE_ADMIN }
+        - { path: ^/monitoring, roles: [ROLE_ANALYST, ROLE_ADMIN]}
         - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/admin/user, roles:  [ROLE_ANALYST, ROLE_ADMIN]}
         - { path: ^/api, roles: ROLE_API }
-        - { path: ^/web, roles: ROLE_ADMIN }
+        - { path: ^/web, roles:  [ROLE_ANALYST, ROLE_ADMIN]}
 
