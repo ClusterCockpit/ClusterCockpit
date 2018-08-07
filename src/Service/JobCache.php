@@ -51,7 +51,6 @@ class JobCache
     private $_em;
     private $_jobRepository;
     private $_plotGenerator;
-    private $_configuration;
     private $_traceRepository;
     private $_tsHelper;
     private $_metricDataRepository;
@@ -69,7 +68,6 @@ class JobCache
         $this->_tsHelper = $tsHelper;
         $this->_em = $em;
         $this->_plotGenerator = $plotGenerator;
-        $this->_config =  $configuration->getConfig();
         $this->_jobRepository = $em->getRepository(\App\Entity\Job::class);
         $this->_metricDataRepository = $metricRepo;
         $this->_traceRepository = $em->getRepository(\App\Entity\TraceResolution::class);
@@ -501,7 +499,7 @@ class JobCache
     public function checkCache(
         $job,
         $options,
-        $config = null
+        $config
     )
     {
         if ( $job->isRunning()) {
@@ -525,19 +523,19 @@ class JobCache
                 $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
                 $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
 
-                if ( $config['view.roofline.show']->value == 'true' ) {
+                if ( $config['plot_view_showRoofline']->value == 'true' ) {
                     $this->_plotGenerator->generateJobRoofline(
                         $job, $this->_metricDataRepository->getJobRoofline($job)
                     );
                 }
 
-                if ( $config['view.polarplot.show']->value == 'true' ) {
+                if ( $config['plot_view_showPolarplot']->value == 'true' ) {
                     $this->_plotGenerator->generateJobPolarPlot(
                         $job, $metrics, $stats
                     );
                 }
 
-                if ( $config['view.statTable.show']->value == 'true' ) {
+                if ( $config['plot_view_showStatTable']->value == 'true' ) {
                     $this->_createNodeStats($job, $stats['nodeStats'], $metrics);
                 }
             } else if ( $options['mode'] === 'list' ) { /* Job list  */
@@ -570,13 +568,13 @@ class JobCache
                 $options['autotick'] = true;
                 $options['legend'] = false;
 
-                if ( $config['view.roofline.show']->value == 'true' ) {
+                if ( $config['plot_view_showRoofline']->value == 'true' ) {
                     $this->_plotGenerator->generateJobRoofline($job);
                 }
 
                 $metrics= $job->getCluster()->getMetricList('stat')->getMetrics();
 
-                if ( $config['view.polarplot.show']->value == 'true' ){
+                if ( $config['plot_view_showPolarplot']->value == 'true' ){
                     $this->_plotGenerator->generateJobPolarPlot($job, $metrics);
                 }
 

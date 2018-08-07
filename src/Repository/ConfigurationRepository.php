@@ -69,6 +69,88 @@ class ConfigurationRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findAllDefaultHierarchy()
+    {
+        $configHash = array();
+        $config = $this->createQueryBuilder('c', 'c.name')
+            ->andWhere("c.scope = 'default'")
+            ->getQuery()
+            ->getResult();
+
+        foreach ($config as $key => $value) {
+            $parts = preg_split( '/_/' , $key);
+
+            if (count($parts) == 3){
+                $toplevel = $parts[0];
+                $sublevel = $parts[1];
+                $name     = $parts[2];
+            } else {
+                continue;
+            }
+
+            if (array_key_exists($toplevel, $configHash)) {
+                if (array_key_exists($sublevel, $configHash[$toplevel])) {
+                    $configHash[$toplevel][$sublevel][$name] = $value;
+                } else {
+                    $configHash[$toplevel][$sublevel] = array($name => $value);
+                }
+            } else {
+                $configHash[$toplevel] = array($sublevel => array($name => $value));
+            }
+        }
+
+        return $configHash;
+    }
+
+
+    public function findAllScopeHierarchy($scopes)
+    {
+        $configHash = array();
+        $config = $this->createQueryBuilder('c', 'c.name')
+            ->andWhere("c.scope = 'default'")
+            ->getQuery()
+            ->getResult();
+
+        foreach ($scopes as $scope) {
+
+            $configScope = $this->createQueryBuilder('c', 'c.name')
+                                ->andWhere('c.scope = :val')
+                                ->setParameter('val', $scope)
+                                ->getQuery()
+                                ->getResult();
+
+            foreach ($configScope as $key => $value) {
+                $parts = preg_split( '/_/' , $key);
+
+                $config[$key] = $value;
+            }
+        }
+
+        foreach ($config as $key => $value) {
+            $parts = preg_split( '/_/' , $key);
+
+            if (count($parts) == 3){
+                $toplevel = $parts[0];
+                $sublevel = $parts[1];
+                $name     = $parts[2];
+            } else {
+                continue;
+            }
+
+            if (array_key_exists($toplevel, $configHash)) {
+                if (array_key_exists($sublevel, $configHash[$toplevel])) {
+                    $configHash[$toplevel][$sublevel][$name] = $value;
+                } else {
+                    $configHash[$toplevel][$sublevel] = array($name => $value);
+                }
+            } else {
+                $configHash[$toplevel] = array($sublevel => array($name => $value));
+            }
+        }
+
+        return $configHash;
+    }
+
     public function findAllScope($scopes)
     {
         $config = $this->createQueryBuilder('c', 'c.name')

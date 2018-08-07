@@ -52,7 +52,7 @@ class TimeseriesHelper
         $unit = 'm';
         $dtick = 1;
         $scale = 60;
-        $round = (int) $this->_config['data.time.digits']->value;
+        $round = (int) $this->_config['data_time_digits']->value;
         $range = end($x) - $x[0];
         $minutes = $range / 60;
 

@@ -37,6 +37,7 @@ use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use App\Repository\JobRepository;
 use App\Service\JobCache;
 use App\Service\ColorMap;
+use App\Service\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\JobSearch;
 use App\Entity\Job;
@@ -55,18 +56,21 @@ use \DateInterval;
 class ExportJob extends Command
 {
     private $_em;
+    private $_configuration;
     private $_jobCache;
     private $_filesystem;
     private $_root;
 
     public function __construct(
         EntityManagerInterface $em,
+        Configuration $configuration,
         $projectDir,
         JobCache $jobCache,
         FileSystem $filesystem
     )
     {
         $this->_em = $em;
+        $this->_configuration = $configuration;
         $this->_jobCache = $jobCache;
         $this->_filesystem = $filesystem;
         $this->_root = $projectDir.'/var/export/';
@@ -116,7 +120,8 @@ class ExportJob extends Command
             $job,
             array(
                 'mode' => 'data'
-            )
+            ),
+            $this->_configuration->getConfig()
         );
 
         if ( $job->hasProfile ) {

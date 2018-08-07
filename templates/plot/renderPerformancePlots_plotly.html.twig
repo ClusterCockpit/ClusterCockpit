@@ -19,7 +19,7 @@
     {{ include("util/setPlotSize.html.twig") }}
 
 {% if mode == 'view' %}
-{% set viewRoofline = config['view.roofline.show'].value|default('true') %}
+{% set viewRoofline = config['plot_view_showRoofline'].value|default('true') %}
 {% if viewRoofline is same as('true')  %}
         {% set plot = jobdata.plots['roofline']%}
 
@@ -36,7 +36,7 @@
             {staticPlot: true});
 {% endif %}
 
-{% set viewPolarplot = config['view.polarplot.show'].value|default('true') %}
+{% set viewPolarplot = config['plot_view_showPolarplot'].value|default('true') %}
 {% if  viewPolarplot is same as('true') %}
         {% set plot = jobdata.plots['polarplot']%}
 
