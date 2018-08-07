@@ -23,12 +23,6 @@ class Data
     private $epoch;
 
     /**
-     *  @ORM\Column(type="integer", nullable=true)
-     */
-    private $epochClamp;
-
-
-    /**
      *  @ORM\Column(type="float")
      */
     private $memUsed;

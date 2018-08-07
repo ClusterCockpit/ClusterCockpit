@@ -24,7 +24,7 @@ class Metric
     /**
      *  @ORM\Column(type="string")
      */
-    private $unit;
+    public $unit;
 
     /**
      *  @ORM\Column(type="float")
@@ -34,25 +34,30 @@ class Metric
     /**
      *  @ORM\Column(type="integer")
      */
-    private $position;
+    public $position;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     *  @ORM\Column(type="integer")
+     */
+    public $slot;
+
+    /**
+     * @ORM\Column(type="float", options={"default":0})
      */
     public $peak;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="float", options={"default":0})
      */
     public $normal;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="float", options={"default":0})
      */
     public $caution;
 
     /**
-     * @ORM\Column(type="float", nullable=true)
+     * @ORM\Column(type="float", options={"default":0})
      */
     public $alert;
 

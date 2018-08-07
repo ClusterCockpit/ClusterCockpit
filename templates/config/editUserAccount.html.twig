@@ -11,40 +11,40 @@
     {{ parent() }}
     <script src="{{ asset('js/feather.min.js') }}"/></script>
     <script>
-      feather.replace()
+        feather.replace()
     </script>
 {% endblock %}
 
 {% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}
 
 {% block body %}
-        <div class="container">
-            <div class="row">
-                {{ include("renderSidebar.html.twig") }}
-                <div class="col-10 ml-auto">
+    <div class="container">
+        <div class="row">
+            {{ include("renderSidebar.html.twig") }}
+            <div class="col-10 ml-auto">
 
-                    <h2>{{ title }}</h2>
+                <h2>{{ title }}</h2>
 
-                    {{ form_start(form) }}
-                    {{ form_errors(form) }}
+                {{ form_start(form) }}
+                {{ form_errors(form) }}
 
-                    {{ form_row(form.username) }}
-                    {{ form_row(form.email) }}
-                    {{ form_row(form.isActive) }}
-                    {{ form_row(form.roles) }}
-                    {{ form_row(form.plainPassword) }}
-                    <div class="form-group row justify-content-end">
-                        <div class="col-1">
-                            {{ form_widget(form.cancel, {'attr': {'class': 'btn-danger btn'}}) }}
-                        </div>
-                        <div class="col-2">
-                            {{ form_widget(form.save, {'attr': {'class': 'btn-success btn'}}) }}
-                        </div>
+                {{ form_row(form.username) }}
+                {{ form_row(form.email) }}
+                {{ form_row(form.isActive) }}
+                {{ form_row(form.roles) }}
+                {{ form_row(form.plainPassword) }}
+                <div class="form-group row justify-content-end">
+                    <div class="col-1">
+                        {{ form_widget(form.cancel, {'attr': {'class': 'btn-danger btn'}}) }}
                     </div>
-                    {{ form_end(form) }}
+                    <div class="col-2">
+                        {{ form_widget(form.save, {'attr': {'class': 'btn-success btn'}}) }}
+                    </div>
                 </div>
+                {{ form_end(form) }}
             </div>
         </div>
+    </div>
 {% endblock %}
 
 

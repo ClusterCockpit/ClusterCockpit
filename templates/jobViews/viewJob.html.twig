@@ -88,7 +88,7 @@
     {% set metrics = job.cluster.metricLists['stat'].metrics %}
     {% set nodeStat = job.jobCache.nodeStat %}
 
-{% set viewStatTable = config['view.statTable.show'].value|default('true') %}
+{% set viewStatTable = config['plot_view_showStatTable'].value|default('true') %}
 {% if  viewStatTable is same as('true') %}
     <div class="row">
         <div class="col-10 offset-1 mt-5">

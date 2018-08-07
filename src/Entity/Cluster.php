@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- *  @ORM\Entity
+ *  @ORM\Entity(repositoryClass="App\Repository\ClusterRepository")
  */
 class Cluster
 {
@@ -47,6 +47,8 @@ class Cluster
      * @ORM\OneToMany(targetEntity="App\Entity\MetricList", mappedBy="cluster", indexBy="name")
      */
     public $metricLists;
+
+    private $nodes;
 
     public function __construct() {
         $this->metricLists = new ArrayCollection();
@@ -108,6 +110,18 @@ class Cluster
                 $metricList->setCluster(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getNodes(): ?array
+    {
+        return $this->nodes;
+    }
+
+    public function setNodes(array $nodes): self
+    {
+        $this->nodes = $nodes;
 
         return $this;
     }

@@ -16,9 +16,11 @@
                            <span data-feather="{{ item.icon }}"></span>
                            {{ item.label }}
                         </a>
+                        {% if item.addlink %}
                         <a class="d-flex align-items-center text-muted" href="{{ item.addlink }}">
                             <span data-feather="plus-circle"></span>
                         </a>
+                        {% endif %}
                 </li>
             {% endfor %}
         </ul>

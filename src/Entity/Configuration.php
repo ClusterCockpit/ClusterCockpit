@@ -22,7 +22,7 @@ class Configuration
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=255, nullable=true)
+     * @ORM\Column(type="string", length=255)
      */
     public $value;
 
@@ -30,6 +30,27 @@ class Configuration
      * @ORM\Column(type="string", length=255)
      */
     private $scope;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $label;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $validation;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $description;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $feedback;
+
 
     public function getId()
     {
@@ -48,12 +69,12 @@ class Configuration
         return $this;
     }
 
-    public function getValue(): ?array
+    public function getValue()
     {
         return $this->value;
     }
 
-    public function setValue(?array $value): self
+    public function setValue($value): self
     {
         $this->value = $value;
 
@@ -71,4 +92,42 @@ class Configuration
 
         return $this;
     }
+
+    public function getValidation(): ?string
+    {
+        return $this->validation;
+    }
+
+    public function setValidation(string $validation): self
+    {
+        $this->validation = $validation;
+
+        return $this;
+    }
+
+
+    public function getLabel(): ?string
+    {
+        return $this->label;
+    }
+
+    public function setLabel(string $label): self
+    {
+        $this->label = $label;
+
+        return $this;
+    }
+
+    public function getFeedback(): ?string
+    {
+        return $this->feedback;
+    }
+
+    public function setFeedback(string $feedback): self
+    {
+        $this->feedback = $feedback;
+
+        return $this;
+    }
+
 }

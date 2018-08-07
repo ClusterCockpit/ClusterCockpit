@@ -30,12 +30,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\ApiKeyType;
 use App\Entity\ApiKey;
+use App\Form\ClusterType;
+use App\Entity\Cluster;
 use App\Entity\Configuration;
 use App\Form\UserAccountType;
 use App\Entity\UserAccount;
 
 class ConfigViewController extends Controller
 {
+    private function _generateSidebar($config)
+    {
+
+    }
+
     private function _sidebar($active = 0)
     {
         $sidebar = array(
@@ -59,33 +66,26 @@ class ConfigViewController extends Controller
                 )
             ),
             array(
-                'label' => 'Plot config',
+                'label' => 'Options',
                 'items' => array(
                     array(
-                        'label' => 'Caching',
-                        'icon' => 'server',
-                        'link' => '/admin/plot/caching',
+                        'label' => 'Plot defaults',
+                        'icon' => 'bar-chart-2',
+                        'link' => '/admin/default',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
-                        'label' => 'Job lists',
-                        'icon' => 'server',
-                        'link' => '/admin/plot/lists',
+                        'label' => 'Plot user',
+                        'icon' => 'bar-chart-2',
+                        'link' => '/admin/user',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
-                        'label' => 'Job view',
-                        'icon' => 'server',
-                        'link' => '/admin/plot/view',
-                        'addlink' => false,
-                        'active' => false
-                    ),
-                    array(
-                        'label' => 'Job stat',
-                        'icon' => 'server',
-                        'link' => '/admin/plot/stat',
+                        'label' => 'Cache',
+                        'icon' => 'copy',
+                        'link' => '/admin/cache',
                         'addlink' => false,
                         'active' => false
                     ),
@@ -94,6 +94,13 @@ class ConfigViewController extends Controller
             array(
                 'label' => 'System config',
                 'items' => array(
+                   array(
+                        'label' => 'Metrics',
+                        'icon' => 'activity',
+                        'link' => '/admin/metrics',
+                        'addlink' => '/admin/create_metric',
+                        'active' => false
+                    ),
                     array(
                         'label' => 'Clusters',
                         'icon' => 'server',
@@ -141,29 +148,61 @@ class ConfigViewController extends Controller
             ));
     }
 
-    public function plotView(Request $request)
+    public function defaultOptions(Request $request)
     {
         $config = $this->getDoctrine()
                        ->getRepository(\App\Entity\Configuration::class)
-                       ->findAllScope(array($user->getUsername()));
+                       ->findAllDefaultHierarchy();
 
-        $config = new PlotViewConfig();
-
-        /* roofline */
-
-        /* polarplot */
-
-        /* metrics */
+        return $this->render('config/editConfigOptions.html.twig',
+            array(
+                'configHash' => $config['plot'],
+                'defaultmode' => true,
+                'sidebar' => $this->_sidebar(
+                    array('menu'=>1,'item'=>0)
+                )
+            ));
     }
 
-    public function plotList(Request $request)
+    public function userOptions(Request $request)
     {
-        /* filters */
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $user = $this->getUser();
 
-        /* metrics */
+        $config = $this->getDoctrine()
+                       ->getRepository(\App\Entity\Configuration::class)
+                       ->findAllScopeHierarchy(array($user->getUsername()));
+
+        return $this->render('config/editConfigOptions.html.twig',
+            array(
+                'configHash' => $config['plot'],
+                'defaultmode' => false,
+                'sidebar' => $this->_sidebar(
+                    array('menu'=>1,'item'=>1)
+                )
+            ));
     }
 
-    /* API KEYS */
+    public function cacheOptions(Request $request)
+    {
+        $config = $this->getDoctrine()
+                       ->getRepository(\App\Entity\Configuration::class)
+                       ->findAllDefaultHierarchy();
+
+        return $this->render('config/editConfigOptions.html.twig',
+            array(
+                'configHash' => $config['data'],
+                'defaultmode' => true,
+                'sidebar' => $this->_sidebar(
+                    array('menu'=>1,'item'=>2)
+                )
+            ));
+    }
+
+
+    /* ####################### */
+    /*       API KEYS          */
+    /* ####################### */
 
     public function listApiKeys(Request $request)
     {
@@ -245,7 +284,9 @@ class ConfigViewController extends Controller
             ));
     }
 
-    /* USER ACCOUNTS */
+    /* ####################### */
+    /*    USER ACCOUNTS        */
+    /* ####################### */
 
     public function listUserAccounts(Request $request)
     {
@@ -333,6 +374,90 @@ class ConfigViewController extends Controller
                 )
             ));
     }
-}
 
+
+    /* ####################### */
+    /*       Clusters          */
+    /* ####################### */
+
+    public function listClusters(Request $request)
+    {
+        $repository = $this->getDoctrine()->getRepository(\App\Entity\Cluster::class);
+        $clusters = $repository->findAllConfig();
+
+        return $this->render('config/listClusters.html.twig',
+            array(
+                'clusters' => $clusters,
+                'sidebar' => $this->_sidebar(
+                    array('menu'=>2,'item'=>0)
+                )
+            ));
+    }
+
+    public function deleteCluster(ApiKey $key, Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($key);
+        $em->flush();
+
+        return $this->redirectToRoute('list_api_keys');
+    }
+
+    public function editCluster(Cluster $cluster, Request $request)
+    {
+        $form = $this->createForm(ClusterType::class, $cluster);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            if ( $form->get('save')->isClicked() )  {
+                $cluster = $form->getData();
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($cluster);
+                $em->flush();
+            }
+
+            return $this->redirectToRoute('list_clusters');
+        }
+
+        return $this->render('config/editCluster.html.twig',
+            array(
+                'form' => $form->createView(),
+                'cluster' => $cluster,
+                'title' => "Edit Cluster ".$cluster->getName(),
+                'sidebar' => $this->_sidebar(
+                    array('menu'=>2,'item'=>1)
+                    )
+            ));
+    }
+
+    public function createCluster(Request $request)
+    {
+        $key = new ApiKey();
+        $key->setToken(sha1(random_bytes(30)));
+        $form = $this->createForm(ApiKeyType::class, $key);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ( $form->get('save')->isClicked() )  {
+                $key = $form->getData();
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($key);
+                $em->flush();
+            }
+
+            return $this->redirectToRoute('list_api_keys');
+        }
+
+        return $this->render('config/editApiKey.html.twig',
+            array(
+                'form' => $form->createView(),
+                'key' => $key,
+                'title' => "Create API Key",
+                'sidebar' => $this->_sidebar(
+                    array('menu'=>0,'item'=>1)
+                )
+            ));
+    }
+}
 

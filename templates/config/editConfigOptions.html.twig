@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Config Panel
+{% endblock %}
+
+{% block javascript %}
+    <script src="{{ asset('js/popper.min.js') }}"/></script>
+    {{ parent() }}
+    <script src="{{ asset('js/feather.min.js') }}"/></script>
+    <script>
+      feather.replace()
+
+      $("button").click(function(e) {
+          e.preventDefault();
+          id = "#"+ $(this).attr("value");
+          action = $(this).attr("name");
+          value = $(id).val();
+          validation = $(id).attr("data-validation");
+          re = new RegExp(validation);
+
+          if ( ! re.test(value) ) {
+              $(id).addClass('is-invalid');
+              return;
+          }
+
+          data = {
+              id: $(this).attr("id"),
+              value: value,
+              name: $(id).attr("id"),
+              scope: 'user'
+          };
+
+          if ( action == 'update' ) {
+              $.ajax({
+                  type: "PATCH",
+                  url: "/web/configurations/"+$(this).attr("id"),
+                  data: JSON.stringify(data),
+                  processData: false,
+                  contentType : 'application/json',
+                  dataType: 'json',
+                  success: function(result) {
+                      $(id+"-help").text('Success!');
+                      $(id+"-help").removeClass('invisible');
+                  },
+                  error: function(result) {
+                      $(id+"-help").text('Error!');
+                      $(id+"-help").removeClass('invisible');
+                  }
+              });
+          } else if ( action == 'reset' ) {
+              $.ajax({
+                  type: "DELETE",
+                  url: "/web/configurations/"+$(this).attr("id"),
+                  success: function(result) {
+                      location.reload();
+                  },
+                  error: function(result) {
+                      $(id+"-help").text('Error!');
+                      $(id+"-help").removeClass('invisible');
+                  }
+              });
+          } else if ( action == 'replace' ) {
+              $.ajax({
+                  type: "POST",
+                  data: JSON.stringify(data),
+                  processData: false,
+                  contentType : 'application/json',
+                  dataType: 'json',
+                  url: "/web/configurations",
+                  success: function(result) {
+                      location.reload();
+                  },
+                  error: function(result) {
+                      $(id+"-help").text('Error!');
+                      $(id+"-help").removeClass('invisible');
+                  }
+              });
+          }
+      });
+    </script>
+{% endblock %}
+
+{% block body %}
+        <div class="row justify-content-between">
+            {{ include("renderSidebar.html.twig") }}
+            <div class="col-10 ml-auto">
+                {% for key, section in configHash %}
+                    <div class="my-3 p-2 bg-secondary text-white text-capitalize">
+                        {{ key }}
+                    </div>
+                    {% for config in section %}
+                    {{ include("util/configItem.html.twig") }}
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+{% endblock %}
+
