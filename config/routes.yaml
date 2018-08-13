@@ -60,6 +60,9 @@ config_index:
 user_options:
     path: /admin/user
     controller:  App\Controller\ConfigViewController::userOptions
+color_options:
+    path: /admin/colormap
+    controller:  App\Controller\ConfigViewController::colorMapOptions
 default_options:
     path: /admin/default
     controller:  App\Controller\ConfigViewController::defaultOptions

@@ -35,6 +35,7 @@ use App\Entity\Cluster;
 use App\Entity\Configuration;
 use App\Form\UserAccountType;
 use App\Entity\UserAccount;
+use App\Service\ColorMap;
 
 class ConfigViewController extends Controller
 {
@@ -79,6 +80,13 @@ class ConfigViewController extends Controller
                         'label' => 'Plot user',
                         'icon' => 'bar-chart-2',
                         'link' => '/admin/user',
+                        'addlink' => false,
+                        'active' => false
+                    ),
+                    array(
+                        'label' => 'Colormap',
+                        'icon' => 'edit',
+                        'link' => '/admin/colormap',
                         'addlink' => false,
                         'active' => false
                     ),
@@ -160,6 +168,27 @@ class ConfigViewController extends Controller
                 'defaultmode' => true,
                 'sidebar' => $this->_sidebar(
                     array('menu'=>1,'item'=>0)
+                )
+            ));
+    }
+
+    public function colorMapOptions(Request $request, ColorMap $colormap)
+    {
+        $config = $this->getDoctrine()
+                       ->getRepository(\App\Entity\Configuration::class)
+                       ->findAllDefault();
+
+        $currentColorMap = $config['plot_general_colorscheme'];
+
+        $colors = $colormap->getAllColorMaps();
+        sort($colors);
+
+        return $this->render('config/colorMap.html.twig',
+            array(
+                'colors' => $colors,
+                'current' => $currentColorMap,
+                'sidebar' => $this->_sidebar(
+                    array('menu'=>1,'item'=>2)
                 )
             ));
     }
