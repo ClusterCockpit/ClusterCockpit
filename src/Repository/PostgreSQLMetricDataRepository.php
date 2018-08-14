@@ -27,7 +27,7 @@ namespace App\Repository;
 
 class PostgreSQLMetricDataRepository implements MetricDataRepository
 {
-    public function getJobRoofline($job)
+    public function getJobRoofline($job, $metrics)
     {
 
     }

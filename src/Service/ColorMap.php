@@ -26,101 +26,10 @@
 namespace App\Service;
 use App\Service\Configuration;
 
-include "../src/Colormaps/Set3.php";
-include "../src/Colormaps/GistEarth.php";
-include "../src/Colormaps/16Level.php";
-include "../src/Colormaps/Set2.php";
-include "../src/Colormaps/Flag.php";
-include "../src/Colormaps/GistHeat.php";
-include "../src/Colormaps/BlueWaves.php";
-include "../src/Colormaps/Purples.php";
-include "../src/Colormaps/RdBu.php";
-include "../src/Colormaps/Set1.php";
-include "../src/Colormaps/Gray.php";
-include "../src/Colormaps/YlOrRd.php";
-include "../src/Colormaps/Steps.php";
-include "../src/Colormaps/Reds.php";
-include "../src/Colormaps/SternSpecial.php";
-include "../src/Colormaps/BlueWhite.php";
-include "../src/Colormaps/BlueRed.php";
-include "../src/Colormaps/Haze.php";
-include "../src/Colormaps/RainbowBlack.php";
-include "../src/Colormaps/Pastel2.php";
-include "../src/Colormaps/Pastels.php";
-include "../src/Colormaps/GistStern.php";
-include "../src/Colormaps/RdGy.php";
-include "../src/Colormaps/GistNcar.php";
-include "../src/Colormaps/YlGn.php";
-include "../src/Colormaps/GistRainbow.php";
-include "../src/Colormaps/GnBu.php";
-include "../src/Colormaps/PuBuGn.php";
-include "../src/Colormaps/Pastel1.php";
-include "../src/Colormaps/PiYG.php";
-include "../src/Colormaps/BlueGreenRedYellow.php";
-include "../src/Colormaps/GreenWhiteExponential.php";
-include "../src/Colormaps/Volcano.php";
-include "../src/Colormaps/Blues.php";
-include "../src/Colormaps/GreenPink.php";
-include "../src/Colormaps/RedPurple.php";
-include "../src/Colormaps/BwLinear.php";
-include "../src/Colormaps/Greens.php";
-include "../src/Colormaps/BluePastelRed.php";
-include "../src/Colormaps/RdPu.php";
-include "../src/Colormaps/PuRd.php";
-include "../src/Colormaps/Oranges.php";
-include "../src/Colormaps/HueSatValue1.php";
-include "../src/Colormaps/StdGamma.php";
-include "../src/Colormaps/HueSatLightness1.php";
-include "../src/Colormaps/Beach.php";
-include "../src/Colormaps/YlOrBr.php";
-include "../src/Colormaps/Copper.php";
-include "../src/Colormaps/Peppermint.php";
-include "../src/Colormaps/HueSatValue2.php";
-include "../src/Colormaps/Hardcandy.php";
-include "../src/Colormaps/RdYlGn.php";
-include "../src/Colormaps/Plasma.php";
-include "../src/Colormaps/HueSatLightness2.php";
-include "../src/Colormaps/GreenWhiteLinear.php";
-include "../src/Colormaps/Accent.php";
-include "../src/Colormaps/EosB.php";
-include "../src/Colormaps/Spectral.php";
-include "../src/Colormaps/RedTemperature.php";
-include "../src/Colormaps/Cool.php";
-include "../src/Colormaps/Rainbow18.php";
-include "../src/Colormaps/YGB2.php";
-include "../src/Colormaps/Nature.php";
-include "../src/Colormaps/Binary.php";
-include "../src/Colormaps/GistYarg.php";
-include "../src/Colormaps/EosA.php";
-include "../src/Colormaps/GistGray.php";
-include "../src/Colormaps/YlGnBu.php";
-include "../src/Colormaps/Waves.php";
-include "../src/Colormaps/PurpleRedStripes.php";
-include "../src/Colormaps/OrRd.php";
-include "../src/Colormaps/BuPu.php";
-include "../src/Colormaps/RdYlBu.php";
-include "../src/Colormaps/RainbowWhite.php";
-include "../src/Colormaps/Hot.php";
-include "../src/Colormaps/Bone.php";
-include "../src/Colormaps/Paired.php";
-include "../src/Colormaps/PRGn.php";
-include "../src/Colormaps/Autumn.php";
-include "../src/Colormaps/Ocean.php";
-include "../src/Colormaps/BrBg.php";
-include "../src/Colormaps/Prism.php";
-include "../src/Colormaps/GreenRedBlueWhite.php";
-include "../src/Colormaps/Thomas.php";
-include "../src/Colormaps/PuOr.php";
-include "../src/Colormaps/BuGn.php";
-include "../src/Colormaps/Dark2.php";
-include "../src/Colormaps/Greys.php";
-include "../src/Colormaps/PuBu.php";
-include "../src/Colormaps/MacStyle.php";
-include "../src/Colormaps/Rainbow.php";
-
 class ColorMap
 {
     private $_colors;
+    private $_projectRoot;
 
     private $_COLORMAPS = array(
         'Set3',
@@ -217,13 +126,16 @@ class ColorMap
     );
 
     public function __construct(
-        Configuration $configuration
+        Configuration $configuration,
+        $projectDir
     )
     {
         $config = $configuration->getConfig();
+        $file = $config['plot_general_colorscheme']->value.'.php';
         $map = 'COLOR_'.$config['plot_general_colorscheme']->value;
+        include "$projectDir/src/Colormaps/$file";
         $this->_color = constant($map);
-        /* $this->_color = COLOR_RainbowBlack; */
+        $this->_projectRoot = $projectDir;
     }
 
     public function getAllColorMaps()
@@ -257,8 +169,12 @@ class ColorMap
         }
     }
 
-    public function setColormap($map)
+    public function setColormap($name)
     {
+        $projectDir = $this->_projectRoot;
+        $file = $name.'.php';
+        $map = 'COLOR_'.$name;
+        include "$projectDir/src/Colormaps/$file";
         $this->_color = constant($map);
     }
 

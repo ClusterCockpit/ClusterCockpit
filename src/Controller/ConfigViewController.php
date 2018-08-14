@@ -106,7 +106,7 @@ class ConfigViewController extends Controller
                         'label' => 'Metrics',
                         'icon' => 'activity',
                         'link' => '/admin/metrics',
-                        'addlink' => '/admin/create_metric',
+                        'addlink' => false,
                         'active' => false
                     ),
                     array(
@@ -223,7 +223,7 @@ class ConfigViewController extends Controller
                 'configHash' => $config['data'],
                 'defaultmode' => true,
                 'sidebar' => $this->_sidebar(
-                    array('menu'=>1,'item'=>2)
+                    array('menu'=>1,'item'=>3)
                 )
             ));
     }
@@ -409,6 +409,46 @@ class ConfigViewController extends Controller
     /*       Clusters          */
     /* ####################### */
 
+    public function listMetrics(Request $request)
+    {
+        $repository = $this->getDoctrine()->getRepository(\App\Entity\Cluster::class);
+        $clusters = $repository->findAll();
+
+        $slots = array();
+
+        foreach ( $clusters as $cluster ) {
+            foreach ( $cluster->metricLists as $list ) {
+                foreach ( $list->metrics as $metric ) {
+                    if ( array_key_exists($metric->slot,$slots) ) {
+                        $slots[$metric->slot][$cluster->getName()][] = array(
+                            'list' => $list->getName(),
+                            'name' => $metric->getName(),
+                            'position' => $metric->position
+                        );
+                    } else {
+                        $slots[$metric->slot] = array();
+                        $slots[$metric->slot][$cluster->getName()][] = array(
+                            'list' => $list->getName(),
+                            'name' => $metric->getName(),
+                            'position' => $metric->position
+                        );
+                    }
+                }
+            }
+        }
+
+        ksort($slots);
+
+        return $this->render('config/listMetrics.html.twig',
+            array(
+                'clusters' => $clusters,
+                'slots' => $slots,
+                'sidebar' => $this->_sidebar(
+                    array('menu'=>2,'item'=>0)
+                )
+            ));
+    }
+
     public function listClusters(Request $request)
     {
         $repository = $this->getDoctrine()->getRepository(\App\Entity\Cluster::class);
@@ -418,7 +458,7 @@ class ConfigViewController extends Controller
             array(
                 'clusters' => $clusters,
                 'sidebar' => $this->_sidebar(
-                    array('menu'=>2,'item'=>0)
+                    array('menu'=>2,'item'=>1)
                 )
             ));
     }

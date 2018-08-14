@@ -155,8 +155,8 @@ class JobListController extends FOSRestController
                 $jobData["severity"] = $job->severity;
                 $jobData["flopsAnyAvg"] = $job->flopsAnyAvg;
                 $jobData["memBwAvg"] = $job->memBwAvg;
-                $jobData["trafficTotalIbAvg"] = $job->trafficTotalIbAvg;
-                $jobData["trafficTotalLustreAvg"] = $job->trafficTotalLustreAvg;
+                $jobData["trafficTotalIbAvg"] = $job->networkIO;
+                $jobData["trafficTotalLustreAvg"] = $job->fileIO;
 
                 $jobData["plots"] = array(
                     'id' => $job->getId(),

@@ -525,7 +525,7 @@ class JobCache
 
                 if ( $config['plot_view_showRoofline']->value == 'true' ) {
                     $this->_plotGenerator->generateJobRoofline(
-                        $job, $this->_metricDataRepository->getJobRoofline($job)
+                        $job, $this->_metricDataRepository->getJobRoofline($job, $metrics)
                     );
                 }
 

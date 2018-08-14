@@ -23,119 +23,118 @@ class Data
     private $epoch;
 
     /**
-     *  @ORM\Column(type="float")
+     *  @ORM\Column(type="float", nullable=true)
      */
-    private $memUsed;
-
-    /**
-     *  @ORM\Column(type="float")
-     */
-    private $loadOne;
-
-    /**
-     *  @ORM\Column(type="float")
-     */
-    private $memBw;
-
-    /**
-     *  @ORM\Column(type="float")
-     */
-    private $flopsAny;
-
-    /**
-     *  @ORM\Column(type="float")
-     */
-    private $flopsDp;
-
-    /**
-     *  @ORM\Column(type="float")
-     */
-    private $flopsSp;
-
-    /**
-     *  @ORM\Column(type="float")
-     */
-    private $cpiAvg;
+    private $slot_0;
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $clockSpeed;
+    private $slot_1;
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $totalPower;
+    private $slot_2;
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $trafficReadEth;
+    private $slot_3;
+
+    /**
+     *  @ORM\Column(type="float", nullable=true)
+     */
+    private $slot_4;
+
+    /**
+     *  @ORM\Column(type="float", nullable=true)
+     */
+    private $slot_5;
+
+    /**
+     *  @ORM\Column(type="float", nullable=true)
+     */
+    private $slot_6;
+
+    /**
+     *  @ORM\Column(type="float", nullable=true)
+     */
+    private $slot_7;
+
+    /**
+     *  @ORM\Column(type="float", nullable=true)
+     */
+    private $slot_8;
+
+    /**
+     *  @ORM\Column(type="float", nullable=true)
+     */
+    private $slot_9;
+
+    /**
+     *  @ORM\Column(type="float", nullable=true)
+     */
+    private $slot_10;
 
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $trafficWriteEth;
+    private $slot_11;
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $trafficReadLustre;
+    private $slot_12;
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $trafficWriteLustre;
+    private $slot_13;
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $reqReadLustre;
+    private $slot_14;
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $reqWriteLustre;
+    private $slot_15;
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $inodesLustre;
+    private $slot_16;
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $pkgRateReadIb;
+    private $slot_17;
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $pkgRateWriteIb;
+    private $slot_18;
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $congestionIb;
+    private $slot_19;
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $trafficReadIb;
+    private $slot_20;
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $trafficWriteIb;
+    private $slot_21;
 
     /**
      *  @ORM\Column(type="float", nullable=true)
      */
-    private $trafficTotalIb;
-
-    /**
-     *  @ORM\Column(type="float", nullable=true)
-     */
-    private $trafficTotalLustre;
+    private $slot_22;
 }
-

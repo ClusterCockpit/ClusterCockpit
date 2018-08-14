@@ -69,12 +69,9 @@ default_options:
 cache_options:
     path: /admin/cache
     controller:  App\Controller\ConfigViewController::cacheOptions
-plot_list:
-    path: /admin/plot/list
-    controller:  App\Controller\ConfigViewController::plotList
-plot_view:
-    path: /admin/plot/view
-    controller:  App\Controller\ConfigViewController::plotView
+metric_list:
+    path: /admin/metrics
+    controller:  App\Controller\ConfigViewController::listMetrics
 list_api_keys:
     path: /admin/apiKeys/
     controller:  App\Controller\ConfigViewController::listApiKeys

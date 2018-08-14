@@ -42,22 +42,22 @@ class Metric
     public $slot;
 
     /**
-     * @ORM\Column(type="float", options={"default":0})
+     * @ORM\Column(type="float", nullable=true)
      */
     public $peak;
 
     /**
-     * @ORM\Column(type="float", options={"default":0})
+     * @ORM\Column(type="float", nullable=true)
      */
     public $normal;
 
     /**
-     * @ORM\Column(type="float", options={"default":0})
+     * @ORM\Column(type="float", nullable=true)
      */
     public $caution;
 
     /**
-     * @ORM\Column(type="float", options={"default":0})
+     * @ORM\Column(type="float", nullable=true)
      */
     public $alert;
 

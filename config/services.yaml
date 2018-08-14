@@ -33,6 +33,9 @@ services:
     App\Command\ExportJob:
         $projectDir: '%kernel.project_dir%'
 
+    App\Service\ColorMap:
+        $projectDir: '%kernel.project_dir%'
+
     App\Service\Plot\PlotGeneratorInterface: '@App\Service\Plot\PlotGeneratorPlotly'
 
     sensio_framework_extra.view.listener:

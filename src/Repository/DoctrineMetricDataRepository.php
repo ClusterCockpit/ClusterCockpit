@@ -36,11 +36,14 @@ class DoctrineMetricDataRepository implements MetricDataRepository
         $this->_connection = $em->getConnection();
     }
 
-    public function getJobRoofline($job)
+    public function getJobRoofline($job, $metrics)
     {
         $id = $job->getId();
         $startTime = $job->getStartTime();
         $stopTime = $job->getStopTime();
+
+        $flopsAny = $metrics['flops_any'];
+        $memBw = $metrics['mem_bw'];
 
         if ($job->isRunning()) {
             $joinTable = 'Rjobs_nodes';
@@ -48,8 +51,11 @@ class DoctrineMetricDataRepository implements MetricDataRepository
             $joinTable = 'jobs_nodes';
         }
 
+        $bwSlot = sprintf("slot_%d", $memBw->slot);
+        $flopsSlot = sprintf("slot_%d", $flopsAny->slot);
+
         $sql = "
-        SELECT ROUND(data.flops_any*0.001,2) AS y, case when data.mem_bw=0 then 0 else ROUND(data.flops_any/data.mem_bw,2) end as x
+        SELECT ROUND($flopsSlot*0.001,2) AS y, case when $bwSlot=0 then 0 else ROUND($flopsSlot/$bwSlot,2) end as x
         FROM data
         INNER JOIN $joinTable ON data.node_id = $joinTable.node_id
         WHERE $joinTable.job_id=$id
@@ -99,17 +105,18 @@ class DoctrineMetricDataRepository implements MetricDataRepository
 
         foreach ( $metrics as $metric ){
             $name = $metric->name;
+            $slot = sprintf("slot_%d", $metric->slot);
             $scale = $metric->scale;
 
             if ( $first ) {
                 $first = false;
-                $metricString .= "ROUND(AVG($name * $scale),2) AS {$name}_avg";
-                $metricString .= ",ROUND(MIN($name * $scale),2) AS {$name}_min";
-                $metricString .= ",ROUND(MAX($name * $scale),2) AS {$name}_max";
+                $metricString .= "ROUND(AVG($slot * $scale),2) AS {$name}_avg";
+                $metricString .= ",ROUND(MIN($slot * $scale),2) AS {$name}_min";
+                $metricString .= ",ROUND(MAX($slot * $scale),2) AS {$name}_max";
             } else {
-                $metricString .= ",ROUND(AVG($name * $scale),2) AS {$name}_avg";
-                $metricString .= ",ROUND(MIN($name * $scale),2) AS {$name}_min";
-                $metricString .= ",ROUND(MAX($name * $scale),2) AS {$name}_max";
+                $metricString .= ",ROUND(AVG($slot * $scale),2) AS {$name}_avg";
+                $metricString .= ",ROUND(MIN($slot * $scale),2) AS {$name}_min";
+                $metricString .= ",ROUND(MAX($slot * $scale),2) AS {$name}_max";
             }
         }
 
@@ -168,12 +175,14 @@ class DoctrineMetricDataRepository implements MetricDataRepository
 
         foreach ( $metrics as $metric ){
             $name = $metric->name;
+            $slot = sprintf("slot_%d", $metric->slot);
             $scale = $metric->scale;
+
             if ( $first ) {
                 $first = false;
-                $metricString = "epoch, ROUND($name * $scale,1) AS $name";
+                $metricString = "epoch, ROUND($slot * $scale,1) AS $name";
             } else {
-                $metricString .= ", ROUND($name * $scale,1) AS $name";
+                $metricString .= ", ROUND($slot * $scale,1) AS $name";
             }
         }
 

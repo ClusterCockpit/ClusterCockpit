@@ -87,12 +87,12 @@ class RunningJob
     /**
      *  @ORM\Column(type="float", options={"default":0})
      */
-    public $trafficTotalIbAvg;
+    public $networkIO;
 
     /**
      *  @ORM\Column(type="float", options={"default":0})
      */
-    public $trafficTotalLustreAvg;
+    public $fileIO;
 
     public $hasProfile;
 

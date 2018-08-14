@@ -1,4 +1,27 @@
 <?php
+/*
+ *  This file is part of ClusterCockpit.
+ *
+ *  Copyright (c) 2018 Jan Eitzinger
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is furnished
+ *  to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in all
+ *  copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
 
 namespace App\Service\Plot;
 
@@ -6,14 +29,20 @@ use Psr\Log\LoggerInterface;
 use App\Entity\Trace;
 use App\Entity\Plot;
 use App\Entity\StatisticPlot;
+use App\Service\Configuration;
 
 class PlotGeneratorPlotly implements PlotGeneratorInterface
 {
     private $_logger;
+    private $_configuration;
 
-    public function __construct(LoggerInterface $logger )
+    public function __construct(
+        LoggerInterface $logger,
+        Configuration $configuration
+    )
     {
         $this->_logger = $logger;
+        $this->_configuration = $configuration;
     }
 
     public function generateScatterPlot( $plot, &$data, $options)
@@ -117,6 +146,7 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
             $r_max[] = $jobData["{$name}_max"]/$metric->peak;
             $theta_max[] = $name;
         }
+
         $name = $metrics['mem_used']->name;
         $r_avg[] = $jobData["{$name}_avg"]/$metrics['mem_used']->peak;
         $theta_avg[] = $name;
@@ -177,7 +207,7 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
             "name" => "$name",
             "line" => array(
                 "color" => $options['color'],
-                "width" => 1
+                "width" => $this->_configuration->getValue('plot_general_lineWidth')
             )
         );
 

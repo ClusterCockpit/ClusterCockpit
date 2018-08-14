@@ -28,7 +28,7 @@ namespace App\Repository;
 class InfluxDBMetricDataRepository implements MetricDataRepository
 {
 
-    public function getJobRoofline($job)
+    public function getJobRoofline($job, $metrics)
     {
 
     }
