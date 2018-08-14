@@ -37,7 +37,7 @@ class UserAccountType extends AbstractType
                 )
             )
             ->add('email', EmailType::class)
-            ->add('isActive', CheckboxType::class)
+            ->add('isActive', CheckboxType::class, array('required' => false))
             ->add('save', SubmitType::class, array('label' => 'Save changes'))
             ->add('cancel', SubmitType::class, array('label' => 'Cancel'))
         ;

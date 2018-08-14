@@ -28,6 +28,7 @@ namespace App\Controller;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Psr\Log\LoggerInterface;
 use App\Form\ApiKeyType;
 use App\Entity\ApiKey;
 use App\Form\ClusterType;
@@ -352,6 +353,8 @@ class ConfigViewController extends Controller
 
             if ( $form->get('save')->isClicked() )  {
                 $user = $form->getData();
+                $password = $passwordEncoder->encodePassword($user, $user->getPlainPassword());
+                $user->setPassword($password);
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($user);
                 $em->flush();
@@ -373,7 +376,8 @@ class ConfigViewController extends Controller
 
     public function createUserAccount(
         Request $request,
-        UserPasswordEncoderInterface $passwordEncoder)
+        UserPasswordEncoderInterface $passwordEncoder
+    )
     {
         $user = new UserAccount();
         $form = $this->createForm(UserAccountType::class, $user);
