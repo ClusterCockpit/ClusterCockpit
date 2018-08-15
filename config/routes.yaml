@@ -27,6 +27,15 @@ list_jobs:
 search_jobs:
     path: /monitoring/job/search
     controller:  App\Controller\JobViewController::search
+user_list_jobs:
+    path: /users/listjobs/
+    controller:  App\Controller\JobViewController::list
+user_search_jobs:
+    path: /users/job/search
+    controller:  App\Controller\JobViewController::search
+user_stat_jobs:
+    path: /users/statistics/
+    controller:  App\Controller\UserViewController::showUser
 show_job:
     path: /monitoring/job/{id}
     controller:  App\Controller\JobViewController::show

@@ -10,6 +10,14 @@ security:
             entity:
                 class: App\Entity\UserAccount
                 property: username
+        my_ldap:
+            ldap:
+                service: Symfony\Component\Ldap\Ldap
+                base_dn: ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de
+                search_dn: '%env(resolve:LDAP_DN)%'
+                search_password: '%env(resolve:LDAP_PW)%'
+                default_roles: ROLE_USER
+                uid_key: uid
 
     firewalls:
         rest_api:
@@ -23,6 +31,17 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
+        user:
+            pattern: ^/users
+            anonymous: ~
+            provider: our_db_provider
+            form_login_ldap:
+                service: Symfony\Component\Ldap\Ldap
+                dn_string: 'uid={username},ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de'
+                check_path: security_login
+                login_path: security_login
+                default_target_path:  /users/listjobs/
+
         main:
             pattern: ^/
             anonymous: ~
@@ -34,6 +53,7 @@ security:
             logout:
                 path:   /logout
                 target: /
+
 
     access_control:
         - { path: ^/monitoring, roles: [ROLE_ANALYST, ROLE_ADMIN]}
