@@ -36,11 +36,11 @@ class QueryLdap extends Command
 {
     private $_ldap;
 
-    public function __construct(
-    )
+    public function __construct()
     {
+	    $url = getenv('LDAP_URL');
         $this->_ldap = Ldap::create('ext_ldap', array(
-            'host' => 'hpcldap.rrze.uni-erlangen.de'
+		'connection_string' => $url
         ));
 
         parent::__construct();
@@ -51,13 +51,83 @@ class QueryLdap extends Command
         $this
             ->setName('app:user:ldap')
             ->setDescription('Query ldap directory.')
-            ->setHelp('This command allows to create and manage user accounts for the web application.')
+            ->setHelp('This command allows to sync users and groups from a ldap server.')
             ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $ldap->bind($dn, $password);
+          $password = getenv('LDAP_PW');
+	  /*$dn = 'cn=hpcmonitoring,ou=roadm,ou=profile,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de';*/
+	  $dn = getenv('LDAP_DN');
+	  $this->_ldap->bind($dn, $password);
+
+	  $query = $this->_ldap->query('ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de', '(&(objectclass=posixAccount)(uid=*))');
+	  $results = $query->execute()->toArray();
+	  $users = array();
+
+	  var_dump($results);
+
+	  foreach ( $results as $entry ) {
+
+		  $user_id;
+		  $uid;
+		  $name;
+
+		  if ( $entry->hasAttribute('uid') ) {
+			  $user_id = $entry->getAttribute('uid')[0];
+		  }
+		  if ( $entry->hasAttribute('uidNumber') ) {
+			  $uid = $entry->getAttribute('uidNumber')[0];
+		  }
+		  if ( $entry->hasAttribute('gecos') ) {
+			  $name = $entry->getAttribute('gecos')[0];
+		  }
+
+		  $users[$user_id] = array(
+			  'user_id' => $user_id,
+			  'uid' => $uid,
+			  'name' => $name
+		  );
+	  }
+
+	  $query = $this->_ldap->query('ou=Group,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de', '(&(objectclass=posixGroup)(cn=*))');
+	  $results = $query->execute()->toArray();
+	  $groups = array();
+	  $userGroup = array();
+	  $activeUsers = array();
+
+	  foreach ( $results as $entry ) {
+
+		  $group_id;
+		  $gid;
+		  $members;
+
+		  if ( $entry->hasAttribute('cn') ) {
+			  $group_id = $entry->getAttribute('cn')[0];
+		  }
+		  if ( $entry->hasAttribute('gidNumber') ) {
+			  $gid = $entry->getAttribute('gidNumber')[0];
+		  }
+		  if ( $entry->hasAttribute('memberUid') ) {
+			  $members = $entry->getAttribute('memberUid');
+		  }
+
+		  $groups[$group_id] = array(
+			  'group_id' => $group_id,
+			  'gid' => $gid,
+			  'members' => $members
+		  );
+
+		  foreach ( $members as $user ) {
+			  $userGroup[$user][] = $group_id;
+
+			  if ( $group_id === 'infohpc' ) {
+				  $ctiveUsers[$user] = 1;
+			  }
+		  }
+
+	  }
 
     }
 }
