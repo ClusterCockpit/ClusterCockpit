@@ -137,4 +137,19 @@ class Data
      *  @ORM\Column(type="float", nullable=true)
      */
     private $slot_22;
+
+    /**
+     *  @ORM\Column(type="float", nullable=true)
+     */
+    private $slot_23;
+
+    /**
+     *  @ORM\Column(type="float", nullable=true)
+     */
+    private $slot_24;
+
+    /**
+     *  @ORM\Column(type="float", nullable=true)
+     */
+    private $slot_25;
 }
