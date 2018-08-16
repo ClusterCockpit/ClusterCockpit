@@ -30,12 +30,6 @@ services:
     App\Service\Plot\PlotGeneratorChartJs: ~
     App\Service\Plot\PlotGeneratorFlot: ~
 
-    Symfony\Component\Ldap\Ldap:
-        arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
-    Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
-        arguments:
-            -   connection_string: '%env(resolve:LDAP_URL)%'
-
     App\Command\ExportJob:
         $projectDir: '%kernel.project_dir%'
 

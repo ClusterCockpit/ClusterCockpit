@@ -40,11 +40,6 @@ use App\Service\ColorMap;
 
 class ConfigViewController extends Controller
 {
-    private function _generateSidebar($config)
-    {
-
-    }
-
     private function _sidebar($active = 0)
     {
         $sidebar = array(
@@ -98,6 +93,14 @@ class ConfigViewController extends Controller
                         'addlink' => false,
                         'active' => false
                     ),
+                    array(
+                        'label' => 'Ldap',
+                        'icon' => 'database',
+                        'link' => '/admin/ldap',
+                        'addlink' => false,
+                        'active' => false
+                    ),
+
                 )
             ),
             array(
@@ -157,6 +160,22 @@ class ConfigViewController extends Controller
             ));
     }
 
+    public function config()
+    {
+        return $this->render('config/index.html.twig',
+            array(
+                'sidebar' => $this->_sidebar(),
+                'init' => $this->getDoctrine()
+                     ->getRepository(\App\Entity\Configuration::class)
+                     ->isInit()
+            ));
+    }
+
+
+    /* ####################### */
+    /*       OPTIONS           */
+    /* ####################### */
+
     public function defaultOptions(Request $request)
     {
         $config = $this->getDoctrine()
@@ -172,6 +191,7 @@ class ConfigViewController extends Controller
                 )
             ));
     }
+
 
     public function colorMapOptions(Request $request, ColorMap $colormap)
     {
@@ -225,6 +245,22 @@ class ConfigViewController extends Controller
                 'defaultmode' => true,
                 'sidebar' => $this->_sidebar(
                     array('menu'=>1,'item'=>3)
+                )
+            ));
+    }
+
+    public function ldapOptions(Request $request)
+    {
+        $config = $this->getDoctrine()
+                       ->getRepository(\App\Entity\Configuration::class)
+                       ->findAllDefaultHierarchy();
+
+        return $this->render('config/editConfigOptions.html.twig',
+            array(
+                'configHash' => $config['ldap'],
+                'defaultmode' => true,
+                'sidebar' => $this->_sidebar(
+                    array('menu'=>1,'item'=>4)
                 )
             ));
     }

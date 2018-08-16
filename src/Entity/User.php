@@ -4,23 +4,43 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
 *  @ORM\Entity(repositoryClass="App\Repository\UserRepository")
+ * @UniqueEntity(fields="email", message="Email already taken")
+ * @UniqueEntity(fields="username", message="Username already taken")
 */
-class User
+class User implements UserInterface, \Serializable
 {
+    private $_configuration;
+
+
     /**
-     *  @ORM\Column(type="integer")
      *  @ORM\Id
      *  @ORM\GeneratedValue(strategy="AUTO")
+     *  @ORM\Column(type="integer")
      */
     private $id;
 
     /**
-     *  @ORM\Column(type="string",)
+     * @ORM\Column(type="string", length=255, unique=true)
+     * @Assert\NotBlank()
      */
-    private $userId;
+    private $username;
+
+    /**
+     * @Assert\NotBlank()
+     * @Assert\Length(max=4096)
+     */
+    private $plainPassword;
+
+    /**
+     * @ORM\Column(type="string", length=64, nullable=true)
+     */
+    private $password;
 
     /**
      *  @ORM\Column(type="integer")
@@ -33,7 +53,14 @@ class User
     private $name;
 
     /**
-     *  @ORM\Column(type="string")
+     * @ORM\Column(type="array", nullable=true)
+     */
+    private $roles;
+
+    /**
+     * @ORM\Column(type="string", length=254, unique=true)
+     * @Assert\NotBlank()
+     * @Assert\Email()
      */
     private $email;
 
@@ -52,9 +79,9 @@ class User
     private $groups;
 
     /**
-     *  @ORM\Column(type="boolean", nullable=true)
+     * @ORM\Column(type="boolean")
      */
-    private $active;
+    private $isActive;
 
     /**
      * @ORM\ManyToMany(targetEntity="Project")
@@ -65,7 +92,9 @@ class User
      */
     private $projects;
 
-    public function __construct() {
+    public function __construct(
+    )
+    {
         $this->groups = new \Doctrine\Common\Collections\ArrayCollection();
         $this->projects = new \Doctrine\Common\Collections\ArrayCollection();
     }
@@ -75,20 +104,102 @@ class User
         return $this->id;
     }
 
-    public function setId($id)
+    public function getSalt()
     {
-        $this->id = $id;
+        // you *may* need a real salt depending on your encoder
+        // see section on salt below
+        return null;
     }
 
-    public function getUserId()
+    public function getRoles()
     {
-        /* return substr(md5($this->userId), 0, 8); */
-        return $this->userId;
+        if ( empty($this->roles) ){
+            return array(
+                'ROLE_USER'
+            );
+        } else {
+            return $this->roles;
+        }
     }
 
-    public function setUserId($userId)
+    public function addRole($role) {
+        $this->roles[] = $role;
+    }
+
+    public function removeRole($role) {
+        if ($this->roles->contains($role)) {
+            $this->roles->removeElement($role);
+        }
+    }
+
+    public function eraseCredentials()
     {
-        $this->userId = $userId;
+
+    }
+
+    /** @see \Serializable::serialize() */
+    public function serialize()
+    {
+        return serialize(array(
+            $this->id,
+            $this->username,
+            $this->password,
+        ));
+    }
+
+    /** @see \Serializable::unserialize() */
+    public function unserialize($serialized)
+    {
+        list (
+            $this->id,
+            $this->username,
+            $this->password,
+        ) = unserialize($serialized, ['allowed_classes' => false]);
+    }
+
+    public function setUsername(string $username): self
+    {
+        $this->username = $username;
+
+        return $this;
+    }
+
+
+    public function getPlainPassword()
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword($password)
+    {
+        $this->plainPassword = $password;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+
+    public function getUsername(): ?string
+    {
+        return $this->username;
+    }
+
+    public function getUserId($hide='false')
+    {
+        if( $hide === 'true' ) {
+            return substr(md5($this->username), 0, 8);
+        } else {
+            return $this->username;
+        }
     }
 
     public function getUid()

@@ -63,6 +63,9 @@ show_group:
 edit_group:
     path: /monitoring/group/edit/{id}
     controller:  App\Controller\UserViewController::editGroup
+config_user:
+    path: /config
+    controller:  App\Controller\ConfigViewController::config
 config_index:
     path: /admin
     controller:  App\Controller\ConfigViewController::index
@@ -75,6 +78,9 @@ color_options:
 default_options:
     path: /admin/default
     controller:  App\Controller\ConfigViewController::defaultOptions
+ldap_options:
+    path: /admin/ldap
+    controller:  App\Controller\ConfigViewController::ldapOptions
 cache_options:
     path: /admin/cache
     controller:  App\Controller\ConfigViewController::cacheOptions

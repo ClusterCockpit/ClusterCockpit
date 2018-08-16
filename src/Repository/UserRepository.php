@@ -28,9 +28,10 @@ namespace App\Repository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-class UserRepository extends ServiceEntityRepository
+class UserRepository extends ServiceEntityRepository  implements UserLoaderInterface
 {
     public function __construct(
         ManagerRegistry $registry
@@ -44,12 +45,21 @@ class UserRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('u');
 
         $qb->select('u')
-            ->innerJoin('u.groups', 'g')
-            ->where('g.id = :group_id')
-            ->setParameter('group_id', $groupId);
+           ->innerJoin('u.groups', 'g')
+           ->where('g.id = :group_id')
+           ->setParameter('group_id', $groupId);
 
         return $qb
             ->getQuery()
             ->getResult();
+    }
+
+    public function loadUserByUsername($username)
+    {
+        return $this->createQueryBuilder('u')
+                    ->where('u.username = :username')
+                    ->setParameter('username', $username)
+                    ->getQuery()
+                    ->getOneOrNullResult();
     }
 }

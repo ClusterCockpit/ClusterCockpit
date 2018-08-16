@@ -16,6 +16,4 @@ framework:
     assets: ~
     php_errors:
         log: true
-sensio_framework_extra:
-    view:        { annotations: false }
 

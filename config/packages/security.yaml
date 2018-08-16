@@ -1,23 +1,14 @@
 security:
     encoders:
-        App\Entity\UserAccount:
+        App\Entity\User:
             algorithm: bcrypt
 
     providers:
         api_key_user_provider:
             id: App\Security\ApiKeyUserProvider
-        our_db_provider:
+        db_provider:
             entity:
-                class: App\Entity\UserAccount
-                property: username
-        my_ldap:
-            ldap:
-                service: Symfony\Component\Ldap\Ldap
-                base_dn: ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de
-                search_dn: '%env(resolve:LDAP_DN)%'
-                search_password: '%env(resolve:LDAP_PW)%'
-                default_roles: ROLE_USER
-                uid_key: uid
+                class: App\Entity\User
 
     firewalls:
         rest_api:
@@ -31,35 +22,21 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
-        user:
-            pattern: ^/users
-            anonymous: ~
-            provider: our_db_provider
-            form_login_ldap:
-                service: Symfony\Component\Ldap\Ldap
-                dn_string: 'uid={username},ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de'
-                check_path: security_login
-                login_path: security_login
-                default_target_path:  /users/listjobs/
-
         main:
             pattern: ^/
             anonymous: ~
-            provider: our_db_provider
-            form_login:
-                check_path: security_login
-                login_path: security_login
-                default_target_path:  /monitoring/listjobs/
-            logout:
-                path:   /logout
-                target: /
+            logout: ~
+            provider: db_provider
+            guard:
+                authenticators:
+                    - App\Security\LdapAuthenticator
 
 
     access_control:
-        - { path: ^/users, roles: [ROLE_USER]}
-        - { path: ^/monitoring, roles: [ROLE_ANALYST, ROLE_ADMIN]}
+        - { path: ^/monitoring, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
+        - { path: ^/config, roles: ROLE_USER }
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/admin/user, roles:  [ROLE_ANALYST, ROLE_ADMIN]}
         - { path: ^/api, roles: ROLE_API }
-        - { path: ^/web, roles:  [ROLE_ANALYST, ROLE_ADMIN]}
+        - { path: ^/web, roles:  [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
 
