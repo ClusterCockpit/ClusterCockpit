@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use AppBundle\Entity\Node;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
@@ -112,8 +113,14 @@ class Job
 
     public $hasProfile;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\JobTag", inversedBy="jobs")
+     */
+    private $tags;
+
     public function __construct() {
         $this->nodes = new ArrayCollection();
+        $this->tags = new ArrayCollection();
     }
 
     public function getId()
@@ -269,6 +276,32 @@ class Job
     public function isRunning()
     {
         return false;
+    }
+
+    /**
+     * @return Collection|JobTag[]
+     */
+    public function getTags(): Collection
+    {
+        return $this->tags;
+    }
+
+    public function addTag(JobTag $tag): self
+    {
+        if (!$this->tags->contains($tag)) {
+            $this->tags[] = $tag;
+        }
+
+        return $this;
+    }
+
+    public function removeTag(JobTag $tag): self
+    {
+        if ($this->tags->contains($tag)) {
+            $this->tags->removeElement($tag);
+        }
+
+        return $this;
     }
 }
 

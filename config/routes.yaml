@@ -66,6 +66,12 @@ edit_group:
 config_user:
     path: /config
     controller:  App\Controller\ConfigViewController::config
+config_plot:
+    path: /config/plot
+    controller:  App\Controller\ConfigViewController::userOptions
+config_color:
+    path: /config/colormap
+    controller:  App\Controller\ConfigViewController::colorMapOptions
 config_index:
     path: /admin
     controller:  App\Controller\ConfigViewController::index

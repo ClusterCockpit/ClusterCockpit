@@ -179,7 +179,7 @@ class JobRepository extends ServiceEntityRepository
         return $stat;
     }
 
-  public function countFilteredJobs( $filter, $search = NULL )
+  public function countFilteredJobs($userId,  $filter, $search = NULL )
     {
         $qb = $this->createQueryBuilder('j');
 
@@ -188,7 +188,7 @@ class JobRepository extends ServiceEntityRepository
                 ->where("j.duration > 300");
         } else {
             $qb->select('count(j.id)')
-                ->innerJoin('j.user', 'u', 'WITH', "u.userId LIKE :word")
+                ->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
                 ->where("j.duration > 300")
                 ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
         }
@@ -207,12 +207,14 @@ class JobRepository extends ServiceEntityRepository
                 if ( is_numeric($userId) ){
                     $qb->andWhere("j.user = $userId");
                 } else {
-                    $qb->innerJoin('j.user', 'u', 'WITH', "u.userId LIKE :word")
+                    $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
                         ->setParameter('word', '%'.addcslashes($userId, '%_').'%');
                 }
             }
-        } else {
-            $qb->andWhere("j.status = 'running'");
+        }
+
+        if ( $userId ){
+            $qb->andWhere("j.user = $userId");
         }
 
         return $qb
@@ -222,6 +224,7 @@ class JobRepository extends ServiceEntityRepository
 
 
     public function findFilteredJobs(
+        $userId,
         $offset, $limit,
         $sorting,
         $filter,
@@ -235,7 +238,7 @@ class JobRepository extends ServiceEntityRepository
             ->setMaxResults( $limit );
 
         if( $filter != 'false' ){
-            $qb->innerJoin('j.user', 'u', 'WITH', "u.userId LIKE :word")
+            $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
                ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
         }
 
@@ -246,18 +249,23 @@ class JobRepository extends ServiceEntityRepository
             if ( $search['clusterId'] != 0 ) {
                 $qb->andWhere("j.cluster = $search[clusterId]");
             }
+        if ( ! $userId ){
             if ( isset($search['userId']) ){
                 $userId = $search['userId'];
 
                 if ( is_numeric($userId) ){
                     $qb->andWhere("j.user = $userId");
                 } else {
-                    $qb->innerJoin('j.user', 'u', 'WITH', "u.userId LIKE :word")
+                    $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
                         ->setParameter('word', '%'.addcslashes($userId, '%_').'%');
                 }
             }
-        }else {
-            $qb->andWhere("j.status = 'running'");
+            }
+
+        }
+
+        if ( $userId ){
+            $qb->andWhere("j.user = $userId");
         }
 
         return $qb

@@ -262,6 +262,19 @@ class User implements UserInterface, \Serializable
     {
         $this->projects = $projects;
     }
+
+    public function getIsActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): self
+    {
+        $this->isActive = $isActive;
+
+        return $this;
+    }
+
 }
 
 

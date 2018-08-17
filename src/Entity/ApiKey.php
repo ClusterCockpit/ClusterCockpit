@@ -22,7 +22,7 @@ class ApiKey
     private $token;
 
     /**
-     * @ORM\ManyToOne(targetEntity="UserAccount")
+     * @ORM\ManyToOne(targetEntity="User")
      */
     private $user;
 
@@ -53,12 +53,12 @@ class ApiKey
         return $this;
     }
 
-    public function getUser(): ?UserAccount
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(?UserAccount $user): self
+    public function setUser(?User $user): self
     {
         $this->user= $user;
 

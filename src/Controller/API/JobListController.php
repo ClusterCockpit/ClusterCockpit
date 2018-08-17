@@ -27,6 +27,8 @@ namespace App\Controller\API;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\View\View;
 use App\Entity\Job;
@@ -49,14 +51,17 @@ class JobListController extends FOSRestController
 {
     private $_jobCache;
     private $_configuration;
+    private $_authChecker;
 
     public function __construct(
         JobCache $jobCache,
+        AuthorizationCheckerInterface $authChecker,
         Configuration $configuration
     )
     {
         $this->_jobCache = $jobCache;
         $this->_configuration = $configuration;
+        $this->_authChecker = $authChecker;
     }
 
     /**
@@ -68,9 +73,7 @@ class JobListController extends FOSRestController
      * @QueryParam(name="search")
      * @QueryParam(name="jobSearch", nullable=true)
      */
-    public function cgetAction(
-        ParamFetcher $paramFetcher
-    )
+    public function cgetAction( ParamFetcher $paramFetcher)
     {
         $draw = $paramFetcher->get('draw');
         $start = $paramFetcher->get('start');
@@ -83,6 +86,11 @@ class JobListController extends FOSRestController
         $tableData;
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $this->_configuration->getUserConfig($this->getUser());
+        $userId = 0;
+
+        if ( false === $this->_authChecker->isGranted('ROLE_ADMIN') ) {
+            $userId = $this->getUser()->getId();
+        }
 
         $sorting; $filter = 'false';
         $index = $order[0]['column'];
@@ -104,28 +112,31 @@ class JobListController extends FOSRestController
 
         if ( !is_null($jobSearch) ) {
             $repository = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
-            $total = $repository->countFilteredJobs('false', $jobSearch);
+            $total = $repository->countFilteredJobs($userId, 'false', $jobSearch);
             $filtered = $total;
             $url = 'job';
 
             if ( $search['value'] != ''){
                 $filter = $search['value'];
-                $filtered = $repository->countFilteredJobs($filter, $jobSearch);
+                $filtered = $repository->countFilteredJobs($userId, $filter, $jobSearch);
             }
 
-            $jobs = $repository->findFilteredJobs($start, $length, $sorting, $filter, $jobSearch);
+            $jobs = $repository->findFilteredJobs($userId, $start, $length, $sorting, $filter, $jobSearch);
         } else {
+            if ( false === $this->_authChecker->isGranted('ROLE_ADMIN') ) {
+                $jobSearch['userId'] = $this->getUser()->getId();
+            }
             $repository = $this->getDoctrine()->getRepository(\App\Entity\RunningJob::class);
-            $total = $repository->countFilteredJobs('false');
+            $total = $repository->countFilteredJobs($userId, 'false');
             $filtered = $total;
             $url = 'running_job';
 
             if ( $search['value'] != ''){
                 $filter = $search['value'];
-                $filtered = $repository->countFilteredJobs($filter);
+                $filtered = $repository->countFilteredJobs($userId, $filter);
             }
 
-            $jobs = $repository->findFilteredJobs($start, $length, $sorting, $filter);
+            $jobs = $repository->findFilteredJobs($userId, $start, $length, $sorting, $filter);
         }
 
         foreach ( $jobs as $job ){

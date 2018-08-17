@@ -41,7 +41,7 @@ class RunningJobRepository extends ServiceEntityRepository
         $this->_connection = $this->getEntityManager()->getConnection();
     }
 
-    public function countFilteredJobs( $filter )
+    public function countFilteredJobs( $userId, $filter )
     {
         $qb = $this->createQueryBuilder('j');
 
@@ -53,12 +53,17 @@ class RunningJobRepository extends ServiceEntityRepository
                ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
         }
 
+        if ( $userId ){
+            $qb->andWhere("j.user = $userId");
+        }
+
         return $qb
             ->getQuery()
             ->getSingleScalarResult();
     }
 
     public function findFilteredJobs(
+        $userId,
         $offset, $limit,
         $sorting,
         $filter
@@ -73,6 +78,10 @@ class RunningJobRepository extends ServiceEntityRepository
         if( $filter != 'false' ){
             $qb->innerJoin('j.user', 'u', 'WITH', "u.userId LIKE :word")
                ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
+        }
+
+        if ( $userId ){
+            $qb->andWhere("j.user = $userId");
         }
 
         return $qb

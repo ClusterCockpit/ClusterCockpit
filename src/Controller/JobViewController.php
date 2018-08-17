@@ -30,6 +30,7 @@ use App\Entity\RunningJob;
 use App\Entity\JobSearch;
 use App\Repository\JobRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
@@ -46,27 +47,44 @@ use \DateInterval;
 
 class JobViewController extends Controller
 {
-    public function searchId(Request $request)
+    public function searchId(Request $request, AuthorizationCheckerInterface $authChecker)
     {
         $searchId = $request->query->get('searchId');
         $jobRepo = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
         $userRepo = $this->getDoctrine()->getRepository(\App\Entity\User::class);
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
-        $job = $jobRepo->findOneBy(['jobId' => $searchId]);
+        if ( false === $authChecker->isGranted('ROLE_ADMIN') ) {
+            $userId = $this->getUser()->getId();
+            $job = $jobRepo->findOneBy(
+                ['jobId' => $searchId, 'user' => $userId]
+            );
 
-        if (!$job) {
-            $user = $userRepo->findOneBy(['userId' => $searchId]);
-
-            if (!$user) {
+            if (!$job) {
                 return $this->render('error/message.html.twig',
                     array(
-                        'message' => 'No such job or user!'
+                        'message' => 'No such job!'
                     ));
             } else {
-                return $this->redirectToRoute('show_user', array('id' => $user->getId()));
+                return $this->redirectToRoute('show_job', array('id' => $job->getId()));
             }
         } else {
-            return $this->redirectToRoute('show_job', array('id' => $job->getId()));
+            $job = $jobRepo->findOneBy(['jobId' => $searchId]);
+
+            if (!$job) {
+                $user = $userRepo->findOneBy(['userId' => $searchId]);
+
+                if (!$user) {
+                    return $this->render('error/message.html.twig',
+                        array(
+                            'message' => 'No such job or user!'
+                        ));
+                } else {
+                    return $this->redirectToRoute('show_user', array('id' => $user->getId()));
+                }
+            } else {
+                return $this->redirectToRoute('show_job', array('id' => $job->getId()));
+            }
         }
     }
 

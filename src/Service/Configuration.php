@@ -27,7 +27,6 @@ namespace App\Service;
 use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ConfigurationRepository;
-use Symfony\Component\Security\Core\Security;
 
 class Configuration
 {
@@ -37,17 +36,12 @@ class Configuration
 
     public function __construct(
         LoggerInterface $logger,
-        Security $security,
         EntityManagerInterface $em
     )
     {
         $this->_logger = $logger;
         $this->_repository = $em->getRepository(\App\Entity\Configuration::class);
-
         $this->_config =  $this->_repository->findAllDefault();
-
-        /* $this->_config = $this->_repository->findAllScope( */
-        /*     array($security->getUser()->getUsername())); */
     }
 
     public function getUserConfig($user)

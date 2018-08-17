@@ -28,6 +28,8 @@ namespace App\Controller;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Psr\Log\LoggerInterface;
 use App\Form\ApiKeyType;
 use App\Entity\ApiKey;
@@ -131,6 +133,36 @@ class ConfigViewController extends Controller
         return $sidebar;
     }
 
+    private function _userSidebar($active = 0)
+    {
+        $sidebar = array(
+            array(
+                'label' => 'Options',
+                'items' => array(
+                    array(
+                        'label' => 'Plot',
+                        'icon' => 'bar-chart-2',
+                        'link' => '/config/plot',
+                        'addlink' => false,
+                        'active' => false
+                    ),
+                    array(
+                        'label' => 'Colormap',
+                        'icon' => 'edit',
+                        'link' => '/config/colormap',
+                        'addlink' => false,
+                        'active' => false
+                    ),
+                )
+            ),
+        );
+
+        if ( $active != 0 ){
+            $sidebar[$active['menu']]['items'][$active['item']]['active'] = true;
+        }
+
+        return $sidebar;
+    }
     public function init()
     {
         $em = $this->getDoctrine()->getManager();
@@ -164,7 +196,7 @@ class ConfigViewController extends Controller
     {
         return $this->render('config/index.html.twig',
             array(
-                'sidebar' => $this->_sidebar(),
+                'sidebar' => $this->_userSidebar(),
                 'init' => $this->getDoctrine()
                      ->getRepository(\App\Entity\Configuration::class)
                      ->isInit()
@@ -193,11 +225,34 @@ class ConfigViewController extends Controller
     }
 
 
-    public function colorMapOptions(Request $request, ColorMap $colormap)
+    public function colorMapOptions(
+        Request $request,
+        ColorMap $colormap,
+        AuthorizationCheckerInterface $authChecker
+    )
     {
-        $config = $this->getDoctrine()
-                       ->getRepository(\App\Entity\Configuration::class)
-                       ->findAllDefault();
+        $mode = false;
+
+        if ( $authChecker->isGranted('ROLE_ADMIN') ) {
+            $config = $this->getDoctrine()
+                           ->getRepository(\App\Entity\Configuration::class)
+                           ->findAllDefault();
+            $mode = true;
+            $sidebar = $this->_sidebar(
+                    array('menu'=>1,'item'=>2)
+                );
+
+        } else {
+            $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+            $user = $this->getUser();
+            $config = $this->getDoctrine()
+                           ->getRepository(\App\Entity\Configuration::class)
+                           ->findAllScope(array($user->getUsername()));
+
+            $sidebar = $this->_userSidebar(
+                    array('menu'=>0,'item'=>1)
+                );
+        }
 
         $currentColorMap = $config['plot_general_colorscheme'];
 
@@ -208,9 +263,8 @@ class ConfigViewController extends Controller
             array(
                 'colors' => $colors,
                 'current' => $currentColorMap,
-                'sidebar' => $this->_sidebar(
-                    array('menu'=>1,'item'=>2)
-                )
+                'defaultmode' => $mode,
+                'sidebar' => $sidebar
             ));
     }
 
@@ -227,8 +281,8 @@ class ConfigViewController extends Controller
             array(
                 'configHash' => $config['plot'],
                 'defaultmode' => false,
-                'sidebar' => $this->_sidebar(
-                    array('menu'=>1,'item'=>1)
+                'sidebar' => $this->_userSidebar(
+                    array('menu'=>0,'item'=>0)
                 )
             ));
     }
@@ -356,8 +410,8 @@ class ConfigViewController extends Controller
 
     public function listUserAccounts(Request $request)
     {
-        $repository = $this->getDoctrine()->getRepository(\App\Entity\UserAccount::class);
-        $users = $repository->findAll();
+        $repository = $this->getDoctrine()->getRepository(\App\Entity\User::class);
+        $users = $repository->findLocalUsers();
 
         return $this->render('config/listUserAccounts.html.twig',
             array(
