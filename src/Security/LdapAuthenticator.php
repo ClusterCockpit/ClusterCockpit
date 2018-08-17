@@ -146,8 +146,7 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
             $this->_logger->info('LDAP');
             /* authenticate with ldap bind */
             try {
-                /* $this->_ldap->bindUser($username, $password); */
-                return true;
+                $this->_ldap->bindUser($username, $password);
             } catch (ConnectionException $e) {
                 throw new BadCredentialsException('Invalid credentials.');
             }
