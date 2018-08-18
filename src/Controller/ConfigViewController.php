@@ -36,12 +36,16 @@ use App\Entity\ApiKey;
 use App\Form\ClusterType;
 use App\Entity\Cluster;
 use App\Entity\Configuration;
-use App\Form\UserAccountType;
-use App\Entity\UserAccount;
+use App\Form\UserType;
+use App\Entity\User;
 use App\Service\ColorMap;
 
 class ConfigViewController extends Controller
 {
+    /* ####################### */
+    /*       SIDEBARS          */
+    /* ####################### */
+
     private function _sidebar($active = 0)
     {
         $sidebar = array(
@@ -163,6 +167,11 @@ class ConfigViewController extends Controller
 
         return $sidebar;
     }
+
+    /* ####################### */
+    /*       ENTRIES           */
+    /* ####################### */
+
     public function init()
     {
         $em = $this->getDoctrine()->getManager();
@@ -203,7 +212,6 @@ class ConfigViewController extends Controller
             ));
     }
 
-
     /* ####################### */
     /*       OPTIONS           */
     /* ####################### */
@@ -223,7 +231,6 @@ class ConfigViewController extends Controller
                 )
             ));
     }
-
 
     public function colorMapOptions(
         Request $request,
@@ -318,7 +325,6 @@ class ConfigViewController extends Controller
                 )
             ));
     }
-
 
     /* ####################### */
     /*       API KEYS          */
@@ -422,7 +428,7 @@ class ConfigViewController extends Controller
             ));
     }
 
-    public function deleteUserAccount(UserAccount $user, Request $request)
+    public function deleteUserAccount(User $user, Request $request)
     {
         $em = $this->getDoctrine()->getManager();
         $em->remove($user);
@@ -432,11 +438,11 @@ class ConfigViewController extends Controller
     }
 
     public function editUserAccount(
-        UserAccount $user,
+        User $user,
         Request $request,
         UserPasswordEncoderInterface $passwordEncoder)
     {
-        $form = $this->createForm(UserAccountType::class, $user);
+        $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -469,8 +475,8 @@ class ConfigViewController extends Controller
         UserPasswordEncoderInterface $passwordEncoder
     )
     {
-        $user = new UserAccount();
-        $form = $this->createForm(UserAccountType::class, $user);
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

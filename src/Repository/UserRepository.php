@@ -40,6 +40,14 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
         parent::__construct($registry, User::class);
     }
 
+    public function findAll()
+    {
+        return $this->createQueryBuilder('u','u.username')
+                    ->where('u.password IS NULL')
+                    ->getQuery()
+                    ->getResult();
+    }
+
     public function findLocalUsers()
     {
         return $this->createQueryBuilder('u')

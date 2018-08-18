@@ -23,42 +23,27 @@
  *  THE SOFTWARE.
  */
 
-namespace App\Form;
+namespace App\Repository;
 
+use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\UnixGroup;
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
-class UnixGroupType extends AbstractType
+class UnixGroupRepository extends ServiceEntityRepository
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function __construct(
+        ManagerRegistry $registry
+    )
     {
-        $builder
-            ->add('groupId', TextType::class, [
-                'attr' => ['autofocus' => true],
-                'label' => 'Group Id',
-                 'required' => false,
-                 'disabled' => true,
-            ])
-            ->add('organisation', TextType::class, [
-                'label' => 'label.title',
-                 'required' => false,
-            ])
-            ->add('submit', SubmitType::class, [
-                'label' => 'Submit changes',
-            ])
-            ->add('contact', TextareaType::class, [
-                'label' => 'label.summary',
-                 'required' => false
-            ]);
+        parent::__construct($registry, User::class);
     }
 
-    public function configureOptions(OptionsResolver $resolver)
+    public function findAll()
     {
-        $resolver->setDefaults([
-            'data_class' => UnixGroup::class,
-        ]);
+        return $this->createQueryBuilder('g','g.groupId')
+                    ->getQuery()
+                    ->getResult();
     }
+
 }
