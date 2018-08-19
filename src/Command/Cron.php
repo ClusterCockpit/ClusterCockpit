@@ -73,7 +73,7 @@ class Cron extends Command
                 $userGroup[$user][] = $group_id;
 
                 if ( $group_id === 'infohpc' ) {
-                    $ctiveUsers[$user] = 1;
+                    $activeUsers[$user] = 1;
                 }
             }
         }
@@ -180,7 +180,7 @@ class Cron extends Command
         $task = $input->getArgument('task');
 
         if ( $task === 'syncUsers' ){
-            $this->syncUsers();
+	    $this->syncUsers();
         }
     }
 }

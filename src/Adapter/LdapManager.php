@@ -27,18 +27,21 @@ namespace App\Adapter;
 
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Ldap\LdapInterface;
+use Psr\Log\LoggerInterface;
 use App\Service\Configuration;
 
 class LdapManager
 {
+    private $_logger;
     private $_ldap;
     private $_configuration;
 
     public function __construct(
+        LoggerInterface $logger,
         Configuration $configuration
     )
     {
-        $url = getenv('LDAP_URL');
+        $this->_logger = $logger;
         $this->_configuration = $configuration;
         $this->_ldap = Ldap::create('ext_ldap', array(
             'connection_string' => $this->_configuration->getValue('ldap_connection_url')
@@ -76,6 +79,5 @@ class LdapManager
 
           return $this->_ldap->query($baseDn, $filter)->execute()->toArray();
     }
-
 }
 
