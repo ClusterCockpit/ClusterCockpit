@@ -26,7 +26,7 @@
 namespace App\Form;
 
 use App\Entity\ApiKey;
-use App\Entity\UserAccount;
+use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -44,7 +44,7 @@ class ApiKeyType extends AbstractType
             ->add('name', TextType::class)
             ->add('token', TextType::class)
             ->add('user', EntityType::class, array(
-                'class' => UserAccount::class,
+                'class' => User::class,
                 'choice_label' => 'username'
             ))
             ->add('enabled', CheckboxType::class, array('label' => 'Active', 'required' => false))

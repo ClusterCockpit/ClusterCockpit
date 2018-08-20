@@ -25,7 +25,7 @@
 
 namespace App\Security;
 
-use App\Entity\UserAccount;
+use App\Entity\User;
 use App\Entity\ApiKey;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\User;
@@ -46,7 +46,7 @@ class ApiKeyUserProvider implements UserProviderInterface
     {
         $this->_logger = $logger;
         $this->_repository = $em->getRepository(\App\Entity\ApiKey::class);
-        $this->_UserDB = $em->getRepository(\App\Entity\UserAccount::class);
+        $this->_UserDB = $em->getRepository(\App\Entity\User::class);
     }
 
     public function getUsernameForApiKey($apiKey)

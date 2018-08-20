@@ -32,7 +32,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\UserAccount;
+use App\Entity\User;
 
 class AddUser extends Command
 {
@@ -70,7 +70,7 @@ class AddUser extends Command
         $email = $input->getArgument('email');
         $roles = $input->getArgument('roles');
 
-        $repository = $this->_em->getRepository(\App\Entity\UserAccount::class);
+        $repository = $this->_em->getRepository(\App\Entity\User::class);
 
         /* validate input */
         /* if (empty($username)){ */
@@ -83,7 +83,7 @@ class AddUser extends Command
             '',
         ]);
 
-        $user = new UserAccount();
+        $user = new User();
         $password = $this->_encoder->encodePassword($user, $plainPassword);
 
         $user->setUsername($username);
