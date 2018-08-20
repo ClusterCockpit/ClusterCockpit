@@ -34,7 +34,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 class UserRepository extends ServiceEntityRepository  implements UserLoaderInterface
 {
-    private _connection;
+    private $_connection;
 
     public function __construct(
         EntityManagerInterface $em,

@@ -29,6 +29,8 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class DoctrineMetricDataRepository implements MetricDataRepository
 {
+    private $_connection;
+
     public function __construct(
         EntityManagerInterface $em
     )
