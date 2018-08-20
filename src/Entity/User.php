@@ -248,9 +248,22 @@ class User implements UserInterface, \Serializable
         return $this->groups;
     }
 
-    public function setGroups($groups)
+    public function addGroup(UnixGroup $group): self
     {
-        $this->groups = $groups;
+        if (!$this->groups->contains($group)) {
+            $this->groups[] = $group;
+        }
+
+        return $this;
+    }
+
+    public function removeGroup(UnixGroup $group): self
+    {
+        if ($this->groups->contains($group)) {
+            $this->groups->removeElement($group);
+        }
+
+        return $this;
     }
 
     public function getProjects()
@@ -276,5 +289,3 @@ class User implements UserInterface, \Serializable
     }
 
 }
-
-

@@ -76,7 +76,6 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
 
     public function supports(Request $request)
     {
-        $this->_logger->info('SUPPORT');
         if ($this->_security->getUser()) {
             return false;
         }
@@ -92,8 +91,6 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
 
     public function getCredentials(Request $request)
     {
-        $this->_logger->info('GET');
-
         $username = $request->request->get('_username');
         $password = $request->request->get('_password');
         $csrfToken = $request->request->get('_csrf_token');
@@ -118,19 +115,11 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
         $user = $userProvider->loadUserByUsername($credentials['username']);
-
-        if ( empty($user) ){
-            $this->_logger->info('NULL');
-        } else {
-            $this->_logger->info('USER', array($user->getUsername()));
-        }
-
         return $user;
     }
 
     public function checkCredentials($credentials, UserInterface $user)
     {
-        $this->_logger->info('CHECK');
         $username = $credentials['username'];
         $password = $credentials['password'];
 
@@ -141,7 +130,6 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
         $dbPassword = $user->getPassword();
 
         if ( empty($dbPassword) ) {
-            $this->_logger->info('LDAP');
             /* authenticate with ldap bind */
             try {
                 $this->_ldap->bindUser($username, $password);
@@ -150,7 +138,6 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
             }
             return true;
         } else {
-            $this->_logger->info('DB');
             /* authenticate with password */
             if ($this->_passwordEncoder->isPasswordValid($user, $password)) {
                 return true;
@@ -163,9 +150,7 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        $this->_logger->info('SUCCESS');
         $targetPath = null;
-
         $targetPath = $this->getTargetPath($request->getSession(), $providerKey);
 
         if (!$targetPath) {
@@ -189,8 +174,6 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
 
     protected function getLoginUrl()
     {
-        $this->_logger->info('URL');
         return $this->_router->generate('security_login');
     }
-
 }

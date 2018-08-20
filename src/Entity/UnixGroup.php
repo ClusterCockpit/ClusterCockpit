@@ -17,12 +17,12 @@ class UnixGroup
     private $id;
 
     /**
-     *  @ORM\Column(type="string",)
+     *  @ORM\Column(type="string")
      */
     private $groupId;
 
     /**
-     *  @ORM\Column(type="integer",)
+     *  @ORM\Column(type="integer")
      */
     private $gid;
 

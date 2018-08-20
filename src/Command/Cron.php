@@ -43,7 +43,6 @@ class Cron extends Command
     private function syncUsers()
     {
         $results = $this->_ldap->queryGroups();
-        $results = array();
         $groups = array();
         $userGroup = array();
         $activeUsers = array();
@@ -80,7 +79,6 @@ class Cron extends Command
         }
 
         $results = $this->_ldap->queryUsers();
-        $results;
         $users = array();
 
         foreach ( $results as $entry ) {
@@ -89,6 +87,7 @@ class Cron extends Command
             $uid;
             $name;
             $active;
+            $groups;
 
             if ( $entry->hasAttribute('uid') ) {
                 $user_id = $entry->getAttribute('uid')[0];
@@ -99,10 +98,15 @@ class Cron extends Command
             if ( $entry->hasAttribute('gecos') ) {
                 $name = $entry->getAttribute('gecos')[0];
             }
-            if (! array_key_exists($user_id, $activeUsers) ) {
+            if ( array_key_exists($user_id, $activeUsers) ) {
                 $active = 1;
             } else {
                 $active = 0;
+            }
+            if ( array_key_exists($user_id, $userGroup) ) {
+                $groups = $userGroup[$user_id];
+            } else {
+                $groups = array();
             }
 
             $users[$user_id] = array(
@@ -111,18 +115,20 @@ class Cron extends Command
                 'name'     => $name,
                 'email'    => $user_id.'@mailhub.uni-erlangen.de',
                 'active'   => $active,
-                'groups'   => $userGroup[$user_id]
+                'groups'   => $groups
             );
         }
 
+        /* get current DB tables */
         $userRepo = $this->_em->getRepository(\App\Entity\User::class);
         $usersDB = $userRepo->findAll();
 
         $groupRepo = $this->_em->getRepository(\App\Entity\UnixGroup::class);
         $groupsDB = $groupRepo->findAll();
 
+        /* update groups */
         foreach  ( $groups as $group ){
-            $groupId = $group[$group_id];
+            $groupId = $group['group_id'];
 
             if (! array_key_exists($groupId, $groupsDB) ) {
                 $this->_logger->info("CRON:syncUsers Add group $groupId");
@@ -135,12 +141,13 @@ class Cron extends Command
         }
         $this->_em->flush();
 
+        /* update users */
         foreach  ( $users as $user ){
             $userId = $user['user_id'];
 
             if ( array_key_exists($userId, $usersDB) ) {
                 $name = $user['name'];
-                $Dbuser = $usersDB[$userId];
+                $DbUser = $usersDB[$userId];
 
                 if ( $name !== $DbUser->getName() ){
                     $this->_logger->info("CRON:syncUsers Change name for $userId");
@@ -155,6 +162,12 @@ class Cron extends Command
                 $newUser->setUid($user['uid']);
                 $newUser->setName($user['name']);
                 $newUser->setEmail($user['email']);
+
+                foreach  ( $user['groups'] as $group ) {
+                    $dbGroup = $groupRepo->findOneBy(['groupId' => $group]);
+                    $newUser->addGroup($dbGroup);
+                }
+
                 $this->_em->persist($newUser);
             }
         }
