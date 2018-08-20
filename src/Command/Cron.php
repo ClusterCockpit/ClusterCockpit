@@ -138,10 +138,10 @@ class Cron extends Command
                 $newGroup = new UnixGroup();
                 $newGroup->setGroupId($group['group_id']);
                 $newGroup->setGid($group['gid']);
-                $this->_em->persist($newGroup);
+                /* $this->_em->persist($newGroup); */
             }
         }
-        $this->_em->flush();
+        /* $this->_em->flush(); */
 
         /* update users */
         foreach  ( $users as $user ){
@@ -154,7 +154,7 @@ class Cron extends Command
                 if ( $name !== $DbUser->getName() ){
                     $this->_logger->info("CRON:syncUsers Change name for $userId");
                     $DbUser->setName($name);
-                    $this->_em->persist($DbUser);
+                    /* $this->_em->persist($DbUser); */
                 }
             } else {
                 $this->_logger->info("CRON:syncUsers Add user $userId");
@@ -166,18 +166,17 @@ class Cron extends Command
                 $newUser->setEmail($user['email']);
 
                 foreach  ( $user['groups'] as $group ) {
-			$groupId = $group['groupId'];
-                    $this->_logger->info("CRON:syncUsers Add $userId to $groupId");
-                    $dbGroup = $groupRepo->findOneBy(['groupId' => $groupId]);
+                    $this->_logger->info("CRON:syncUsers Add $userId to $group");
+                    $dbGroup = $groupRepo->findOneBy(['groupId' => $group]);
                     $newUser->addGroup($dbGroup);
                 }
 
-                $this->_em->persist($newUser);
+                /* $this->_em->persist($newUser); */
             }
         }
-        $this->_em->flush();
+        /* $this->_em->flush(); */
 
-        $userRepo->resetActiveUsers($activeUsers);
+        /* $userRepo->resetActiveUsers($activeUsers); */
     }
 
 
