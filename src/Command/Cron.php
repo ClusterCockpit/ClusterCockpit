@@ -99,7 +99,7 @@ class Cron extends Command
             if ( $entry->hasAttribute('gecos') ) {
                 $name = $entry->getAttribute('gecos')[0];
             }
-            if (! array_key_exists($activeUsers[$user_id]) ) {
+            if (! array_key_exists($user_id, $activeUsers) ) {
                 $active = 1;
             } else {
                 $active = 0;
@@ -124,7 +124,7 @@ class Cron extends Command
         foreach  ( $groups as $group ){
             $groupId = $group[$group_id];
 
-            if (! array_key_exists($groupsDB[$groupId]) ) {
+            if (! array_key_exists($groupId, $groupsDB) ) {
                 $this->_logger->info("CRON:syncUsers Add group $groupId");
 
                 $newGroup = new UnixGroup();
@@ -138,7 +138,7 @@ class Cron extends Command
         foreach  ( $users as $user ){
             $userId = $user['user_id'];
 
-            if ( array_key_exists($usersDB[$userId]) ) {
+            if ( array_key_exists($userId, $usersDB) ) {
                 $name = $user['name'];
                 $Dbuser = $usersDB[$userId];
 
