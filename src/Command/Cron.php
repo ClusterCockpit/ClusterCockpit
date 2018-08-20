@@ -43,6 +43,7 @@ class Cron extends Command
     private function syncUsers()
     {
         $results = $this->_ldap->queryGroups();
+        $results = array();
         $groups = array();
         $userGroup = array();
         $activeUsers = array();
@@ -79,12 +80,15 @@ class Cron extends Command
         }
 
         $results = $this->_ldap->queryUsers();
+        $results;
+        $users = array();
 
         foreach ( $results as $entry ) {
 
             $user_id;
             $uid;
             $name;
+            $active;
 
             if ( $entry->hasAttribute('uid') ) {
                 $user_id = $entry->getAttribute('uid')[0];
@@ -95,22 +99,27 @@ class Cron extends Command
             if ( $entry->hasAttribute('gecos') ) {
                 $name = $entry->getAttribute('gecos')[0];
             }
+            if (! array_key_exists($activeUsers[$user_id]) ) {
+                $active = 1;
+            } else {
+                $active = 0;
+            }
 
             $users[$user_id] = array(
                 'user_id'  => $user_id,
                 'uid'      => $uid,
                 'name'     => $name,
                 'email'    => $user_id.'@mailhub.uni-erlangen.de',
-                'active'   => $activeUsers[$user_id] ? 1 : 0,
+                'active'   => $active,
                 'groups'   => $userGroup[$user_id]
             );
         }
 
-        $repository = $this->_em->getRepository(\App\Entity\User::class);
-        $usersDB = $repository->findAll();
+        $userRepo = $this->_em->getRepository(\App\Entity\User::class);
+        $usersDB = $userRepo->findAll();
 
-        $repository = $this->_em->getRepository(\App\Entity\UnixGroup::class);
-        $groupsDB = $repository->findAll();
+        $groupRepo = $this->_em->getRepository(\App\Entity\UnixGroup::class);
+        $groupsDB = $groupRepo->findAll();
 
         foreach  ( $groups as $group ){
             $groupId = $group[$group_id];
@@ -150,6 +159,8 @@ class Cron extends Command
             }
         }
         $this->_em->flush();
+
+        $userRepo->resetActiveUsers($activeUsers);
     }
 
 
@@ -180,7 +191,7 @@ class Cron extends Command
         $task = $input->getArgument('task');
 
         if ( $task === 'syncUsers' ){
-	    $this->syncUsers();
+            $this->syncUsers();
         }
     }
 }

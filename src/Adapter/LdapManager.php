@@ -52,10 +52,11 @@ class LdapManager
     {
         $base = $this->_configuration->getValue('ldap_user_base');
         $key = $this->_configuration->getValue('ldap_user_key');
-        $dn = $key.'='.$uid.$base;
-        $username = $this->_ldap->escape($dn, '', LdapInterface::ESCAPE_DN);
+        $dn = $key.'='.$uid.','.$base;
+        $this->_logger->info('BIND', array($dn))
+        /* $username = $this->_ldap->escape($dn, '', LdapInterface::ESCAPE_DN); */
 
-        $this->_ldap->bind($username, $password);
+        $this->_ldap->bind($dn, $password);
     }
 
     public function queryUsers()

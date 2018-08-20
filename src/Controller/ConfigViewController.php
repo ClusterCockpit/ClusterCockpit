@@ -563,17 +563,18 @@ class ConfigViewController extends Controller
             ));
     }
 
-    public function deleteCluster(ApiKey $key, Request $request)
+    public function deleteCluster(Cluster $cluster, Request $request)
     {
         $em = $this->getDoctrine()->getManager();
-        $em->remove($key);
+        $em->remove($cluster);
         $em->flush();
 
-        return $this->redirectToRoute('list_api_keys');
+        return $this->redirectToRoute('list_clusters');
     }
 
     public function editCluster(Cluster $cluster, Request $request)
     {
+        $repository = $this->getDoctrine()->getRepository(\App\Entity\Cluster::class);
         $form = $this->createForm(ClusterType::class, $cluster);
         $form->handleRequest($request);
 
@@ -592,7 +593,7 @@ class ConfigViewController extends Controller
         return $this->render('config/editCluster.html.twig',
             array(
                 'form' => $form->createView(),
-                'cluster' => $cluster,
+                'cluster' => $repository->addNodes($cluster),
                 'title' => "Edit Cluster ".$cluster->getName(),
                 'sidebar' => $this->_sidebar(
                     array('menu'=>2,'item'=>1)

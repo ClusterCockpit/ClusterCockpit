@@ -118,7 +118,6 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        $this->_logger->info('USER', $credentials);
         $user = $userProvider->loadUserByUsername($credentials['username']);
 
         if ( empty($user) ){

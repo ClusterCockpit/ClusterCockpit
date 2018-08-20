@@ -29,14 +29,19 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 class UserRepository extends ServiceEntityRepository  implements UserLoaderInterface
 {
+    private _connection;
+
     public function __construct(
+        EntityManagerInterface $em,
         ManagerRegistry $registry
     )
     {
+        $this->_connection = $em->getConnection();
         parent::__construct($registry, User::class);
     }
 
@@ -77,5 +82,18 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
                     ->setParameter('username', $username)
                     ->getQuery()
                     ->getOneOrNullResult();
+    }
+
+    public function resetActiveUsers($activeUsers)
+    {
+        $sql = "UPDATE user SET is_active = 0";
+        $stmt = $this->_connection->executeUpdate($sql);
+
+        foreach ($activeUsers as $key => $value){
+            if ( $value ){
+                $sql = "UPDATE user SET is_active = 1 WHERE username = ?";
+                $stmt = $this->_connection->executeUpdate($sql, array($key));
+            }
+        }
     }
 }

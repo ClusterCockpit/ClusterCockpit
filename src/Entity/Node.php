@@ -20,43 +20,43 @@ class Node
     /**
      *  @ORM\Column(type="string",)
      */
-    private $nodeId;
+    public $nodeId;
 
     /**
      *  @ORM\Column(type="string",nullable=true)
      */
-    private $rackId;
+    public $rackId;
 
     /**
      *  @ORM\Column(type="string",nullable=true)
      */
-    private $uarch;
+    public $uarch;
 
     /**
      *  @ORM\Column(type="integer")
      */
-    private $cluster;
+    public $cluster;
 
     /**
      *  @ORM\Column(type="integer")
      */
-    private $numCores;
+    public $numCores;
 
     /**
      *  @ORM\Column(type="integer")
      */
-    private $numProcessors;
+    public $numProcessors;
 
     /**
      * @ORM\ManyToMany(targetEntity="Property")
      * @ORM\JoinTable(name="nodes_properties", joinColumns={@ORM\JoinColumn(name="node_id", referencedColumnName="id")}, inverseJoinColumns={@ORM\JoinColumn(name="property_id", referencedColumnName="id")})
      */
-    private $properties;
+    public $properties;
 
     /**
-     *  @ORM\Column(type="string",options={"default":"free"})
+     *  @ORM\Column(type="string",options={"default":"active"})
      */
-    private $status;
+    public $status;
 
     public function __construct() {
         $this->properties = new \Doctrine\Common\Collections\ArrayCollection();

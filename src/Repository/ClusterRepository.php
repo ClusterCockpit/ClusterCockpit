@@ -47,8 +47,8 @@ class ClusterRepository extends ServiceEntityRepository
     public function findAllConfig()
     {
         $clusters = $this->createQueryBuilder('c', 'c.name')
-            ->getQuery()
-            ->getResult();
+                         ->getQuery()
+                         ->getResult();
 
         foreach ($clusters as $cluster ) {
             $cluster->setNodes($this->_nodeRepository->findBy(
@@ -57,6 +57,15 @@ class ClusterRepository extends ServiceEntityRepository
         }
 
         return $clusters;
+    }
+
+    public function addNodes(Cluster $cluster)
+    {
+        $cluster->setNodes($this->_nodeRepository->findBy(
+            ['cluster' => $cluster->getId()])
+        );
+
+        return $cluster;
     }
 
 }

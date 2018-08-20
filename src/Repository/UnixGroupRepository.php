@@ -36,7 +36,7 @@ class UnixGroupRepository extends ServiceEntityRepository
         ManagerRegistry $registry
     )
     {
-        parent::__construct($registry, User::class);
+        parent::__construct($registry, UnixGroup::class);
     }
 
     public function findAll()
