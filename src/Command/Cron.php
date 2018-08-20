@@ -166,7 +166,9 @@ class Cron extends Command
                 $newUser->setEmail($user['email']);
 
                 foreach  ( $user['groups'] as $group ) {
-                    $dbGroup = $groupRepo->findOneBy(['groupId' => $group]);
+			$groupId = $group['groupId'];
+                    $this->_logger->info("CRON:syncUsers Add $userId to $groupId");
+                    $dbGroup = $groupRepo->findOneBy(['groupId' => $groupId]);
                     $newUser->addGroup($dbGroup);
                 }
 
@@ -181,6 +183,7 @@ class Cron extends Command
 
     public function __construct(
         LdapManager $ldap,
+        LoggerInterface $logger,
         EntityManagerInterface $em
     )
     {
