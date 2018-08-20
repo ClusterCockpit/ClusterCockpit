@@ -36,12 +36,12 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
     private $_connection;
 
     public function __construct(
-        EntityManagerInterface $em,
-        ManagerRegistry $registry
+        ManagerRegistry $registry,
+        EntityManagerInterface $em
     )
     {
-        $this->_connection = $em->getConnection();
         parent::__construct($registry, User::class);
+        $this->_connection = $em->getConnection();
     }
 
     public function findAll()

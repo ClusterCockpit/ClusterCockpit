@@ -102,8 +102,6 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
             'password' => $password,
         );
 
-        $this->_logger->info('getCredentials', $credentials);
-
         if (false === $this->_csrfTokenManager->isTokenValid(new CsrfToken('authenticate', $csrfToken))) {
             throw new InvalidCsrfTokenException('Invalid CSRF token.');
         }
