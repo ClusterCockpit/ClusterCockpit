@@ -25,7 +25,6 @@
 
 namespace App\Security;
 
-use App\Entity\User;
 use App\Entity\ApiKey;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\User;
