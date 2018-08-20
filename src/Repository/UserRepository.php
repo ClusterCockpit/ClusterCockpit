@@ -29,7 +29,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 class UserRepository extends ServiceEntityRepository  implements UserLoaderInterface
