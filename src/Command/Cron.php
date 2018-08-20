@@ -33,10 +33,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Adapter\LdapManager;
 use App\Entity\User;
 use App\Entity\UnixGroup;
+use Psr\Log\LoggerInterface;
 
 
 class Cron extends Command
 {
+    private $_logger;
     private $_em;
     private $_ldap;
 
@@ -182,6 +184,7 @@ class Cron extends Command
         EntityManagerInterface $em
     )
     {
+        $this->_logger = $logger;
         $this->_em = $em;
         $this->_ldap = $ldap;
 
