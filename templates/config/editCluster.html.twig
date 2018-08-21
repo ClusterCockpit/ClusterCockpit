@@ -5,35 +5,33 @@
 {% endblock %}
 
 {% block navigation %}
-    <div class="collapse navbar-collapse">
-        <span class="navbar-text font-weight-bold ml-5">
-            Navigation
-        </span>
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-                <a class="nav-link page-scroll" href="#page-top">
-                    Top
-                </a>
-            </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
-                        Metric lists
-                    </a>
-                    <div class="dropdown-menu">
-                        {% for list in cluster.metricLists %}
-                            <a class="dropdown-item page-scroll" href="#list-{{ list.id }}">
-                            {{ list.name }}
-                        </a>
-                        {% endfor %}
-                    </div>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#nodes">
-                        Node list
-                    </a>
-                </li>
-        </ul>
-    </div>
+     <span class="navbar-text font-weight-bold ml-5">
+         Navigation
+     </span>
+     <ul class="navbar-nav mr-auto">
+         <li class="nav-item">
+             <a class="nav-link page-scroll" href="#page-top">
+                 Top
+             </a>
+         </li>
+             <li class="nav-item dropdown">
+                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
+                     Metric lists
+                 </a>
+                 <div class="dropdown-menu">
+                     {% for list in cluster.metricLists %}
+                         <a class="dropdown-item page-scroll" href="#list-{{ list.id }}">
+                         {{ list.name }}
+                     </a>
+                     {% endfor %}
+                 </div>
+             </li>
+             <li class="nav-item">
+                 <a class="nav-link" href="#nodes">
+                     Node list
+                 </a>
+             </li>
+     </ul>
 {% endblock %}
 
 {% block javascript %}
