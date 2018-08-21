@@ -42,6 +42,19 @@ class Cron extends Command
     private $_em;
     private $_ldap;
 
+    public function __construct(
+        LdapManager $ldap,
+        LoggerInterface $logger,
+        EntityManagerInterface $em
+    )
+    {
+        $this->_logger = $logger;
+        $this->_em = $em;
+        $this->_ldap = $ldap;
+
+        parent::__construct();
+    }
+
     private function syncUsers()
     {
         $results = $this->_ldap->queryGroups();
@@ -179,20 +192,6 @@ class Cron extends Command
         /* $userRepo->resetActiveUsers($activeUsers); */
     }
 
-
-    public function __construct(
-        LdapManager $ldap,
-        LoggerInterface $logger,
-        EntityManagerInterface $em
-    )
-    {
-        $this->_logger = $logger;
-        $this->_em = $em;
-        $this->_ldap = $ldap;
-
-        parent::__construct();
-    }
-
     protected function configure()
     {
         $this
@@ -213,5 +212,4 @@ class Cron extends Command
         }
     }
 }
-
 
