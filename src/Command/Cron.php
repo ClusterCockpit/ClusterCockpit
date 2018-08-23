@@ -55,7 +55,7 @@ class Cron extends Command
         parent::__construct();
     }
 
-    private function syncUsers()
+    private function syncUsers($output)
     {
         $results = $this->_ldap->queryGroups();
         $groups = array();
@@ -64,12 +64,13 @@ class Cron extends Command
 
         foreach ( $results as $entry ) {
 
-            $group_id;
-            $gid;
-            $members;
+            $group_id = 'no_group';
+            $gid= '000';
+            $members = array();
 
             if ( $entry->hasAttribute('cn') ) {
-                $group_id = $entry->getAttribute('cn')[0];
+                $str = $entry->getAttribute('cn')[0];
+		$group_id = str_replace("hpc_","", $str);
             }
             if ( $entry->hasAttribute('gidNumber') ) {
                 $gid = $entry->getAttribute('gidNumber')[0];
@@ -102,7 +103,7 @@ class Cron extends Command
             $uid;
             $name;
             $active;
-            $groups;
+            $groupsUser;
 
             if ( $entry->hasAttribute('uid') ) {
                 $user_id = $entry->getAttribute('uid')[0];
@@ -119,9 +120,9 @@ class Cron extends Command
                 $active = 0;
             }
             if ( array_key_exists($user_id, $userGroup) ) {
-                $groups = $userGroup[$user_id];
+                $groupsUser = $userGroup[$user_id];
             } else {
-                $groups = array();
+                $groupsUser = array();
             }
 
             $users[$user_id] = array(
@@ -130,7 +131,7 @@ class Cron extends Command
                 'name'     => $name,
                 'email'    => $user_id.'@mailhub.uni-erlangen.de',
                 'active'   => $active,
-                'groups'   => $groups
+                'groups'   => $groupsUser
             );
         }
 
@@ -143,18 +144,19 @@ class Cron extends Command
 
         /* update groups */
         foreach  ( $groups as $group ){
-            $groupId = $group['group_id'];
+		    $groupId = $group['group_id'];
 
             if (! array_key_exists($groupId, $groupsDB) ) {
                 $this->_logger->info("CRON:syncUsers Add group $groupId");
+		$output->writeln("Add group $groupId");
 
                 $newGroup = new UnixGroup();
                 $newGroup->setGroupId($group['group_id']);
                 $newGroup->setGid($group['gid']);
-                /* $this->_em->persist($newGroup); */
-            }
+                $this->_em->persist($newGroup);
+	    }
         }
-        /* $this->_em->flush(); */
+        $this->_em->flush();
 
         /* update users */
         foreach  ( $users as $user ){
@@ -165,11 +167,13 @@ class Cron extends Command
                 $DbUser = $usersDB[$userId];
 
                 if ( $name !== $DbUser->getName() ){
+		$output->writeln("Change name for $userId");
                     $this->_logger->info("CRON:syncUsers Change name for $userId");
                     $DbUser->setName($name);
-                    /* $this->_em->persist($DbUser); */
+                    $this->_em->persist($DbUser);
                 }
             } else {
+		$output->writeln("Add user $userId");
                 $this->_logger->info("CRON:syncUsers Add user $userId");
 
                 $newUser = new User();
@@ -177,19 +181,21 @@ class Cron extends Command
                 $newUser->setUid($user['uid']);
                 $newUser->setName($user['name']);
                 $newUser->setEmail($user['email']);
+                $newUser->setIsActive('false');
 
                 foreach  ( $user['groups'] as $group ) {
+		$output->writeln("Add user $userId to $group");
                     $this->_logger->info("CRON:syncUsers Add $userId to $group");
                     $dbGroup = $groupRepo->findOneBy(['groupId' => $group]);
                     $newUser->addGroup($dbGroup);
                 }
 
-                /* $this->_em->persist($newUser); */
+                $this->_em->persist($newUser);
             }
         }
-        /* $this->_em->flush(); */
+        $this->_em->flush();
 
-        /* $userRepo->resetActiveUsers($activeUsers); */
+        $userRepo->resetActiveUsers($activeUsers);
     }
 
     protected function configure()
@@ -208,7 +214,7 @@ class Cron extends Command
         $task = $input->getArgument('task');
 
         if ( $task === 'syncUsers' ){
-            $this->syncUsers();
+            $this->syncUsers($output);
         }
     }
 }
