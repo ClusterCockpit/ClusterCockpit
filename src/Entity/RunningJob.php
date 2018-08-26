@@ -48,6 +48,11 @@ class RunningJob
     public $duration;
 
     /**
+     *  @ORM\Column(type="string", nullable=true)
+     */
+    private $queue;
+
+    /**
      *  @ORM\Column(type="integer", nullable=true, options={"default":0})
      */
     public $severity;

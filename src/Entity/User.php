@@ -79,7 +79,7 @@ class User implements UserInterface, \Serializable
     private $groups;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @ORM\Column(type="boolean", nullable=true)
      */
     private $isActive;
 
