@@ -418,8 +418,8 @@ class JobCache
     public function warmupCache($job)
     {
         $options = array();
-            $job->stopTime = 1521057932;
-        /* $job->stopTime = time(); */
+            /* $job->stopTime = 1521057932; */
+        $job->stopTime = time();
         $job->duration = $job->stopTime - $job->startTime;
 
         $job->jobCache = new \App\Entity\JobCache();
