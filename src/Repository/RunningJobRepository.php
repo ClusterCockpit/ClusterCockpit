@@ -49,7 +49,7 @@ class RunningJobRepository extends ServiceEntityRepository
             $qb->select('count(j.id)');
         } else {
             $qb->select('count(j.id)')
-               ->innerJoin('j.user', 'u', 'WITH', "u.userId LIKE :word")
+               ->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
                ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
         }
 
@@ -76,7 +76,7 @@ class RunningJobRepository extends ServiceEntityRepository
            ->setMaxResults( $limit );
 
         if( $filter != 'false' ){
-            $qb->innerJoin('j.user', 'u', 'WITH', "u.userId LIKE :word")
+            $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
                ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
         }
 

@@ -179,18 +179,18 @@ class JobRepository extends ServiceEntityRepository
         return $stat;
     }
 
-  public function countFilteredJobs($userId,  $filter, $search = NULL )
+    public function countFilteredJobs($userId,  $filter, $search = NULL )
     {
         $qb = $this->createQueryBuilder('j');
 
         if( $filter == 'false' ){
             $qb->select('count(j.id)')
-                ->where("j.duration > 300");
+               ->where("j.duration > 300");
         } else {
             $qb->select('count(j.id)')
-                ->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
-                ->where("j.duration > 300")
-                ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
+               ->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
+               ->where("j.duration > 300")
+               ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
         }
 
         if ( !is_null($search) ){
@@ -200,7 +200,7 @@ class JobRepository extends ServiceEntityRepository
             if ( $search['clusterId'] != 0 ) {
                 $qb->andWhere("j.cluster = $search[clusterId]");
             }
-           if ( isset($search['userId']) ){
+            if ( isset($search['userId']) ){
                 $userId = $search['userId'];
                 /* $qb->andWhere("j.user = $userId"); */
 
@@ -208,7 +208,7 @@ class JobRepository extends ServiceEntityRepository
                     $qb->andWhere("j.user = $userId");
                 } else {
                     $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
-                        ->setParameter('word', '%'.addcslashes($userId, '%_').'%');
+                       ->setParameter('word', '%'.addcslashes($userId, '%_').'%');
                 }
             }
         }
@@ -232,10 +232,10 @@ class JobRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('j');
         $qb->select('j')
-            ->where("j.duration > 300")
-            ->orderBy('j.'.$sorting['col'], $sorting['order'])
-            ->setFirstResult( $offset )
-            ->setMaxResults( $limit );
+           ->where("j.duration > 300")
+           ->orderBy('j.'.$sorting['col'], $sorting['order'])
+           ->setFirstResult( $offset )
+           ->setMaxResults( $limit );
 
         if( $filter != 'false' ){
             $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
@@ -249,17 +249,17 @@ class JobRepository extends ServiceEntityRepository
             if ( $search['clusterId'] != 0 ) {
                 $qb->andWhere("j.cluster = $search[clusterId]");
             }
-        if ( ! $userId ){
-            if ( isset($search['userId']) ){
-                $userId = $search['userId'];
+            if ( ! $userId ){
+                if ( isset($search['userId']) ){
+                    $userId = $search['userId'];
 
-                if ( is_numeric($userId) ){
-                    $qb->andWhere("j.user = $userId");
-                } else {
-                    $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
-                        ->setParameter('word', '%'.addcslashes($userId, '%_').'%');
+                    if ( is_numeric($userId) ){
+                        $qb->andWhere("j.user = $userId");
+                    } else {
+                        $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
+                           ->setParameter('word', '%'.addcslashes($userId, '%_').'%');
+                    }
                 }
-            }
             }
 
         }
@@ -318,8 +318,8 @@ class JobRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('j');
         $qb->select('j')
-            ->where($qb->expr()->between( 'j.startTime', $startTime, $stopTime))
-            ->andWhere("j.duration > 300");
+           ->where($qb->expr()->between( 'j.startTime', $startTime, $stopTime))
+           ->andWhere("j.duration > 300");
 
         return $qb
             ->getQuery()
@@ -336,10 +336,10 @@ class JobRepository extends ServiceEntityRepository
         $stopTime = $settings['stopTime'];
 
         $qb->select('j')
-            ->where('j.user = ?1')
-            ->orderBy('j.startTime', 'DESC')
-            ->setMaxResults( $limit )
-            ->setParameter(1, $userId);
+           ->where('j.user = ?1')
+           ->orderBy('j.startTime', 'DESC')
+           ->setMaxResults( $limit )
+           ->setParameter(1, $userId);
         $qb->andWhere($qb->expr()->between( 'j.startTime', $startTime, $stopTime));
 
         return $qb
@@ -352,10 +352,10 @@ class JobRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('j');
 
         $qb->select('j')
-            ->where('j.cluster = ?1')
-            ->orderBy('j.numNodes', 'DESC')
-            ->setMaxResults( 20 )
-            ->setParameter(1, $control->getCluster());
+           ->where('j.cluster = ?1')
+           ->orderBy('j.numNodes', 'DESC')
+           ->setMaxResults( 20 )
+           ->setParameter(1, $control->getCluster());
 
         return $qb
             ->getQuery()
@@ -414,7 +414,7 @@ class JobRepository extends ServiceEntityRepository
 
             $users = $this->_connection->fetchAll($sql);
 
-        $sql = "
+            $sql = "
             SELECT user_id as userId,
                    COUNT(*) as count
             FROM job
@@ -424,12 +424,12 @@ class JobRepository extends ServiceEntityRepository
             GROUP BY 1
             ";
 
-        $shortJobs = $this->_connection->fetchAll($sql);
+            $shortJobs = $this->_connection->fetchAll($sql);
 
-        foreach ( $shortJobs as $id => &$user ){
-            $index = $user['userId'];
-            $lookup[$index] = $user['count'];
-        }
+            foreach ( $shortJobs as $id => &$user ){
+                $index = $user['userId'];
+                $lookup[$index] = $user['count'];
+            }
 
         } else {
             foreach ( $settings['clusters'] as $cluster ){

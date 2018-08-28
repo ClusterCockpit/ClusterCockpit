@@ -31,6 +31,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Adapter\LdapManager;
+use App\Service\JobCache;
 use App\Entity\User;
 use App\Entity\UnixGroup;
 use Psr\Log\LoggerInterface;
@@ -41,18 +42,33 @@ class Cron extends Command
     private $_logger;
     private $_em;
     private $_ldap;
+    private $_jobCache;
 
     public function __construct(
         LdapManager $ldap,
         LoggerInterface $logger,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        JobCache $jobCache
     )
     {
         $this->_logger = $logger;
         $this->_em = $em;
         $this->_ldap = $ldap;
+        $this->_jobCache = $jobCache;
 
         parent::__construct();
+    }
+
+    private function warmupCache($output)
+    {
+        $repository = $this->_em->getRepository(\App\Entity\RunningJob::class);
+        $jobs = $repository->findAll();
+
+        foreach ( $jobs as $job ){
+            $this->_jobCache->warmupCache($job);
+            $this->_em->persist($job);
+        }
+        $this->_em->flush();
     }
 
     private function syncUsers($output)
@@ -215,6 +231,8 @@ class Cron extends Command
 
         if ( $task === 'syncUsers' ){
             $this->syncUsers($output);
+        } else if ( $task === 'warmupCache' ){
+            $this->warmupCache($output);
         }
     }
 }

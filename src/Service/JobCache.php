@@ -38,6 +38,8 @@ use App\Entity\MetricStat;
 use App\Repository\DoctrineMetricDataRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
+/* use Symfony\Component\Cache\Adapter\PhpArrayAdapter; */
 
 /**
  * Class: JobCache
@@ -49,6 +51,7 @@ class JobCache
 {
     private $_logger;
     private $_em;
+    private $_cache;
     private $_jobRepository;
     private $_plotGenerator;
     private $_traceRepository;
@@ -61,6 +64,7 @@ class JobCache
         EntityManagerInterface $em,
         PlotGenerator $plotGenerator,
         DoctrineMetricDataRepository $metricRepo,
+        AdapterInterface $cache,
         Configuration $configuration
     )
     {
@@ -71,6 +75,8 @@ class JobCache
         $this->_jobRepository = $em->getRepository(\App\Entity\Job::class);
         $this->_metricDataRepository = $metricRepo;
         $this->_traceRepository = $em->getRepository(\App\Entity\TraceResolution::class);
+
+        $this->_cache = $cache;
     }
 
     public function getBackend()
@@ -143,12 +149,9 @@ class JobCache
         $this->_em->persist($plot);
     }
 
-    private function _buildViewPlots($job)
+    private function _buildViewPlots($job, $stats, $metrics)
     {
-        $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
-        $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
-
-        $this->_createJobRooflineCache($job);
+        $this->_createJobRooflineCache($job, $metrics);
         $this->_createJobPolarPlotCache($job, $stats);
         $this->_createNodeStats($job, $stats['nodeStats'], $metrics, true);
     }
@@ -185,9 +188,9 @@ class JobCache
         }
     }
 
-    private function _createJobRooflineCache($job)
+    private function _createJobRooflineCache($job, $metrics)
     {
-        $data = $this->_metricDataRepository->getJobRoofline($job);
+        $data = $this->_metricDataRepository->getJobRoofline($job, $metrics);
         $plot = new Plot();
         $plot->name = 'roofline';
         $x; $y;
@@ -216,7 +219,7 @@ class JobCache
         $plot->traceResolution = $traceResolution;
         $job->jobCache->addPlot($plot);
         $plot->setJobCache($job->jobCache);
-        $this->_persistPlot($plot);
+        /* $this->_persistPlot($plot); */
     }
 
     private function _generateMetricPlotCache(
@@ -248,7 +251,7 @@ class JobCache
             $trace->setName($nodeId);
 
             if ($options['sample'] > 0){
-                $this->_tsHelper->downsampleData($x,$y,$options['sample']);
+                $this->_tsHelper->downsampling($x,$y,$options['sample']);
             }
 
             $trace->setJson(json_encode(array(
@@ -266,7 +269,7 @@ class JobCache
         $plot->traceResolution = $traceResolution;
     }
 
-    private function _createJobPolarPlotCache($stats)
+    private function _createJobPolarPlotCache($job, $stats)
     {
         $plot = new Plot();
         $plot->name = 'polarplot';
@@ -275,13 +278,12 @@ class JobCache
         $traceResolution->resolution = 'view';
         $trace = new Trace();
         $trace->setName('polarplot');
-        $trace->setJson(json_encode($avg));
+        $trace->setJson(json_encode($stats));
         $traceResolution->addTrace($trace);
         $trace->setTraceResolution($traceResolution);
         $plot->traceResolution = $traceResolution;
         $job->jobCache->addPlot($plot);
         $plot->setJobCache($job->jobCache);
-        $this->_persistPlot($plot);
     }
 
 
@@ -309,7 +311,7 @@ class JobCache
                 $plot->setJobCache($jobCache);
             }
 
-            $this->_plotGenerator->generateMetricPlotCache(
+            $this->_generateMetricPlotCache(
                 $plot,
                 $job,
                 $metric,
@@ -317,7 +319,7 @@ class JobCache
                 $data,
                 $options);
 
-            $this->_persistPlot($plot);
+            /* $this->_persistPlot($plot); */
         }
     }
 
@@ -413,6 +415,76 @@ class JobCache
         }
     }
 
+    public function warmupCache($job)
+    {
+        $options = array();
+            $job->stopTime = 1521057932;
+        /* $job->stopTime = time(); */
+        $job->duration = $job->stopTime - $job->startTime;
+
+        $job->jobCache = new \App\Entity\JobCache();
+
+        $options['mode'] = 'view';
+        $options['autotick'] = true;
+        $options['sample'] = 0;
+        $options['legend'] = false;
+        $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
+        $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
+
+        $job->memUsedAvg = $stats['mem_used_avg'];
+        $job->memBwAvg = $stats['mem_bw_avg'];
+        $job->flopsAnyAvg = $stats['flops_any_avg'];
+        $job->trafficTotalIbAvg = $stats['traffic_total_ib_avg'];
+        $job->trafficTotalLustreAvg = $stats['traffic_total_lustre_avg'];
+
+        $this->_plotGenerator->generateJobRoofline(
+            $job, $this->_metricDataRepository->getJobRoofline($job, $metrics)
+        );
+
+        $this->_plotGenerator->generateJobPolarPlot(
+            $job, $metrics, $stats
+        );
+
+        $this->_createNodeStats($job, $stats['nodeStats'], $metrics);
+
+        $metrics = $job->getCluster()->getMetricList($options['mode'])->getMetrics();
+        $data = $this->_metricDataRepository->getMetricData( $job, $metrics);
+
+        foreach ($metrics as $metric){
+            $this->_plotGenerator->generateMetricPlot(
+                $job,
+                $metric,
+                $options,
+                $data
+            );
+        }
+
+        $item = $this->_cache->getItem($job->getJobId().'view');
+        $this->_cache->save($item->set($job->jobCache));
+        $job->jobCache = NULL;
+
+        $job->jobCache = new \App\Entity\JobCache();
+        $options['mode'] = 'list' ;
+        $options['sample'] = 150;
+        $options['legend'] = false;
+
+        $metrics = $job->getCluster()->getMetricList($options['mode'])->getMetrics();
+        $data = $this->_metricDataRepository->getMetricData( $job, $metrics);
+
+        foreach ($metrics as $metric){
+            $this->_plotGenerator->generateMetricPlot(
+                $job,
+                $metric,
+                $options,
+                $data
+            );
+        }
+
+        $item = $this->_cache->getItem($job->getJobId().'list');
+        $this->_cache->save($item->set($job->jobCache));
+        $job->jobCache = NULL;
+    }
+
     public function dropCache( $job )
     {
         $jobCache = $job->jobCache;
@@ -502,15 +574,25 @@ class JobCache
         $config
     )
     {
+        $item = NULL;
+
         if ( $job->isRunning()) {
             $job->stopTime = time();
             /* $job->stopTime = 1521057932; */
             $job->duration = $job->stopTime - $job->startTime;
+            $item = $this->_cache->getItem($job->getJobId().$options['mode']);
+
+            if ($item->isHit()) {
+                $job->jobCache = $item->get();
+                $job->hasProfile = true;
+                return;
+            }
         }
 
         if ( is_null( $job->jobCache ) ) {
 
             if (! $this->_metricDataRepository->hasProfile($job)){
+                $job->hasProfile = false;
                 return;
             }
 
