@@ -68,8 +68,10 @@
             $('body table.table').each(function(i){
                 var list = {};
                 list['name'] = $(this).attr('id');
-                list['rows'] = collectTableData($(this), 9);
-                lists.push(list);
+                if ( list['name'] != null ){
+                    list['rows'] = collectTableData($(this), 9);
+                    lists.push(list);
+                }
             });
 
             return lists;
