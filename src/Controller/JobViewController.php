@@ -174,7 +174,10 @@ class JobViewController extends Controller
 
     public function list()
     {
-        return $this->render('jobViews/listJobs.html.twig');
+        return $this->render('jobViews/listJobs.html.twig',
+            array(
+                'isRunning' => true
+            ));
     }
 
     public function showRunning(

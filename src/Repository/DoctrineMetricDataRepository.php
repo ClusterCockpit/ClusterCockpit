@@ -155,9 +155,15 @@ class DoctrineMetricDataRepository implements MetricDataRepository
             }
         }
 
+        if ( count($nodeStats) == 0 ) {
+            $statCount = 1;
+        } else {
+            $statCount = count($nodeStats);
+        }
+
         foreach ( $metrics as $metric ){
             $metricName = $metric->name;
-            $stats["{$metricName}_avg"] = round($sums[$metricName]/count($nodeStats), 2);
+            $stats["{$metricName}_avg"] = round($sums[$metricName]/$statCount, 2);
         }
 
         return $stats;

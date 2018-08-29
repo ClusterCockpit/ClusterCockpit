@@ -11,7 +11,9 @@
                     <th scope="col">Severity</th>
                     <th scope="col">Nodes</th>
                     <th scope="col">Start time</th>
+                    {% if isRunning == false %}
                     <th scope="col">Runtime [h]</th>
+                    {% endif %}
                     <th scope="col">Flops [GF/s]</th>
                     <th scope="col">MemBW [GB/s]</th>
                     <th scope="col">Network</th>

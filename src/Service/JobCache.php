@@ -149,6 +149,42 @@ class JobCache
         $this->_em->persist($plot);
     }
 
+    private function _computeSeverity($job, $metrics)
+    {
+        $severity = 0;
+        $memBw = $metrics['mem_bw'];
+        $flopsAny = $metrics['flops_any'];
+        $memUsed = $metrics['mem_used'];
+
+        if ( $job->memBwAvg < $memBw->alert ){
+            $severity += 20;
+        } else if ( $job->memBwAvg < $memBw->caution ){
+            $severity += 10;
+        } else if ( $job->memBwAvg > $memBw->normal ){
+            $severity -= 15;
+        }
+
+        if ( $job->flopsAnyAvg < $flopsAny->alert ){
+            $severity += 20;
+        } else if ( $job->flopsAnyAvg < $flopsAny->caution ){
+            $severity += 10;
+        } else if ( $job->flopsAnyAvg > $flopsAny->normal ){
+            $severity -= 15;
+        }
+
+        if ( $job->memUsedAvg > $memUsed->alert ){
+            $severity += 20;
+        } else if ( $job->memUsedAvg > $memUsed->caution ){
+            $severity += 10;
+        }
+
+        if ( $severity < 0 ) {
+            $severity = 0;
+        }
+
+        $job->severity = $severity * $job->getNumNodes();
+    }
+
     private function _buildViewPlots($job, $stats, $metrics)
     {
         $this->_createJobRooflineCache($job, $metrics);
@@ -436,6 +472,8 @@ class JobCache
         $job->flopsAnyAvg = $stats['flops_any_avg'];
         $job->trafficTotalIbAvg = $stats['traffic_total_ib_avg'];
         $job->trafficTotalLustreAvg = $stats['traffic_total_lustre_avg'];
+
+        $this->_computeSeverity($job, $metrics);
 
         $this->_plotGenerator->generateJobRoofline(
             $job, $this->_metricDataRepository->getJobRoofline($job, $metrics)

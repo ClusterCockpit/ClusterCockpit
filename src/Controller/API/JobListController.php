@@ -92,7 +92,8 @@ class JobListController extends FOSRestController
             $userId = $this->getUser()->getId();
         }
 
-        $sorting; $filter = 'false';
+        $sorting;
+        $filter = 'false';
         $index = $order[0]['column'];
         $direction = $order[0]['dir'];
 
@@ -108,13 +109,14 @@ class JobListController extends FOSRestController
             );
         }
 
-        $total; $filtered; $jobs; $url;
+        $total; $filtered; $jobs; $url; $isRunning;
 
         if ( !is_null($jobSearch) ) {
             $repository = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
             $total = $repository->countFilteredJobs($userId, 'false', $jobSearch);
             $filtered = $total;
             $url = 'job';
+            $isRunning = false;
 
             if ( $search['value'] != ''){
                 $filter = $search['value'];
@@ -130,6 +132,7 @@ class JobListController extends FOSRestController
             $total = $repository->countFilteredJobs($userId, 'false');
             $filtered = $total;
             $url = 'running_job';
+            $isRunning = true;
 
             if ( $search['value'] != ''){
                 $filter = $search['value'];
@@ -193,6 +196,7 @@ class JobListController extends FOSRestController
 
         $view = $this->view(array(
             "draw" => (int) $draw,
+            "isRunning" => $isRunning,
             "recordsTotal" => $total,
             "recordsFiltered" => $filtered,
             "data" => $tableData

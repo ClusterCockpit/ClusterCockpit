@@ -70,7 +70,9 @@ $(document).ready( function () {
                 { "data": "severity" },
                 { "data": "numNodes" },
                 { "data": "startTime" },
+                {% if isRunning == false %}
                 { "data": "duration" },
+                {% endif %}
                 { "data": "flopsAnyAvg" },
                 { "data": "memBwAvg" },
                 { "data": "trafficTotalIbAvg" },
@@ -112,9 +114,15 @@ $(document).ready( function () {
                 }
             ],
             "columnDefs": [
+                {% if isRunning == false %}
                 { "orderable": false, "targets": [0,9] },
                 { "visible": false, "targets": [1,2,3,4,5,6,7,8] },
                 { "searchable": false, "targets": [1,2,3,4,5,6,7,8,9] }
+                {% else %}
+                { "orderable": false, "targets": [0,8] },
+                { "visible": false, "targets": [1,2,3,4,5,6,7] },
+                { "searchable": false, "targets": [1,2,3,4,5,6,7,8] }
+                {% endif %}
             ],
             "paging": true
         }
@@ -127,11 +135,19 @@ $(document).ready( function () {
     $('#toggleFilter').click(function(){
         var table = $('#jobs').DataTable();
 
+        {% if isRunning == false %}
         if ( table.column(1).visible() ){
             table.columns( [ 1,2,3,4,5,6,7,8 ] ).visible( false );
         } else {
             table.columns( [ 1,2,3,4,5,6,7,8 ] ).visible( true );
         }
+        {% else %}
+        if ( table.column(1).visible() ){
+            table.columns( [ 1,2,3,4,5,6,7 ] ).visible( false );
+        } else {
+            table.columns( [ 1,2,3,4,5,6,7 ] ).visible( true );
+        }
+        {% endif %}
     });
 } );
 
