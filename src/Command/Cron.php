@@ -65,10 +65,12 @@ class Cron extends Command
         $jobs = $repository->findAll();
 
         foreach ( $jobs as $job ){
-            $this->_jobCache->warmupCache($job);
-            $this->_em->persist($job);
+            if ( $job->getNumNodes() > 0 ) {
+                $this->_jobCache->warmupCache($job);
+                $this->_em->persist($job);
+                $this->_em->flush();
+            }
         }
-        $this->_em->flush();
     }
 
     private function syncUsers($output)
