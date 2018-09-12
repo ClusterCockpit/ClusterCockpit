@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+{% set mode = 'view' %}
+{% set id = job.id %}
+
+{% block title %}
+    Job {{ job.jobId }}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('css/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+    <!-- <script src="{{ asset('js/datatables.min.js') }}"/></script> -->
+    <script src="{{ asset('js/plotly.min.js') }}"/></script>
+    <script src="{{ asset('js/app.js') }}"/></script>
+{% endblock %}
+
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-3 ">
+            <table class="table table-sm table-striped">
+                <tbody>
+                    <tr>
+                        <th scope="col"> Job id </th>
+                        <td scope="col"> {{ job.jobId }} </td>
+                    </tr>
+                    <tr>
+                        <th scope="col"> User name </th>
+                        <td scope="col"> {{ job.user.name }} </td>
+                    </tr>
+                    <tr>
+                        <th scope="col"> User id </th>
+                        <td scope="col">
+                            <a href="{{ path('show_user',{ 'id':job.user.id }) }}">
+                                {{ job.user.userId }}
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="col"> Number of nodes </th>
+                        <td scope="col"> {{ job.numNodes }} </td>
+                    </tr>
+                    <tr>
+                        <th scope="col"> Job start </th>
+                        <td scope="col">{{ job.startTime|date('d.m.y - H:i') }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="col"> Walltime </th>
+                        <td scope="col">{{ "%5.2f hours"|format(job.duration / 3600) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-4" id="roofline"> </div>
+        <div class="col-4" id="polarplot"> </div>
+    </div>
+
+    {% set metrics = job.cluster.metricLists[mode].metrics %}
+    {% set margin = 'mt-4' %}
+
+    <div class="row">
+        {% for metric in metrics %}
+            <div class="col {{ margin }}" id="{{ metric.name }}"></div>
+        {% endfor %}
+    </div>
+{% endblock %}

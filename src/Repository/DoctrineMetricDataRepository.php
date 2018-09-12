@@ -214,7 +214,7 @@ class DoctrineMetricDataRepository implements MetricDataRepository
             foreach ($metrics as $metric) {
                 $metricName = $metric->getName();
                 $data[$metricName][$nodeId]['x'][] =  0;
-                $data[$metricName][$nodeId]['y'][] =  $row[$metricName];
+                $data[$metricName][$nodeId]['y'][] =  floatval($row[$metricName]);
             }
 
             while ($row = $stmt->fetch()) {
@@ -223,7 +223,7 @@ class DoctrineMetricDataRepository implements MetricDataRepository
                 foreach ($metrics as $metric) {
                     $metricName = $metric->getName();
                     $data[$metricName][$nodeId]['x'][] = $time;
-                    $data[$metricName][$nodeId]['y'][] = $row[$metricName];
+                    $data[$metricName][$nodeId]['y'][] = floatval($row[$metricName]);
                 }
             }
         }

@@ -10,7 +10,7 @@
         {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
-    <body>
+    <body data-id="{{ id|default(0) }}">
         <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light">
             <a class="navbar-brand" href="{{ path('index') }}">
                 {% block brand %}

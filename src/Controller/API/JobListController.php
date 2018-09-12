@@ -64,6 +64,77 @@ class JobListController extends FOSRestController
         $this->_authChecker = $authChecker;
     }
 
+    public function getAction($slug)
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $config = $this->_configuration->getUserConfig($this->getUser());
+        $userId = 0;
+
+        if ( false === $this->_authChecker->isGranted('ROLE_ADMIN') ) {
+            $userId = $this->getUser()->getId();
+        }
+
+        $repository = $this->getDoctrine()->getRepository(\App\Entity\RunningJob::class);
+        $job = $repository->findJobById($slug, $userId);
+
+        if (empty($job)) {
+            $repository = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
+            $job = $repository->findJobById($slug, $userId);
+        }
+
+        if (empty($job)) {
+            throw new HttpException(400, "No such job $slug.");
+        }
+
+        $this->_jobCache->checkCache(
+            $job,
+            array(
+                'mode' => 'view'
+            ),
+            $config
+        );
+
+        $jobData = array(
+            "jobinfo" => array(
+                "jobid" => $job->getJobId(),
+                "username" => $job->getUser()->getUserId(),
+                "userid" => $job->getUser()->getId(),
+                "numnodes" => $job->getNumNodes(),
+                "runtime" => $job->getDuration(),
+                "starttime" => $job->getStartTime()
+            ),
+            "numNodes" => $job->getNumNodes(),
+            "startTime" => $job->getStartTime(),
+            "duration" => sprintf("%.02f",$job->getDuration()/3600),
+        );
+
+        if( $job->hasProfile ){
+            $jobData["plots"] =  $job->jobCache->getPlotsArray(
+                    $job->getCluster()->getMetricList('view')->getMetrics()
+                );
+
+            $plot = $job->jobCache->getPlot('roofline');
+            $jobData["plots"][] =  array(
+                'name' => $plot->name,
+                'options' => $plot->options,
+                'data' => $plot->data
+            );
+
+            $plot = $job->jobCache->getPlot('polarplot');
+            $jobData["plots"][] =  array(
+                'name' => $plot->name,
+                'options' => $plot->options,
+                'data' => $plot->data
+            );
+        } else {
+            $jobData["severity"] = 0;
+            $jobData["plots"] = false;
+        }
+
+        $view = $this->view($jobData);
+        return $this->handleView($view);
+    } // "get_job"             [GET] api/jobs/$slug
+
     /**
      * @QueryParam(name="draw", requirements="\d+")
      * @QueryParam(name="start", requirements="\d+")

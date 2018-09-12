@@ -162,12 +162,10 @@ class PlotGenerator
             $data = $trace[0]->getData();
 
         } else {
-            $x; $y;
-
             for($i = 0; $i < count($data); $i++) {
                 if ( $data[$i]['x'] > 0.01 ) {
-                    $x[] = $data[$i]['x'];
-                    $y[] = $data[$i]['y'];
+                    $x[] = floatval($data[$i]['x']);
+                    $y[] = floatval($data[$i]['y']);
                 }
             }
 

@@ -65,7 +65,6 @@ class JobRepository extends ServiceEntityRepository
             );
         }
     }
-
     public function getSettings($control): array
     {
         $single = true;
@@ -115,7 +114,6 @@ class JobRepository extends ServiceEntityRepository
 
         return  $settings;
     }
-
     private function getHisto($settings, $target, $constraint = '', $join = ''): array
     {
         $startTime = $settings['startTime'];
@@ -147,7 +145,6 @@ class JobRepository extends ServiceEntityRepository
 
         return $histo;
     }
-
     private function getStats($settings, $constraint = '', $join = ''): array
     {
         $startTime = $settings['startTime'];
@@ -178,7 +175,6 @@ class JobRepository extends ServiceEntityRepository
 
         return $stat;
     }
-
     public function countFilteredJobs($userId,  $filter, $search = NULL )
     {
         $qb = $this->createQueryBuilder('j');
@@ -221,8 +217,6 @@ class JobRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
-
-
     public function findFilteredJobs(
         $userId,
         $offset, $limit,
@@ -272,7 +266,6 @@ class JobRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
     public function findRunningJobs()
     {
         $qb = $this->createQueryBuilder('j');
@@ -283,8 +276,6 @@ class JobRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
-
     public function findByJobSearch(JobSearch $search)
     {
         $qb = $this->createQueryBuilder('j');
@@ -313,7 +304,6 @@ class JobRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
     public function findAvgTodo($startTime, $stopTime)
     {
         $qb = $this->createQueryBuilder('j');
@@ -325,8 +315,6 @@ class JobRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
-
     public function findByUser($userId, $limit, $control )
     {
         $settings = $this->getSettings($control);
@@ -346,7 +334,6 @@ class JobRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
     public function findBySystem($control)
     {
         $qb = $this->createQueryBuilder('j');
@@ -361,7 +348,6 @@ class JobRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-
     public function findStatByUser($userId, $control, $full=true)
     {
         $stat = array();
@@ -377,7 +363,6 @@ class JobRepository extends ServiceEntityRepository
         }
         return $stat;
     }
-
     public function statClusters($control)
     {
         $stat = array();
@@ -387,8 +372,6 @@ class JobRepository extends ServiceEntityRepository
         $stat['histo_numnodes'] = $this->getHisto($settings,'num_nodes');
         return $stat;
     }
-
-
     public function statUsers($control)
     {
         $settings = $this->getSettings($control);
@@ -482,7 +465,6 @@ class JobRepository extends ServiceEntityRepository
 
         return $users;
     }
-
     public function statGroups($control)
     {
         $settings = $this->getSettings($control);
@@ -501,7 +483,6 @@ class JobRepository extends ServiceEntityRepository
 
         return $stat;
     }
-
     public function findStatByGroup($groupId, $settings)
     {
         $join = "INNER JOIN users_groups ON job.user_id = users_groups.user_id ";
@@ -511,7 +492,6 @@ class JobRepository extends ServiceEntityRepository
         $stat['histo_numnodes'] = $this->getHisto($settings,'num_nodes',$constraint, $join);
         return $stat;
     }
-
     public function getNumUsers()
     {
         $sql = "SELECT COUNT(DISTINCT(user_id)) AS count FROM job WHERE status='running'";
@@ -520,7 +500,6 @@ class JobRepository extends ServiceEntityRepository
 
         return $stmt->fetch();
     }
-
     public function persistJobSeverity($job){
         $id = $job->getId();
         $severity = $job->severity;
@@ -528,5 +507,19 @@ class JobRepository extends ServiceEntityRepository
         $sql = "UPDATE job SET severity=$severity WHERE id=$id";
         $stmt = $this->_connection->prepare($sql);
         $stmt->execute();
+    }
+    public function findJobById($jobId, $userId)
+    {
+        $qb = $this->createQueryBuilder('j');
+        $qb->select('j')
+           ->andWhere("j.id = $jobId");
+
+        if ( $userId ){
+            $qb->andWhere("j.user = $userId");
+        }
+
+        return $qb
+            ->getQuery()
+            ->getSingleResult();
     }
 }

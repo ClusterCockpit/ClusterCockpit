@@ -88,37 +88,35 @@
     {% set metrics = job.cluster.metricLists['stat'].metrics %}
     {% set nodeStat = job.jobCache.nodeStat %}
 
-{% set viewStatTable = config['plot_view_showStatTable'].value|default('true') %}
-{% if  viewStatTable is same as('true') %}
-    <div class="row">
-        <div class="col-10 offset-1 mt-5">
-            <table class="table table-striped" id="stat">
-                <thead>
-                    <tr>
-                        <th scope="col">Node</th>
-                        {% for metric in metrics%}
-                            <th scope="col">{{ metric.name }}_min</th>
-                            <th scope="col">{{ metric.name }}_max</th>
-                            <th scope="col">{{ metric.name }}_avg</th>
-                        {% endfor %}
-                    </tr>
-                </thead>
-                <tbody class="text-center">
-                    {% for node in nodeStat %}
+    {% set viewStatTable = config['plot_view_showStatTable'].value|default('true') %}
+    {% if  viewStatTable is same as('true') %}
+        <div class="row">
+            <div class="col-10 offset-1 mt-5">
+                <table class="table table-striped" id="stat">
+                    <thead>
                         <tr>
-                            <td> {{ node.nodeName }} </td>
+                            <th scope="col">Node</th>
                             {% for metric in metrics%}
-                                <td> {{ node.metrics[metric.name].min }} </td>
-                                <td> {{ node.metrics[metric.name].max }} </td>
-                                <td> {{ node.metrics[metric.name].avg }} </td>
+                                <th scope="col">{{ metric.name }}_min</th>
+                                <th scope="col">{{ metric.name }}_max</th>
+                                <th scope="col">{{ metric.name }}_avg</th>
                             {% endfor %}
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="text-center">
+                        {% for node in nodeStat %}
+                            <tr>
+                                <td> {{ node.nodeName }} </td>
+                                {% for metric in metrics%}
+                                    <td> {{ node.metrics[metric.name].min }} </td>
+                                    <td> {{ node.metrics[metric.name].max }} </td>
+                                    <td> {{ node.metrics[metric.name].avg }} </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-{% endif %}
-
-
+    {% endif %}
 {% endblock %}

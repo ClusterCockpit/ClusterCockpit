@@ -87,7 +87,6 @@ class JobViewController extends Controller
             }
         }
     }
-
     private function getSystems(){
         return array(
             'ALL' => 0,
@@ -97,8 +96,6 @@ class JobViewController extends Controller
             'woody' => 4,
         );
     }
-
-
     public function search(
         Request $request,
         SerializerInterface $serializer)
@@ -171,7 +168,6 @@ class JobViewController extends Controller
             'form' => $form->createView(),
         ));
     }
-
     public function list()
     {
         return $this->render('jobViews/listJobs.html.twig',
@@ -179,7 +175,6 @@ class JobViewController extends Controller
                 'isRunning' => true
             ));
     }
-
     public function showRunning(
         RunningJob $job,
         Configuration $configuration,
@@ -197,6 +192,7 @@ class JobViewController extends Controller
             $config
         );
 
+        /* return $this->render('jobViews/viewJob-ajax.html.twig', */
         return $this->render('jobViews/viewJob.html.twig',
             array(
                 'job' => $job,
@@ -204,7 +200,6 @@ class JobViewController extends Controller
                 'backend' => $jobCache->getBackend()
             ));
     }
-
     public function show(
         Job $job,
         Configuration $configuration,
@@ -222,7 +217,8 @@ class JobViewController extends Controller
             $config
         );
 
-        return $this->render('jobViews/viewJob.html.twig',
+        return $this->render('jobViews/viewJob-ajax.html.twig',
+        /* return $this->render('jobViews/viewJob.html.twig', */
             array(
                 'job' => $job,
                 'config' => $config,

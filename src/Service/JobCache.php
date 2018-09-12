@@ -78,12 +78,10 @@ class JobCache
 
         $this->_cache = $cache;
     }
-
     public function getBackend()
     {
         return $this->_plotGenerator->getBackend();
     }
-
     public function checkStatisticCache(
         $userId,
         $control,
@@ -118,7 +116,6 @@ class JobCache
 
         return $stat;
     }
-
     public function updateJobAverage( $job )
     {
         $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
@@ -129,13 +126,11 @@ class JobCache
         $job->trafficTotalIbAvg = $stats['traffic_total_ib_avg'];
         $job->trafficTotalLustreAvg = $stats['traffic_total_lustre_avg'];
     }
-
     public function getResolution($plot, $name)
     {
         $resolutions = $plot->getResolutions();
         $plot->traceResolution = $this->_traceRepository->find($resolutions[$name]);
     }
-
     private function _persistPlot( $plot )
     {
         $resolution = $plot->traceResolution;
@@ -148,7 +143,6 @@ class JobCache
         $plot->resolutionCache[] = $resolution;
         $this->_em->persist($plot);
     }
-
     private function _computeSeverity($job, $metrics)
     {
         $severity = 0;
@@ -184,14 +178,12 @@ class JobCache
 
         $job->severity = $severity * $job->getNumNodes();
     }
-
     private function _buildViewPlots($job, $stats, $metrics)
     {
         $this->_createJobRooflineCache($job, $metrics);
         $this->_createJobPolarPlotCache($job, $stats);
         $this->_createNodeStats($job, $stats['nodeStats'], $metrics, true);
     }
-
     private function _createNodeStats(
         $job, $stats, $metrics, $persist = false
     )
@@ -223,7 +215,6 @@ class JobCache
             }
         }
     }
-
     private function _createJobRooflineCache($job, $metrics)
     {
         $data = $this->_metricDataRepository->getJobRoofline($job, $metrics);
@@ -257,7 +248,6 @@ class JobCache
         $plot->setJobCache($job->jobCache);
         /* $this->_persistPlot($plot); */
     }
-
     private function _generateMetricPlotCache(
         $plot,
         $job,
@@ -304,7 +294,6 @@ class JobCache
         $plot->xDtick = $xAxis['dtick'];
         $plot->traceResolution = $traceResolution;
     }
-
     private function _createJobPolarPlotCache($job, $stats)
     {
         $plot = new Plot();
@@ -321,8 +310,6 @@ class JobCache
         $job->jobCache->addPlot($plot);
         $plot->setJobCache($job->jobCache);
     }
-
-
     private function _buildMetricPlots(
         $job,
         $mode,
@@ -358,7 +345,6 @@ class JobCache
             /* $this->_persistPlot($plot); */
         }
     }
-
     public function buildData( $job )
     {
         $options = array(
@@ -390,7 +376,6 @@ class JobCache
                     $options);
             }
     }
-
 
     /**
      * Builds and persists job cache
@@ -450,11 +435,10 @@ class JobCache
 
         }
     }
-
     public function warmupCache($job)
     {
         $options = array();
-            /* $job->stopTime = 1521057932; */
+        /* $job->stopTime = 1521057932; */
         $job->stopTime = time();
         $job->duration = $job->stopTime - $job->startTime;
 
@@ -522,7 +506,6 @@ class JobCache
         $this->_cache->save($item->set($job->jobCache));
         $job->jobCache = NULL;
     }
-
     public function dropCache( $job )
     {
         $jobCache = $job->jobCache;
@@ -618,13 +601,14 @@ class JobCache
             $job->stopTime = time();
             /* $job->stopTime = 1521057932; */
             $job->duration = $job->stopTime - $job->startTime;
-            $item = $this->_cache->getItem($job->getJobId().$options['mode']);
+        }
 
-            if ($item->isHit()) {
-                $job->jobCache = $item->get();
-                $job->hasProfile = true;
-                return;
-            }
+        $item = $this->_cache->getItem($job->getJobId().$options['mode']);
+
+        if ($item->isHit()) {
+            $job->jobCache = $item->get();
+            $job->hasProfile = true;
+            return;
         }
 
         if ( is_null( $job->jobCache ) ) {

@@ -98,4 +98,19 @@ class RunningJobRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findJobById($jobId, $userId)
+    {
+        $qb = $this->createQueryBuilder('j');
+        $qb->select('j')
+           ->andWhere("j.id = $jobId");
+
+        if ( $userId ){
+            $qb->andWhere("j.user = $userId");
+        }
+
+        return $qb
+            ->getQuery()
+            ->getSingleResult();
+    }
 }
