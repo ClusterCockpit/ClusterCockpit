@@ -11,19 +11,47 @@ $(document).ready( function () {
         contentType : 'application/json',
         dataType: 'json',
         success: function(data) {
+            var nodeStats = data.nodeStats;
+            var cols = Object.keys(nodeStats[0]);
+            var columnsSource = [];
+            console.log(cols);
+
+            for (var col of cols) {
+            console.log(col);
+                columnsSource.push({"data" : col});
+            }
+
             for (let plot of data.plots) {
                 // console.log(plot);
 
-                let options = JSON.parse(plot.options);
+                let options = plot.options;
                 options['height'] = p_height;
                 options['width'] = p_width;
 
                 Plotly.newPlot(
                     plot.name,
-                    JSON.parse(plot.data),
+                    plot.data,
                     options,
                     {staticPlot: true});
             }
+
+            console.log(columnsSource);
+
+            var tablelist =  $('#stat').DataTable(
+                {
+                    "columnDefs": [
+                        { "visible": false, "targets": [10,11,12,13,14,15] }
+                    ],
+                    paging: false,
+                    bFilter: false,
+                    data: nodeStats,
+                    columns: columnsSource,
+                }
+            );
+
+            tablelist
+                .draw();
+
         },
         error: function(result) {
             console.log("Error");

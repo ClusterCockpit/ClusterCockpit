@@ -36,7 +36,7 @@ class RunningJob
     /**
      *  @ORM\Column(type="integer")
      */
-    private $numNodes;
+    public $numNodes;
 
     /**
      *  @ORM\Column(type="integer")
@@ -63,10 +63,6 @@ class RunningJob
      */
     private $nodes;
 
-    /**
-     * @ORM\OneToOne(targetEntity="JobCache")
-     * @ORM\JoinColumn(name="cache_id", referencedColumnName="id"))
-     */
     public $jobCache;
 
     /**
@@ -75,29 +71,29 @@ class RunningJob
     private $jobScript;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $memUsedAvg;
+    public $slot_0;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $memBwAvg;
+    public $slot_1;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $flopsAnyAvg;
+    public $slot_2;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $networkIO;
+    public $slot_3;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $fileIO;
+    public $slot_4;
 
     public $hasProfile;
 

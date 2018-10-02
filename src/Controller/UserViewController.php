@@ -31,6 +31,7 @@ use App\Entity\User;
 use App\Entity\UnixGroup;
 use App\Entity\UpdateGroupRequest;
 use App\Entity\StatisticsControl;
+use App\Service\Configuration;
 use App\Service\JobCache;
 use App\Service\PlotGenerator;
 use App\Service\GroupFacade;
@@ -53,7 +54,6 @@ class UserViewController extends Controller
                 'users' => $users,
             ));
     }
-
     public function showGroup(
         UnixGroup $group,
         Request $request)
@@ -115,7 +115,6 @@ class UserViewController extends Controller
                 'users' => $usersD,
             ));
     }
-
     public function editGroup(UnixGroup $group, GroupFacade $groupFacade, Request $request)
     {
         $updateGroupRequest = UpdateGroupRequest::fromUnixGroup($group);
@@ -139,12 +138,11 @@ class UserViewController extends Controller
                 'form' => $form->createView(),
             ));
     }
-
-
     public function show(
         User $user,
         JobCache $jobCache,
         SerializerInterface $serializer,
+        Configuration $configuration,
         Request $request)
     {
         $year = $request->query->get('year');
@@ -214,11 +212,31 @@ class UserViewController extends Controller
             $control->getCluster(),
             $status);
 
+        $sortMetrics = $this->getDoctrine()
+                            ->getRepository(\App\Entity\TableSortConfig::class)
+                            ->findMetrics(1);
+
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $config = $configuration->getUserConfig($this->getUser());
+
+        $count = count($sortMetrics);
+        $end = $count+1;
+
+        $columnDefs = array(
+            'orderable'  => "0,$end",
+            'visible'    => implode(',',range(1,$count)),
+            'searchable' => implode(',',range(1,$end))
+        );
+
         return $this->render('users/showUser.html.twig',
             array(
                 'form' => $form->createView(),
                 'user' => $user,
                 'status' => $status,
+                'isRunning' => false,
+                'config' => $config,
+                'sortMetrics' => $sortMetrics,
+                'columnDefs' => $columnDefs,
                 'stat'  => $statCache,
                 'backend' => $jobCache->getBackend(),
                 'jobSearch' => $serializer->serialize($search, 'json')

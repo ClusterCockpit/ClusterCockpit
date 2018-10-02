@@ -10,11 +10,9 @@ class StatisticsControl
     private $year;
 
     private $cluster;
-    
+
     private $submit;
 
-
-    
     /**
      * Get month.
      *
@@ -24,7 +22,6 @@ class StatisticsControl
     {
         return $this->month;
     }
-    
     /**
      * Set month.
      *
@@ -34,7 +31,6 @@ class StatisticsControl
     {
         $this->month = $month;
     }
-    
     /**
      * Get year.
      *
@@ -44,7 +40,6 @@ class StatisticsControl
     {
         return $this->year;
     }
-    
     /**
      * Set year.
      *
@@ -54,7 +49,6 @@ class StatisticsControl
     {
         $this->year = $year;
     }
-    
     /**
      * Get system.
      *
@@ -64,7 +58,6 @@ class StatisticsControl
     {
         return $this->cluster;
     }
-    
     /**
      * Set cluster.
      *
@@ -74,7 +67,6 @@ class StatisticsControl
     {
         $this->cluster = $cluster;
     }
-    
     /**
      * Get submit.
      *
@@ -84,7 +76,6 @@ class StatisticsControl
     {
         return $this->submit;
     }
-    
     /**
      * Set submit.
      *

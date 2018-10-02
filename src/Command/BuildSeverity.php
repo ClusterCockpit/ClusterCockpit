@@ -41,8 +41,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\JobSearch;
 use App\Entity\Job;
 use App\Entity\Plot;
-use App\Entity\TraceResolution;
-use App\Entity\Trace;
 use \DateInterval;
 
 /**
@@ -155,41 +153,41 @@ class BuildSeverity extends Command
             );
 
             if ( $job->hasProfile ) {
-                $severity = 0;
-                /* get thresholds for metrics */
-                $metricsStat = $job->getCluster()->getMetricList('stat')->getMetrics();
-                $jobCache = $job->jobCache;
+                /* $severity = 0; */
+                /* /1* get thresholds for metrics *1/ */
+                /* $metricsStat = $job->getCluster()->getMetricList('stat')->getMetrics(); */
+                /* $jobCache = $job->jobCache; */
 
-                foreach ( $metrics as $metric ) {
-                    $plots[$metric] = $jobCache->getPlot($metric);
-                    $nodes[$metric] = $plots[$metric]->traceResolution->getTraces()->toArray();
-                    $thresholds[$metric] = array(
-                        'caution' => $metricsStat[$metric]->caution,
-                        'alert' => $metricsStat[$metric]->alert
-                    );
-                }
+                /* foreach ( $metrics as $metric ) { */
+                /*     $plots[$metric] = $jobCache->getPlot($metric); */
+                /*     $nodes[$metric] = $plots[$metric]->traceResolution->getTraces()->toArray(); */
+                /*     $thresholds[$metric] = array( */
+                /*         'caution' => $metricsStat[$metric]->caution, */
+                /*         'alert' => $metricsStat[$metric]->alert */
+                /*     ); */
+                /* } */
 
-                /* iterate over nodes */
-                for ($i=0; $i<count($nodes['flops_any']); $i++) {
-                    $dataFlops = $nodes['flops_any'][$i]->getData();
-                    $dataMemBw = $nodes['mem_bw'][$i]->getData();
+                /* /1* iterate over nodes *1/ */
+                /* for ($i=0; $i<count($nodes['flops_any']); $i++) { */
+                /*     $dataFlops = $nodes['flops_any'][$i]->getData(); */
+                /*     $dataMemBw = $nodes['mem_bw'][$i]->getData(); */
 
-                    /* iterate over time */
-                    for ($j=0; $j<count($dataFlops['x']); $j++) {
+                /*     /1* iterate over time *1/ */
+                /*     for ($j=0; $j<count($dataFlops['x']); $j++) { */
 
-                        if ( $dataFlops['y'][$j] < $thresholds['flops_any']['alert'] ){
-                            $severity += 10;
-                        } elseif ( $dataFlops['y'][$j] < $thresholds['flops_any']['caution'] ) {
-                            $severity += 5;
-                        }
+                /*         if ( $dataFlops['y'][$j] < $thresholds['flops_any']['alert'] ){ */
+                /*             $severity += 10; */
+                /*         } elseif ( $dataFlops['y'][$j] < $thresholds['flops_any']['caution'] ) { */
+                /*             $severity += 5; */
+                /*         } */
 
-                        if ( $dataMemBw['y'][$j] < $thresholds['mem_bw']['alert'] ){
-                            $severity += 10;
-                        } elseif ( $dataMemBw['y'][$j] < $thresholds['mem_bw']['caution'] ) {
-                            $severity += 5;
-                        }
-                    }
-                }
+                /*         if ( $dataMemBw['y'][$j] < $thresholds['mem_bw']['alert'] ){ */
+                /*             $severity += 10; */
+                /*         } elseif ( $dataMemBw['y'][$j] < $thresholds['mem_bw']['caution'] ) { */
+                /*             $severity += 5; */
+                /*         } */
+                /*     } */
+                /* } */
 
                 $job->severity = $severity;
                 $repository->persistJobSeverity($job);

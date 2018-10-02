@@ -23,7 +23,6 @@
             var time =  hour + ':' + min + '</br>' + date + ' ' + month + ' ' + year;
             return time;
         }
-
 $(document).ready( function () {
     var tablelist =  $('#jobs').DataTable(
         {
@@ -67,16 +66,9 @@ $(document).ready( function () {
                         return content;
                     }
                 },
-                { "data": "severity" },
-                { "data": "numNodes" },
-                { "data": "startTime" },
-                {% if isRunning == false %}
-                { "data": "duration" },
-                {% endif %}
-                { "data": "flopsAnyAvg" },
-                { "data": "memBwAvg" },
-                { "data": "trafficTotalIbAvg" },
-                { "data": "trafficTotalLustreAvg" },
+                {% for metric in sortMetrics %}
+                    { "data": "{{ metric.accessKey }}" },
+                {% endfor %}
                 {
                     "data": "plots",
                     "render": function ( data, type, row ) {
@@ -92,8 +84,8 @@ $(document).ready( function () {
                                 content += 'var size = ($(window).width() /'+count+')*0.8;';
                                 content += 'var p_width = size;';
                                 content += 'var p_height = size;';
-                                content += 'var options_'+plot_name+'='+plot.options+';';
-                                content += 'var data_'+plot_name+'='+plot.data+';';
+                                content += 'var options_'+plot_name+'='+JSON.stringify(plot.options)+';';
+                                content += 'var data_'+plot_name+'='+JSON.stringify(plot.data)+';';
                                 content += 'options_'+plot_name+'[\'height\'] = p_height;';
                                 content += 'options_'+plot_name+'[\'width\'] = p_width;';
                                 content += 'Plotly.newPlot(\''+plot_name+'\',data_'+plot_name+',options_'+plot_name+',{staticPlot: true});';
@@ -114,41 +106,29 @@ $(document).ready( function () {
                 }
             ],
             "columnDefs": [
-                {% if isRunning == false %}
-                { "orderable": false, "targets": [0,9] },
-                { "visible": false, "targets": [1,2,3,4,5,6,7,8] },
-                { "searchable": false, "targets": [1,2,3,4,5,6,7,8,9] }
-                {% else %}
-                { "orderable": false, "targets": [0,8] },
-                { "visible": false, "targets": [1,2,3,4,5,6,7] },
-                { "searchable": false, "targets": [1,2,3,4,5,6,7,8] }
-                {% endif %}
+            { "orderable": false, "targets": [{{ columnDefs.orderable }}] },
+            { "visible": false, "targets": [{{ columnDefs.visible }}] },
+            { "searchable": false, "targets": [{{ columnDefs.searchable }}] }
             ],
             "paging": true
         }
     );
 
     tablelist
-        .order([1, 'desc'])
-        .draw();
+    .order([{{ config['plot_list_sortColumn'].value|default(1) }},
+    '{{ config['plot_list_sortDirection'].value|default('asc') }}'
+    ])
+    .draw();
 
-    $('#toggleFilter').click(function(){
+        $('#toggleFilter').click(function(){
         var table = $('#jobs').DataTable();
 
-        {% if isRunning == false %}
         if ( table.column(1).visible() ){
-            table.columns( [ 1,2,3,4,5,6,7,8 ] ).visible( false );
+        table.columns( [{{ columnDefs.visible }}] ).visible( false );
         } else {
-            table.columns( [ 1,2,3,4,5,6,7,8 ] ).visible( true );
+        table.columns( [{{ columnDefs.visible }}] ).visible( true );
         }
-        {% else %}
-        if ( table.column(1).visible() ){
-            table.columns( [ 1,2,3,4,5,6,7 ] ).visible( false );
-        } else {
-            table.columns( [ 1,2,3,4,5,6,7 ] ).visible( true );
-        }
-        {% endif %}
-    });
+        });
 } );
 
     </script>

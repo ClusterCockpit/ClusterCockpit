@@ -45,16 +45,16 @@ class RunningJobRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('j');
 
-        if( $filter == 'false' ){
-            $qb->select('count(j.id)');
-        } else {
-            $qb->select('count(j.id)')
-               ->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
-               ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
-        }
+        $qb->select('count(j.id)');
 
+        /* regular user is not allowed to filter for users */
         if ( $userId ){
             $qb->andWhere("j.user = $userId");
+        } else {
+            if( $filter ){
+                $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
+                   ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
+            }
         }
 
         return $qb
@@ -70,18 +70,20 @@ class RunningJobRepository extends ServiceEntityRepository
     )
     {
         $qb = $this->createQueryBuilder('j');
+
         $qb->select('j')
            ->orderBy('j.'.$sorting['col'], $sorting['order'])
            ->setFirstResult( $offset )
            ->setMaxResults( $limit );
 
-        if( $filter != 'false' ){
-            $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
-               ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
-        }
-
+        /* regular user is not allowed to filter for users */
         if ( $userId ){
             $qb->andWhere("j.user = $userId");
+        } else {
+            if( $filter ){
+                $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
+                   ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
+            }
         }
 
         return $qb
@@ -111,6 +113,6 @@ class RunningJobRepository extends ServiceEntityRepository
 
         return $qb
             ->getQuery()
-            ->getSingleResult();
+            ->getResult();
     }
 }

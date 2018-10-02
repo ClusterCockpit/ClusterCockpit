@@ -65,6 +65,7 @@ class JobRepository extends ServiceEntityRepository
             );
         }
     }
+
     public function getSettings($control): array
     {
         $single = true;
@@ -114,6 +115,7 @@ class JobRepository extends ServiceEntityRepository
 
         return  $settings;
     }
+
     private function getHisto($settings, $target, $constraint = '', $join = ''): array
     {
         $startTime = $settings['startTime'];
@@ -145,6 +147,7 @@ class JobRepository extends ServiceEntityRepository
 
         return $histo;
     }
+
     private function getStats($settings, $constraint = '', $join = ''): array
     {
         $startTime = $settings['startTime'];
@@ -175,76 +178,35 @@ class JobRepository extends ServiceEntityRepository
 
         return $stat;
     }
+
     public function countFilteredJobs($userId,  $filter, $search = NULL )
     {
         $qb = $this->createQueryBuilder('j');
 
-        if( $filter == 'false' ){
-            $qb->select('count(j.id)')
-               ->where("j.duration > 300");
-        } else {
-            $qb->select('count(j.id)')
-               ->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
-               ->where("j.duration > 300")
-               ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
-        }
+        $qb->select('count(j.id)')
+           ->where("j.duration > 300");  /* TODO: Make this configurable */
 
-        if ( !is_null($search) ){
+        if ( ! is_null($search) ){
             $qb->andWhere($qb->expr()->between('j.numNodes',$search['numNodesFrom'],$search['numNodesTo']));
             $qb->andWhere($qb->expr()->between( 'j.duration', $search['durationFrom'], $search['durationTo']));
             $qb->andWhere($qb->expr()->between( 'j.startTime', $search['dateFrom'], $search['dateTo']));
-            if ( $search['clusterId'] != 0 ) {
+
+            if ( $search['clusterId'] != 0 ){  /* 0 means all Clusters */
                 $qb->andWhere("j.cluster = $search[clusterId]");
             }
-            if ( isset($search['userId']) ){
-                $userId = $search['userId'];
-                /* $qb->andWhere("j.user = $userId"); */
 
-                if ( is_numeric($userId) ){
-                    $qb->andWhere("j.user = $userId");
-                } else {
+            /* regular user is not allowed to search or filter for users */
+            if ( $userId ){
+                $qb->andWhere("j.user = $userId");
+            } else {
+
+                if( $filter ){
                     $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
-                       ->setParameter('word', '%'.addcslashes($userId, '%_').'%');
+                       ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
                 }
-            }
-        }
 
-        if ( $userId ){
-            $qb->andWhere("j.user = $userId");
-        }
-
-        return $qb
-            ->getQuery()
-            ->getSingleScalarResult();
-    }
-    public function findFilteredJobs(
-        $userId,
-        $offset, $limit,
-        $sorting,
-        $filter,
-        $search = NULL )
-    {
-        $qb = $this->createQueryBuilder('j');
-        $qb->select('j')
-           ->where("j.duration > 300")
-           ->orderBy('j.'.$sorting['col'], $sorting['order'])
-           ->setFirstResult( $offset )
-           ->setMaxResults( $limit );
-
-        if( $filter != 'false' ){
-            $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
-               ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
-        }
-
-        if ( !is_null($search) ){
-            $qb->andWhere($qb->expr()->between('j.numNodes',$search['numNodesFrom'],$search['numNodesTo']));
-            $qb->andWhere($qb->expr()->between( 'j.duration', $search['durationFrom'], $search['durationTo']));
-            $qb->andWhere($qb->expr()->between( 'j.startTime', $search['dateFrom'], $search['dateTo']));
-            if ( $search['clusterId'] != 0 ) {
-                $qb->andWhere("j.cluster = $search[clusterId]");
-            }
-            if ( ! $userId ){
                 if ( isset($search['userId']) ){
+
                     $userId = $search['userId'];
 
                     if ( is_numeric($userId) ){
@@ -255,17 +217,67 @@ class JobRepository extends ServiceEntityRepository
                     }
                 }
             }
-
         }
 
-        if ( $userId ){
-            $qb->andWhere("j.user = $userId");
+        return $qb
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findFilteredJobs(
+        $userId,
+        $offset, $limit,
+        $sorting,
+        $filter,
+        $search = NULL )
+    {
+        $qb = $this->createQueryBuilder('j');
+
+        $qb->select('j')
+           ->where("j.duration > 300")
+           ->orderBy('j.'.$sorting['col'], $sorting['order'])
+           ->setFirstResult( $offset )
+           ->setMaxResults( $limit );
+
+
+        if ( ! is_null($search) ){
+            $qb->andWhere($qb->expr()->between('j.numNodes',$search['numNodesFrom'],$search['numNodesTo']));
+            $qb->andWhere($qb->expr()->between( 'j.duration', $search['durationFrom'], $search['durationTo']));
+            $qb->andWhere($qb->expr()->between( 'j.startTime', $search['dateFrom'], $search['dateTo']));
+
+            if ( $search['clusterId'] != 0 ) { /* 0means all Clusters */
+                $qb->andWhere("j.cluster = $search[clusterId]");
+            }
+
+            /* regular user is not allowed to search or filter for users */
+            if ( $userId ){
+                $qb->andWhere("j.user = $userId");
+            } else {
+
+                if( $filter ){
+                    $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
+                       ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
+                }
+
+                if ( isset($search['userId']) ){
+
+                    $userId = $search['userId'];
+
+                    if ( is_numeric($userId) ){
+                        $qb->andWhere("j.user = $userId");
+                    } else {
+                        $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
+                           ->setParameter('word', '%'.addcslashes($userId, '%_').'%');
+                    }
+                }
+            }
         }
 
         return $qb
             ->getQuery()
             ->getResult();
     }
+
     public function findRunningJobs()
     {
         $qb = $this->createQueryBuilder('j');
@@ -276,6 +288,7 @@ class JobRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
     public function findByJobSearch(JobSearch $search)
     {
         $qb = $this->createQueryBuilder('j');
@@ -304,6 +317,7 @@ class JobRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
     public function findAvgTodo($startTime, $stopTime)
     {
         $qb = $this->createQueryBuilder('j');
@@ -315,6 +329,7 @@ class JobRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
     public function findByUser($userId, $limit, $control )
     {
         $settings = $this->getSettings($control);
@@ -334,6 +349,7 @@ class JobRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
     public function findBySystem($control)
     {
         $qb = $this->createQueryBuilder('j');
@@ -348,6 +364,7 @@ class JobRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
     public function findStatByUser($userId, $control, $full=true)
     {
         $stat = array();
@@ -363,6 +380,7 @@ class JobRepository extends ServiceEntityRepository
         }
         return $stat;
     }
+
     public function statClusters($control)
     {
         $stat = array();
@@ -372,6 +390,7 @@ class JobRepository extends ServiceEntityRepository
         $stat['histo_numnodes'] = $this->getHisto($settings,'num_nodes');
         return $stat;
     }
+
     public function statUsers($control)
     {
         $settings = $this->getSettings($control);
@@ -465,6 +484,7 @@ class JobRepository extends ServiceEntityRepository
 
         return $users;
     }
+
     public function statGroups($control)
     {
         $settings = $this->getSettings($control);
@@ -483,6 +503,7 @@ class JobRepository extends ServiceEntityRepository
 
         return $stat;
     }
+
     public function findStatByGroup($groupId, $settings)
     {
         $join = "INNER JOIN users_groups ON job.user_id = users_groups.user_id ";
@@ -492,6 +513,7 @@ class JobRepository extends ServiceEntityRepository
         $stat['histo_numnodes'] = $this->getHisto($settings,'num_nodes',$constraint, $join);
         return $stat;
     }
+
     public function getNumUsers()
     {
         $sql = "SELECT COUNT(DISTINCT(user_id)) AS count FROM job WHERE status='running'";
@@ -500,6 +522,7 @@ class JobRepository extends ServiceEntityRepository
 
         return $stmt->fetch();
     }
+
     public function persistJobSeverity($job){
         $id = $job->getId();
         $severity = $job->severity;
@@ -508,6 +531,7 @@ class JobRepository extends ServiceEntityRepository
         $stmt = $this->_connection->prepare($sql);
         $stmt->execute();
     }
+
     public function findJobById($jobId, $userId)
     {
         $qb = $this->createQueryBuilder('j');

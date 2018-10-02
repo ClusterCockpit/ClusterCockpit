@@ -70,7 +70,7 @@ class Job
     /**
      *  @ORM\Column(type="integer")
      */
-    private $numNodes;
+    public $numNodes;
 
     /**
      *  @ORM\Column(type="integer")
@@ -98,10 +98,6 @@ class Job
      */
     private $nodes;
 
-    /**
-     * @ORM\OneToOne(targetEntity="JobCache")
-     * @ORM\JoinColumn(name="cache_id", referencedColumnName="id"))
-     */
     public $jobCache;
 
     /**
@@ -110,29 +106,29 @@ class Job
     private $jobScript;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $memUsedAvg;
+    public $slot_0;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $memBwAvg;
+    public $slot_1;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $flopsAnyAvg;
+    public $slot_2;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $networkIO;
+    public $slot_3;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $fileIO;
+    public $slot_4;
 
     public $hasProfile;
 
@@ -275,7 +271,6 @@ class Job
         return $this->nodes[$id];
     }
 
-
     public function getStatus()
     {
         return $this->status;
@@ -301,9 +296,50 @@ class Job
         return false;
     }
 
-    /**
-     * @return Collection|JobTag[]
-     */
+    public function getPlots()
+    {
+        return $this->plots;
+    }
+
+    public function getPlotsArray($metrics)
+    {
+        $jsonPlots;
+
+        foreach ($metrics as $metric){
+            $plot = $this->plots[$metric->name];
+            $jsonPlots[] = array(
+                'name' => $plot->name,
+                'options' => $plot->options,
+                'data' => $plot->data
+            );
+        }
+        return $jsonPlots;
+    }
+
+    public function removePlot(Plot $plot): self
+    {
+        if ($this->plots->contains($plot)) {
+            $this->plots->removeElement($plot);
+        }
+
+        return $this;
+    }
+
+    public function addPlot(Plot $plot): self
+    {
+        $this->plots[$plot->name] = $plot;
+        return $this;
+    }
+
+    public function getPlot($name)
+    {
+        if (!isset($this->plots[$name])) {
+            return false;
+        }
+
+        return $this->plots[$name];
+    }
+
     public function getTags(): Collection
     {
         return $this->tags;

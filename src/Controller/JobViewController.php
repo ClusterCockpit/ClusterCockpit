@@ -87,6 +87,7 @@ class JobViewController extends Controller
             }
         }
     }
+
     private function getSystems(){
         return array(
             'ALL' => 0,
@@ -96,9 +97,12 @@ class JobViewController extends Controller
             'woody' => 4,
         );
     }
+
     public function search(
         Request $request,
-        SerializerInterface $serializer)
+        SerializerInterface $serializer,
+        Configuration $configuration
+    )
     {
         $search = new JobSearch();
         $search->setNumNodesFrom(1);
@@ -152,6 +156,21 @@ class JobViewController extends Controller
                 $job = $repository->findOneBy(['jobId' => $jobId]);
                 return $this->redirectToRoute('show_job', array('id' => $job->getId()));
             } else {
+                $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+                $config = $configuration->getUserConfig($this->getUser());
+                $sortMetrics = $this->getDoctrine()
+                                    ->getRepository(\App\Entity\TableSortConfig::class)
+                                    ->findMetrics(1);
+
+                $count = count($sortMetrics);
+                $end = $count+1;
+
+                $columnDefs = array(
+                    'orderable'  => "0,$end",
+                    'visible'    => implode(',',range(1,$count)),
+                    'searchable' => implode(',',range(1,$end))
+                );
+
                 $durationFrom =$search->getDurationFrom()->h*3600+$search->getDurationFrom()->m*60;
                 $durationTo =$search->getDurationTo()->h*3600+$search->getDurationFrom()->m*60;
                 $search->setDurationFrom($durationFrom);
@@ -160,6 +179,9 @@ class JobViewController extends Controller
                 return $this->render('jobViews/listJobs.html.twig',
                     array(
                         'jobSearch' => $serializer->serialize($search, 'json'),
+                        'config' => $config,
+                        'sortMetrics' => $sortMetrics,
+                        'columnDefs' => $columnDefs
                     ));
             }
         }
@@ -168,13 +190,35 @@ class JobViewController extends Controller
             'form' => $form->createView(),
         ));
     }
-    public function list()
+
+    public function list(
+        Configuration $configuration
+    )
     {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $config = $configuration->getUserConfig($this->getUser());
+        $sortMetrics = $this->getDoctrine()
+                            ->getRepository(\App\Entity\TableSortConfig::class)
+                            ->findMetrics(1);
+
+        $count = count($sortMetrics);
+        $end = $count+1;
+
+        $columnDefs = array(
+            'orderable'  => "0,$end",
+            'visible'    => implode(',',range(1,$count)),
+            'searchable' => implode(',',range(1,$end))
+        );
+
         return $this->render('jobViews/listJobs.html.twig',
             array(
-                'isRunning' => true
+                'isRunning' => true,
+                'config' => $config,
+                'sortMetrics' => $sortMetrics,
+                'columnDefs' => $columnDefs
             ));
     }
+
     public function showRunning(
         RunningJob $job,
         Configuration $configuration,
@@ -183,23 +227,18 @@ class JobViewController extends Controller
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());
+            /* $job->stopTime = time(); */
+        $job->stopTime = 1521057932;
+        $job->duration = $job->stopTime - $job->startTime;
 
-        $jobCache->checkCache(
-            $job,
-            array(
-                'mode' => 'view',
-            ),
-            $config
-        );
-
-        /* return $this->render('jobViews/viewJob-ajax.html.twig', */
-        return $this->render('jobViews/viewJob.html.twig',
+        return $this->render('jobViews/viewJob-ajax.html.twig',
             array(
                 'job' => $job,
                 'config' => $config,
                 'backend' => $jobCache->getBackend()
             ));
     }
+
     public function show(
         Job $job,
         Configuration $configuration,
@@ -209,16 +248,7 @@ class JobViewController extends Controller
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());
 
-        $jobCache->checkCache(
-            $job,
-            array(
-                'mode' => 'view',
-            ),
-            $config
-        );
-
         return $this->render('jobViews/viewJob-ajax.html.twig',
-        /* return $this->render('jobViews/viewJob.html.twig', */
             array(
                 'job' => $job,
                 'config' => $config,

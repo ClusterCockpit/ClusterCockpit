@@ -35,7 +35,7 @@ use App\Service\JobCache;
 use App\Entity\User;
 use App\Entity\UnixGroup;
 use Psr\Log\LoggerInterface;
-
+use App\Service\Configuration;
 
 class Cron extends Command
 {
@@ -43,10 +43,12 @@ class Cron extends Command
     private $_em;
     private $_ldap;
     private $_jobCache;
+    private $_configuration;
 
     public function __construct(
         LdapManager $ldap,
         LoggerInterface $logger,
+        Configuration $configuration,
         EntityManagerInterface $em,
         JobCache $jobCache
     )
@@ -54,6 +56,7 @@ class Cron extends Command
         $this->_logger = $logger;
         $this->_em = $em;
         $this->_ldap = $ldap;
+        $this->_configuration = $configuration;
         $this->_jobCache = $jobCache;
 
         parent::__construct();
@@ -66,7 +69,8 @@ class Cron extends Command
 
         foreach ( $jobs as $job ){
             if ( $job->getNumNodes() > 0 ) {
-                $this->_jobCache->warmupCache($job);
+                $this->_jobCache->warmupCache(
+                    $job, $this->_configuration->getConfig());
                 $this->_em->persist($job);
                 $this->_em->flush();
             }
@@ -235,7 +239,8 @@ class Cron extends Command
             $this->syncUsers($output);
         } else if ( $task === 'warmupCache' ){
             $this->warmupCache($output);
+        } else {
+            $output->writeln("Unknown command $task !");
         }
     }
 }
-

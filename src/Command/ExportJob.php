@@ -42,8 +42,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\JobSearch;
 use App\Entity\Job;
 use App\Entity\Plot;
-use App\Entity\TraceResolution;
-use App\Entity\Trace;
 use \DateInterval;
 
 /**
@@ -154,10 +152,10 @@ EOT;
             $plots = $jobCache->getPlots();
 
             foreach ( $plots as $plot ) {
-                $nodes = $plot->traceResolution->getTraces();
+                $nodes = $plot->getData();
 
                 $nodeCache;
-                $data = $nodes->first()->getData();
+                $data = $nodes->first();
                 $length = count($data['x']);
 
                 for ($j=0; $j<$length; $j++) {
@@ -165,10 +163,8 @@ EOT;
                 }
 
                 foreach ($nodes as $node){
-                    $data = $node->getData();
-
                     for ($j=0; $j<$length; $j++) {
-                        $nodeCache[$j] .= " {$data['y'][$j]}";
+                        $nodeCache[$j] .= " {$node['y'][$j]}";
                     }
                 }
 

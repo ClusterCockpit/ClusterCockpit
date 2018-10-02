@@ -13,7 +13,7 @@
 
 {% block javascript %}
     {{ parent() }}
-    <!-- <script src="{{ asset('js/datatables.min.js') }}"/></script> -->
+    <script src="{{ asset('js/datatables.min.js') }}"/></script>
     <script src="{{ asset('js/plotly.min.js') }}"/></script>
     <script src="{{ asset('js/app.js') }}"/></script>
 {% endblock %}
@@ -67,4 +67,25 @@
             <div class="col {{ margin }}" id="{{ metric.name }}"></div>
         {% endfor %}
     </div>
+
+    {% set metrics = job.cluster.metricLists['stat'].metrics %}
+    {% set viewStatTable = config['plot_view_showStatTable'].value|default('true') %}
+    {% if  viewStatTable is same as('true') %}
+        <div class="row">
+            <div class="col-10 offset-1 mt-5">
+                <table class="table table-striped" id="stat">
+                    <thead>
+                        <tr>
+                            <th scope="col">nodeId</th>
+                            {% for metric in metrics%}
+                                <th scope="col">{{ metric.name }}_min</th>
+                                <th scope="col">{{ metric.name }}_max</th>
+                                <th scope="col">{{ metric.name }}_avg</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    {% endif %}
 {% endblock %}
