@@ -25,35 +25,44 @@
 
 namespace App\Repository;
 
-use App\Entity\StatisticCache;
+use App\Entity\TableSortConfig;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-/**
- * @method StatisticCache|null find($id, $lockMode = null, $lockVersion = null)
- * @method StatisticCache|null findOneBy(array $criteria, array $orderBy = null)
- * @method StatisticCache[]    findAll()
- * @method StatisticCache[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
-class StatisticCacheRepository extends ServiceEntityRepository
+class TableSortConfigRepository extends ServiceEntityRepository
 {
     public function __construct(RegistryInterface $registry)
     {
-        parent::__construct($registry, StatisticCache::class);
+        parent::__construct($registry, TableSortConfig::class);
     }
 
-    public function findOneBySignature($userId,$clusterId,$month,$year): ?StatisticCache
+    public function findDataMetrics($job)
     {
-        return $this->createQueryBuilder('s')
-            ->andWhere('s.userId = :user')
-            ->andWhere('s.clusterId = :cluster')
-            ->andWhere('s.month = :month')
-            ->andWhere('s.year = :year')
-            ->setParameter('user', $userId)
-            ->setParameter('cluster', $clusterId)
-            ->setParameter('month', $month)
-            ->setParameter('year', $year)
+        $cluster = $job->getCluster();
+        $metrics = $cluster->getMetricList('sort')->getMetrics();
+        $info = $this->createQueryBuilder('t', 't.accessKey')
+            ->andWhere('t.clusterId = :cluster')
+            ->andWhere('t.type = :type')
             ->getQuery()
-            ->getOneOrNullResult() ;
+            ->setParameter('type', 'data')
+            ->setParameter('cluster', $cluster->getId())
+            ->getResult();
+
+        return array(
+            'metrics' => $metrics,
+            'info'    => $info
+        );
     }
+
+    public function findMetrics($clusterId)
+    {
+        return $this->createQueryBuilder('t', 't.accessKey')
+            ->andWhere('t.clusterId = :val')
+            ->setParameter('val', $clusterId)
+            ->orderBy('t.position','asc')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
 }
