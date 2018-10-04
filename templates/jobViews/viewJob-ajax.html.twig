@@ -72,15 +72,14 @@
     {% set viewStatTable = config['plot_view_showStatTable'].value|default('true') %}
     {% if  viewStatTable is same as('true') %}
         <div class="row">
-            <div class="col-10 offset-1 mt-5">
+            <div class="col  mt-5">
                 <table class="table table-striped" id="stat">
                     <thead>
-                        <tr>
-                            <th scope="col">nodeId</th>
+                            <th style="font-size: 0.9rem;" scope="col">nodeId</th>
                             {% for metric in metrics%}
-                                <th scope="col">{{ metric.name }}_min</th>
-                                <th scope="col">{{ metric.name }}_max</th>
-                                <th scope="col">{{ metric.name }}_avg</th>
+                                <th style="font-size: 0.8rem;" scope="col">{{ metric.name }} min [{{ metric.unit }}]</th>
+                                <th style="font-size: 0.8rem;" scope="col">{{ metric.name }} max [{{ metric.unit }}]</th>
+                                <th style="font-size: 0.8rem;" scope="col">{{ metric.name }} avg [{{ metric.unit }}]</th>
                             {% endfor %}
                         </tr>
                     </thead>

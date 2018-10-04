@@ -39,9 +39,6 @@ $(document).ready( function () {
 
             var tablelist =  $('#stat').DataTable(
                 {
-                    "columnDefs": [
-                        { "visible": false, "targets": [10,11,12,13,14,15] }
-                    ],
                     paging: false,
                     bFilter: false,
                     data: nodeStats,

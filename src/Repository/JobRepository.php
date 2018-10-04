@@ -245,7 +245,7 @@ class JobRepository extends ServiceEntityRepository
             $qb->andWhere($qb->expr()->between( 'j.duration', $search['durationFrom'], $search['durationTo']));
             $qb->andWhere($qb->expr()->between( 'j.startTime', $search['dateFrom'], $search['dateTo']));
 
-            if ( $search['clusterId'] != 0 ) { /* 0means all Clusters */
+            if ( $search['clusterId'] != 0 ) { /* 0 means all Clusters */
                 $qb->andWhere("j.cluster = $search[clusterId]");
             }
 
