@@ -248,7 +248,7 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
             $layout["yaxis"] = array(
                 "autotick" => 'false',
                 "dtick" => $y_dtick,
-                "range" => array(0,$options['maxVal']),
+                "range" => array(0,$options['maxVal']*1.2),
                 "title" => "[".$unit."]"
             );
         }

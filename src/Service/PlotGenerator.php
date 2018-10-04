@@ -55,6 +55,7 @@ class PlotGenerator
         $this->_plotter = $plotter;
         $this->_color = $color;
     }
+
     private function _createClusterRoof(&$cluster)
     {
         # compute roofline points
@@ -73,6 +74,7 @@ class PlotGenerator
                 $yCut, $cluster->flopRateSimd, $cluster->flopRateSimd)
             );
     }
+
     private function _createHistogram($stat, $options)
     {
         for($i = $options['start']; $i < $options['stop']; $i++) {
@@ -90,10 +92,12 @@ class PlotGenerator
 
         return $this->_plotter->generateBarPlot($options['name'], $data, $options);
     }
+
     public function getBackend()
     {
         return $this->_plotter->getBackendName();
     }
+
     public function createJobCloud($statCache, $cluster, &$data, &$status)
     {
         if ( ! $data ){
@@ -111,6 +115,7 @@ class PlotGenerator
                 'title' => 'nodes'
             )));
     }
+
     public function generateJobPolarPlot($job, $metrics, $data = NULL)
     {
         $plot = new Plot();
@@ -123,6 +128,7 @@ class PlotGenerator
                 'x-title' => 'Usage'
             ));
     }
+
     public function generateJobRoofline($job, $data = NULL, $fileOut = false)
     {
         $cluster = $job->getCluster();
@@ -167,6 +173,7 @@ class PlotGenerator
                 'title' => 'time [min]'
             ));
     }
+
     public function createClusterRoofline($data, $cluster)
     {
         $x; $y;
@@ -184,6 +191,7 @@ class PlotGenerator
 
         return $this->_plotter->generateScatterPlot('time [min]', $data, array('name'=>'data'));
     }
+
     public function generateJobHistograms($statCache, &$stat)
     {
         $statCache->addPlot(
@@ -206,6 +214,7 @@ class PlotGenerator
             ))
         );
     }
+
     public function generateMetricPlot(
         $job,
         $metric,
@@ -247,6 +256,24 @@ class PlotGenerator
                 $nodeId,
                 $x, $y,
                 $options);
+        }
+
+        if ( $options['mode'] === 'list' ){
+            /* add reference line */
+            $options['color'] = 'rgb(0,0,0)';
+            $value = $metric->normal;
+            $x = array(0, end($x));
+            $y = array($value,$value);
+
+            $this->_plotter->generateLine(
+                $lineData,
+                'Reference',
+                $x, $y,
+                $options);
+
+            if ($value > $maxVal){
+                $maxVal = $value;
+            }
         }
 
         $options['maxVal'] = $maxVal;
