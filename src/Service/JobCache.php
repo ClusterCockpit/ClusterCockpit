@@ -155,7 +155,9 @@ class JobCache
     private function _generatePlots(
         $job,
         $mode,
-        $config
+        $config,
+        $metrics,
+        $stats
     )
     {
         $job->jobCache = new \App\Entity\JobCache();
@@ -165,9 +167,6 @@ class JobCache
             $options['autotick'] = true;
             $options['sample'] = 0;
             $options['legend'] = false;
-            /* collect all metrics required for node table and job table sorting */
-            $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();  /* stat table */
-            $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
 
             if ( $config['plot_view_showRoofline']->value == 'true' ) {
                 $this->_plotGenerator->generateJobRoofline(
@@ -201,6 +200,32 @@ class JobCache
         }
 
         foreach ($metrics as $metric){
+
+            $metricName = $metric->name;
+
+            if ( $config['plot_general_colorBackground']->value === 'true' ) {
+                if ( isset($stats["{$metricName}_avg"]) ) {
+                    if ( $metricName === 'mem_used' ){
+                        if ( $stats["{$metricName}_avg"] > $metric->alert ){
+                            $options['bgColor'] = 'rgb(255,238,230)';
+                        } else if ( $stats["{$metricName}_avg"] > $metric->caution ){
+                            $options['bgColor'] = 'rgb(255,255,230)';
+                        } else {
+                            unset($options['bgColor']);
+                        }
+
+                    } else {
+                        if ( $stats["{$metricName}_avg"] < $metric->alert ){
+                            $options['bgColor'] = 'rgb(255,238,230)';
+                        } else if ( $stats["{$metricName}_avg"] < $metric->caution ){
+                            $options['bgColor'] = 'rgb(255,255,230)';
+                        } else {
+                            unset($options['bgColor']);
+                        }
+                    }
+                }
+            }
+
             $this->_plotGenerator->generateMetricPlot(
                 $job,
                 $metric,
@@ -216,12 +241,17 @@ class JobCache
     )
     {
         $this->_initJob($job);
-        $this->_generatePlots($job, 'view', $config);
+
+        /* collect all metrics required for node table and job table sorting */
+        $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();  /* stat table */
+        $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
+
+        $this->_generatePlots($job, 'view', $config, $metrics, $stats);
         $item = $this->_cache->getItem($job->getJobId().'view');
         $this->_cache->save($item->set($job->jobCache));
 
         $job->jobCache = NULL;
-        $this->_generatePlots($job, 'list', $config);
+        $this->_generatePlots($job, 'list', $config, $metrics, $stats);
         $item = $this->_cache->getItem($job->getJobId().'list');
         $this->_cache->save($item->set($job->jobCache));
 
@@ -240,6 +270,10 @@ class JobCache
         $this->_initJob($job);
         $item = $this->_cache->getItem($job->getJobId().$mode);
 
+        /* collect all metrics required for node table and job table sorting */
+        $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();  /* stat table */
+        $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
+
         if ($item->isHit()) {
             $job->jobCache = $item->get();
             $job->hasProfile = true;
@@ -252,6 +286,6 @@ class JobCache
         }
 
         $job->hasProfile = true;
-        $this->_generatePlots($job, $mode, $config);
+        $this->_generatePlots($job, $mode, $config, $metrics, $stats);
     }
 }

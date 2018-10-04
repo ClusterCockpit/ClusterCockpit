@@ -253,6 +253,11 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
             );
         }
 
+        if ( isset($options['bgColor'])){
+            $layout["plot_bgcolor"] = $options['bgColor'];
+        }
+
+
         return $layout;
     }
     public function getBackendName(){

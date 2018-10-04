@@ -19,6 +19,24 @@
     Job List
 {% endblock %}
 
+{% block helptext %}
+    <h4>Sorting</h4>
+    <p>
+        You can change the sort order of jobs by pressing the
+        sort button in the first column and selecting a column.
+        Press multiple times to switch between ascending and
+        descending sort order.
+    </p>
+    <h4>Legend</h4>
+    <p>
+        Different lines represent nodes within a job. The colors of lines only
+        helps to distinguish lines and does not serve another purpose. Metrics are
+        aggregated values per node. The horizontal black line
+        indicates an acceptable normal performance and serves as
+        frame of reference.
+    </p>
+{% endblock %}
+
 {% block body %}
     {% set message="No data " %}
     {{ include('util/printInfo.html.twig') }}

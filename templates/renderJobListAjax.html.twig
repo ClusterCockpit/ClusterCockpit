@@ -1,3 +1,4 @@
+
 <div class="row">
     <div class="col">
         <table class="table" id="jobs">
@@ -5,12 +6,18 @@
                 <tr>
                     <th scope="col">
                         Job ID
-                        <button type="button" class="btn btn-info btn-sm" id="toggleFilter">Sort</button>
+                        <button type="button" class="btn btn-dark btn-sm" id="toggleFilter">Sort</button>
                     </th>
                     {% for metric in sortMetrics %}
                         <th scope="col">{{ metric.label }}</th>
                     {% endfor %}
-                    <th scope="col">Plots</th>
+                    <th scope="col">
+                        Plots
+                        <button type="button" class="btn btn-info"  href="#helpmodal"  data-toggle="modal" data-target="#helpmodal">
+                                <i class="fas fa-question-circle"></i>
+                                Help
+                        </button>
+                    </th>
                 </tr>
             </thead>
         </table>

@@ -92,6 +92,28 @@
         </nav>
 
         <div class="container-fluid" style="margin-top:80px;">
+
+<div class="modal" id="helpmodal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Help</h3>
+            </div>
+            <div class="modal-body">
+                {% block helptext %}
+                {% endblock %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                    Close
+                    <i class="fas fa-times fa-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
             {% block body %}
             {% endblock %}
         </div>

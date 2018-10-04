@@ -18,6 +18,20 @@
     <script src="{{ asset('js/app.js') }}"/></script>
 {% endblock %}
 
+{% block helptext %}
+    <h4>Roofline plot</h4>
+    <p>
+    </p>
+    <h4>Polar plot</h4>
+    <p>
+    </p>
+    <h4>Metric plots</h4>
+    <p>
+    </p>
+    <h4>Node statistic table</h4>
+    <p>
+    </p>
+{% endblock %}
 
 {% block body %}
     <div class="row justify-content-center">
@@ -54,6 +68,12 @@
                     </tr>
                 </tbody>
             </table>
+            <button type="button" class="btn btn-info"  href="#helpmodal"  data-toggle="modal" data-target="#helpmodal">
+                <h5 class="text-center m-2">
+                    <i class="fas fa-question-circle fa-lg"></i>
+                    Help
+                </h5>
+            </button>
         </div>
         <div class="col-4" id="roofline"> </div>
         <div class="col-4" id="polarplot"> </div>
