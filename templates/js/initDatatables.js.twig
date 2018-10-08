@@ -50,6 +50,12 @@ $(document).ready( function () {
                             data.numnodes+' nodes</br></br>'+
                             '<strong>Duration:</strong></br>'+runtime.toFixed(2)+' hours</br></br>'+
                             '<strong>Started:</strong></br>'+timeConverter(data.starttime);
+                            content += '</br></br> <strong>Tags:</strong></br>';
+
+                        for (let tag of data.tags) {
+                            content += '<span class="badge badge-pill badge-warning">'+tag.name+'</span></br';
+                        }
+
                         return content;
                     }
                 },
@@ -60,7 +66,7 @@ $(document).ready( function () {
                     "data": "plots",
                         "render": function ( data, type, row ) {
                             if ( data ){
-                                var content = '<a href=\"/monitoring/'+data.url+'/'+data.id+'\" target=\"_blank\">';
+                                var content = '<a href=\"/monitoring/job/'+data.id+'\" target=\"_blank\">';
                                 content += '<div class=\"row\">';
                                 var count = data.plots.length;
 
@@ -75,7 +81,8 @@ $(document).ready( function () {
                                     content += 'var data_'+plot_name+'='+JSON.stringify(plot.data)+';';
                                     content += 'options_'+plot_name+'[\'height\'] = p_height;';
                                     content += 'options_'+plot_name+'[\'width\'] = p_width;';
-                                    content += 'Plotly.newPlot(\''+plot_name+'\',data_'+plot_name+',options_'+plot_name+',{staticPlot: true});';
+                                    content += 'Plotly.newPlot(\''+plot_name+'\',data_'+plot_name+
+                                                ',options_'+plot_name+','+data.plotOptions+');';
                                     content += '\</script\>';
                                 }
                                 content += '</div>';
@@ -116,6 +123,11 @@ $(document).ready( function () {
             table.columns( [{{ columnDefs.visible }}] ).visible( true );
         }
     });
+
+    $('#toggleLegend').click(function(){
+
+    });
+
 
     tablelist.on('draw.dt', function() {
         $('html, body').animate({ scrollTop: $(".dataTables_wrapper").offset().top }, 'slow');

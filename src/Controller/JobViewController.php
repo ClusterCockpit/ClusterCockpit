@@ -26,7 +26,6 @@
 namespace App\Controller;
 
 use App\Entity\Job;
-use App\Entity\RunningJob;
 use App\Entity\JobSearch;
 use App\Repository\JobRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -219,26 +218,6 @@ class JobViewController extends Controller
             ));
     }
 
-    public function showRunning(
-        RunningJob $job,
-        Configuration $configuration,
-        JobCache $jobCache
-    )
-    {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $config = $configuration->getUserConfig($this->getUser());
-            /* $job->stopTime = time(); */
-        $job->stopTime = 1521057932;
-        $job->duration = $job->stopTime - $job->startTime;
-
-        return $this->render('jobViews/viewJob-ajax.html.twig',
-            array(
-                'job' => $job,
-                'config' => $config,
-                'backend' => $jobCache->getBackend()
-            ));
-    }
-
     public function show(
         Job $job,
         Configuration $configuration,
@@ -247,6 +226,12 @@ class JobViewController extends Controller
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());
+
+        if ( $job->isRunning ) {
+            /* $job->stopTime = time(); */
+            $job->stopTime = 1521057932;
+            $job->duration = $job->stopTime - $job->startTime;
+        }
 
         return $this->render('jobViews/viewJob-ajax.html.twig',
             array(

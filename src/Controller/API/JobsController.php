@@ -30,7 +30,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\View\View;
 use App\Entity\Job;
-use App\Entity\RunningJob;
 use App\Entity\Cluster;
 use App\Entity\User;
 use App\Entity\Node;
@@ -63,7 +62,7 @@ class JobsController extends FOSRestController
         $startTime = $request->request->get('start_time');
         $jobScript = $request->request->get('job_script');
 
-        $job_rep = $this->getDoctrine()->getRepository(RunningJob::class);
+        $job_rep = $this->getDoctrine()->getRepository(Job::class);
         $user_rep = $this->getDoctrine()->getRepository(User::class);
         $node_rep = $this->getDoctrine()->getRepository(Node::class);
         $cluster_rep = $this->getDoctrine()->getRepository(Cluster::class);
@@ -73,7 +72,7 @@ class JobsController extends FOSRestController
             throw new HttpException(400, "Job already exists ".$jobId);
         }
 
-        $job =  new RunningJob;
+        $job =  new Job;
         $job->setJobId($jobId);
         $job->setStartTime($startTime);
 
@@ -124,7 +123,7 @@ class JobsController extends FOSRestController
     /**
      * @QueryParam(name="stop_time", requirements="\d+")
      */
-    public function patchJobsAction(RunningJob $id, ParamFetcher $paramFetcher)
+    public function patchJobsAction(Job $id, ParamFetcher $paramFetcher)
     {
         $stop_time = $paramFetcher->get('stop_time');
         /* $repository = $this->getDoctrine()->getRepository(\App\Entity\RunningJob::class); */

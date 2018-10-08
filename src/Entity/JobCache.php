@@ -63,7 +63,7 @@ class JobCache
 
     public function getPlotsArray($metrics)
     {
-        $jsonPlots;
+        $jsonPlots = array();
 
         foreach ($metrics as $metric){
             $plot = $this->plots[$metric->name];

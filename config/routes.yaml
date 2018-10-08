@@ -10,6 +10,10 @@ configuration:
     type:     rest
     resource: App\Controller\API\ConfigurationController
     prefix:  "web"
+jobtag:
+    type:     rest
+    resource: App\Controller\API\JobTagController
+    prefix:  "web"
 cluster:
     type:     rest
     resource: App\Controller\API\ClusterController

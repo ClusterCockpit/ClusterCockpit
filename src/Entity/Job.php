@@ -32,6 +32,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
 *  @ORM\Entity(repositoryClass="App\Repository\JobRepository")
+*  @ORM\Table(name="job",indexes={@ORM\Index(name="search_idx", columns={"is_running"})})
 */
 class Job
 {
@@ -99,6 +100,11 @@ class Job
     private $nodes;
 
     public $jobCache;
+
+    /**
+     *  @ORM\Column(type="boolean")
+     */
+    public $isRunning;
 
     /**
      *  @ORM\Column(type="text", nullable=true)
@@ -271,15 +277,7 @@ class Job
         return $this->nodes[$id];
     }
 
-    public function getStatus()
-    {
-        return $this->status;
-    }
 
-    public function setStatus($status)
-    {
-        $this->status = $status;
-    }
 
     public function getJobScript()
     {
@@ -293,57 +291,27 @@ class Job
 
     public function isRunning()
     {
-        return false;
-    }
-
-    public function getPlots()
-    {
-        return $this->plots;
-    }
-
-    public function getPlotsArray($metrics)
-    {
-        $jsonPlots;
-
-        foreach ($metrics as $metric){
-            $plot = $this->plots[$metric->name];
-            $jsonPlots[] = array(
-                'name' => $plot->name,
-                'options' => $plot->options,
-                'data' => $plot->data
-            );
-        }
-        return $jsonPlots;
-    }
-
-    public function removePlot(Plot $plot): self
-    {
-        if ($this->plots->contains($plot)) {
-            $this->plots->removeElement($plot);
-        }
-
-        return $this;
-    }
-
-    public function addPlot(Plot $plot): self
-    {
-        $this->plots[$plot->name] = $plot;
-        return $this;
-    }
-
-    public function getPlot($name)
-    {
-        if (!isset($this->plots[$name])) {
-            return false;
-        }
-
-        return $this->plots[$name];
+        return $this->isRunning;
     }
 
     public function getTags(): Collection
     {
         return $this->tags;
     }
+
+    public function getTagsArray()
+    {
+        $tags = array();
+
+        foreach ($this->tags as $tag){
+            $tags[] = array(
+                'name' => $tag->getName(),
+                'type' => $tag->getType()
+            );
+        }
+        return $tags;
+    }
+
 
     public function addTag(JobTag $tag): self
     {

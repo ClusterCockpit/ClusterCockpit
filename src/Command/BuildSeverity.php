@@ -76,7 +76,6 @@ class BuildSeverity extends Command
             ->setDescription('Rebuild job severity metric')
             ->setHelp('This command builds or rebuild the job severity metric and stores it in the job database.')
             ->addArgument('month', InputArgument::OPTIONAL, 'Apply for month. Month is e.g. 2018-05.')
-            ->addOption( 'running', 'r', InputOption::VALUE_NONE, 'Apply for all running jobs. Month argument is ignored.')
             ;
     }
 
@@ -92,10 +91,6 @@ class BuildSeverity extends Command
             '',
         ]);
 
-        if ( $running ){
-            $repository = $this->_em->getRepository(\App\Entity\RunningJob::class);
-            $jobs = $repository->findAvgTodo();
-        } else {
             $repository = $this->_em->getRepository(\App\Entity\Job::class);
 
             if (empty($month)) {
@@ -108,7 +103,6 @@ class BuildSeverity extends Command
                 "Search jobs from $starttime to $stoptime",
                 '',
             ]);
-        }
 
 
         $search = new JobSearch();

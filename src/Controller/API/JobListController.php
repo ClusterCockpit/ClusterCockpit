@@ -74,15 +74,8 @@ class JobListController extends FOSRestController
             $userId = $this->getUser()->getId();
         }
 
-        $repository = $this->getDoctrine()->getRepository(\App\Entity\RunningJob::class);
-        $test = $repository->findJobById($slug, $userId);
-
-        if (empty($test)) {
-            $repository = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
-            $job = $repository->findJobById($slug, $userId);
-        } else {
-            $job = $test[0];
-        }
+        $repository = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
+        $job = $repository->findJobById($slug, $userId);
 
         if (empty($job)) {
             throw new HttpException(400, "No such job $slug.");
@@ -121,12 +114,21 @@ class JobListController extends FOSRestController
             );
 
             $plot = $job->jobCache->getPlot('polarplot');
+
             $jobData["plots"][] =  array(
                 'name' => $plot->name,
                 'options' => $plot->options,
                 'data' => $plot->data
             );
 
+            if ( $config['plot_general_interactive']->value === 'false' ) {
+                $plotOptions = '{staticPlot: true}';
+            } else {
+                $plotOptions = '{modeBarButtonsToRemove: [\'sendDataToCloud\']}';
+            }
+
+            /* $jobData['plotOptions'] = $plotOptions; */
+            $jobData['plotOptions'] = '{staticPlot: true}';
             $jobData['nodeStats'] = $job->jobCache->nodeStat;
         } else {
             $jobData["severity"] = 0;
@@ -194,22 +196,8 @@ class JobListController extends FOSRestController
 
         /* START setup job query */
         $filter = false;
+        $repository = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
 
-        if ( is_null($jobSearch) ) { /* Running job table */
-            $repository = $this->getDoctrine()->getRepository(\App\Entity\RunningJob::class);
-            $total = $repository->countFilteredJobs($userId, false);
-            $filtered = $total;
-
-            if ( $search['value'] != ''){
-                $filter = $search['value'];
-                $filtered = $repository->countFilteredJobs($userId, $filter);
-            }
-
-            $jobs = $repository->findFilteredJobs($userId, $start, $length, $sorting, $filter);
-
-            $url = 'running_job'; $isRunning = true;
-
-        } else {  /* regular job table */
             $repository = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
             $total = $repository->countFilteredJobs($userId, false, $jobSearch);
             $filtered = $total;
@@ -222,8 +210,6 @@ class JobListController extends FOSRestController
 
             $jobs = $repository->findFilteredJobs($userId, $start, $length, $sorting, $filter, $jobSearch);
 
-            $url = 'job'; $isRunning = false;
-       }
         /* STOP setup job query */
 
         /* START get performance profile and setup message data */
@@ -237,11 +223,13 @@ class JobListController extends FOSRestController
             $jobData = array(
                 "jobinfo" => array(
                     "jobid" => $job->getJobId(),
+                    'id' => $job->getId(),
                     "username" => $job->getUser()->getUserId(),
                     "userid" => $job->getUser()->getId(),
                     "numnodes" => $job->getNumNodes(),
                     "runtime" => $job->getDuration(),
-                    "starttime" => $job->getStartTime()
+                    "starttime" => $job->getStartTime(),
+                    "tags" => $job->getTagsArray()
                 )
             );
 
@@ -259,10 +247,10 @@ class JobListController extends FOSRestController
 
                 $jobData["plots"] = array(
                     'id' => $job->getId(),
-                    'url' => $url,
                     'plots' => $job->jobCache->getPlotsArray(
-                        $job->getCluster()->getMetricList('list')->getMetrics()
-                    ));
+                        $job->getCluster()->getMetricList('list')->getMetrics()),
+                    'plotOptions' => '{staticPlot: true}'
+                );
             } else {
                 foreach ( $sortMetrics as $metric ){
                     $name = $metric->getAccessKey();
@@ -272,6 +260,7 @@ class JobListController extends FOSRestController
                 $jobData["plots"] = false;
             }
 
+
             $tableData[] = $jobData;
         }
         /* STOP get performance profile and setup message data */
@@ -280,9 +269,9 @@ class JobListController extends FOSRestController
             $tableData = array();
         }
 
+
         $view = $this->view(array(
             "draw" => (int) $draw,
-            "isRunning" => $isRunning,
             "recordsTotal" => $total,
             "recordsFiltered" => $filtered,
             "data" => $tableData

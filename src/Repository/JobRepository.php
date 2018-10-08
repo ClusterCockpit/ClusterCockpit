@@ -217,6 +217,18 @@ class JobRepository extends ServiceEntityRepository
                     }
                 }
             }
+        } else {
+            $qb->andWhere("j.isRunning = true");
+
+            /* regular user is not allowed to filter for users */
+            if ( $userId ){
+                $qb->andWhere("j.user = $userId");
+            } else {
+                if( $filter ){
+                    $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
+                       ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
+                }
+            }
         }
 
         return $qb
@@ -271,6 +283,19 @@ class JobRepository extends ServiceEntityRepository
                     }
                 }
             }
+        } else {
+            $qb->andWhere("j.isRunning = true");
+
+            /* regular user is not allowed to filter for users */
+            if ( $userId ){
+                $qb->andWhere("j.user = $userId");
+            } else {
+                if( $filter ){
+                    $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
+                       ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
+                }
+            }
+
         }
 
         return $qb
@@ -283,7 +308,7 @@ class JobRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('j');
 
         return $qb
-            ->where("j.status = 'running'")
+            ->where("j.isRunning = true")
             ->orderBy('j.startTime', 'DESC')
             ->getQuery()
             ->getResult();

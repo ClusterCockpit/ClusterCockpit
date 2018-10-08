@@ -26,7 +26,6 @@
 namespace App\Service;
 
 use App\Entity\Job;
-use App\Entity\RunningJob;
 use App\Entity\Plot;
 use App\Entity\Data;
 use App\Entity\NodeStat;
@@ -270,10 +269,6 @@ class JobCache
         $this->_initJob($job);
         $item = $this->_cache->getItem($job->getJobId().$mode);
 
-        /* collect all metrics required for node table and job table sorting */
-        $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();  /* stat table */
-        $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
-
         if ($item->isHit()) {
             $job->jobCache = $item->get();
             $job->hasProfile = true;
@@ -284,6 +279,10 @@ class JobCache
             $job->hasProfile = false;
             return;
         }
+
+        /* collect all metrics required for node table and job table sorting */
+        $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();  /* stat table */
+        $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
 
         $job->hasProfile = true;
         $this->_generatePlots($job, $mode, $config, $metrics, $stats);

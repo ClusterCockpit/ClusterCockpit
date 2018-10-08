@@ -64,8 +64,8 @@ class Cron extends Command
 
     private function warmupCache($output)
     {
-        $repository = $this->_em->getRepository(\App\Entity\RunningJob::class);
-        $jobs = $repository->findAll();
+        $repository = $this->_em->getRepository(\App\Entity\Job::class);
+        $jobs = $repository->findRunningJobs();
 
         foreach ( $jobs as $job ){
             if ( $job->getNumNodes() > 0 ) {
