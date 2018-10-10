@@ -80,8 +80,7 @@ class JobTagController extends FOSRestController
         return $this->handleView($view);
     } // "post_jobtag"           [POST] /api/jobtags
 
-
-    public function deleteJobTagAction(Configuration $id)
+    public function deleteJobTagAction($slug)
     {
         if (empty($id)) {
             throw new HttpException(400, "No such configuration key: $id");
