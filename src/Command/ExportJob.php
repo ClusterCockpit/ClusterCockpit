@@ -42,6 +42,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\JobSearch;
 use App\Entity\Job;
 use App\Entity\Plot;
+use App\Entity\User;
 use \DateInterval;
 
 /**
@@ -90,6 +91,28 @@ class ExportJob extends Command
     {
         $id = $input->getArgument('id');
         $repository = $this->_em->getRepository(\App\Entity\Job::class);
+
+        $userRep = $this->_em->getRepository(\App\Entity\User::class);
+
+        $users = $userRep->findAll();
+
+        foreach ( $users as $user ) {
+
+            $name = $user->getName(true);
+            $userID = $user->getUserId(true);
+            $email = $user->getEmail(true);
+            $pass = $user->getPassword();
+
+            /* $output->writeln([ 'TRY ', $name, $pass]); */
+
+                $user->setName($name);
+                $user->setUsername($userID);
+                $user->setEmail($email);
+                $this->_em->persist($user);
+        }
+                $this->_em->flush();
+
+        exit;
 
         $output->writeln([
             'Job File Export',

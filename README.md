@@ -53,8 +53,15 @@ to be used by someone developing or testing ClusterCockpit. Please refer to the
 Wiki if you want to install ClusterCockpit in a production environment.
 
 1. Clone repository
+
+You may use 
 ```
 $ git clone git@github.com:ClusterCockpit/ClusterCockpit.git ClusterCockpit
+```
+if you have a github account or you can use https:
+
+```
+$ git clone https://github.com/ClusterCockpit/ClusterCockpit.git ClusterCockpit
 ```
 
 2. Install required PHP version on Ubuntu
@@ -91,9 +98,10 @@ $mysql> quit
 Everything is currently in one database. Symfony uses the
 [Doctrine](https://www.doctrine-project.org) ORM for mapping PHP classes on
 database tables. Database access for Doctrine is configured in the local only
-.env file. This file is not committed.
+.env file. This file is not committed. You first need to copy the .env.dist
+file to .env and adopt it to your needs.
 
-To configure mysql credentials open the existing .env file in you project root and add the following line (enter above username and password for the placeholders):
+To configure mysql credentials open the .env file in you project root and add the following line (enter above username and password for the placeholders):
 
 ```
 DATABASE_URL=mysql://<username>:<mypass>@127.0.0.1:3306/ClusterCockpit
