@@ -57,8 +57,7 @@ class JobCache
         EntityManagerInterface $em,
         PlotGenerator $plotGenerator,
         DoctrineMetricDataRepository $metricRepo,
-        AdapterInterface $cache,
-        Configuration $configuration
+        AdapterInterface $cache
     )
     {
         $this->_logger = $logger;
@@ -236,23 +235,32 @@ class JobCache
 
     public function warmupCache(
         $job,
-        $config
+        $config,
+        $points = 0
     )
     {
         $this->_initJob($job);
+        $viewMetrics = $job->getCluster()->getMetricList('view')->getMetrics();
+        $pointsJob = $this->_metricDataRepository->getMetricCount($job, $viewMetrics);
 
-        /* collect all metrics required for node table and job table sorting */
-        $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();  /* stat table */
-        $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
+        if ( $points == 0 ){
+            $points = (int) $config['data_cache_numpoints']->value;
+        }
 
-        $this->_generatePlots($job, 'view', $config, $metrics, $stats);
-        $item = $this->_cache->getItem($job->getJobId().'view');
-        $this->_cache->save($item->set($job->jobCache));
+        if ( $pointsJob > $points ){
+            /* collect all metrics required for node table and job table sorting */
+            $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();  /* stat table */
+            $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
 
-        $job->jobCache = NULL;
-        $this->_generatePlots($job, 'list', $config, $metrics, $stats);
-        $item = $this->_cache->getItem($job->getJobId().'list');
-        $this->_cache->save($item->set($job->jobCache));
+            $this->_generatePlots($job, 'view', $config, $metrics, $stats);
+            $item = $this->_cache->getItem($job->getJobId().'view');
+            $this->_cache->save($item->set($job->jobCache));
+
+            $job->jobCache = NULL;
+            $this->_generatePlots($job, 'list', $config, $metrics, $stats);
+            $item = $this->_cache->getItem($job->getJobId().'list');
+            $this->_cache->save($item->set($job->jobCache));
+        }
 
         $tableSortRepository = $this->_em->getRepository(\App\Entity\TableSortConfig::class);
         $sortMetrics = $tableSortRepository->findDataMetrics($job);

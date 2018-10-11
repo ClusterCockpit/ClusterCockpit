@@ -227,6 +227,26 @@ class DoctrineMetricDataRepository implements MetricDataRepository
             return $data;
         }
     }
+
+    public function getMetricCount($job, $metrics)
+    {
+        $nodes = $job->getNodes();
+        $id = $nodes->first()->getId();
+        $startTime = $job->getStartTime();
+        $stopTime = $job->getStopTime();
+
+        $sql = "
+               SELECT COUNT(*) as count FROM data
+               WHERE node_id = $id
+               AND epoch BETWEEN $startTime AND $stopTime
+               ";
+
+        $stmt = $this->_connection->prepare($sql);
+        $stmt->execute();
+        $row = $stmt->fetch();
+
+        return $row['count'] * count($nodes) * count($metrics);
+    }
 }
 
     /* public function fetchClusterRoofline($clusterId):array */
