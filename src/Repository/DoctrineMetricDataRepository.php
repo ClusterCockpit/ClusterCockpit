@@ -47,11 +47,7 @@ class DoctrineMetricDataRepository implements MetricDataRepository
         $flopsAny = $metrics['flops_any'];
         $memBw = $metrics['mem_bw'];
 
-        if ($job->isRunning()) {
-            $joinTable = 'Rjobs_nodes';
-        } else {
-            $joinTable = 'jobs_nodes';
-        }
+        $joinTable = 'jobs_nodes';
 
         $bwSlot = sprintf("slot_%d", $memBw->slot);
         $flopsSlot = sprintf("slot_%d", $flopsAny->slot);
@@ -59,8 +55,8 @@ class DoctrineMetricDataRepository implements MetricDataRepository
         $sql = "
         SELECT ROUND($flopsSlot*0.001,2) AS y, case when $bwSlot=0 then 0 else ROUND($flopsSlot/$bwSlot,2) end as x
         FROM data
-        INNER JOIN $joinTable ON data.node_id = $joinTable.node_id
-        WHERE $joinTable.job_id=$id
+        INNER JOIN jobs_nodes ON data.node_id = jobs_nodes.node_id
+        WHERE jobs_nodes.job_id=$id
         AND data.epoch BETWEEN $startTime AND $stopTime
         ORDER BY data.epoch ASC
         ";
@@ -99,12 +95,6 @@ class DoctrineMetricDataRepository implements MetricDataRepository
         $metricString = '';
         $first = true;
 
-        if ($job->isRunning()) {
-            $joinTable = 'Rjobs_nodes';
-        } else {
-            $joinTable = 'jobs_nodes';
-        }
-
         foreach ( $metrics as $metric ){
             $name = $metric->name;
             $slot = sprintf("slot_%d", $metric->slot);
@@ -128,8 +118,8 @@ class DoctrineMetricDataRepository implements MetricDataRepository
             WHERE data.node_id IN (
                 SELECT node.id
                 FROM node
-                INNER JOIN $joinTable ON node.id = $joinTable.node_id
-                WHERE $joinTable.job_id = {$job->id})
+                INNER JOIN jobs_nodes ON node.id = jobs_nodes.node_id
+                WHERE jobs_nodes.job_id = {$job->id})
                 AND epoch BETWEEN {$job->startTime} AND {$job->stopTime}
                 GROUP BY data.node_id";
 
