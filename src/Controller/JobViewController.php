@@ -211,7 +211,7 @@ class JobViewController extends Controller
 
         return $this->render('jobViews/listJobs.html.twig',
             array(
-                'isRunning' => true,
+                /* 'isRunning' => true, */
                 'config' => $config,
                 'sortMetrics' => $sortMetrics,
                 'columnDefs' => $columnDefs
@@ -233,10 +233,15 @@ class JobViewController extends Controller
             $job->duration = $job->stopTime - $job->startTime;
         }
 
+        $alltags = $this->getDoctrine()
+                            ->getRepository(\App\Entity\JobTag::class)
+                            ->findAll();
+
         return $this->render('jobViews/viewJob-ajax.html.twig',
             array(
                 'job' => $job,
                 'config' => $config,
+                'tags' => $alltags,
                 'backend' => $jobCache->getBackend()
             ));
     }

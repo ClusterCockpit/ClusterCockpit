@@ -260,12 +260,31 @@ class JobCache
             $this->_generatePlots($job, 'list', $config, $metrics, $stats);
             $item = $this->_cache->getItem($job->getJobId().'list');
             $this->_cache->save($item->set($job->jobCache));
+            $job->isCached = true;
         }
 
         $tableSortRepository = $this->_em->getRepository(\App\Entity\TableSortConfig::class);
         $sortMetrics = $tableSortRepository->findDataMetrics($job);
         $this->_computeAverages($job, $sortMetrics);
         $this->_computeSeverity($job, $sortMetrics);
+    }
+
+    public function dropCache(
+        $job
+    )
+    {
+        $this->_initJob($job);
+
+        if ( $job->isCached ){
+
+            $key = $job->getJobId().'view';
+            $this->_cache->deleteItem($key);
+
+            $key = $job->getJobId().'list';
+            $this->_cache->deleteItem($key);
+
+            $job->isCached = false;
+        }
     }
 
     public function checkCache(

@@ -314,6 +314,27 @@ class JobRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    public function findCachedJobs($starttime)
+    {
+        $qb = $this->createQueryBuilder('j');
+
+        return $qb
+            ->where("j.isCached = true")
+            ->andWhere($qb->expr()->lt( 'j.startTime', $starttime))
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByStartTime($startFrom, $startTo)
+    {
+        $qb = $this->createQueryBuilder('j');
+
+        return $qb
+            ->where($qb->expr()->between( 'j.startTime', $startFrom, $startTo))
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findByJobSearch(JobSearch $search)
     {
         $qb = $this->createQueryBuilder('j');

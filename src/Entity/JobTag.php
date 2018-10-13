@@ -56,6 +56,7 @@ class JobTag
      */
     private $jobs;
 
+
     public function __construct()
     {
         $this->jobs = new ArrayCollection();
@@ -117,4 +118,5 @@ class JobTag
 
         return $this;
     }
+
 }

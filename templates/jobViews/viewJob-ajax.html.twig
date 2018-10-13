@@ -15,8 +15,34 @@
     {{ parent() }}
     <script src="{{ asset('js/datatables.min.js') }}"/></script>
     <script src="{{ asset('js/plotly.min.js') }}"/></script>
+    <script src="{{ asset('js/bootstrap3-typeahead.min.js') }}"/></script>
     <script src="{{ asset('js/app.js') }}"/></script>
     <script src="{{ asset('js/tag-control.js') }}"/></script>
+
+    <script>
+var searchtags = [
+    {% for tag in tags %}
+        { id:{{ tag.id }}, name:'{{ tag.name }}', type:'{{ tag.type }}' },
+    {% endfor %}
+];
+
+var $input = $("#tagname");
+
+$input.typeahead({
+  source: searchtags,
+  autoSelect: true
+});
+
+$input.change(function() {
+  var current = $input.typeahead("getActive");
+
+  if (current) {
+    if (current.name == $input.val()) {
+        $("#tagtype").val(current.type);
+    }
+  }
+});
+    </script>
 {% endblock %}
 
 {% block helptext %}
@@ -115,18 +141,23 @@
                         </form>
                     </div>
                 </div>
-                <div class="col-8" id='tagarea'>
-                    {% for tag in job.tags %}
-                        <span class="badge badge-warning" >
-                            {{ tag.name }}
-                            <button type="button" class="btn btn-outline-dark btn-sm tag-remove"  data-job-id="{{ job.id }}" data-tag-id="{{ tag.id }}">
-                                <i class="fas fa-times fa-sm"></i>
+                <div class="col-8">
+                    <div class="row">
+                        <div class="col" id='tagarea' data-job-id="{{ job.id }}">
+                            {% for tag in job.tags %}
+                                <span class="badge badge-pill badge-warning mt-1 tag-pill" data-tag-id={{ tag.id }} >
+                                    {{ tag.name }}
+                                </span><br/>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn btn-secondary btn-sm tag-enter mt-2">
+                                <i class="fas fa-tag"></i> Add Tag
                             </button>
-                        </span>
-                    {% endfor %}
-                    <button type="button" class="btn btn-secondary btn-sm tag-enter">
-                        <i class="fas fa-tag"></i> Add Tag
-                    </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

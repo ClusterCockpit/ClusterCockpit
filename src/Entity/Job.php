@@ -107,6 +107,11 @@ class Job
     public $isRunning;
 
     /**
+     *  @ORM\Column(type="boolean", options={"default":false})
+     */
+    public $isCached;
+
+    /**
      *  @ORM\Column(type="text", nullable=true)
      */
     private $jobScript;
@@ -142,6 +147,7 @@ class Job
      * @ORM\ManyToMany(targetEntity="App\Entity\JobTag", inversedBy="jobs")
      */
     private $tags;
+
 
     public function __construct() {
         $this->nodes = new ArrayCollection();
@@ -294,6 +300,9 @@ class Job
         return $this->isRunning;
     }
 
+    /**
+     * @return Collection|JobTag[]
+     */
     public function getTags(): Collection
     {
         return $this->tags;
@@ -306,12 +315,12 @@ class Job
         foreach ($this->tags as $tag){
             $tags[] = array(
                 'name' => $tag->getName(),
+                'id' => $tag->getId(),
                 'type' => $tag->getType()
             );
         }
         return $tags;
     }
-
 
     public function addTag(JobTag $tag): self
     {
@@ -330,6 +339,7 @@ class Job
 
         return $this;
     }
+
 }
 
 

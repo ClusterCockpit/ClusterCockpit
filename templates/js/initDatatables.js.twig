@@ -53,7 +53,7 @@ $(document).ready( function () {
                             content += '</br></br> <strong>Tags:</strong></br>';
 
                         for (let tag of data.tags) {
-                            content += '<span class="badge badge-pill badge-warning">'+tag.name+'</span></br';
+                            content += '<span class="badge badge-pill badge-warning mt-1">'+tag.name+'</span></br>';
                         }
 
                         return content;
@@ -123,11 +123,6 @@ $(document).ready( function () {
             table.columns( [{{ columnDefs.visible }}] ).visible( true );
         }
     });
-
-    $('#toggleLegend').click(function(){
-
-    });
-
 
     tablelist.on('draw.dt', function() {
         $('html, body').animate({ scrollTop: $(".dataTables_wrapper").offset().top }, 'slow');
