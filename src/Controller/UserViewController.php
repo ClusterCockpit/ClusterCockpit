@@ -239,7 +239,7 @@ class UserViewController extends Controller
                 'columnDefs' => $columnDefs,
                 'stat'  => $statCache,
                 'backend' => $jobCache->getBackend(),
-                'jobSearch' => $serializer->serialize($search, 'json')
+                'jobQuery' => $serializer->serialize($search, 'json')
                 ));
     }
 }

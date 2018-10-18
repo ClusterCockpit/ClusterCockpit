@@ -197,19 +197,19 @@ class JobRepository extends ServiceEntityRepository
             $qb->andWhere("j.isRunning = true");
         } elseif (array_key_exists ( 'clusterId', $jobQuery )) {
 
-            $qb->andWhere($qb->expr()->between('j.numNodes',$search['numNodesFrom'],$search['numNodesTo']));
-            $qb->andWhere($qb->expr()->between( 'j.duration', $search['durationFrom'], $search['durationTo']));
-            $qb->andWhere($qb->expr()->between( 'j.startTime', $search['dateFrom'], $search['dateTo']));
+            $qb->andWhere($qb->expr()->between('j.numNodes',$jobQuery['numNodesFrom'],$jobQuery['numNodesTo']));
+            $qb->andWhere($qb->expr()->between( 'j.duration', $jobQuery['durationFrom'], $jobQuery['durationTo']));
+            $qb->andWhere($qb->expr()->between( 'j.startTime', $jobQuery['dateFrom'], $jobQuery['dateTo']));
 
-            if ( $search['clusterId'] != 0 ){  /* 0 means all Clusters */
-                $qb->andWhere("j.cluster = $search[clusterId]");
+            if ( $jobQuery['clusterId'] != 0 ){  /* 0 means all Clusters */
+                $qb->andWhere("j.cluster = $jobQuery[clusterId]");
             }
 
             /* regular user is not allowed to search or filter for users */
             if ( ! $userId ){
-                if ( isset($search['userId']) ){
+                if ( isset($jobQuery['userId']) ){
 
-                    $userId = $search['userId'];
+                    $userId = $jobQuery['userId'];
 
                     if ( is_numeric($userId) ){
                         $qb->andWhere("j.user = $userId");
@@ -259,12 +259,12 @@ class JobRepository extends ServiceEntityRepository
                 }
             }
         } elseif (array_key_exists ( 'clusterId', $jobQuery )) {
-            $qb->andWhere($qb->expr()->between('j.numNodes',$search['numNodesFrom'],$search['numNodesTo']));
-            $qb->andWhere($qb->expr()->between( 'j.duration', $search['durationFrom'], $search['durationTo']));
-            $qb->andWhere($qb->expr()->between( 'j.startTime', $search['dateFrom'], $search['dateTo']));
+            $qb->andWhere($qb->expr()->between('j.numNodes',$jobQuery['numNodesFrom'],$jobQuery['numNodesTo']));
+            $qb->andWhere($qb->expr()->between( 'j.duration', $jobQuery['durationFrom'], $jobQuery['durationTo']));
+            $qb->andWhere($qb->expr()->between( 'j.startTime', $jobQuery['dateFrom'], $jobQuery['dateTo']));
 
-            if ( $search['clusterId'] != 0 ) { /* 0 means all Clusters */
-                $qb->andWhere("j.cluster = $search[clusterId]");
+            if ( $jobQuery['clusterId'] != 0 ) { /* 0 means all Clusters */
+                $qb->andWhere("j.cluster = $jobQuery[clusterId]");
             }
 
             /* regular user is not allowed to search or filter for users */
@@ -274,9 +274,9 @@ class JobRepository extends ServiceEntityRepository
                        ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
                 }
 
-                if ( isset($search['userId']) ){
+                if ( isset($jobQuery['userId']) ){
 
-                    $userId = $search['userId'];
+                    $userId = $jobQuery['userId'];
 
                     if ( is_numeric($userId) ){
                         $qb->andWhere("j.user = $userId");

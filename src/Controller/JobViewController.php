@@ -89,13 +89,18 @@ class JobViewController extends Controller
     }
 
     private function getSystems(){
-        return array(
-            'ALL' => 0,
-            'emmy' => 1,
-            'lima' => 2,
-            'meggie' => 3,
-            'woody' => 4,
-        );
+
+        $clusters = $this->getDoctrine()
+                            ->getRepository(\App\Entity\Cluster::class)
+                            ->findAll();
+
+        $systems['ALL'] = 0;
+
+        foreach  ( $clusters as $cluster ){
+            $systems[$cluster->getName()] = $cluster->getId();
+        }
+
+        return $systems;
     }
 
     public function search(
@@ -178,7 +183,7 @@ class JobViewController extends Controller
 
                 return $this->render('jobViews/listJobs.html.twig',
                     array(
-                        'jobSearch' => $serializer->serialize($search, 'json'),
+                        'jobQuery' => $serializer->serialize($search, 'json'),
                         'config' => $config,
                         'sortMetrics' => $sortMetrics,
                         'columnDefs' => $columnDefs

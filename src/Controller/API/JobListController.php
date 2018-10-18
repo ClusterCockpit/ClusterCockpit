@@ -125,11 +125,19 @@ class JobListController extends FOSRestController
                         $jobData[$name] = $job->{$slot};
                     }
                 }
+
+                $jobData["plots"] = array(
+                    'id' => $job->getId(),
+                    'plots' => $job->jobCache->getPlotsArray(
+                        $job->getCluster()->getMetricList($mode)->getMetrics()),
+                    'plotOptions' => '{staticPlot: true}'
+                );
+
             }
 
             if ( $mode === 'view' ){
                 $jobData["plots"] = $job->jobCache->getPlotsArray(
-                        $job->getCluster()->getMetricList($mode)->getMetrics());
+                    $job->getCluster()->getMetricList($mode)->getMetrics());
 
                 $plot = $job->jobCache->getPlot('roofline');
                 $jobData["plots"][] =  array(
@@ -162,12 +170,6 @@ class JobListController extends FOSRestController
                     $jobData[$name] = 0;
                 }
 
-                $jobData["plots"] = array(
-                    'id' => $job->getId(),
-                    'plots' => $job->jobCache->getPlotsArray(
-                        $job->getCluster()->getMetricList($mode)->getMetrics()),
-                    'plotOptions' => '{staticPlot: true}'
-                );
             }
 
             $jobData["plots"] = false;
