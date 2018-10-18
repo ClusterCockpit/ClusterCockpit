@@ -220,3 +220,14 @@ div.dataTables_wrapper div.dataTables_processing {
   top: 35%;
 }
 
+div.clusterCockpit_processing {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  width: 200px;
+  margin-left: -100px;
+  margin-top: -26px;
+  text-align: center;
+  padding: 1em 0;
+}
+

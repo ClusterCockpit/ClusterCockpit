@@ -179,14 +179,24 @@ class JobRepository extends ServiceEntityRepository
         return $stat;
     }
 
-    public function countFilteredJobs($userId,  $filter, $search = NULL )
+    public function countJobs(
+        $userId,
+        $jobQuery
+    )
     {
         $qb = $this->createQueryBuilder('j');
 
         $qb->select('count(j.id)')
            ->where("j.duration > 300");  /* TODO: Make this configurable */
 
-        if ( ! is_null($search) ){
+        if ( $userId ){
+            $qb->andWhere("j.user = $userId");
+        }
+
+        if (array_key_exists ( 'runningJobs', $jobQuery )) {
+            $qb->andWhere("j.isRunning = true");
+        } elseif (array_key_exists ( 'clusterId', $jobQuery )) {
+
             $qb->andWhere($qb->expr()->between('j.numNodes',$search['numNodesFrom'],$search['numNodesTo']));
             $qb->andWhere($qb->expr()->between( 'j.duration', $search['durationFrom'], $search['durationTo']));
             $qb->andWhere($qb->expr()->between( 'j.startTime', $search['dateFrom'], $search['dateTo']));
@@ -196,15 +206,7 @@ class JobRepository extends ServiceEntityRepository
             }
 
             /* regular user is not allowed to search or filter for users */
-            if ( $userId ){
-                $qb->andWhere("j.user = $userId");
-            } else {
-
-                if( $filter ){
-                    $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
-                       ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
-                }
-
+            if ( ! $userId ){
                 if ( isset($search['userId']) ){
 
                     $userId = $search['userId'];
@@ -217,18 +219,9 @@ class JobRepository extends ServiceEntityRepository
                     }
                 }
             }
-        } else {
-            $qb->andWhere("j.isRunning = true");
-
-            /* regular user is not allowed to filter for users */
-            if ( $userId ){
-                $qb->andWhere("j.user = $userId");
-            } else {
-                if( $filter ){
-                    $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
-                       ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
-                }
-            }
+        } elseif (array_key_exists ( 'jobTag', $jobQuery )) {
+            $qb->innerJoin('j.tags', 't', 'WITH', 't.id = :tagId')
+            ->setParameter('tagId', $jobQuery['jobTag']);
         }
 
         return $qb
@@ -241,7 +234,7 @@ class JobRepository extends ServiceEntityRepository
         $offset, $limit,
         $sorting,
         $filter,
-        $search = NULL )
+        $jobQuery)
     {
         $qb = $this->createQueryBuilder('j');
 
@@ -251,8 +244,21 @@ class JobRepository extends ServiceEntityRepository
            ->setFirstResult( $offset )
            ->setMaxResults( $limit );
 
+        if ( $userId ){
+            $qb->andWhere("j.user = $userId");
+        }
 
-        if ( ! is_null($search) ){
+        if (array_key_exists ( 'runningJobs', $jobQuery )) {
+            $qb->andWhere("j.isRunning = true");
+
+            /* regular user is not allowed to filter for users */
+            if ( ! $userId ){
+                if( $filter ){
+                    $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
+                       ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
+                }
+            }
+        } elseif (array_key_exists ( 'clusterId', $jobQuery )) {
             $qb->andWhere($qb->expr()->between('j.numNodes',$search['numNodesFrom'],$search['numNodesTo']));
             $qb->andWhere($qb->expr()->between( 'j.duration', $search['durationFrom'], $search['durationTo']));
             $qb->andWhere($qb->expr()->between( 'j.startTime', $search['dateFrom'], $search['dateTo']));
@@ -262,10 +268,7 @@ class JobRepository extends ServiceEntityRepository
             }
 
             /* regular user is not allowed to search or filter for users */
-            if ( $userId ){
-                $qb->andWhere("j.user = $userId");
-            } else {
-
+            if (! $userId ){
                 if( $filter ){
                     $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
                        ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
@@ -283,19 +286,9 @@ class JobRepository extends ServiceEntityRepository
                     }
                 }
             }
-        } else {
-            $qb->andWhere("j.isRunning = true");
-
-            /* regular user is not allowed to filter for users */
-            if ( $userId ){
-                $qb->andWhere("j.user = $userId");
-            } else {
-                if( $filter ){
-                    $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
-                       ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
-                }
-            }
-
+        } elseif (array_key_exists ( 'jobTag', $jobQuery )) {
+            $qb->innerJoin('j.tags', 't', 'WITH', 't.id = :tagId')
+            ->setParameter('tagId', $jobQuery['jobTag']);
         }
 
         return $qb

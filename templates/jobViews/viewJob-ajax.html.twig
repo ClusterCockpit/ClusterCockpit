@@ -20,28 +20,28 @@
     <script src="{{ asset('js/tag-control.js') }}"/></script>
 
     <script>
-var searchtags = [
-    {% for tag in tags %}
-        { id:{{ tag.id }}, name:'{{ tag.name }}', type:'{{ tag.type }}' },
-    {% endfor %}
-];
+        var searchtags = [
+            {% for tag in tags %}
+                { id:{{ tag.id }}, name:'{{ tag.name }}', type:'{{ tag.type }}' },
+            {% endfor %}
+        ];
 
-var $input = $("#tagname");
+        var $input = $("#tagname");
 
-$input.typeahead({
-  source: searchtags,
-  autoSelect: true
-});
+        $input.typeahead({
+            source: searchtags,
+            autoSelect: true
+        });
 
-$input.change(function() {
-  var current = $input.typeahead("getActive");
+        $input.change(function() {
+            var current = $input.typeahead("getActive");
 
-  if (current) {
-    if (current.name == $input.val()) {
-        $("#tagtype").val(current.type);
-    }
-  }
-});
+            if (current) {
+                if (current.name == $input.val()) {
+                    $("#tagtype").val(current.type);
+                }
+            }
+        });
     </script>
 {% endblock %}
 
@@ -61,27 +61,6 @@ $input.change(function() {
 {% endblock %}
 
 {% block body %}
-<div class="modal" id="tagmodal" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Add tag</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <p>Modal body text goes here.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
     <div class="row justify-content-center">
         <div class="col-3 ">
             <div class="row">
@@ -121,27 +100,7 @@ $input.change(function() {
                 </div>
             </div>
             <div class="row">
-                <div class="col-4">
-                    <button type="button" class="btn btn-info"  href="#helpmodal"  data-toggle="modal" data-target="#helpmodal">
-                        <h5 class="text-center m-2">
-                            <i class="fas fa-question-circle fa-lg"></i> Help
-                        </h5>
-                    </button>
-
-                    <div id='tag-form' class='invisible'>
-                        <form>
-                            <div class="form-group mt-2">
-                                <input type="tagname" class="form-control" id="tagname"  placeholder="tag name">
-                            </div>
-                            <div class="form-group">
-                                <input type="tagtype" class="form-control" id="tagtype" placeholder="tag type">
-                            </div>
-                            <button id='tag-add' type="button" name="add" class="btn btn-success" data-job-id="{{ job.id }}"><span class="fas fa-check fa-lg"></span></button>
-                            <button id='tag-cancel' type="button" name="cancel" class="btn btn-danger"><span class="fas fa-times fa-lg"></span></button>
-                        </form>
-                    </div>
-                </div>
-                <div class="col-8">
+                <div class="col-5">
                     <div class="row">
                         <div class="col" id='tagarea' data-job-id="{{ job.id }}">
                             {% for tag in job.tags %}
@@ -157,6 +116,20 @@ $input.change(function() {
                                 <i class="fas fa-tag"></i> Add Tag
                             </button>
                         </div>
+                    </div>
+                </div>
+                <div class="col-7">
+                    <div id='tag-form' class='invisible'>
+                        <form>
+                            <div class="form-group mt-2">
+                                <input type="tagname" class="form-control" id="tagname"  placeholder="tag name">
+                            </div>
+                            <div class="form-group">
+                                <input type="tagtype" class="form-control" id="tagtype" placeholder="tag type">
+                            </div>
+                            <button id='tag-add' type="button" name="add" class="btn btn-success" data-job-id="{{ job.id }}"><span class="fas fa-check fa-lg"></span></button>
+                            <button id='tag-cancel' type="button" name="cancel" class="btn btn-danger"><span class="fas fa-times fa-lg"></span></button>
+                        </form>
                     </div>
                 </div>
             </div>

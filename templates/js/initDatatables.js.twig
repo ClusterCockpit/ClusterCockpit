@@ -14,16 +14,12 @@ function timeConverter(UNIX_timestamp){
 $(document).ready( function () {
     var tablelist =  $('#jobs').DataTable(
         {
-            {% if jobSearch is defined %}
-                "ajax": {
-                    "url": "/web/jobs",
-                    "data": {
-                        "jobSearch": {{ jobSearch|raw }}
-                    }
-                },
-            {% else %}
-                "ajax": "/web/jobs",
-            {% endif %}
+            "ajax": {
+                "url": "/web/jobs",
+                "data": {
+                    "jobQuery": {{ jobQuery|raw }}
+                }
+            },
             "serverSide": true,
             "processing": true,
             "stateSave": true,
@@ -50,10 +46,10 @@ $(document).ready( function () {
                             data.numnodes+' nodes</br></br>'+
                             '<strong>Duration:</strong></br>'+runtime.toFixed(2)+' hours</br></br>'+
                             '<strong>Started:</strong></br>'+timeConverter(data.starttime);
-                            content += '</br></br> <strong>Tags:</strong></br>';
+                            content += '</br>';
 
                         for (let tag of data.tags) {
-                            content += '<span class="badge badge-pill badge-warning mt-1">'+tag.name+'</span></br>';
+                            content += '<a href="/monitoring/listjobs/'+tag.id+'" class="badge badge-pill badge-warning mt-1">'+tag.name+'</a></br>';
                         }
 
                         return content;

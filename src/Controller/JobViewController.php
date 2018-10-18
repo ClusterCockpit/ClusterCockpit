@@ -26,6 +26,7 @@
 namespace App\Controller;
 
 use App\Entity\Job;
+use App\Entity\JobTag;
 use App\Entity\JobSearch;
 use App\Repository\JobRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -211,7 +212,36 @@ class JobViewController extends Controller
 
         return $this->render('jobViews/listJobs.html.twig',
             array(
-                /* 'isRunning' => true, */
+                'jobQuery' => json_encode(array('runningJobs' => true)),
+                'config' => $config,
+                'sortMetrics' => $sortMetrics,
+                'columnDefs' => $columnDefs
+            ));
+    }
+
+    public function listTag(
+        JobTag $id,
+        Configuration $configuration
+    )
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $config = $configuration->getUserConfig($this->getUser());
+        $sortMetrics = $this->getDoctrine()
+                            ->getRepository(\App\Entity\TableSortConfig::class)
+                            ->findMetrics(1);
+
+        $count = count($sortMetrics);
+        $end = $count+1;
+
+        $columnDefs = array(
+            'orderable'  => "0,$end",
+            'visible'    => implode(',',range(1,$count)),
+            'searchable' => implode(',',range(1,$end))
+        );
+
+        return $this->render('jobViews/listJobs.html.twig',
+            array(
+                'jobQuery' => json_encode(array('jobTag' => $id->getId())),
                 'config' => $config,
                 'sortMetrics' => $sortMetrics,
                 'columnDefs' => $columnDefs

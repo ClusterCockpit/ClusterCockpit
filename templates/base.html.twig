@@ -73,45 +73,49 @@
                             </li>
                         {% endif %}
                     </ul>
+                    <button type="button" class="btn btn-info"  href="#helpmodal"  data-toggle="modal" data-target="#helpmodal">
+                        <i class="fas fa-question-circle"></i> Help
+                    </button>
+
                 {% endblock %}
                 {% if is_granted('IS_AUTHENTICATED_FULLY') %}
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('security_logout') }}">
-                            {{ app.user.username }} Logout
-                            <i class="fas fa-sign-out-alt"></i>
-                        </a>
-                    </li>
-                </ul>
-                <form class="form-inline my-0" onsubmit="this.action='/monitoring/searchId/';">
-                    <input class="form-control mr-sm-2" name="searchId" placeholder="jobId / userId" id="searchId" aria-label="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('security_logout') }}">
+                                {{ app.user.username }} Logout
+                                <i class="fas fa-sign-out-alt"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <form class="form-inline my-0" onsubmit="this.action='/monitoring/searchId/';">
+                        <input class="form-control mr-sm-2" name="searchId" placeholder="jobId / userId" id="searchId" aria-label="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                    </form>
                 {% endif %}
             </div>
         </nav>
 
         <div class="container-fluid" style="margin-top:80px;">
 
-<div class="modal" id="helpmodal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Help</h3>
+            <div class="modal" id="helpmodal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3 class="modal-title">Help</h3>
+                        </div>
+                        <div class="modal-body">
+                            {% block helptext %}
+                            {% endblock %}
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                                Close
+                                <i class="fas fa-times fa-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                {% block helptext %}
-                {% endblock %}
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
-                    Close
-                    <i class="fas fa-times fa-lg"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 
             {% block body %}

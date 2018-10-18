@@ -31,6 +31,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 use App\Repository\JobRepository;
 use App\Repository\RunningJobRepository;
@@ -72,49 +73,43 @@ class BuildJobCache extends Command
     protected function configure()
     {
         $this
-            ->setName('app:jobcache')
+            ->setName('app:jobcache:build')
             ->setDescription('Warmup job cache')
-            ->setHelp('This command builds or rebuilds the job cache for certain months.')
-            ->addArgument('month', InputArgument::OPTIONAL, 'Apply for month. Month is e.g. 2018-05.')
+            ->setHelp('This command builds or rebuilds the job cache for certain days.')
+            ->addArgument('day', InputArgument::OPTIONAL, 'Apply for day. Day is e.g. 2018-05-30.')
             ->addOption( 'numpoints', 'N', InputOption::VALUE_REQUIRED, 'Cache is build for jobs with more points than numpoints.', '0')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $stopwatch = new Stopwatch();
         $jobs;
-        $month = $input->getArgument('month');
+        $day = $input->getArgument('day');
+
         $numpoints = $input->getOption('numpoints');
 
         $output->writeln([
-            'Build job cache',
+            '==================',
+            ' Build job cache',
             '==================',
             '',
         ]);
 
         $repository = $this->_em->getRepository(\App\Entity\Job::class);
 
-        if (empty($month)) {
-            $month = date('Y-m');
+        if (empty($day)) {
+            $day = date('Y-m-d');
         }
 
-        $starttime = strtotime("$month");
-        $stoptime = strtotime("+1 month $month");
+        $startFrom = strtotime("$day");
+        $startTo = strtotime("+1 day $day");
         $output->writeln([
-            "Search jobs from $starttime to $stoptime",
+            "Search jobs from $startFrom to $startTo",
             '',
         ]);
 
-
-        $search = new JobSearch();
-        $search->setNumNodesFrom(1);
-        $search->setNumNodesTo(64);
-        $search->setDurationFrom(new DateInterval('PT1H'));
-        $search->setDurationTo(new DateInterval('PT24H'));
-        $search->setDateFrom($starttime);
-        $search->setDateTo($stoptime);
-
-        $jobs = $repository->findByJobSearch($search);
+        $jobs = $repository->findByStartTime($startFrom, $startTo);
         $jobCount = count($jobs);
         $progressBar = new ProgressBar($output, $jobCount);
         $progressBar->setRedrawFrequency(25);
@@ -125,6 +120,7 @@ class BuildJobCache extends Command
         ]);
 
         $progressBar->start();
+        $stopwatch->start('BuildCache');
 
         foreach ( $jobs as $job ) {
             $progressBar->advance();
@@ -137,6 +133,14 @@ class BuildJobCache extends Command
                 $this->_em->flush();
             }
         }
+        $event = $stopwatch->stop('BuildCache');
         $progressBar->finish();
+
+        $output->writeln([
+            'Time:',
+            $event->getDuration(),
+            'jobs/sec:'
+        ]);
+
     }
 }
