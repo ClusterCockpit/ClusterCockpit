@@ -134,12 +134,16 @@ class BuildJobCache extends Command
             }
         }
         $event = $stopwatch->stop('BuildCache');
+        $duration = $event->getDuration()/ 1000;
+        $count = count($jobs);
         $progressBar->finish();
 
         $output->writeln([
-            'Time:',
-            $event->getDuration(),
-            'jobs/sec:'
+            'Processed ',
+            $count,
+            'in',
+            $duration,
+            's'
         ]);
 
     }

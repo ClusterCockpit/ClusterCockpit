@@ -29,6 +29,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Adapter\LdapManager;
 use App\Service\JobCache;
@@ -36,6 +37,8 @@ use App\Entity\User;
 use App\Entity\UnixGroup;
 use Psr\Log\LoggerInterface;
 use App\Service\Configuration;
+use \DateTimeZone;
+use \DateTime;
 
 class Cron extends Command
 {
@@ -44,18 +47,21 @@ class Cron extends Command
     private $_ldap;
     private $_jobCache;
     private $_configuration;
+    private $_timer;
 
     public function __construct(
         LdapManager $ldap,
         LoggerInterface $logger,
         Configuration $configuration,
         EntityManagerInterface $em,
+        StopWatch $stopwatch,
         JobCache $jobCache
     )
     {
         $this->_logger = $logger;
         $this->_em = $em;
         $this->_ldap = $ldap;
+        $this->_timer = $stopwatch;
         $this->_configuration = $configuration;
         $this->_jobCache = $jobCache;
 
@@ -67,6 +73,7 @@ class Cron extends Command
         $repository = $this->_em->getRepository(\App\Entity\Job::class);
         $jobs = $repository->findRunningJobs();
 
+        $this->_timer->start('WarmupCache');
         foreach ( $jobs as $job ){
             if ( $job->getNumNodes() > 0 ) {
                 $this->_jobCache->warmupCache(
@@ -75,10 +82,15 @@ class Cron extends Command
                 $this->_em->flush();
             }
         }
+        $event = $this->_timer->stop('WarmupCache');
+        $duration = $event->getDuration()/ 1000;
+        $count = count($jobs);
+        $this->_logger->info("CRON:warmupCache $count jobs in $duration s");
     }
 
     private function syncUsers($output)
     {
+        $this->_timer->start('syncUsers');
         $results = $this->_ldap->queryGroups();
         $groups = array();
         $userGroup = array();
@@ -218,6 +230,10 @@ class Cron extends Command
         $this->_em->flush();
 
         $userRepo->resetActiveUsers($activeUsers);
+
+        $event = $this->_timer->stop('syncUsers');
+        $duration = $event->getDuration()/ 1000;
+        $this->_logger->info("CRON:syncUsers  $duration s");
     }
 
     protected function configure()
@@ -232,15 +248,17 @@ class Cron extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
+        $d = new DateTime('NOW', new DateTimeZone('Europe/Berlin'));
+        $datestr = $d->format('Y-m-d\TH:i:s');
         $task = $input->getArgument('task');
+        $this->_logger->info("CRON Start $task at $datestr");
 
         if ( $task === 'syncUsers' ){
             $this->syncUsers($output);
         } else if ( $task === 'warmupCache' ){
             $this->warmupCache($output);
         } else {
-            $output->writeln("Unknown command $task !");
+            $output->writeln("CRON Error: Unknown command $task !");
         }
     }
 }
