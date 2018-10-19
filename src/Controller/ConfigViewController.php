@@ -593,6 +593,7 @@ class ConfigViewController extends Controller
         return $this->render('config/editCluster.html.twig',
             array(
                 'form' => $form->createView(),
+                'id' => $cluster->getId(),
                 'cluster' => $repository->addNodes($cluster),
                 'title' => "Edit Cluster ".$cluster->getName(),
                 'sidebar' => $this->_sidebar(

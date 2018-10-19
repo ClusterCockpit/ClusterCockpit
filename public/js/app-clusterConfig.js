@@ -116,10 +116,11 @@ $( document ).ready(function() {
     $("#cluster_save").click(function( e ) {
         var data = {};
         data['metricLists'] = findTables();
+        var id = $('body').data('id');
 
         $.ajax({
             type: "PATCH",
-            url: "/web/clusters/{{ cluster.id }}",
+            url: "/web/clusters/"+id,
             data: JSON.stringify(data),
             processData: false,
             contentType : 'application/json',

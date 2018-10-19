@@ -25,11 +25,7 @@ $(document).ready( function () {
             "stateSave": true,
             "deferRender": true,
             "initComplete": function( settings, json ) {
-                {% if jobSearch is defined %}
                     $('#info_message').text('Showing '+json.recordsTotal+' jobs.');
-                {% else %}
-                    $('#info_message').text('Info: '+json.recordsTotal+' jobs running.');
-                {% endif %}
             },
             "language":  {
                 "processing": '<h4 class="text-center mt-4">\
