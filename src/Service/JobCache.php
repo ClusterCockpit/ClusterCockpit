@@ -201,27 +201,31 @@ class JobCache
 
             $metricName = $metric->name;
 
-            if ( $config['plot_general_colorBackground']->value === 'true' ) {
-                if ( isset($stats["{$metricName}_avg"]) ) {
-                    if ( $metricName === 'mem_used' ){
-                        if ( $stats["{$metricName}_avg"] > $metric->alert ){
-                            $options['bgColor'] = 'rgb(255,238,230)';
-                        } else if ( $stats["{$metricName}_avg"] > $metric->caution ){
-                            $options['bgColor'] = 'rgb(255,255,230)';
-                        } else {
-                            unset($options['bgColor']);
-                        }
+            if ( ! is_null($metric->alert) ){
+                if ( $config['plot_general_colorBackground']->value === 'true' ) {
+                    if ( isset($stats["{$metricName}_avg"]) ) {
+                        if ( $metricName === 'mem_used' ){
+                            if ( $stats["{$metricName}_avg"] > $metric->alert ){
+                                $options['bgColor'] = 'rgb(255,238,230)';
+                            } else if ( $stats["{$metricName}_avg"] > $metric->caution ){
+                                $options['bgColor'] = 'rgb(255,255,230)';
+                            } else {
+                                unset($options['bgColor']);
+                            }
 
-                    } else {
-                        if ( $stats["{$metricName}_avg"] < $metric->alert ){
-                            $options['bgColor'] = 'rgb(255,238,230)';
-                        } else if ( $stats["{$metricName}_avg"] < $metric->caution ){
-                            $options['bgColor'] = 'rgb(255,255,230)';
                         } else {
-                            unset($options['bgColor']);
+                            if ( $stats["{$metricName}_avg"] < $metric->alert ){
+                                $options['bgColor'] = 'rgb(255,238,230)';
+                            } else if ( $stats["{$metricName}_avg"] < $metric->caution ){
+                                $options['bgColor'] = 'rgb(255,255,230)';
+                            } else {
+                                unset($options['bgColor']);
+                            }
                         }
                     }
                 }
+            } else {
+                unset($options['bgColor']);
             }
 
             $this->_plotGenerator->generateMetricPlot(

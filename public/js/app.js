@@ -54,5 +54,10 @@ $(document).ready( function () {
             console.log("Error");
         }
     });
+
+    $('.perfplot').click(function(e) {
+        var plot = $(this).attr('id');
+        Plotly.plot(plot, [], {}, { staticPlot: false });
+    });
 });
 
