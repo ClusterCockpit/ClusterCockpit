@@ -231,3 +231,6 @@ div.clusterCockpit_processing {
   padding: 1em 0;
 }
 
+::-webkit-calendar-picker-indicator {
+  opacity: 1
+}

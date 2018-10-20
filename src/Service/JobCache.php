@@ -135,7 +135,7 @@ class JobCache
             $severity -= 15;
         }
 
-        $job->severity = $severity * $job->getNumNodes();
+        $job->severity = $severity ;
     }
 
     private function _computeAverages($job, $sortMetrics)

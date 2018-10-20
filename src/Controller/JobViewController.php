@@ -43,6 +43,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use App\Service\JobCache;
 use App\Service\Configuration;
 use Psr\Log\LoggerInterface;
+use \DateTime;
 use \DateInterval;
 
 class JobViewController extends Controller
@@ -115,11 +116,9 @@ class JobViewController extends Controller
         $search->setDurationFrom(new DateInterval('PT1H'));
         $search->setDurationTo(new DateInterval('PT24H'));
         $search->setDateFrom(1520640000);
-        $search->setDateTo(time());
+        $search->setDateTo(floor(time()/60)*60);
 
         $form = $this->createFormBuilder($search)
-            ->add('jobId', TextType::class, array('required' => false))
-            ->add('userId', TextType::class, array('required' => false))
             ->add('clusterId', ChoiceType::class,array(
                 'choices'  => $this->getSystems(),
                 'required' => true))
@@ -140,10 +139,12 @@ class JobViewController extends Controller
                 'with_years' => false,
             ))
             ->add('dateFrom', DateTimeType::class, array(
-                'input' => 'timestamp'
+                'input' => 'timestamp',
+                'widget' => 'single_text'
             ))
             ->add('dateTo', DateTimeType::class, array(
-                'input' => 'timestamp'
+                'input' => 'timestamp',
+                'widget' => 'single_text'
             ))
             ->add('search', SubmitType::class, array('label' => 'Search Jobs'))
             ->getForm();
@@ -272,9 +273,15 @@ class JobViewController extends Controller
                             ->getRepository(\App\Entity\JobTag::class)
                             ->findAll();
 
+        $d1 = new DateTime();
+        $d2 = new DateTime();
+        $d2->add(new DateInterval('PT'.$job->duration.'S'));
+        $iv = $d2->diff($d1);
+
         return $this->render('jobViews/viewJob-ajax.html.twig',
             array(
                 'job' => $job,
+                'duration' => $iv->format('%h h %i m'),
                 'config' => $config,
                 'tags' => $alltags,
                 'backend' => $jobCache->getBackend()
