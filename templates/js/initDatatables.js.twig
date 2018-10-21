@@ -28,11 +28,10 @@ $(document).ready( function () {
                 {
                     "data": "jobinfo",
                     "render": function ( data, type, row ) {
-                        var runtime = data.runtime/3600;
                         var content = '<strong>'+data.jobid+'</strong></br>'+
                             '<a href="/monitoring/user/'+data.userid+'">'+data.username+'</a></br>'+
                             data.numnodes+' nodes</br></br>'+
-                            '<strong>Duration:</strong></br>'+runtime.toFixed(2)+' hours</br></br>'+
+                            '<strong>Duration:</strong></br>'+data.runtime+'</br></br>'+
                             '<strong>Started:</strong></br>'+timeConverter(data.starttime);
                             content += '</br>';
 
@@ -94,7 +93,7 @@ $(document).ready( function () {
 
     tablelist
         .order([{{ config['plot_list_sortColumn'].value|default(1) }},
-            '{{ config['plot_list_sortDirection'].value|default('asc') }}'
+            '{{ config['plot_list_sortDirection'].value|default('desc') }}'
         ])
         .draw();
 

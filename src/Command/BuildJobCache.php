@@ -42,6 +42,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\JobSearch;
 use App\Entity\Job;
 use App\Entity\Plot;
+use \DateTime;
 use \DateInterval;
 
 /**
@@ -134,16 +135,16 @@ class BuildJobCache extends Command
             }
         }
         $event = $stopwatch->stop('BuildCache');
-        $duration = $event->getDuration()/ 1000;
-        $count = count($jobs);
         $progressBar->finish();
 
+        $seconds = $event->getDuration()/ 1000;
+        $d1 = new DateTime();
+        $d2 = new DateTime();
+        $d2->add(new DateInterval('PT'.$seconds.'S'));
+        $iv = $d2->diff($d1);
+
         $output->writeln([
-            'Processed ',
-            $count,
-            'in',
-            $duration,
-            's'
+            $iv->format('%h h %i m')
         ]);
 
     }

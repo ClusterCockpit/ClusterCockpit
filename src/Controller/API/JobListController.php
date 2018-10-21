@@ -43,6 +43,8 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
+use \DateTime;
+use \DateInterval;
 
 /**
  * @RouteResource("Jobs", pluralize=false)
@@ -99,6 +101,11 @@ class JobListController extends FOSRestController
             $config
         );
 
+        $d1 = new DateTime();
+        $d2 = new DateTime();
+        $d2->add(new DateInterval('PT'.$job->duration.'S'));
+        $iv = $d2->diff($d1);
+
         /* add job meta data */
         $jobData = array(
             "jobinfo" => array(
@@ -107,7 +114,7 @@ class JobListController extends FOSRestController
                 "username" => $job->getUser()->getUserId(),
                 "userid" => $job->getUser()->getId(),
                 "numnodes" => $job->getNumNodes(),
-                "runtime" => $job->getDuration(),
+                "runtime" => $iv->format('%h h %i m'),
                 "starttime" => $job->getStartTime(),
                 "tags" => $job->getTagsArray()
             )
@@ -242,9 +249,15 @@ class JobListController extends FOSRestController
 
         $filter = $search['value'];
 
+        if ($filter === ''){
+            $filter = NULL;
+        }
+
         /* setup job query */
         $repository = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
-        $total = $repository->countJobs($userId, $jobQuery);
+        $total = $repository->countJobs($userId, NULL, $jobQuery);
+        $filtered = $total;
+
         $jobs = $repository->findFilteredJobs(
             $userId,
             $start, $length,
@@ -252,7 +265,9 @@ class JobListController extends FOSRestController
             $filter,
             $jobQuery);
 
-        $filtered = count($jobs);
+        if ( $filter ){
+            $filtered = $repository->countJobs($userId, $filter, $jobQuery);
+        }
 
         /* get performance profile and setup message data */
         foreach ( $jobs as $job ){

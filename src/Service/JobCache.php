@@ -108,6 +108,38 @@ class JobCache
         }
     }
 
+    private function _colorBackground($options, $metric, $stats)
+    {
+        $metricName = $metric->name;
+
+        if ( ! is_null($metric->alert) ){
+            if ( $config['plot_general_colorBackground']->value === 'true' ) {
+                if ( isset($stats["{$metricName}_avg"]) ) {
+                    if ( $metricName === 'mem_used' ){
+                        if ( $stats["{$metricName}_avg"] > $metric->alert ){
+                            $options['bgColor'] = 'rgb(255,238,230)';
+                        } else if ( $stats["{$metricName}_avg"] > $metric->caution ){
+                            $options['bgColor'] = 'rgb(255,255,230)';
+                        } else {
+                            unset($options['bgColor']);
+                        }
+
+                    } else {
+                        if ( $stats["{$metricName}_avg"] < $metric->alert ){
+                            $options['bgColor'] = 'rgb(255,238,230)';
+                        } else if ( $stats["{$metricName}_avg"] < $metric->caution ){
+                            $options['bgColor'] = 'rgb(255,255,230)';
+                        } else {
+                            unset($options['bgColor']);
+                        }
+                    }
+                }
+            }
+        } else {
+            unset($options['bgColor']);
+        }
+    }
+
     private function _computeSeverity($job, $sortMetrics)
     {
         $severity = 0;
@@ -153,12 +185,19 @@ class JobCache
     private function _generatePlots(
         $job,
         $mode,
-        $config,
-        $metrics,
-        $stats
+        $config
     )
     {
         $job->jobCache = new \App\Entity\JobCache();
+
+        if ( $config['plot_view_showPolarplot']->value == 'true' or
+            $config['plot_view_showStatTable']->value == 'true' or
+            $config['plot_general_colorBackground']->value == 'true'
+        ) {
+            /* collect all metrics required for node table and job table sorting */
+            $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
+            $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
+        }
 
         if ( $mode === 'view' ) { /* Single Job View */
             $options['mode'] = 'view';
@@ -199,33 +238,8 @@ class JobCache
 
         foreach ($metrics as $metric){
 
-            $metricName = $metric->name;
-
-            if ( ! is_null($metric->alert) ){
-                if ( $config['plot_general_colorBackground']->value === 'true' ) {
-                    if ( isset($stats["{$metricName}_avg"]) ) {
-                        if ( $metricName === 'mem_used' ){
-                            if ( $stats["{$metricName}_avg"] > $metric->alert ){
-                                $options['bgColor'] = 'rgb(255,238,230)';
-                            } else if ( $stats["{$metricName}_avg"] > $metric->caution ){
-                                $options['bgColor'] = 'rgb(255,255,230)';
-                            } else {
-                                unset($options['bgColor']);
-                            }
-
-                        } else {
-                            if ( $stats["{$metricName}_avg"] < $metric->alert ){
-                                $options['bgColor'] = 'rgb(255,238,230)';
-                            } else if ( $stats["{$metricName}_avg"] < $metric->caution ){
-                                $options['bgColor'] = 'rgb(255,255,230)';
-                            } else {
-                                unset($options['bgColor']);
-                            }
-                        }
-                    }
-                }
-            } else {
-                unset($options['bgColor']);
+            if ( $config['plot_general_colorBackground']->value == 'true' ) {
+                $this->_colorBackground($options, $metric, $stats);
             }
 
             $this->_plotGenerator->generateMetricPlot(
@@ -308,14 +322,9 @@ class JobCache
 
         if (! $this->_metricDataRepository->hasProfile($job)){
             $job->hasProfile = false;
-            return;
+        } else {
+            $job->hasProfile = true;
+            $this->_generatePlots($job, $mode, $config);
         }
-
-        /* collect all metrics required for node table and job table sorting */
-        $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();  /* stat table */
-        $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
-
-        $job->hasProfile = true;
-        $this->_generatePlots($job, $mode, $config, $metrics, $stats);
     }
 }
