@@ -65,11 +65,13 @@ class Cron extends Command
         $jobs = $repository->findAll();
 
         foreach ( $jobs as $job ){
-            if ( $job->getNumNodes() > 0 ) {
+            if ( count($job->getNodes()) > 0 ) {
                 $this->_jobCache->warmupCache($job);
                 $this->_em->persist($job);
                 $this->_em->flush();
-            }
+	    } else {
+            $output->writeln(["Search jobs from $starttime to $stoptime"]);
+	    }
         }
     }
 
