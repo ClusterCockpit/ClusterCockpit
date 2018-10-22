@@ -8,28 +8,27 @@
 
 {% block body %}
 {{ form_start(form) }}
-<div class="row align-items-center">
-    <div class="col-md-2 offset-md-3">
-        {{ form_row(form.jobId) }}
-        {{ form_row(form.userId) }}
+<div class="container">
+<div class="row justify-content-center">
+    <div class="col-3">
         {{ form_row(form.clusterId) }}
         {{ form_row(form.numNodesFrom) }}
         {{ form_row(form.numNodesTo) }}
     </div>
-    <div class="col-md-2">
-        {{ form_row(form.durationFrom) }}
+    <div class="col-3">
         {{ form_row(form.dateFrom) }}
-    </div>
-    <div class="col-md-2">
-        {{ form_row(form.durationTo) }}
         {{ form_row(form.dateTo) }}
     </div>
-</div>
-<div class="row">
-    <div class="col-md offset-md-3">
-        {{ form_row(form.search) }}
+    <div class="col-3">
+        {{ form_row(form.durationFrom) }}
+        {{ form_row(form.durationTo) }}
     </div>
+</div>
+<div class="row justify-content-end">
+    <div class="col-4">
+        {{ form_row(form.search, {'attr': {'class': 'btn btn-secondary btn-lg'}}) }}
+    </div>
+</div>
 </div>
 {{ form_end(form) }}
 {% endblock %}
-

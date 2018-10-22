@@ -32,6 +32,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
 *  @ORM\Entity(repositoryClass="App\Repository\JobRepository")
+*  @ORM\Table(name="job",indexes={@ORM\Index(name="search_idx", columns={"is_running"})})
 */
 class Job
 {
@@ -70,7 +71,7 @@ class Job
     /**
      *  @ORM\Column(type="integer")
      */
-    private $numNodes;
+    public $numNodes;
 
     /**
      *  @ORM\Column(type="integer")
@@ -98,11 +99,17 @@ class Job
      */
     private $nodes;
 
-    /**
-     * @ORM\OneToOne(targetEntity="JobCache")
-     * @ORM\JoinColumn(name="cache_id", referencedColumnName="id"))
-     */
     public $jobCache;
+
+    /**
+     *  @ORM\Column(type="boolean")
+     */
+    public $isRunning;
+
+    /**
+     *  @ORM\Column(type="boolean", options={"default":false})
+     */
+    public $isCached;
 
     /**
      *  @ORM\Column(type="text", nullable=true)
@@ -110,29 +117,29 @@ class Job
     private $jobScript;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $memUsedAvg;
+    public $slot_0;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $memBwAvg;
+    public $slot_1;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $flopsAnyAvg;
+    public $slot_2;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $networkIO;
+    public $slot_3;
 
     /**
-     *  @ORM\Column(type="float", options={"default":0})
+     *  @ORM\Column(type="float", nullable=true)
      */
-    public $fileIO;
+    public $slot_4;
 
     public $hasProfile;
 
@@ -140,6 +147,7 @@ class Job
      * @ORM\ManyToMany(targetEntity="App\Entity\JobTag", inversedBy="jobs")
      */
     private $tags;
+
 
     public function __construct() {
         $this->nodes = new ArrayCollection();
@@ -276,15 +284,6 @@ class Job
     }
 
 
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    public function setStatus($status)
-    {
-        $this->status = $status;
-    }
 
     public function getJobScript()
     {
@@ -298,7 +297,7 @@ class Job
 
     public function isRunning()
     {
-        return false;
+        return $this->isRunning;
     }
 
     /**
@@ -307,6 +306,20 @@ class Job
     public function getTags(): Collection
     {
         return $this->tags;
+    }
+
+    public function getTagsArray()
+    {
+        $tags = array();
+
+        foreach ($this->tags as $tag){
+            $tags[] = array(
+                'name' => $tag->getName(),
+                'id' => $tag->getId(),
+                'type' => $tag->getType()
+            );
+        }
+        return $tags;
     }
 
     public function addTag(JobTag $tag): self
@@ -326,6 +339,7 @@ class Job
 
         return $this;
     }
+
 }
 
 

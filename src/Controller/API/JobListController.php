@@ -43,6 +43,8 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
+use \DateTime;
+use \DateInterval;
 
 /**
  * @RouteResource("Jobs", pluralize=false)
@@ -64,6 +66,150 @@ class JobListController extends FOSRestController
         $this->_authChecker = $authChecker;
     }
 
+    private function _createJobSorting($columns, $index, $direction, $sortMetrics)
+    {
+        if ( $index != 0 ){
+            $sortMetric = $sortMetrics[$columns[$index]['data']];
+
+            if ( $sortMetric->getType() === 'data' ){
+                $column = 'slot_'.$sortMetric->getSlot();
+            } else {
+                $column = $sortMetric->getAccessKey();
+            }
+
+            $sorting = array(
+                'col'   => $column,
+                'order' =>$direction
+            );
+        } else {
+            $sorting = array(
+                'col'   => $columns[1]['data'],
+                'order' => 'desc'
+            );
+        }
+
+        return $sorting;
+    }
+
+    private function _addJobPerformanceProfile($job, $mode, $sortMetrics = NULL)
+    {
+        $config = $this->_configuration->getUserConfig($this->getUser());
+
+        $this->_jobCache->checkCache(
+            $job,
+            $mode,
+            $config
+        );
+
+        $d1 = new DateTime();
+        $d2 = new DateTime();
+        $d2->add(new DateInterval('PT'.$job->duration.'S'));
+        $iv = $d2->diff($d1);
+
+        /* add job meta data */
+        $jobData = array(
+            "jobinfo" => array(
+                "jobid" => $job->getJobId(),
+                'id' => $job->getId(),
+                "username" => $job->getUser()->getUserId(),
+                "userid" => $job->getUser()->getId(),
+                "numnodes" => $job->getNumNodes(),
+                "runtime" => $iv->format('%h h %i m'),
+                "starttime" => $job->getStartTime(),
+                "tags" => $job->getTagsArray()
+            )
+        );
+
+        if( $job->hasProfile ){
+            if ( $mode === 'list' ){
+                foreach ( $sortMetrics as $metric ){
+                    $name = $metric->getAccessKey();
+
+                    if ( $metric->getType() === 'job' ){
+                        $jobData[$name] = $job->{$name};
+                    } else if ( $metric->getType() === 'data' ){
+                        $slot = 'slot_'.$metric->getSlot();
+                        $jobData[$name] = $job->{$slot};
+                    }
+                }
+
+                $jobData["plots"] = array(
+                    'id' => $job->getId(),
+                    'plots' => $job->jobCache->getPlotsArray(
+                        $job->getCluster()->getMetricList($mode)->getMetrics()),
+                    'plotOptions' => '{staticPlot: true}'
+                );
+
+            }
+
+            if ( $mode === 'view' ){
+                $jobData["plots"] = $job->jobCache->getPlotsArray(
+                    $job->getCluster()->getMetricList($mode)->getMetrics());
+
+                $plot = $job->jobCache->getPlot('roofline');
+                $jobData["plots"][] =  array(
+                    'name' => $plot->name,
+                    'options' => $plot->options,
+                    'data' => $plot->data
+                );
+
+                $plot = $job->jobCache->getPlot('polarplot');
+
+                $jobData["plots"][] =  array(
+                    'name' => $plot->name,
+                    'options' => $plot->options,
+                    'data' => $plot->data
+                );
+
+                if ( $config['plot_general_interactive']->value === 'false' ) {
+                    $plotOptions = '{staticPlot: true}';
+                } else {
+                    $plotOptions = '{modeBarButtonsToRemove: [\'sendDataToCloud\']}';
+                }
+
+                $jobData['nodeStats'] = $job->jobCache->nodeStat;
+                /* $jobData['plotOptions'] = $plotOptions; */
+            }
+        } else {
+            if ( $mode === 'list' ){
+                foreach ( $sortMetrics as $metric ){
+                    $name = $metric->getAccessKey();
+                    $jobData[$name] = 0;
+                }
+
+            }
+
+            $jobData["plots"] = false;
+        }
+
+        return $jobData;
+    }
+
+    public function getAction($slug)
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $config = $this->_configuration->getUserConfig($this->getUser());
+        $userId = 0;
+
+        if ( false === $this->_authChecker->isGranted('ROLE_ADMIN') ) {
+            $userId = $this->getUser()->getId();
+        }
+
+        $repository = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
+        $job = $repository->findJobById($slug, $userId);
+
+        if (empty($job)) {
+            throw new HttpException(400, "No such job $slug.");
+        }
+
+        $jobData = $this->_addJobPerformanceProfile(
+            $job,
+            'view');
+
+        $view = $this->view($jobData);
+        return $this->handleView($view);
+    } // "get_job"             [GET] api/jobs/$slug
+
     /**
      * @QueryParam(name="draw", requirements="\d+")
      * @QueryParam(name="start", requirements="\d+")
@@ -71,7 +217,7 @@ class JobListController extends FOSRestController
      * @QueryParam(name="order")
      * @QueryParam(name="columns")
      * @QueryParam(name="search")
-     * @QueryParam(name="jobSearch", nullable=true)
+     * @QueryParam(name="jobQuery")
      */
     public function cgetAction( ParamFetcher $paramFetcher)
     {
@@ -81,122 +227,63 @@ class JobListController extends FOSRestController
         $order = $paramFetcher->get('order');
         $search = $paramFetcher->get('search');
         $columns = $paramFetcher->get('columns');
-        $jobSearch = $paramFetcher->get('jobSearch');
+        $jobQuery = $paramFetcher->get('jobQuery');
 
-        $tableData;
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $config = $this->_configuration->getUserConfig($this->getUser());
         $userId = 0;
 
         if ( false === $this->_authChecker->isGranted('ROLE_ADMIN') ) {
             $userId = $this->getUser()->getId();
         }
 
-        $sorting;
-        $filter = 'false';
-        $index = $order[0]['column'];
-        $direction = $order[0]['dir'];
+        $sortMetrics = $this->getDoctrine()
+                            ->getRepository(\App\Entity\TableSortConfig::class)
+                            ->findMetrics(1);
 
-        if ( $index != 0 ){
-            $sorting = array(
-                'col'   => $columns[$index]['data'],
-                'order' =>$direction
-            );
-        } else {
-            $sorting = array(
-                'col'   => $columns[3]['data'],
-                'order' => 'desc'
-            );
+        $sorting = $this->_createJobSorting(
+            $columns,
+            $order[0]['column'],
+            $order[0]['dir'],
+            $sortMetrics
+        );
+
+        $filter = $search['value'];
+
+        if ($filter === ''){
+            $filter = NULL;
         }
 
-        $total; $filtered; $jobs; $url; $isRunning;
+        /* setup job query */
+        $repository = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
+        $total = $repository->countJobs($userId, NULL, $jobQuery);
+        $filtered = $total;
 
-        if ( !is_null($jobSearch) ) {
-            $repository = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
-            $total = $repository->countFilteredJobs($userId, 'false', $jobSearch);
-            $filtered = $total;
-            $url = 'job';
-            $isRunning = false;
+        $jobs = $repository->findFilteredJobs(
+            $userId,
+            $start, $length,
+            $sorting,
+            $filter,
+            $jobQuery);
 
-            if ( $search['value'] != ''){
-                $filter = $search['value'];
-                $filtered = $repository->countFilteredJobs($userId, $filter, $jobSearch);
-            }
-
-            $jobs = $repository->findFilteredJobs($userId, $start, $length, $sorting, $filter, $jobSearch);
-        } else {
-            if ( false === $this->_authChecker->isGranted('ROLE_ADMIN') ) {
-                $jobSearch['userId'] = $this->getUser()->getId();
-            }
-            $repository = $this->getDoctrine()->getRepository(\App\Entity\RunningJob::class);
-            $total = $repository->countFilteredJobs($userId, 'false');
-            $filtered = $total;
-            $url = 'running_job';
-            $isRunning = true;
-
-            if ( $search['value'] != ''){
-                $filter = $search['value'];
-                $filtered = $repository->countFilteredJobs($userId, $filter);
-            }
-
-            $jobs = $repository->findFilteredJobs($userId, $start, $length, $sorting, $filter);
+        if ( $filter ){
+            $filtered = $repository->countJobs($userId, $filter, $jobQuery);
         }
 
+        /* get performance profile and setup message data */
         foreach ( $jobs as $job ){
-            $this->_jobCache->checkCache(
-                $job,
-                array(
-                    'mode' => 'list'
-                ),
-                $config
-            );
-
-            $jobData = array(
-                "jobinfo" => array(
-                    "jobid" => $job->getJobId(),
-                    "username" => $job->getUser()->getUserId(),
-                    "userid" => $job->getUser()->getId(),
-                    "numnodes" => $job->getNumNodes(),
-                    "runtime" => $job->getDuration(),
-                    "starttime" => $job->getStartTime()
-                ),
-                "numNodes" => $job->getNumNodes(),
-                "startTime" => $job->getStartTime(),
-                "duration" => sprintf("%.02f",$job->getDuration()/3600),
-            );
-
-            if( $job->hasProfile ){
-                $jobData["severity"] = $job->severity;
-                $jobData["flopsAnyAvg"] = $job->flopsAnyAvg;
-                $jobData["memBwAvg"] = $job->memBwAvg;
-                $jobData["trafficTotalIbAvg"] = $job->networkIO;
-                $jobData["trafficTotalLustreAvg"] = $job->fileIO;
-
-                $jobData["plots"] = array(
-                    'id' => $job->getId(),
-                    'url' => $url,
-                    'plots' => $job->jobCache->getPlotsArray(
-                        $job->getCluster()->getMetricList('list')->getMetrics()
-                    ));
-            } else {
-                $jobData["severity"] = 0;
-                $jobData["flopsAnyAvg"] = 0;
-                $jobData["memBwAvg"] = 0;
-                $jobData["trafficTotalIbAvg"] = 0;
-                $jobData["trafficTotalLustreAvg"] = 0;
-                $jobData["plots"] = false;
-            }
-
-            $tableData[] = $jobData;
+            $tableData[] =
+                $this->_addJobPerformanceProfile(
+                    $job,
+                    'list',
+                    $sortMetrics);
         }
 
-        if (count($jobs) == 0) {
+        if ($filtered == 0) {
             $tableData = array();
         }
 
         $view = $this->view(array(
             "draw" => (int) $draw,
-            "isRunning" => $isRunning,
             "recordsTotal" => $total,
             "recordsFiltered" => $filtered,
             "data" => $tableData
@@ -204,4 +291,3 @@ class JobListController extends FOSRestController
         return $this->handleView($view);
     } // "get_jobs"             [GET] /web/joblist/
 }
-

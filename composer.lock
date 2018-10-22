@@ -4,7 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "167ae9df2316e2c50b422d6a5132a37e",
+    "hash": "9ed5dfb957a4afe68267ad0530f7967d",
+    "content-hash": "c6e78659b1bbff8dd89fb383ff28429e",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -296,7 +297,7 @@
                 "persistence",
                 "spl"
             ],
-            "time": "2018-07-12T21:16:12+00:00"
+            "time": "2018-07-12 21:16:12"
         },
         {
             "name": "doctrine/dbal",
@@ -375,7 +376,7 @@
                 "persistence",
                 "queryobject"
             ],
-            "time": "2018-07-13T03:16:35+00:00"
+            "time": "2018-07-13 03:16:35"
         },
         {
             "name": "doctrine/doctrine-bundle",
@@ -684,6 +685,80 @@
                 "eventmanager"
             ],
             "time": "2018-06-11T11:59:03+00:00"
+        },
+        {
+            "name": "doctrine/event-manager",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/doctrine/event-manager.git",
+                "reference": "a520bc093a0170feeb6b14e9d83f3a14452e64b3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/doctrine/event-manager/zipball/a520bc093a0170feeb6b14e9d83f3a14452e64b3",
+                "reference": "a520bc093a0170feeb6b14e9d83f3a14452e64b3",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1"
+            },
+            "conflict": {
+                "doctrine/common": "<2.9@dev"
+            },
+            "require-dev": {
+                "doctrine/coding-standard": "^4.0",
+                "phpunit/phpunit": "^7.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Doctrine\\Common\\": "lib/Doctrine/Common"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Roman Borschel",
+                    "email": "roman@code-factory.org"
+                },
+                {
+                    "name": "Benjamin Eberlei",
+                    "email": "kontakt@beberlei.de"
+                },
+                {
+                    "name": "Guilherme Blanco",
+                    "email": "guilhermeblanco@gmail.com"
+                },
+                {
+                    "name": "Jonathan Wage",
+                    "email": "jonwage@gmail.com"
+                },
+                {
+                    "name": "Johannes Schmitt",
+                    "email": "schmittjoh@gmail.com"
+                },
+                {
+                    "name": "Marco Pivetta",
+                    "email": "ocramius@gmail.com"
+                }
+            ],
+            "description": "Doctrine Event Manager component",
+            "homepage": "https://www.doctrine-project.org/projects/event-manager.html",
+            "keywords": [
+                "event",
+                "eventdispatcher",
+                "eventmanager"
+            ],
+            "time": "2018-06-11 11:59:03"
         },
         {
             "name": "doctrine/inflector",
@@ -1014,7 +1089,7 @@
                 "database",
                 "orm"
             ],
-            "time": "2018-07-12T20:47:13+00:00"
+            "time": "2018-07-12 20:47:13"
         },
         {
             "name": "doctrine/persistence",
@@ -1092,7 +1167,7 @@
             "keywords": [
                 "persistence"
             ],
-            "time": "2018-06-14T18:57:48+00:00"
+            "time": "2018-06-14 18:57:48"
         },
         {
             "name": "doctrine/reflection",
@@ -1167,7 +1242,7 @@
             "keywords": [
                 "reflection"
             ],
-            "time": "2018-06-14T14:45:07+00:00"
+            "time": "2018-06-14 14:45:07"
         },
         {
             "name": "egulias/email-validator",
@@ -1381,6 +1456,247 @@
                 "rest"
             ],
             "time": "2018-02-28T13:57:04+00:00"
+        },
+        {
+            "name": "guzzlehttp/guzzle",
+            "version": "6.3.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/guzzle.git",
+                "reference": "407b0cb880ace85c9b63c5f9551db498cb2d50ba"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/guzzle/guzzle/zipball/407b0cb880ace85c9b63c5f9551db498cb2d50ba",
+                "reference": "407b0cb880ace85c9b63c5f9551db498cb2d50ba",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/promises": "^1.0",
+                "guzzlehttp/psr7": "^1.4",
+                "php": ">=5.5"
+            },
+            "require-dev": {
+                "ext-curl": "*",
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.4 || ^7.0",
+                "psr/log": "^1.0"
+            },
+            "suggest": {
+                "psr/log": "Required for using the Log middleware"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "6.3-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "src/functions_include.php"
+                ],
+                "psr-4": {
+                    "GuzzleHttp\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                }
+            ],
+            "description": "Guzzle is a PHP HTTP client library",
+            "homepage": "http://guzzlephp.org/",
+            "keywords": [
+                "client",
+                "curl",
+                "framework",
+                "http",
+                "http client",
+                "rest",
+                "web service"
+            ],
+            "time": "2018-04-22 15:46:56"
+        },
+        {
+            "name": "guzzlehttp/promises",
+            "version": "v1.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/promises.git",
+                "reference": "a59da6cf61d80060647ff4d3eb2c03a2bc694646"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/guzzle/promises/zipball/a59da6cf61d80060647ff4d3eb2c03a2bc694646",
+                "reference": "a59da6cf61d80060647ff4d3eb2c03a2bc694646",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GuzzleHttp\\Promise\\": "src/"
+                },
+                "files": [
+                    "src/functions_include.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                }
+            ],
+            "description": "Guzzle promises library",
+            "keywords": [
+                "promise"
+            ],
+            "time": "2016-12-20 10:07:11"
+        },
+        {
+            "name": "guzzlehttp/psr7",
+            "version": "1.4.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/guzzle/psr7.git",
+                "reference": "f5b8a8512e2b58b0071a7280e39f14f72e05d87c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/f5b8a8512e2b58b0071a7280e39f14f72e05d87c",
+                "reference": "f5b8a8512e2b58b0071a7280e39f14f72e05d87c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "psr/http-message": "~1.0"
+            },
+            "provide": {
+                "psr/http-message-implementation": "1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "GuzzleHttp\\Psr7\\": "src/"
+                },
+                "files": [
+                    "src/functions_include.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Dowling",
+                    "email": "mtdowling@gmail.com",
+                    "homepage": "https://github.com/mtdowling"
+                },
+                {
+                    "name": "Tobias Schultze",
+                    "homepage": "https://github.com/Tobion"
+                }
+            ],
+            "description": "PSR-7 message implementation that also provides common utility methods",
+            "keywords": [
+                "http",
+                "message",
+                "request",
+                "response",
+                "stream",
+                "uri",
+                "url"
+            ],
+            "time": "2017-03-20 17:10:46"
+        },
+        {
+            "name": "influxdb/influxdb-php",
+            "version": "1.14.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/influxdata/influxdb-php.git",
+                "reference": "570bd5cdedb9b1c1628dceea5785bc40e08f7e48"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/influxdata/influxdb-php/zipball/570bd5cdedb9b1c1628dceea5785bc40e08f7e48",
+                "reference": "570bd5cdedb9b1c1628dceea5785bc40e08f7e48",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "^6.0",
+                "php": "^5.5 || ^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7"
+            },
+            "suggest": {
+                "stefanotorresi/influxdb-php-async": "An asyncronous client for InfluxDB, implemented via ReactPHP."
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "InfluxDB\\": "src/InfluxDB"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Gianluca Arbezzano",
+                    "email": "gianarb92@gmail.com"
+                },
+                {
+                    "name": "Daniel Martinez",
+                    "email": "danimartcas@hotmail.com"
+                },
+                {
+                    "name": "Stephen Hoogendijk",
+                    "email": "stephen@tca0.nl"
+                }
+            ],
+            "description": "InfluxDB client library for PHP",
+            "keywords": [
+                "client",
+                "influxdata",
+                "influxdb",
+                "influxdb class",
+                "influxdb client",
+                "influxdb library",
+                "time series"
+            ],
+            "time": "2018-07-06 10:13:39"
         },
         {
             "name": "jdorn/sql-formatter",
@@ -1877,6 +2193,56 @@
             "time": "2017-02-14T16:28:37+00:00"
         },
         {
+            "name": "psr/http-message",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-message.git",
+                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-message/zipball/f6561bf28d520154e4b0ec72be95418abe6d9363",
+                "reference": "f6561bf28d520154e4b0ec72be95418abe6d9363",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Message\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP messages",
+            "homepage": "https://github.com/php-fig/http-message",
+            "keywords": [
+                "http",
+                "http-message",
+                "psr",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "time": "2016-08-06 14:39:51"
+        },
+        {
             "name": "psr/link",
             "version": "1.0.0",
             "source": {
@@ -2148,7 +2514,7 @@
                 "mail",
                 "mailer"
             ],
-            "time": "2018-07-13T07:04:35+00:00"
+            "time": "2018-07-13 07:04:35"
         },
         {
             "name": "symfony/asset",
@@ -2204,7 +2570,7 @@
             ],
             "description": "Symfony Asset Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T09:10:45+00:00"
+            "time": "2018-07-26 09:10:45"
         },
         {
             "name": "symfony/cache",
@@ -2273,7 +2639,7 @@
                 "caching",
                 "psr6"
             ],
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/config",
@@ -2336,7 +2702,7 @@
             ],
             "description": "Symfony Config Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/console",
@@ -2404,7 +2770,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/debug",
@@ -2460,7 +2826,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/dependency-injection",
@@ -2531,7 +2897,7 @@
             ],
             "description": "Symfony DependencyInjection Component",
             "homepage": "https://symfony.com",
-            "time": "2018-08-01T08:24:03+00:00"
+            "time": "2018-08-01 08:24:03"
         },
         {
             "name": "symfony/doctrine-bridge",
@@ -2611,7 +2977,7 @@
             ],
             "description": "Symfony Doctrine Bridge",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/event-dispatcher",
@@ -2674,7 +3040,7 @@
             ],
             "description": "Symfony EventDispatcher Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T09:10:45+00:00"
+            "time": "2018-07-26 09:10:45"
         },
         {
             "name": "symfony/expression-language",
@@ -2724,7 +3090,7 @@
             ],
             "description": "Symfony ExpressionLanguage Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T09:10:45+00:00"
+            "time": "2018-07-26 09:10:45"
         },
         {
             "name": "symfony/filesystem",
@@ -2774,7 +3140,7 @@
             ],
             "description": "Symfony Filesystem Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/finder",
@@ -2823,7 +3189,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/flex",
@@ -2870,7 +3236,7 @@
                 }
             ],
             "description": "Composer plugin for Symfony",
-            "time": "2018-07-29T16:20:30+00:00"
+            "time": "2018-07-29 16:20:30"
         },
         {
             "name": "symfony/form",
@@ -2951,7 +3317,7 @@
             ],
             "description": "Symfony Form Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T09:10:45+00:00"
+            "time": "2018-07-26 09:10:45"
         },
         {
             "name": "symfony/framework-bundle",
@@ -3067,7 +3433,7 @@
             ],
             "description": "Symfony FrameworkBundle",
             "homepage": "https://symfony.com",
-            "time": "2018-08-01T08:24:03+00:00"
+            "time": "2018-08-01 08:24:03"
         },
         {
             "name": "symfony/http-foundation",
@@ -3121,7 +3487,7 @@
             ],
             "description": "Symfony HttpFoundation Component",
             "homepage": "https://symfony.com",
-            "time": "2018-08-01T14:07:44+00:00"
+            "time": "2018-08-01 14:07:44"
         },
         {
             "name": "symfony/http-kernel",
@@ -3208,7 +3574,7 @@
             ],
             "description": "Symfony HttpKernel Component",
             "homepage": "https://symfony.com",
-            "time": "2018-08-01T15:30:34+00:00"
+            "time": "2018-08-01 15:30:34"
         },
         {
             "name": "symfony/inflector",
@@ -3266,7 +3632,7 @@
                 "symfony",
                 "words"
             ],
-            "time": "2018-07-26T08:55:25+00:00"
+            "time": "2018-07-26 08:55:25"
         },
         {
             "name": "symfony/intl",
@@ -3341,7 +3707,7 @@
                 "l10n",
                 "localization"
             ],
-            "time": "2018-08-01T08:24:03+00:00"
+            "time": "2018-08-01 08:24:03"
         },
         {
             "name": "symfony/ldap",
@@ -3396,7 +3762,7 @@
                 "active directory",
                 "ldap"
             ],
-            "time": "2018-07-26T08:55:25+00:00"
+            "time": "2018-07-26 08:55:25"
         },
         {
             "name": "symfony/lts",
@@ -3555,7 +3921,7 @@
             ],
             "description": "Symfony Monolog Bridge",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T09:10:45+00:00"
+            "time": "2018-07-26 09:10:45"
         },
         {
             "name": "symfony/monolog-bundle",
@@ -3672,7 +4038,7 @@
                 "configuration",
                 "options"
             ],
-            "time": "2018-07-26T08:55:25+00:00"
+            "time": "2018-07-26 08:55:25"
         },
         {
             "name": "symfony/orm-pack",
@@ -3758,7 +4124,7 @@
                 "polyfill",
                 "portable"
             ],
-            "time": "2018-08-06T14:22:27+00:00"
+            "time": "2018-08-06 14:22:27"
         },
         {
             "name": "symfony/polyfill-intl-icu",
@@ -3816,7 +4182,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2018-08-06T14:22:27+00:00"
+            "time": "2018-08-06 14:22:27"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -3875,7 +4241,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2018-08-06T14:22:27+00:00"
+            "time": "2018-08-06 14:22:27"
         },
         {
             "name": "symfony/process",
@@ -3924,7 +4290,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/property-access",
@@ -3991,7 +4357,7 @@
                 "property path",
                 "reflection"
             ],
-            "time": "2018-07-26T09:10:45+00:00"
+            "time": "2018-07-26 09:10:45"
         },
         {
             "name": "symfony/property-info",
@@ -4067,7 +4433,7 @@
                 "type",
                 "validator"
             ],
-            "time": "2018-07-26T08:55:25+00:00"
+            "time": "2018-07-26 08:55:25"
         },
         {
             "name": "symfony/routing",
@@ -4144,7 +4510,7 @@
                 "uri",
                 "url"
             ],
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/security",
@@ -4221,7 +4587,7 @@
             ],
             "description": "Symfony Security Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T09:10:45+00:00"
+            "time": "2018-07-26 09:10:45"
         },
         {
             "name": "symfony/security-bundle",
@@ -4301,7 +4667,7 @@
             ],
             "description": "Symfony SecurityBundle",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T09:10:45+00:00"
+            "time": "2018-07-26 09:10:45"
         },
         {
             "name": "symfony/serializer",
@@ -4381,7 +4747,7 @@
             ],
             "description": "Symfony Serializer Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T09:10:45+00:00"
+            "time": "2018-07-26 09:10:45"
         },
         {
             "name": "symfony/serializer-pack",
@@ -4579,7 +4945,7 @@
             ],
             "description": "Symfony Templating Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/translation",
@@ -4648,7 +5014,7 @@
             ],
             "description": "Symfony Translation Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/twig-bridge",
@@ -4738,7 +5104,7 @@
             ],
             "description": "Symfony Twig Bridge",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/twig-bundle",
@@ -4812,7 +5178,7 @@
             ],
             "description": "Symfony TwigBundle",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T09:10:45+00:00"
+            "time": "2018-07-26 09:10:45"
         },
         {
             "name": "symfony/validator",
@@ -4898,7 +5264,7 @@
             ],
             "description": "Symfony Validator Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/web-link",
@@ -4969,7 +5335,7 @@
                 "psr13",
                 "push"
             ],
-            "time": "2018-07-26T09:10:45+00:00"
+            "time": "2018-07-26 09:10:45"
         },
         {
             "name": "symfony/webpack-encore-pack",
@@ -5000,7 +5366,7 @@
                 "MIT"
             ],
             "description": "A pack for Symfony Encore",
-            "time": "2018-07-16T10:15:28+00:00"
+            "time": "2018-07-16 10:15:28"
         },
         {
             "name": "symfony/yaml",
@@ -5059,7 +5425,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "twig/twig",
@@ -5126,7 +5492,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2018-07-13T07:18:09+00:00"
+            "time": "2018-07-13 07:18:09"
         },
         {
             "name": "webmozart/assert",
@@ -5321,7 +5687,7 @@
                 "code",
                 "zf2"
             ],
-            "time": "2018-08-13T20:36:59+00:00"
+            "time": "2018-08-13 20:36:59"
         },
         {
             "name": "zendframework/zend-eventmanager",
@@ -5427,7 +5793,7 @@
                 "monolog",
                 "productivity"
             ],
-            "time": "2018-07-27T15:41:37+00:00"
+            "time": "2018-07-27 15:41:37"
         },
         {
             "name": "nikic/php-parser",
@@ -5478,7 +5844,7 @@
                 "parser",
                 "php"
             ],
-            "time": "2018-07-15T17:25:16+00:00"
+            "time": "2018-07-15 17:25:16"
         },
         {
             "name": "symfony/browser-kit",
@@ -5535,7 +5901,7 @@
             ],
             "description": "Symfony BrowserKit Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T09:10:45+00:00"
+            "time": "2018-07-26 09:10:45"
         },
         {
             "name": "symfony/css-selector",
@@ -5588,7 +5954,7 @@
             ],
             "description": "Symfony CssSelector Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T09:10:45+00:00"
+            "time": "2018-07-26 09:10:45"
         },
         {
             "name": "symfony/debug-bundle",
@@ -5683,7 +6049,7 @@
                 "MIT"
             ],
             "description": "A debug pack for Symfony projects",
-            "time": "2018-08-10T15:18:32+00:00"
+            "time": "2018-08-10 15:18:32"
         },
         {
             "name": "symfony/dom-crawler",
@@ -5740,7 +6106,7 @@
             ],
             "description": "Symfony DomCrawler Component",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:00:49+00:00"
+            "time": "2018-07-26 11:00:49"
         },
         {
             "name": "symfony/dotenv",
@@ -5797,7 +6163,7 @@
                 "env",
                 "environment"
             ],
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/maker-bundle",
@@ -5862,7 +6228,7 @@
                 "scaffold",
                 "scaffolding"
             ],
-            "time": "2018-08-07T16:05:09+00:00"
+            "time": "2018-08-07 16:05:09"
         },
         {
             "name": "symfony/phpunit-bridge",
@@ -5928,7 +6294,7 @@
             ],
             "description": "Symfony PHPUnit Bridge",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T08:55:25+00:00"
+            "time": "2018-07-26 08:55:25"
         },
         {
             "name": "symfony/polyfill-php72",
@@ -5983,7 +6349,7 @@
                 "portable",
                 "shim"
             ],
-            "time": "2018-08-06T14:22:27+00:00"
+            "time": "2018-08-06 14:22:27"
         },
         {
             "name": "symfony/profiler-pack",
@@ -6011,7 +6377,56 @@
                 "MIT"
             ],
             "description": "A pack for the Symfony web profiler",
-            "time": "2017-12-12T01:48:24+00:00"
+            "time": "2017-12-12 01:48:24"
+        },
+        {
+            "name": "symfony/stopwatch",
+            "version": "v4.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/stopwatch.git",
+                "reference": "966c982df3cca41324253dc0c7ffe76b6076b705"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/stopwatch/zipball/966c982df3cca41324253dc0c7ffe76b6076b705",
+                "reference": "966c982df3cca41324253dc0c7ffe76b6076b705",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Stopwatch\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Stopwatch Component",
+            "homepage": "https://symfony.com",
+            "time": "2018-07-26 11:00:49"
         },
         {
             "name": "symfony/test-pack",
@@ -6114,7 +6529,7 @@
                 "debug",
                 "dump"
             ],
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/web-profiler-bundle",
@@ -6180,7 +6595,7 @@
             ],
             "description": "Symfony WebProfilerBundle",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T11:24:31+00:00"
+            "time": "2018-07-26 11:24:31"
         },
         {
             "name": "symfony/web-server-bundle",
@@ -6239,7 +6654,7 @@
             ],
             "description": "Symfony WebServerBundle",
             "homepage": "https://symfony.com",
-            "time": "2018-07-26T09:10:45+00:00"
+            "time": "2018-07-26 09:10:45"
         }
     ],
     "aliases": [],

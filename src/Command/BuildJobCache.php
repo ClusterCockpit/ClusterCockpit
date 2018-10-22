@@ -31,12 +31,18 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
-use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 
 use App\Repository\JobRepository;
+use App\Repository\RunningJobRepository;
 use App\Service\JobCache;
+use App\Service\ColorMap;
+use App\Service\Configuration;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\JobSearch;
 use App\Entity\Job;
+use App\Entity\Plot;
+use \DateTime;
 use \DateInterval;
 
 /**
@@ -46,17 +52,20 @@ use \DateInterval;
  * @author Jan Eitzinger
  * @version 0.1
  */
-class BuildCache extends Command
+class BuildJobCache extends Command
 {
     private $_em;
+    private $_configuration;
     private $_jobCache;
 
     public function __construct(
         EntityManagerInterface $em,
+        Configuration $configuration,
         JobCache $jobCache
     )
     {
         $this->_em = $em;
+        $this->_configuration = $configuration;
         $this->_jobCache = $jobCache;
 
         parent::__construct();
@@ -65,52 +74,46 @@ class BuildCache extends Command
     protected function configure()
     {
         $this
-            ->setName('app:job:cache')
-            ->setDescription('Manage job cache')
-            ->setHelp('This command enables to build and drop job caches.')
-            ->addArgument('cmd', InputArgument::REQUIRED, 'Command: build or drop.')
-            ->addArgument('month', InputArgument::OPTIONAL, 'Apply for month. Month is e.g. 2018-05.')
-            ->addOption( 'running', 'r', InputOption::VALUE_NONE, 'Apply for all running jobs. Month argument is ignored.')
-            ->addOption( 'numpoints', 'n', InputOption::VALUE_REQUIRED, 'Cache is build for jobs with more points than numpoints.', '5000')
+            ->setName('app:jobcache:build')
+            ->setDescription('Warmup job cache')
+            ->setHelp('This command builds or rebuilds the job cache for certain days.')
+            ->addArgument('day', InputArgument::OPTIONAL, 'Apply for day. Day is e.g. 2018-05-30.')
+            ->addOption( 'numpoints', 'N', InputOption::VALUE_REQUIRED, 'Cache is build for jobs with more points than numpoints.', '0')
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $stopwatch = new Stopwatch();
         $jobs;
-        $month = $input->getArgument('month');
-        $running = $input->getOption('running');
+        $day = $input->getArgument('day');
+
         $numpoints = $input->getOption('numpoints');
 
         $output->writeln([
-            "Job cache: $cmd",
-            '================',
-            ''
+            '==================',
+            ' Build job cache',
+            '==================',
+            '',
         ]);
 
-        if ( $running ){
-            $repository = $this->_em->getRepository(\App\Entity\RunningJob::class);
-            $jobs = $repository->findAll();
-        } else {
-            $repository = $this->_em->getRepository(\App\Entity\Job::class);
+        $repository = $this->_em->getRepository(\App\Entity\Job::class);
 
-            if (empty($month)) {
-                $month = date('Y-m');
-            }
-
-            $starttime = strtotime("$month");
-            $stoptime = strtotime("+1 month $month");
-            $output->writeln([
-                "Search jobs from $starttime to $stoptime",
-                '',
-            ]);
-
-            $jobs = $repository->findAvgTodo($starttime, $stoptime);
+        if (empty($day)) {
+            $day = date('Y-m-d');
         }
 
+        $startFrom = strtotime("$day");
+        $startTo = strtotime("+1 day $day");
+        $output->writeln([
+            "Search jobs from $startFrom to $startTo",
+            '',
+        ]);
+
+        $jobs = $repository->findByStartTime($startFrom, $startTo);
         $jobCount = count($jobs);
         $progressBar = new ProgressBar($output, $jobCount);
-        $progressBar->setRedrawFrequency(10);
+        $progressBar->setRedrawFrequency(25);
 
         $output->writeln([
             "Processing $jobCount jobs!",
@@ -118,17 +121,31 @@ class BuildCache extends Command
         ]);
 
         $progressBar->start();
+        $stopwatch->start('BuildCache');
 
-        foreach ( $jobs as $job ){
-            if ( $job->isRunning() ){
-                $this->_jobCache->updateJobAverage($job);
-            }
-            $this->_jobCache->buildCache($job, array('point' => $numpoints));
-
-            $this->_em->persist($job);
-            $this->_em->flush();
+        foreach ( $jobs as $job ) {
             $progressBar->advance();
+
+            if ( $job->getNumNodes() > 0 ) {
+                $id = $job->getId();
+
+                $this->_jobCache->warmupCache($job, $this->_configuration->getConfig(), $numpoints);
+                $this->_em->persist($job);
+                $this->_em->flush();
+            }
         }
+        $event = $stopwatch->stop('BuildCache');
         $progressBar->finish();
+
+        $seconds = $event->getDuration()/ 1000;
+        $d1 = new DateTime();
+        $d2 = new DateTime();
+        $d2->add(new DateInterval('PT'.$seconds.'S'));
+        $iv = $d2->diff($d1);
+
+        $output->writeln([
+            $iv->format('%h h %i m')
+        ]);
+
     }
 }

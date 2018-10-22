@@ -1,0 +1,177 @@
+{% extends 'base.html.twig' %}
+{% set mode = 'view' %}
+{% set id = job.id %}
+
+{% block title %}
+    Job {{ job.jobId }}
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('css/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+    <script src="{{ asset('js/datatables.min.js') }}"/></script>
+    <script src="{{ asset('js/plotly.min.js') }}"/></script>
+    <script src="{{ asset('js/bootstrap3-typeahead.min.js') }}"/></script>
+    <script src="{{ asset('js/app.js') }}"/></script>
+    <script src="{{ asset('js/tag-control.js') }}"/></script>
+
+    <script>
+        var searchtags = [
+            {% for tag in tags %}
+                { id:{{ tag.id }}, name:'{{ tag.name }}', type:'{{ tag.type }}' },
+            {% endfor %}
+        ];
+
+        var $input = $("#tagname");
+
+        $input.typeahead({
+            source: searchtags,
+            autoSelect: true
+        });
+
+        $input.change(function() {
+            var current = $input.typeahead("getActive");
+
+            if (current) {
+                if (current.name == $input.val()) {
+                    $("#tagtype").val(current.type);
+                }
+            }
+        });
+    </script>
+{% endblock %}
+
+{% block helptext %}
+    <h5>Tag area</h5>
+    <p>
+        Below the job meta data table there are the tags set for this jobs and
+        a button Add Tag which allows opens a form to add a new tag. Known tags
+        are automatically expanded, unknown tags will be added. To remove a tag
+        move the cursor above a tag pill, a remove button will appear. If you press
+        it the tag will be removed from the job.
+    </p>
+    <h5>Roofline plot</h4>
+    <p>
+    </p>
+    <h5>Polar plot</h4>
+    <p>
+    </p>
+    <h4>Metric plots</h4>
+    <p>
+    </p>
+    <h4>Node statistic table</h4>
+    <p>
+    </p>
+{% endblock %}
+
+{% block body %}
+    <div class="row justify-content-center">
+        <div class="col-3 ">
+            <div class="row">
+                <div class="col">
+                    <table class="table table-sm table-striped">
+                        <tbody>
+                            <tr>
+                                <th scope="col"> Job id </th>
+                                <td scope="col"> {{ job.jobId }} </td>
+                            </tr>
+                            <tr>
+                                <th scope="col"> User name </th>
+                                <td scope="col"> {{ job.user.name }} </td>
+                            </tr>
+                            <tr>
+                                <th scope="col"> User id </th>
+                                <td scope="col">
+                                    <a href="{{ path('show_user',{ 'id':job.user.id }) }}">
+                                        {{ job.user.userId }}
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th scope="col"> Number of nodes </th>
+                                <td scope="col"> {{ job.numNodes }} </td>
+                            </tr>
+                            <tr>
+                                <th scope="col"> Job start </th>
+                                <td scope="col">{{ job.startTime|date('d.m.y - H:i') }}</td>
+                            </tr>
+                            <tr>
+                                <th scope="col"> Walltime </th>
+                                <td scope="col">{{ duration }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-5">
+                    <div class="row">
+                        <div class="col" id='tagarea' data-job-id="{{ job.id }}">
+                            {% for tag in job.tags %}
+                                <span class="badge badge-pill badge-warning mt-1 tag-pill" data-tag-id={{ tag.id }} >
+                                    {{ tag.name }}
+                                </span><br/>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <button type="button" class="btn btn-secondary btn-sm tag-enter mt-2">
+                                <i class="fas fa-tag"></i> Add Tag
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-7">
+                    <div id='tag-form' class='invisible'>
+                        <form>
+                            <div class="form-group mt-2">
+                                <input type="tagname" class="form-control" id="tagname"  placeholder="tag name">
+                            </div>
+                            <div class="form-group">
+                                <input type="tagtype" class="form-control" id="tagtype" placeholder="tag type">
+                            </div>
+                            <button id='tag-add' type="button" name="add" class="btn btn-success" data-job-id="{{ job.id }}"><span class="fas fa-check fa-lg"></span></button>
+                            <button id='tag-cancel' type="button" name="cancel" class="btn btn-danger"><span class="fas fa-times fa-lg"></span></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4" id="roofline"> </div>
+        <div class="col-4" id="polarplot"> </div>
+    </div>
+
+    {% set metrics = job.cluster.metricLists[mode].metrics %}
+    {% set margin = 'mt-4' %}
+
+    <div class="row">
+        {% for metric in metrics %}
+            <div class="col {{ margin }} perfplot" id="{{ metric.name }}"></div>
+        {% endfor %}
+    </div>
+
+    {% set metrics = job.cluster.metricLists['stat'].metrics %}
+    {% set viewStatTable = config['plot_view_showStatTable'].value|default('true') %}
+    {% if  viewStatTable is same as('true') %}
+        <div class="row">
+            <div class="col  mt-5">
+                <table class="table table-striped" id="stat">
+                    <thead>
+                        <th style="font-size: 0.9rem;" scope="col">nodeId</th>
+                        {% for metric in metrics%}
+                            <th style="font-size: 0.8rem;" scope="col">{{ metric.name }} min [{{ metric.unit }}]</th>
+                            <th style="font-size: 0.8rem;" scope="col">{{ metric.name }} max [{{ metric.unit }}]</th>
+                            <th style="font-size: 0.8rem;" scope="col">{{ metric.name }} avg [{{ metric.unit }}]</th>
+                        {% endfor %}
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

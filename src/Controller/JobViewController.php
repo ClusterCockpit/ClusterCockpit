@@ -26,7 +26,7 @@
 namespace App\Controller;
 
 use App\Entity\Job;
-use App\Entity\RunningJob;
+use App\Entity\JobTag;
 use App\Entity\JobSearch;
 use App\Repository\JobRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -43,6 +43,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 use App\Service\JobCache;
 use App\Service\Configuration;
 use Psr\Log\LoggerInterface;
+use \DateTime;
 use \DateInterval;
 
 class JobViewController extends Controller
@@ -89,19 +90,25 @@ class JobViewController extends Controller
     }
 
     private function getSystems(){
-        return array(
-            'ALL' => 0,
-            'emmy' => 1,
-            'lima' => 2,
-            'meggie' => 3,
-            'woody' => 4,
-        );
-    }
 
+        $clusters = $this->getDoctrine()
+                            ->getRepository(\App\Entity\Cluster::class)
+                            ->findAll();
+
+        $systems['ALL'] = 0;
+
+        foreach  ( $clusters as $cluster ){
+            $systems[$cluster->getName()] = $cluster->getId();
+        }
+
+        return $systems;
+    }
 
     public function search(
         Request $request,
-        SerializerInterface $serializer)
+        SerializerInterface $serializer,
+        Configuration $configuration
+    )
     {
         $search = new JobSearch();
         $search->setNumNodesFrom(1);
@@ -109,11 +116,9 @@ class JobViewController extends Controller
         $search->setDurationFrom(new DateInterval('PT1H'));
         $search->setDurationTo(new DateInterval('PT24H'));
         $search->setDateFrom(1520640000);
-        $search->setDateTo(time());
+        $search->setDateTo(floor(time()/60)*60);
 
         $form = $this->createFormBuilder($search)
-            ->add('jobId', TextType::class, array('required' => false))
-            ->add('userId', TextType::class, array('required' => false))
             ->add('clusterId', ChoiceType::class,array(
                 'choices'  => $this->getSystems(),
                 'required' => true))
@@ -134,10 +139,12 @@ class JobViewController extends Controller
                 'with_years' => false,
             ))
             ->add('dateFrom', DateTimeType::class, array(
-                'input' => 'timestamp'
+                'input' => 'timestamp',
+                'widget' => 'single_text'
             ))
             ->add('dateTo', DateTimeType::class, array(
-                'input' => 'timestamp'
+                'input' => 'timestamp',
+                'widget' => 'single_text'
             ))
             ->add('search', SubmitType::class, array('label' => 'Search Jobs'))
             ->getForm();
@@ -155,6 +162,21 @@ class JobViewController extends Controller
                 $job = $repository->findOneBy(['jobId' => $jobId]);
                 return $this->redirectToRoute('show_job', array('id' => $job->getId()));
             } else {
+                $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+                $config = $configuration->getUserConfig($this->getUser());
+                $sortMetrics = $this->getDoctrine()
+                                    ->getRepository(\App\Entity\TableSortConfig::class)
+                                    ->findMetrics(1);
+
+                $count = count($sortMetrics);
+                $end = $count+1;
+
+                $columnDefs = array(
+                    'orderable'  => "0,$end",
+                    'visible'    => implode(',',range(1,$count)),
+                    'searchable' => implode(',',range(1,$end))
+                );
+
                 $durationFrom =$search->getDurationFrom()->h*3600+$search->getDurationFrom()->m*60;
                 $durationTo =$search->getDurationTo()->h*3600+$search->getDurationFrom()->m*60;
                 $search->setDurationFrom($durationFrom);
@@ -162,7 +184,10 @@ class JobViewController extends Controller
 
                 return $this->render('jobViews/listJobs.html.twig',
                     array(
-                        'jobSearch' => $serializer->serialize($search, 'json'),
+                        'jobQuery' => $serializer->serialize($search, 'json'),
+                        'config' => $config,
+                        'sortMetrics' => $sortMetrics,
+                        'columnDefs' => $columnDefs
                     ));
             }
         }
@@ -172,36 +197,60 @@ class JobViewController extends Controller
         ));
     }
 
-    public function list()
-    {
-        return $this->render('jobViews/listJobs.html.twig',
-            array(
-                'isRunning' => true
-            ));
-    }
-
-    public function showRunning(
-        RunningJob $job,
-        Configuration $configuration,
-        JobCache $jobCache
+    public function list(
+        Configuration $configuration
     )
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());
+        $sortMetrics = $this->getDoctrine()
+                            ->getRepository(\App\Entity\TableSortConfig::class)
+                            ->findMetrics(1);
 
-        $jobCache->checkCache(
-            $job,
-            array(
-                'mode' => 'view',
-            ),
-            $config
+        $count = count($sortMetrics);
+        $end = $count+1;
+
+        $columnDefs = array(
+            'orderable'  => "0,$end",
+            'visible'    => implode(',',range(1,$count)),
+            'searchable' => implode(',',range(1,$end))
         );
 
-        return $this->render('jobViews/viewJob.html.twig',
+        return $this->render('jobViews/listJobs.html.twig',
             array(
-                'job' => $job,
+                'jobQuery' => json_encode(array('runningJobs' => true)),
                 'config' => $config,
-                'backend' => $jobCache->getBackend()
+                'sortMetrics' => $sortMetrics,
+                'columnDefs' => $columnDefs
+            ));
+    }
+
+    public function listTag(
+        JobTag $id,
+        Configuration $configuration
+    )
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $config = $configuration->getUserConfig($this->getUser());
+        $sortMetrics = $this->getDoctrine()
+                            ->getRepository(\App\Entity\TableSortConfig::class)
+                            ->findMetrics(1);
+
+        $count = count($sortMetrics);
+        $end = $count+1;
+
+        $columnDefs = array(
+            'orderable'  => "0,$end",
+            'visible'    => implode(',',range(1,$count)),
+            'searchable' => implode(',',range(1,$end))
+        );
+
+        return $this->render('jobViews/listJobs.html.twig',
+            array(
+                'jobQuery' => json_encode(array('jobTag' => $id->getId())),
+                'config' => $config,
+                'sortMetrics' => $sortMetrics,
+                'columnDefs' => $columnDefs
             ));
     }
 
@@ -214,18 +263,27 @@ class JobViewController extends Controller
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());
 
-        $jobCache->checkCache(
-            $job,
-            array(
-                'mode' => 'view',
-            ),
-            $config
-        );
+        if ( $job->isRunning ) {
+            $job->stopTime = time();
+            /* $job->stopTime = 1521057932; */
+            $job->duration = $job->stopTime - $job->startTime;
+        }
 
-        return $this->render('jobViews/viewJob.html.twig',
+        $alltags = $this->getDoctrine()
+                            ->getRepository(\App\Entity\JobTag::class)
+                            ->findAll();
+
+        $d1 = new DateTime();
+        $d2 = new DateTime();
+        $d2->add(new DateInterval('PT'.$job->duration.'S'));
+        $iv = $d2->diff($d1);
+
+        return $this->render('jobViews/viewJob-ajax.html.twig',
             array(
                 'job' => $job,
+                'duration' => $iv->format('%h h %i m'),
                 'config' => $config,
+                'tags' => $alltags,
                 'backend' => $jobCache->getBackend()
             ));
     }

@@ -42,9 +42,6 @@ p {
     height: 30px;
 }
 
-
-
-
 @media(min-width:768px) {
     .navbar-custom {
         padding: 10px 0;
@@ -63,7 +60,6 @@ p {
         background: #fff;
     }
 }
-
 
 .feather {
   width: 16px;
@@ -143,7 +139,6 @@ body {
     webkit-tap-highlight-color: rgba(255,255,255,.2);
 }
 
-
 #tagsselect {
     height: 250px;
 }
@@ -182,7 +177,6 @@ legend
     overflow: hidden;
 }
 
-
 .box {
     width: 300px;
     height: 600px;
@@ -207,12 +201,10 @@ legend
     padding: 10px;
 }
 
-
 #listing ul li {
     list-style-type: none;
     display: block;
 }
-
 
 table {
     width: 100%;
@@ -223,3 +215,22 @@ th {
     text-align: center;
 }
 
+div.dataTables_wrapper div.dataTables_processing {
+  position: fixed;
+  top: 35%;
+}
+
+div.clusterCockpit_processing {
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  width: 200px;
+  margin-left: -100px;
+  margin-top: -26px;
+  text-align: center;
+  padding: 1em 0;
+}
+
+::-webkit-calendar-picker-indicator {
+  opacity: 1
+}

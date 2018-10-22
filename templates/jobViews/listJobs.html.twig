@@ -1,8 +1,8 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    {{ parent() }}
     <link href="{{ asset('css/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+    {{ parent() }}
 {% endblock %}
 
 {% block javascript %}
@@ -10,153 +10,56 @@
     <script src="{{ asset('js/datatables.min.js') }}"/></script>
     <script src="{{ asset('js/plotly-basic.min.js') }}"/></script>
     <script>
-
-        function timeConverter(UNIX_timestamp){
-            var a = new Date(UNIX_timestamp * 1000);
-            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-            var year = a.getFullYear();
-            var month = months[a.getMonth()];
-            var date = a.getDate();
-            var hour = a.getHours();
-            var min = a.getMinutes();
-            var sec = a.getSeconds();
-            var time =  hour + ':' + min + '</br>' + date + ' ' + month + ' ' + year;
-            return time;
-        }
-
-$(document).ready( function () {
-    var tablelist =  $('#jobs').DataTable(
-        {
-        {% if jobSearch is defined %}
-            "ajax": {
-                "url": "/web/jobs",
-                "data": {
-                "jobSearch": {{ jobSearch|raw }}
-                }
-            },
-        {% else %}
-            "ajax": "/web/jobs",
-        {% endif %}
-            <!-- "dom": '<"top"lifr>t<"bottom"p><"clear">', -->
-            "serverSide": true,
-            "processing": true,
-            "stateSave": true,
-            "deferRender": true,
-            "initComplete": function( settings, json ) {
-        {% if jobSearch is defined %}
-            $('#info_message').text('Showing '+json.recordsTotal+' jobs.');
-        {% else %}
-            $('#info_message').text('Info: '+json.recordsTotal+' jobs running.');
-        {% endif %}
-            },
-            "language":  {
-            "processing": '<h4 class="text-center mt-4">\
-                              <i class="fas fa-circle-notch fa-spin fa-lg"></i> loading...\
-                      </h4>'
-            },
-            "columns": [
-                {
-                    "data": "jobinfo",
-                    "render": function ( data, type, row ) {
-                        var runtime = data.runtime/3600;
-                        var content = '<strong>'+data.jobid+'</strong></br>'+
-                            '<a href="/monitoring/user/'+data.userid+'">'+data.username+'</a></br>'+
-                            data.numnodes+' nodes</br></br>'+
-                            '<strong>Duration:</strong></br>'+runtime.toFixed(2)+' hours</br></br>'+
-                            '<strong>Started:</strong></br>'+timeConverter(data.starttime);
-                        return content;
-                    }
-                },
-                { "data": "severity" },
-                { "data": "numNodes" },
-                { "data": "startTime" },
-                {% if isRunning == false %}
-                { "data": "duration" },
-                {% endif %}
-                { "data": "flopsAnyAvg" },
-                { "data": "memBwAvg" },
-                { "data": "trafficTotalIbAvg" },
-                { "data": "trafficTotalLustreAvg" },
-                {
-                    "data": "plots",
-                    "render": function ( data, type, row ) {
-                        if ( data ){
-                            var content = '<a href=\"/monitoring/'+data.url+'/'+data.id+'\" target=\"_blank\">';
-                            content += '<div class=\"row\">';
-                            var count = data.plots.length;
-
-                            for (let plot of data.plots) {
-                                let plot_name = data.id+'_'+plot.name;
-                                content += '<div class=\"col px-1 py-1\" id=\"'+plot_name+'\"></div>';
-                                content += '\<script\>';
-                                content += 'var size = ($(window).width() /'+count+')*0.8;';
-                                content += 'var p_width = size;';
-                                content += 'var p_height = size;';
-                                content += 'var options_'+plot_name+'='+plot.options+';';
-                                content += 'var data_'+plot_name+'='+plot.data+';';
-                                content += 'options_'+plot_name+'[\'height\'] = p_height;';
-                                content += 'options_'+plot_name+'[\'width\'] = p_width;';
-                                content += 'Plotly.newPlot(\''+plot_name+'\',data_'+plot_name+',options_'+plot_name+',{staticPlot: true});';
-                                content += '\</script\>';
-                            }
-                            content += '</div>';
-                            content += '</a>';
-                        } else {
-                            var content = '<div class="alert alert-secondary" role="alert">\
-                                             <h4 class="text-center mt-4">\
-                                             <i class="fas fa-exclamation-triangle fa-lg"></i>\
-                                                No performance data available! \
-                                             </h4>\
-                                           </div>';
-                        }
-                        return content;
-                    }
-                }
-            ],
-            "columnDefs": [
-                {% if isRunning == false %}
-                { "orderable": false, "targets": [0,9] },
-                { "visible": false, "targets": [1,2,3,4,5,6,7,8] },
-                { "searchable": false, "targets": [1,2,3,4,5,6,7,8,9] }
-                {% else %}
-                { "orderable": false, "targets": [0,8] },
-                { "visible": false, "targets": [1,2,3,4,5,6,7] },
-                { "searchable": false, "targets": [1,2,3,4,5,6,7,8] }
-                {% endif %}
-            ],
-            "paging": true
-        }
-    );
-
-    tablelist
-        .order([1, 'desc'])
-        .draw();
-
-    $('#toggleFilter').click(function(){
-        var table = $('#jobs').DataTable();
-
-        {% if isRunning == false %}
-        if ( table.column(1).visible() ){
-            table.columns( [ 1,2,3,4,5,6,7,8 ] ).visible( false );
-        } else {
-            table.columns( [ 1,2,3,4,5,6,7,8 ] ).visible( true );
-        }
-        {% else %}
-        if ( table.column(1).visible() ){
-            table.columns( [ 1,2,3,4,5,6,7 ] ).visible( false );
-        } else {
-            table.columns( [ 1,2,3,4,5,6,7 ] ).visible( true );
-        }
-        {% endif %}
-    });
-} );
-
+        {{ include('js/initDatatables.js.twig') }}
     </script>
 {% endblock %}
 
 
 {% block title %}
     Job List
+{% endblock %}
+
+{% block helptext %}
+    <h5>Basic usage</h5>
+    <p>
+        If you click anywhere on the plot area you get to the detailed single
+        job view of this particular job. In the Job ID column you can click the user
+        name to get job statistics and the all jobs of a user in the current
+        month. Jobs may have tags which can be clicked to get a job list with
+        all jobs having this tag.
+    </p>
+    <h5>Filtering</h5>
+    <p>
+        The Search input area above the job list allows to filter for a subset of users.
+        This also allows e.g. to show all users belonging to a group in case
+        the group name is a substring of the user name. It may take a short time to
+        update the job list after entering a string in the Search field as a updated
+        job list has to be fetched from the server.
+    </p>
+    <h5>Sorting</h5>
+    <p>
+        You can change the sort order of jobs by pressing the
+        sort button in the first column and selecting a column.
+        Press multiple times to switch between ascending and
+        descending sort order. Default sorting order is ascending severity.
+        Severity is a metric that indicates that a job makes not good
+        use of the hardware resources.
+    </p>
+    <h5>Plot Legend</h5>
+    <p>
+        Different lines represent nodes within a job. The color of lines only
+        helps to distinguish nodes and does not serve another purpose. Metrics are
+        always aggregated per node. The horizontal black line
+        indicates an acceptable normal performance and serves as
+        frame of reference. The y-axis is runtime from the start of the job.
+    </p>
+    <h5>Plot background</h5>
+    <p>
+        The plot background is colored according to metric thresholds. Light
+        red background indicates an inacceptable value and light yellow a worse
+        than average value. The thresholds used for every metric can be configured
+        in the metric section of the configuration view (alert value for light red and warning for light yellow).
+    </p>
 {% endblock %}
 
 {% block body %}

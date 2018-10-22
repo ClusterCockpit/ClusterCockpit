@@ -30,8 +30,6 @@ use Psr\Log\LoggerInterface;
 use App\Service\Plot\PlotGeneratorInterface;
 use App\Service\Plot\FilePlotGeneratorXmGrace;
 use App\Service\ColorMap;
-use App\Entity\TraceResolution;
-use App\Entity\Trace;
 use App\Entity\Plot;
 
 class PlotGenerator
@@ -41,7 +39,6 @@ class PlotGenerator
     private $_filePlotter;
     private $_color;
     private $_tsHelper;
-    private $_traceRepository;
 
     public function __construct(
         LoggerInterface $logger,
@@ -57,7 +54,6 @@ class PlotGenerator
         $this->_filePlotter = $filePlotter;
         $this->_plotter = $plotter;
         $this->_color = $color;
-        $this->_traceRepository = $em->getRepository(\App\Entity\TraceResolution::class);
     }
 
     private function _createClusterRoof(&$cluster)
@@ -78,13 +74,6 @@ class PlotGenerator
                 $yCut, $cluster->flopRateSimd, $cluster->flopRateSimd)
             );
     }
-
-    private function _getResolution($plot, $name)
-    {
-        $resolutions = $plot->getResolutions();
-        $plot->traceResolution = $this->_traceRepository->find($resolutions[$name]);
-    }
-
 
     private function _createHistogram($stat, $options)
     {
@@ -129,18 +118,9 @@ class PlotGenerator
 
     public function generateJobPolarPlot($job, $metrics, $data = NULL)
     {
-        $plot = $job->jobCache->getPlot('polarplot');
-
-        if ( $plot ) {
-            $this->_getResolution($plot, 'view');
-            $resolution = $plot->traceResolution;
-            $trace = $resolution->getTraces();
-            $data = $trace[0]->getData();
-        } else {
-            $plot = new Plot();
-            $plot->name = 'polarplot';
-            $job->jobCache->addPlot($plot);
-        }
+        $plot = new Plot();
+        $plot->name = 'polarplot';
+        $job->jobCache->addPlot($plot);
 
         $this->_plotter->generatePolarPlot($plot, $data, $metrics,
             array(
@@ -149,49 +129,38 @@ class PlotGenerator
             ));
     }
 
-
-    /* TODO provide error handling if data is null and plot is null */
     public function generateJobRoofline($job, $data = NULL, $fileOut = false)
     {
         $cluster = $job->getCluster();
         $plot = $job->jobCache->getPlot('roofline');
 
-        if ( $plot ) {
-            $this->_getResolution($plot, 'view');
-            $trace = $plot->traceResolution->getTraces();
-            $data = $trace[0]->getData();
-
-        } else {
-            $x; $y;
-
-            for($i = 0; $i < count($data); $i++) {
-                if ( $data[$i]['x'] > 0.01 ) {
-                    $x[] = $data[$i]['x'];
-                    $y[] = $data[$i]['y'];
-                }
+        for($i = 0; $i < count($data); $i++) {
+            if ( $data[$i]['x'] > 0.01 ) {
+                $x[] = floatval($data[$i]['x']);
+                $y[] = floatval($data[$i]['y']);
             }
-
-            if ( !isset($x) ){
-                $x[] = 0.015;
-                $y[] = 0.015;
-            }
-
-            $data['x']= $x;
-            $data['y']= $y;
-
-            if ($fileOut) {
-                $this->_filePlotter->generateScatterPlot(
-                    $tmpdata,
-                    array(
-                        'name'=>'data',
-                        'title' => 'time [min]'
-                    ));
-            }
-
-            $plot = new Plot();
-            $plot->name = 'roofline';
-            $job->jobCache->addPlot($plot);
         }
+
+        if ( !isset($x) ){
+            $x[] = 0.015;
+            $y[] = 0.015;
+        }
+
+        $data['x']= $x;
+        $data['y']= $y;
+
+        if ($fileOut) {
+            $this->_filePlotter->generateScatterPlot(
+                $tmpdata,
+                array(
+                    'name'=>'data',
+                    'title' => 'time [min]'
+                ));
+        }
+
+        $plot = new Plot();
+        $plot->name = 'roofline';
+        $job->jobCache->addPlot($plot);
 
         $data['roof']= $this->_createClusterRoof($cluster);
         $data['color']= range(0,count($data['x']));
@@ -259,60 +228,51 @@ class PlotGenerator
         $lineData;
         $colorState;
 
-        $plot = $job->jobCache->getPlot($metricName);
+        $plot = new  Plot();
+        $plot->name = $metricName;
+        $nodes = $job->getNodes();
+        $this->_color->init($colorState, count($nodes));
 
-        if ( $plot ) {
-            $this->_getResolution($plot, $options['mode']);
-            $nodes = $plot->traceResolution->getTraces();
-            $this->_color->init($colorState, count($nodes));
+        foreach ($nodes as $node){
 
-            foreach ($nodes as $node){
+            $nodeId = $node->getNodeId();
+            $x = $data[$metricName][$nodeId]['x'];
+            $y = $data[$metricName][$nodeId]['y'];
 
-                $nodeData = $node->getData();
-                $options['color'] = $this->_color->getColor($colorState);
+            /* get max y for axis range */
+            $maxVal = max($maxVal,max($y));
+            /* adjust x axis time unit */
+            $xAxis = $this->_tsHelper->scaleTime($x);
 
-                $this->_plotter->generateLine(
-                    $lineData,
-                    $node->getName(),
-                    $nodeData['x'],
-                    $nodeData['y'],
-                    $options);
+            /* downsample data frequency */
+            if ( $options['sample'] > 0 ){
+                $this->_tsHelper->downsampling($x,$y,$options['sample']);
             }
 
-            $maxVal = $plot->yMax;
-            $xAxis['unit'] = $plot->xUnit;
-            $xAxis['dtick'] = $plot->xDtick;
+            $options['color'] = $this->_color->getColor($colorState);
 
-        } else {
-            $plot = new  Plot();
-            $plot->name = $metricName;
-            $job->jobCache->addPlot($plot);
-            $nodes = $job->getNodes();
-            $this->_color->init($colorState, count($nodes));
+            $this->_plotter->generateLine(
+                $lineData,
+                $nodeId,
+                $x, $y,
+                $options);
+        }
 
-            foreach ($nodes as $node){
+        if ( $options['mode'] === 'list' ){
+            /* add reference line */
+            $options['color'] = 'rgb(0,0,0)';
+            $value = $metric->normal;
+            $x = array(0, end($x));
+            $y = array($value,$value);
 
-                $nodeId = $node->getNodeId();
-                $x = $data[$metricName][$nodeId]['x'];
-                $y = $data[$metricName][$nodeId]['y'];
+            $this->_plotter->generateLine(
+                $lineData,
+                'Reference',
+                $x, $y,
+                $options);
 
-                /* get max y for axis range */
-                $maxVal = max($maxVal,max($y));
-                /* adjust x axis time unit */
-                $xAxis = $this->_tsHelper->scaleTime($x);
-
-                /* downsample data frequency */
-                if ( $options['sample'] > 0 ){
-                    $this->_tsHelper->downsampling($x,$y,$options['sample']);
-                }
-
-                $options['color'] = $this->_color->getColor($colorState);
-
-                $this->_plotter->generateLine(
-                    $lineData,
-                    $nodeId,
-                    $x, $y,
-                    $options);
+            if ($value > $maxVal){
+                $maxVal = $value;
             }
         }
 
@@ -323,6 +283,6 @@ class PlotGenerator
 
         $plot->setOptions($this->_plotter->generateLayout($metricName, $options));
         $plot->setData($lineData);
+        $job->jobCache->addPlot($plot);
     }
 }
-

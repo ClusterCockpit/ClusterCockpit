@@ -1,4 +1,3 @@
-
 <div class="row">
     <div class="col">
         <table class="table" id="jobs">
@@ -6,22 +5,16 @@
                 <tr>
                     <th scope="col">
                         Job ID
-                        <button type="button" class="btn btn-info btn-sm" id="toggleFilter">Sort</button>
+                        <button type="button" class="btn btn-dark btn-sm" id="toggleFilter">Sort</button>
                     </th>
-                    <th scope="col">Severity</th>
-                    <th scope="col">Nodes</th>
-                    <th scope="col">Start time</th>
-                    {% if isRunning == false %}
-                    <th scope="col">Runtime [h]</th>
-                    {% endif %}
-                    <th scope="col">Flops [GF/s]</th>
-                    <th scope="col">MemBW [GB/s]</th>
-                    <th scope="col">Network</th>
-                    <th scope="col">File IO</th>
-                    <th scope="col">Plots</th>
+                    {% for metric in sortMetrics %}
+                        <th scope="col">{{ metric.label }}</th>
+                    {% endfor %}
+                    <th scope="col">
+                        Plots
+                    </th>
                 </tr>
             </thead>
         </table>
     </div>
 </div>
-

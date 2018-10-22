@@ -27,6 +27,7 @@ namespace App\Form;
 
 use App\Entity\ApiKey;
 use App\Entity\User;
+use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -45,6 +46,10 @@ class ApiKeyType extends AbstractType
             ->add('token', TextType::class)
             ->add('user', EntityType::class, array(
                 'class' => User::class,
+                'query_builder' => function (EntityRepository $er) {
+                    return $er->createQueryBuilder('u')
+                              ->where('u.password IS NOT NULL');
+                },
                 'choice_label' => 'username'
             ))
             ->add('enabled', CheckboxType::class, array('label' => 'Active', 'required' => false))

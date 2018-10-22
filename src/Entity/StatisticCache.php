@@ -1,77 +1,51 @@
 <?php
+/*
+ *  This file is part of ClusterCockpit.
+ *
+ *  Copyright (c) 2018 Jan Eitzinger
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is furnished
+ *  to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in all
+ *  copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
+
 
 namespace App\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
-
-/**
-*  @ORM\Entity(repositoryClass="App\Repository\StatisticCacheRepository")
- */
 class StatisticCache
 {
-    /**
-     * @ORM\Id()
-     * @ORM\GeneratedValue()
-     * @ORM\Column(type="integer")
-     */
-    private $id;
-
-    /**
-     * @ORM\Column(type="integer")
-     */
     private $userId;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
     private $month;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
     private $year;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
     private $clusterId;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
     public $jobCount;
 
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
     public $totalWalltime;
 
-    /**
-     * @ORM\Column(type="float", nullable=true)
-     */
     public $totalCoreHours;
 
-    /**
-     * @ORM\Column(type="integer", nullable=true)
-     */
     public $shortJobCount;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\StatisticPlot", mappedBy="statisticCache", orphanRemoval=true, indexBy="name")
-     */
-    private $plots;
+    public $plots;
 
-    public function __construct()
-    {
-        $this->plots = new ArrayCollection();
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
 
     public function getUserId(): ?int
     {
@@ -169,28 +143,21 @@ class StatisticCache
         return $this;
     }
 
-    /**
-     * @return Collection|StatisticPlot[]
-     */
-    public function getPlots(): Collection
+    public function getPlots()
     {
         return $this->plots;
     }
 
-    public function removePlot(StatisticPlot $plot): self
+    public function removePlot($plot): self
     {
         if ($this->plots->contains($plot)) {
             $this->plots->removeElement($plot);
-            // set the owning side to null (unless already changed)
-            if ($plot->getStatisticCache() === $this) {
-                $plot->setStatisticCache(null);
-            }
         }
 
         return $this;
     }
 
-    public function addPlot(StatisticPlot $plot): self
+    public function addPlot($plot): self
     {
         $this->plots[$plot->name] = $plot;
         return $this;

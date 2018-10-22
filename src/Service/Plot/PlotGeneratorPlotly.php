@@ -28,7 +28,6 @@ namespace App\Service\Plot;
 use Psr\Log\LoggerInterface;
 use App\Entity\Trace;
 use App\Entity\Plot;
-use App\Entity\StatisticPlot;
 use App\Service\Configuration;
 
 class PlotGeneratorPlotly implements PlotGeneratorInterface
@@ -44,7 +43,6 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
         $this->_logger = $logger;
         $this->_configuration = $configuration;
     }
-
     public function generateScatterPlot( $plot, &$data, $options)
     {
         $colorscale = array(
@@ -91,7 +89,7 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
 
 
         $plot->setData($traceObject);
-        $plot->setOptions(json_encode(array(
+        $plot->setOptions(array(
             /* "title" => 'Job Roofline', */
             "autosize" => 'false',
             "width" => 600,
@@ -113,15 +111,13 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
                 'autorange' => true,
                 'title' => 'Performance (GF/s)'
             )
-        )));
+        ));
     }
-
     public function generatePolarPlot($plot, &$jobData, $metrics, $options)
     {
         $data; $theta_avg; $r_avg; $theta_max; $r_max;
 
         $plot->setOptions(
-            json_encode(
                 array(
                     "margin" => array(
                         "l" => 40,
@@ -136,7 +132,7 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
                     "angularaxis" => array(
                         "direction" => "clockwise",
                         "period" => 6,
-                    ))
+                    )
                 ));
 
         foreach ($metrics as $metric){
@@ -170,23 +166,23 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
 
         $plot->setData($data);
     }
-
     public function generateBarPlot($title, &$jobData, $options)
     {
         $data;
-        $plot = new StatisticPlot();
+        $plot = new Plot();
         $plot->name = $title;
 
         $plot->setOptions(
-            json_encode(array(
+            array(
                 "title" => "Histogram: ".$options['caption'],
                 "xaxis" => array(
                     "title" => $options['x-title']
                 ),
                 "yaxis" => array(
                     "title" => "count"
-                )))
-            );
+                )
+            )
+        );
 
         $data[] = array(
             "x" => $jobData['x'],
@@ -197,7 +193,6 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
 
         return $plot;
     }
-
     public function generateLine(&$data, $name, &$x, &$y, $options)
     {
         $line = array(
@@ -217,7 +212,6 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
 
         $data[] = $line;
     }
-
     public function generateLayout($title, $options)
     {
         $xUnit = $options['xUnit'];
@@ -254,15 +248,18 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
             $layout["yaxis"] = array(
                 "autotick" => 'false',
                 "dtick" => $y_dtick,
-                "range" => array(0,$options['maxVal']),
+                "range" => array(0,$options['maxVal']*1.2),
                 "title" => "[".$unit."]"
             );
         }
 
-        return json_encode($layout);
+        if ( isset($options['bgColor'])){
+            $layout["plot_bgcolor"] = $options['bgColor'];
+        }
+
+
+        return $layout;
     }
-
-
     public function getBackendName(){
         return 'plotly';
     }

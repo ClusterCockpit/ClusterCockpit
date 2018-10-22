@@ -10,6 +10,10 @@ configuration:
     type:     rest
     resource: App\Controller\API\ConfigurationController
     prefix:  "web"
+tag:
+    type:     rest
+    resource: App\Controller\API\TagController
+    prefix:  "web"
 cluster:
     type:     rest
     resource: App\Controller\API\ClusterController
@@ -24,6 +28,9 @@ index:
 list_jobs:
     path: /monitoring/listjobs/
     controller:  App\Controller\JobViewController::list
+list_jobs_tag:
+    path: /monitoring/listjobs/{id}
+    controller:  App\Controller\JobViewController::listTag
 search_jobs:
     path: /monitoring/job/search
     controller:  App\Controller\JobViewController::search
@@ -39,9 +46,6 @@ user_stat_jobs:
 show_job:
     path: /monitoring/job/{id}
     controller:  App\Controller\JobViewController::show
-show_running_job:
-    path: /monitoring/running_job/{id}
-    controller:  App\Controller\JobViewController::showRunning
 search_id:
     path: /monitoring/searchId
     controller:  App\Controller\JobViewController::searchId

@@ -7,15 +7,15 @@
     {% set histoRuntime = stat.plots['histoPlotRuntime'] %}
     {% set histoNumnodes = stat.plots['histoPlotNumnodes'] %}
 
-var options_histo_runtime = {{ histoRuntime.options|raw }};
-var data_histo_runtime = {{ histoRuntime.data|raw }};
+var options_histo_runtime = {{ histoRuntime.options|json_encode | raw }};
+var data_histo_runtime = {{ histoRuntime.data|json_encode | raw }};
 
 Plotly.newPlot('histo_plot_runtime',
     data_histo_runtime,
     options_histo_runtime);
 
-var options_histo_numnodes = {{ histoNumnodes.options|raw }};
-var data_histo_numnodes =  {{ histoNumnodes.data|raw }};
+var options_histo_numnodes = {{ histoNumnodes.options|json_encode | raw }};
+var data_histo_numnodes =  {{ histoNumnodes.data|json_encode | raw }};
 
 Plotly.newPlot('histo_plot_numnodes',
     data_histo_numnodes,

@@ -3,8 +3,8 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    {{ parent() }}
     <link href="{{ asset('css/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+    {{ parent() }}
 {% endblock %}
 
 {% block title %}
@@ -14,165 +14,35 @@
 {% block javascript %}
     {{ parent() }}
     <script src="{{ asset('js/datatables.min.js') }}"/></script>
-    <script src="{{ asset('js/plotly-basic.min.js') }}"/></script>
     <script>
-
-        function timeConverter(UNIX_timestamp){
-            var a = new Date(UNIX_timestamp * 1000);
-            var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-            var year = a.getFullYear();
-            var month = months[a.getMonth()];
-            var date = a.getDate();
-            var hour = a.getHours();
-            var min = a.getMinutes();
-            var sec = a.getSeconds();
-            var time =  hour + ':' + min + '</br>' + date + ' ' + month + ' ' + year;
-            return time;
-        }
-
-$(document).ready( function () {
-    var tablelist =  $('#jobs').DataTable(
-        {
-        {% if jobSearch is defined %}
-            "ajax": {
-                "url": "/web/jobs",
-                "data": {
-                "jobSearch": {{ jobSearch|raw }}
-                }
-            },
-        {% else %}
-            "ajax": "/web/jobs",
-        {% endif %}
-            <!-- "dom": '<"top"lifr>t<"bottom"p><"clear">', -->
-            "serverSide": true,
-            "processing": true,
-            "stateSave": true,
-            "deferRender": true,
-            "initComplete": function( settings, json ) {
-        {% if jobSearch is defined %}
-            $('#info_message').text('Showing '+json.recordsTotal+' jobs.');
-        {% else %}
-            $('#info_message').text('Info: '+json.recordsTotal+' jobs running.');
-        {% endif %}
-            },
-            "language":  {
-            "processing": '<h4 class="text-center mt-4">\
-                              <i class="fas fa-circle-notch fa-spin fa-lg"></i> loading...\
-                      </h4>'
-            },
-            "columns": [
-                {
-                    "data": "jobinfo",
-                    "render": function ( data, type, row ) {
-                      var runtime = data.runtime/3600;
-                      var content = '<strong>'+data.jobid+'</strong></br>'+
-                          '<a href="/monitoring/user/'+data.userid+'">'+data.username+'</a></br>'+
-                          data.numnodes+' nodes</br></br>'+
-                          '<strong>Duration:</strong></br>'+runtime.toFixed(2)+' hours</br></br>'+
-                          '<strong>Started:</strong></br>'+timeConverter(data.starttime);
-                      return content;
-                    }
-                },
-                { "data": "severity" },
-                { "data": "numNodes" },
-                { "data": "startTime" },
-                { "data": "duration" },
-                { "data": "flopsAnyAvg" },
-                { "data": "memBwAvg" },
-                { "data": "trafficTotalIbAvg" },
-                { "data": "trafficTotalLustreAvg" },
-                {
-                    "data": "plots",
-                    "render": function ( data, type, row ) {
-                        if ( data ){
-                            var content = '<a href=\"/monitoring/'+data.url+'/'+data.id+'\" target=\"_blank\">';
-                        content += '<div class=\"row\">';
-                        var count = data.plots.length;
-
-                        for (let plot of data.plots) {
-                            let plot_name = data.id+'_'+plot.name;
-                            content += '<div class=\"col px-1 py-1\" id=\"'+plot_name+'\"></div>';
-                            content += '\<script\>';
-                            content += 'var size = ($(window).width() /'+count+')*0.8;';
-                            content += 'var p_width = size;';
-                            content += 'var p_height = size;';
-                            content += 'var options_'+plot_name+'='+plot.options+';';
-                            content += 'var data_'+plot_name+'='+plot.data+';';
-                            content += 'options_'+plot_name+'[\'height\'] = p_height;';
-                            content += 'options_'+plot_name+'[\'width\'] = p_width;';
-                            content += 'Plotly.newPlot(\''+plot_name+'\',data_'+plot_name+',options_'+plot_name+',{staticPlot: true});';
-                            content += '\</script\>';
-                        }
-                        content += '</div>';
-                        content += '</a>';
-                        } else {
-                            var content = '<div class="alert alert-secondary" role="alert">\
-                                             <h4 class="text-center mt-4">\
-                                             <i class="fas fa-exclamation-triangle fa-lg"></i>\
-                                                No performance data available! \
-                                             </h4>\
-                                           </div>';
-                        }
-                        return content;
-                    }
-                }
-            ],
-            "columnDefs": [
-                { "orderable": false, "targets": [0,9] },
-                { "visible": false, "targets": [1,2,3,4,5,6,7,8] },
-                { "searchable": false, "targets": [1,2,3,4,5,6,7,8,9] }
-            ],
-            "paging": true
-        }
-    );
-
-    tablelist
-        .order([2, 'desc'])
-        .draw();
-
-    $('#toggleFilter').click(function(){
-        var table = $('#jobs').DataTable();
-
-        if ( table.column(1).visible() ){
-            table.columns( [ 1,2,3,4,5,6,7,8 ] ).visible( false );
-        } else {
-            table.columns( [ 1,2,3,4,5,6,7,8 ] ).visible( true );
-        }
-    });
-} );
-
+        {{ include('js/initDatatables.js.twig') }}
     </script>
 {% endblock %}
 
 
 {% block body %}
     {% if status.hasJobs %}
+    <script src="{{ asset('js/plotly-basic.min.js') }}"/></script>
+        {{ include('renderStatForm.html.twig') }}
+        {% set id = user.userId %}
+        {% set name = user.name %}
+        {% set contact = user.email %}
+        {% set showJobCloud = false %}
+        {{ include('renderStatTable.html.twig') }}
+        {{ include(renderTemplate) }}
 
-        <script src="{{ asset('js/plotly-basic.min.js') }}"/></script>
-
-    {{ include('renderStatForm.html.twig') }}
-    {% set id = user.userId %}
-    {% set name = user.name %}
-    {% set contact = user.email %}
-    {% set showJobCloud = false %}
-    {{ include('renderStatTable.html.twig') }}
-    {{ include(renderTemplate) }}
-
-    {% if status.hasPerf %}
-        {% set message="No data... " %}
-        {{ include('util/printInfo.html.twig') }}
-        {{ include('renderJobListAjax.html.twig') }}
+        {% if status.hasPerf %}
+            {% set message="No data... " %}
+            {{ include('util/printInfo.html.twig') }}
+            {{ include('renderJobListAjax.html.twig') }}
+        {% else %}
+            {% set message = "No performance data available!" %}
+            {{ include('util/printWarning.html.twig') }}
+        {% endif %}
     {% else %}
-        {% set message = "No performance data available!" %}
-        {{ include('util/printWarning.html.twig') }}
-    {% endif %}
-
-    {% else %}
-
         {{ include('renderStatForm.html.twig') }}
         {% set message = "No jobs available!" %}
         {{ include('util/printInfo.html.twig') }}
-
     {% endif %}
 {% endblock %}
 

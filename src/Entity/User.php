@@ -193,9 +193,9 @@ class User implements UserInterface, \Serializable
         return $this->username;
     }
 
-    public function getUserId($hide='false')
+    public function getUserId($hide=false)
     {
-        if( $hide === 'true' ) {
+        if( $hide === true ) {
             return substr(md5($this->username), 0, 8);
         } else {
             return $this->username;
@@ -212,10 +212,13 @@ class User implements UserInterface, \Serializable
         $this->uid = $uid;
     }
 
-    public function getName()
+    public function getName($hide=false)
     {
-        /* return substr(md5($this->name), 0, 8); */
-        return $this->name;
+        if( $hide === true ) {
+            return substr(md5($this->name), 0, 8);
+        } else {
+            return $this->name;
+        }
     }
 
     public function setName($name)
@@ -223,9 +226,13 @@ class User implements UserInterface, \Serializable
         $this->name = $name;
     }
 
-    public function getEmail()
+    public function getEmail($hide=false)
     {
-        return $this->email;
+        if( $hide === true ) {
+            return substr(md5($this->email), 0, 8);
+        } else {
+            return $this->email;
+        }
     }
 
     public function setEmail($email)
