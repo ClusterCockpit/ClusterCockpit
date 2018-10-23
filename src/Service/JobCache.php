@@ -102,36 +102,34 @@ class JobCache
     private function _initJob($job)
     {
         if ( $job->isRunning()) {
-            $job->stopTime = time();
-            /* $job->stopTime = 1521057932; */
+            /* $job->stopTime = time(); */
+            $job->stopTime = 1521057932;
             $job->duration = $job->stopTime - $job->startTime;
         }
     }
 
-    private function _colorBackground($options, $config, $metric, $stats)
+    private function _colorBackground(&$options, $metric, $stats)
     {
         $metricName = $metric->name;
 
         if ( ! is_null($metric->alert) ){
-            if ( $config['plot_general_colorBackground']->value === 'true' ) {
-                if ( isset($stats["{$metricName}_avg"]) ) {
-                    if ( $metricName === 'mem_used' ){
-                        if ( $stats["{$metricName}_avg"] > $metric->alert ){
-                            $options['bgColor'] = 'rgb(255,238,230)';
-                        } else if ( $stats["{$metricName}_avg"] > $metric->caution ){
-                            $options['bgColor'] = 'rgb(255,255,230)';
-                        } else {
-                            unset($options['bgColor']);
-                        }
-
+            if ( isset($stats["{$metricName}_avg"]) ) {
+                if ( $metricName === 'mem_used' ){
+                    if ( $stats["{$metricName}_avg"] > $metric->alert ){
+                        $options['bgColor'] = 'rgb(255,238,230)';
+                    } else if ( $stats["{$metricName}_avg"] > $metric->caution ){
+                        $options['bgColor'] = 'rgb(255,255,230)';
                     } else {
-                        if ( $stats["{$metricName}_avg"] < $metric->alert ){
-                            $options['bgColor'] = 'rgb(255,238,230)';
-                        } else if ( $stats["{$metricName}_avg"] < $metric->caution ){
-                            $options['bgColor'] = 'rgb(255,255,230)';
-                        } else {
-                            unset($options['bgColor']);
-                        }
+                        unset($options['bgColor']);
+                    }
+
+                } else {
+                    if ( $stats["{$metricName}_avg"] < $metric->alert ){
+                        $options['bgColor'] = 'rgb(255,238,230)';
+                    } else if ( $stats["{$metricName}_avg"] < $metric->caution ){
+                        $options['bgColor'] = 'rgb(255,255,230)';
+                    } else {
+                        unset($options['bgColor']);
                     }
                 }
             }
@@ -238,8 +236,8 @@ class JobCache
 
         foreach ($metrics as $metric){
 
-            if ( $config['plot_general_colorBackground']->value == 'true' ) {
-                $this->_colorBackground($options, $config,  $metric, $stats);
+            if ( $config['plot_general_colorBackground']->value === 'true' ) {
+                $this->_colorBackground($options, $metric, $stats);
             }
 
             $this->_plotGenerator->generateMetricPlot(
