@@ -188,7 +188,7 @@ class JobRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('j');
 
         $qb->select('count(j)')
-           ->where("j.duration > 300");  /* TODO: Make this configurable */
+	   ->where("j.duration > 300");
 
         if ( $userId ){
             $qb->andWhere("j.user = $userId");
@@ -203,6 +203,7 @@ class JobRepository extends ServiceEntityRepository
             $qb->andWhere("j.isRunning = true");
         } elseif (array_key_exists ( 'clusterId', $jobQuery )) {
 
+            $qb->andWhere("j.duration > 300");  /* TODO: Make this configurable */
             $qb->andWhere($qb->expr()->between('j.numNodes',$jobQuery['numNodesFrom'],$jobQuery['numNodesTo']));
             $qb->andWhere($qb->expr()->between( 'j.duration', $jobQuery['durationFrom'], $jobQuery['durationTo']));
             $qb->andWhere($qb->expr()->between( 'j.startTime', $jobQuery['dateFrom'], $jobQuery['dateTo']));
@@ -248,6 +249,7 @@ class JobRepository extends ServiceEntityRepository
             $qb->andWhere("j.isRunning = true");
 
         } elseif (array_key_exists ( 'clusterId', $jobQuery )) {
+
             $qb->andWhere($qb->expr()->between('j.numNodes',$jobQuery['numNodesFrom'],$jobQuery['numNodesTo']));
             $qb->andWhere($qb->expr()->between( 'j.duration', $jobQuery['durationFrom'], $jobQuery['durationTo']));
             $qb->andWhere($qb->expr()->between( 'j.startTime', $jobQuery['dateFrom'], $jobQuery['dateTo']));
