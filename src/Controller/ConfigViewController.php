@@ -483,6 +483,7 @@ class ConfigViewController extends Controller
 
             if ( $form->get('save')->isClicked() )  {
                 $user = $form->getData();
+                $user->setUid(0);
                 $password = $passwordEncoder->encodePassword($user, $user->getPlainPassword());
                 $user->setPassword($password);
                 $em = $this->getDoctrine()->getManager();
