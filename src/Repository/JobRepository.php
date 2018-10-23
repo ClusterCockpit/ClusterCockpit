@@ -205,7 +205,6 @@ class JobRepository extends ServiceEntityRepository
             $qb->andWhere("j.isCached = true");
         } elseif (array_key_exists ( 'clusterId', $jobQuery )) {
 
-            $qb->andWhere("j.duration > 300");  /* TODO: Make this configurable */
             $qb->andWhere($qb->expr()->between('j.numNodes',$jobQuery['numNodesFrom'],$jobQuery['numNodesTo']));
             $qb->andWhere($qb->expr()->between( 'j.duration', $jobQuery['durationFrom'], $jobQuery['durationTo']));
             $qb->andWhere($qb->expr()->between( 'j.startTime', $jobQuery['dateFrom'], $jobQuery['dateTo']));
@@ -214,7 +213,7 @@ class JobRepository extends ServiceEntityRepository
                 $qb->andWhere("j.cluster = $jobQuery[clusterId]");
             }
 
-            if ( ! $userId and  array_key_exists ( 'userId', $jobQuery )){
+            if ( ! $userId and  $jobQuery['userId'] != 0 ){
                 $qb->andWhere("j.user = $jobQuery[userId]");
             }
 

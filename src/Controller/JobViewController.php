@@ -181,6 +181,7 @@ class JobViewController extends Controller
                 $durationTo =$search->getDurationTo()->h*3600+$search->getDurationFrom()->m*60;
                 $search->setDurationFrom($durationFrom);
                 $search->setDurationTo($durationTo);
+                $search->userId(0);
 
                 return $this->render('jobViews/listJobs.html.twig',
                     array(
