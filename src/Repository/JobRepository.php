@@ -265,7 +265,7 @@ class JobRepository extends ServiceEntityRepository
                 $qb->andWhere("j.cluster = $jobQuery[clusterId]");
             }
 
-            if ( ! $userId and  array_key_exists ( 'userId', $jobQuery )){
+            if ( ! $userId and  $jobQuery['userId'] != 0 ){
                 $qb->andWhere("j.user = $jobQuery[userId]");
             }
 
