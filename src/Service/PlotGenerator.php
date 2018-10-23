@@ -83,8 +83,10 @@ class PlotGenerator
         }
 
         foreach ( $stat as $bin=>$count ){
-            $index = (int) $bin;
-            $y[$index] = (int) $count;
+            if ( $bin < $options['stop'] ){
+                $index = (int) $bin;
+                $y[$index] = (int) $count;
+            }
         }
 
         $data['x'] = $x;

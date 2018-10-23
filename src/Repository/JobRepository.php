@@ -200,7 +200,9 @@ class JobRepository extends ServiceEntityRepository
         }
 
         if (array_key_exists ( 'runningJobs', $jobQuery )) {
+
             $qb->andWhere("j.isRunning = true");
+            $qb->andWhere("j.isCached = true");
         } elseif (array_key_exists ( 'clusterId', $jobQuery )) {
 
             $qb->andWhere("j.duration > 300");  /* TODO: Make this configurable */
@@ -252,6 +254,7 @@ class JobRepository extends ServiceEntityRepository
 
         if (array_key_exists ( 'runningJobs', $jobQuery )) {
             $qb->andWhere("j.isRunning = true");
+            $qb->andWhere("j.isCached = true");
 
         } elseif (array_key_exists ( 'clusterId', $jobQuery )) {
 
