@@ -77,7 +77,7 @@ class UserViewController extends Controller
         if ( $cluster ) {
             $control->setCluster($cluster);
         } else {
-            $control->setCluster(1);
+            $control->setCluster(0);
         }
 
         $form = $this->createForm(StatisticsControlType::class, $control);
@@ -169,7 +169,7 @@ class UserViewController extends Controller
         if ( $cluster ) {
             $control->setCluster($cluster);
         } else {
-            $control->setCluster(1);
+            $control->setCluster(0);
         }
 
         $search = new JobSearch();

@@ -33,16 +33,26 @@ use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Doctrine\ORM\EntityManagerInterface;
 
 class StatisticsControlType extends AbstractType
 {
+    public function __construct(
+        EntityManagerInterface $em
+    )
+    {
+        $this->_clusterRepository = $em->getRepository(\App\Entity\Cluster::class);
+    }
+
+
     private function getSystems(){
-        return array(
-            'emmy' => 1,
-            'lima' => 2,
-            'meggie' => 3,
-            'woody' => 4,
-        );
+        $clusters = $this->_clusterRepository->findAll();
+
+        foreach  ( $clusters as $cluster ){
+            $systems[$cluster->getName()] = $cluster->getId();
+        }
+
+        return $systems;
     }
 
     private function getMonth(){
@@ -82,8 +92,7 @@ class StatisticsControlType extends AbstractType
                 'choices'  => $this->getYear(),
                 'placeholder' => 'All', 'required' => true))
             ->add('cluster', ChoiceType::class,array(
-                'choices'  => $this->getSystems(),
-                'placeholder' => 'All', 'required' => true))
+                'choices'  => $this->getSystems(), 'required' => true))
             ->add('submit', SubmitType::class, array('label' => 'Update'));
     }
 
