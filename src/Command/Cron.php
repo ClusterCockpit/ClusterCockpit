@@ -81,7 +81,9 @@ class Cron extends Command
                     $job, $this->_configuration->getConfig());
                 $this->_em->persist($job);
                 $this->_em->flush();
-            }
+	    } else {
+            $output->writeln(["Search jobs from $starttime to $stoptime"]);
+	    }
         }
         $event = $this->_timer->stop('WarmupCache');
         $duration = $event->getDuration()/ 1000;

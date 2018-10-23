@@ -108,7 +108,7 @@ class JobCache
         }
     }
 
-    private function _colorBackground($options, $metric, $stats)
+    private function _colorBackground($options, $config, $metric, $stats)
     {
         $metricName = $metric->name;
 
@@ -239,7 +239,7 @@ class JobCache
         foreach ($metrics as $metric){
 
             if ( $config['plot_general_colorBackground']->value == 'true' ) {
-                $this->_colorBackground($options, $metric, $stats);
+                $this->_colorBackground($options, $config,  $metric, $stats);
             }
 
             $this->_plotGenerator->generateMetricPlot(
