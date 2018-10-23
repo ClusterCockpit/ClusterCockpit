@@ -210,6 +210,11 @@ class JobRepository extends ServiceEntityRepository
             if ( $jobQuery['clusterId'] != 0 ){  /* 0 means all Clusters */
                 $qb->andWhere("j.cluster = $jobQuery[clusterId]");
             }
+
+            if ( ! $userId and  array_key_exists ( 'userId', $jobQuery )){
+                $qb->andWhere("j.user = $jobQuery[userId]");
+            }
+
         } elseif (array_key_exists ( 'jobTag', $jobQuery )) {
             $qb->innerJoin('j.tags', 't', 'WITH', 't.id = :tagId')
             ->setParameter('tagId', $jobQuery['jobTag']);
@@ -255,6 +260,11 @@ class JobRepository extends ServiceEntityRepository
             if ( $jobQuery['clusterId'] != 0 ) { /* 0 means all Clusters */
                 $qb->andWhere("j.cluster = $jobQuery[clusterId]");
             }
+
+            if ( ! $userId and  array_key_exists ( 'userId', $jobQuery )){
+                $qb->andWhere("j.user = $jobQuery[userId]");
+            }
+
         } elseif (array_key_exists ( 'jobTag', $jobQuery )) {
             $qb->innerJoin('j.tags', 't', 'WITH', 't.id = :tagId')
             ->setParameter('tagId', $jobQuery['jobTag']);
