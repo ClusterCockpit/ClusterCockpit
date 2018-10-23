@@ -127,9 +127,8 @@ class BuildJobCache extends Command
             $progressBar->advance();
 
             if ( $job->getNumNodes() > 0 ) {
-                $id = $job->getId();
-
-                $this->_jobCache->warmupCache($job, $this->_configuration->getConfig(), $numpoints);
+                $this->_jobCache->warmupCache(
+                    $job, $this->_configuration->getConfig(), $numpoints);
                 $this->_em->persist($job);
                 $this->_em->flush();
             }

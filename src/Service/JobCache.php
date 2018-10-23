@@ -266,16 +266,12 @@ class JobCache
         }
 
         if ( $pointsJob > $points ){
-            /* collect all metrics required for node table and job table sorting */
-            $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();  /* stat table */
-            $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
-
-            $this->_generatePlots($job, 'view', $config, $metrics, $stats);
+            $this->_generatePlots($job, 'view', $config);
             $item = $this->_cache->getItem($job->getJobId().'view');
             $this->_cache->save($item->set($job->jobCache));
 
             $job->jobCache = NULL;
-            $this->_generatePlots($job, 'list', $config, $metrics, $stats);
+            $this->_generatePlots($job, 'list', $config);
             $item = $this->_cache->getItem($job->getJobId().'list');
             $this->_cache->save($item->set($job->jobCache));
             $job->isCached = true;

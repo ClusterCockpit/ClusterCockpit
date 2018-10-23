@@ -75,6 +75,7 @@ class Cron extends Command
 
         $this->_timer->start('WarmupCache');
         foreach ( $jobs as $job ){
+
             if ( $job->getNumNodes() > 0 ) {
                 $this->_jobCache->warmupCache(
                     $job, $this->_configuration->getConfig());
@@ -104,7 +105,7 @@ class Cron extends Command
 
             if ( $entry->hasAttribute('cn') ) {
                 $str = $entry->getAttribute('cn')[0];
-		$group_id = str_replace("hpc_","", $str);
+                $group_id = str_replace("hpc_","", $str);
             }
             if ( $entry->hasAttribute('gidNumber') ) {
                 $gid = $entry->getAttribute('gidNumber')[0];
@@ -178,17 +179,17 @@ class Cron extends Command
 
         /* update groups */
         foreach  ( $groups as $group ){
-		    $groupId = $group['group_id'];
+            $groupId = $group['group_id'];
 
             if (! array_key_exists($groupId, $groupsDB) ) {
                 $this->_logger->info("CRON:syncUsers Add group $groupId");
-		$output->writeln("Add group $groupId");
+                $output->writeln("Add group $groupId");
 
                 $newGroup = new UnixGroup();
                 $newGroup->setGroupId($group['group_id']);
                 $newGroup->setGid($group['gid']);
                 $this->_em->persist($newGroup);
-	    }
+            }
         }
         $this->_em->flush();
 
@@ -201,13 +202,13 @@ class Cron extends Command
                 $DbUser = $usersDB[$userId];
 
                 if ( $name !== $DbUser->getName() ){
-		$output->writeln("Change name for $userId");
+                    $output->writeln("Change name for $userId");
                     $this->_logger->info("CRON:syncUsers Change name for $userId");
                     $DbUser->setName($name);
                     $this->_em->persist($DbUser);
                 }
             } else {
-		$output->writeln("Add user $userId");
+                $output->writeln("Add user $userId");
                 $this->_logger->info("CRON:syncUsers Add user $userId");
 
                 $newUser = new User();
@@ -218,7 +219,7 @@ class Cron extends Command
                 $newUser->setIsActive('false');
 
                 foreach  ( $user['groups'] as $group ) {
-		$output->writeln("Add user $userId to $group");
+                    $output->writeln("Add user $userId to $group");
                     $this->_logger->info("CRON:syncUsers Add $userId to $group");
                     $dbGroup = $groupRepo->findOneBy(['groupId' => $group]);
                     $newUser->addGroup($dbGroup);
@@ -243,7 +244,7 @@ class Cron extends Command
             ->setDescription('Cron job execution manager.')
             ->setHelp('This command allows to sync users and groups from a ldap server.')
             ->addArgument('task', InputArgument::REQUIRED, 'Task to perform')
-            ;
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
