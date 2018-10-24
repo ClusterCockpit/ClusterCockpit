@@ -180,18 +180,21 @@ class JobCache
     private function _generatePlots(
         $job,
         $mode,
-        $config
+        $config,
+        $live = false
     )
     {
         $job->jobCache = new \App\Entity\JobCache();
 
-        if ( $config['plot_view_showPolarplot']->value == 'true' or
-            $config['plot_view_showStatTable']->value == 'true' or
-            $config['plot_general_colorBackground']->value == 'true'
-        ) {
-            /* collect all metrics required for node table and job table sorting */
-            $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
-            $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
+        if ( $mode === 'view' or $live == false ){
+            if ( $config['plot_view_showPolarplot']->value == 'true' or
+                $config['plot_view_showStatTable']->value == 'true' or
+                $config['plot_general_colorBackground']->value == 'true'
+            ) {
+                /* collect all metrics required for node table and job table sorting */
+                $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
+                $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
+            }
         }
 
         if ( $mode === 'view' ) { /* Single Job View */
@@ -233,8 +236,10 @@ class JobCache
 
         foreach ($metrics as $metric){
 
-            if ( $config['plot_general_colorBackground']->value === 'true' ) {
-                $this->_colorBackground($options, $metric, $stats);
+            if ( $mode === 'view' or $live == false ) {
+                if ( $config['plot_general_colorBackground']->value === 'true' ) {
+                    $this->_colorBackground($options, $metric, $stats);
+                }
             }
 
             $this->_plotGenerator->generateMetricPlot(
@@ -315,7 +320,7 @@ class JobCache
             $job->hasProfile = false;
         } else {
             $job->hasProfile = true;
-            $this->_generatePlots($job, $mode, $config);
+            $this->_generatePlots($job, $mode, $config, true);
         }
     }
 }
