@@ -12,16 +12,4 @@ class JobTagRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, JobTag::class);
     }
-
-    /* public function findByExampleField($value) */
-    /* { */
-    /*     return $this->createQueryBuilder('j') */
-    /*         ->andWhere('j.exampleField = :val') */
-    /*         ->setParameter('val', $value) */
-    /*         ->orderBy('j.id', 'ASC') */
-    /*         ->setMaxResults(10) */
-    /*         ->getQuery() */
-    /*         ->getResult() */
-    /*     ; */
-    /* } */
 }

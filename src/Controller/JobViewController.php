@@ -226,6 +226,30 @@ class JobViewController extends Controller
             ));
     }
 
+    public function listTagTypes()
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $tags = $this->getDoctrine()
+                            ->getRepository(\App\Entity\JobTag::class)
+                            ->findAll();
+        $tagHash = array();
+
+        foreach ( $tags as $tag ){
+            $type = $tag->getType();
+
+            $tagHash[$type][] = array(
+                'id' => $tag->getId(),
+                'name' => $tag->getName(),
+                'count' => count($tag->getJobs())
+            );
+        }
+
+        return $this->render('default/listJobTagCounts.html.twig',
+            array(
+                'tagHash' => $tagHash,
+            ));
+    }
+
     public function listTag(
         JobTag $id,
         Configuration $configuration
@@ -254,6 +278,8 @@ class JobViewController extends Controller
                 'columnDefs' => $columnDefs
             ));
     }
+
+
 
     public function show(
         Job $job,
