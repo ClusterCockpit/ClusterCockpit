@@ -136,7 +136,7 @@ class BuildJobCache extends Command
         $event = $stopwatch->stop('BuildCache');
         $progressBar->finish();
 
-        $seconds = $event->getDuration()/ 1000;
+        $seconds =  floor($event->getDuration()/ 1000);
         $d1 = new DateTime();
         $d2 = new DateTime();
         $d2->add(new DateInterval('PT'.$seconds.'S'));
