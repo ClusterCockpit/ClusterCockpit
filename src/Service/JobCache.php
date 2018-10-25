@@ -150,13 +150,13 @@ class JobCache
         $flopsAnySlot = 'slot_'.$info['flops_any']->getSlot();
 
         if ( $job->{$memBwSlot} < $memBwMetric->alert  and  $job->{$flopsAnySlot} < $flopsAnyMetric->alert ){
-            $severity += 200;
+            $severity += 400;
         } else if ( $job->{$memBwSlot} < $memBwMetric->caution  and  $job->{$flopsAnySlot} < $flopsAnyMetric->caution ){
-            $severity += 100;
+            $severity += 200;
         } else if ( $job->{$flopsAnySlot} < $flopsAnyMetric->alert ){
-            $severity += 50;
+            $severity += 100;
         } else if ( $job->{$memBwSlot} < $memBwMetric->alert ){
-            $severity += 50;
+            $severity += 100;
         }
 
         $severity += $job->getNumNodes();

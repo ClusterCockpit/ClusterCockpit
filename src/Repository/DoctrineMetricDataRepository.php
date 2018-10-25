@@ -126,7 +126,6 @@ class DoctrineMetricDataRepository implements MetricDataRepository
         $stmt = $this->_connection->prepare($sql);
         $stmt->execute();
         $nodeStats = $stmt->fetchAll();
-        $stats['nodeStats'] = $nodeStats;
         $sums = array();
 
         foreach ( $metrics as $metric ){
@@ -136,7 +135,10 @@ class DoctrineMetricDataRepository implements MetricDataRepository
             $sums[$metricName] = 0;
         }
 
-        foreach ($nodeStats as $node){
+        foreach ($nodeStats as &$node){
+
+            $node['nodeId'] = $job->getNode($node['nodeId'])->getNodeId();
+
             foreach ( $metrics as $metric ){
                 $metricName = $metric->name;
                 $sums[$metricName] += $node["{$metricName}_avg"];
@@ -156,6 +158,7 @@ class DoctrineMetricDataRepository implements MetricDataRepository
             $stats["{$metricName}_avg"] = round($sums[$metricName]/$statCount, 2);
         }
 
+        $stats['nodeStats'] = $nodeStats;
         return $stats;
     }
 

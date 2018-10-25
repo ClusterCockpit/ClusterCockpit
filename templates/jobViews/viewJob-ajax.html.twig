@@ -164,9 +164,9 @@
                     <thead>
                         <th style="font-size: 0.9rem;" scope="col">nodeId</th>
                         {% for metric in metrics%}
+                            <th style="font-size: 0.8rem;" scope="col">{{ metric.name }} avg [{{ metric.unit }}]</th>
                             <th style="font-size: 0.8rem;" scope="col">{{ metric.name }} min [{{ metric.unit }}]</th>
                             <th style="font-size: 0.8rem;" scope="col">{{ metric.name }} max [{{ metric.unit }}]</th>
-                            <th style="font-size: 0.8rem;" scope="col">{{ metric.name }} avg [{{ metric.unit }}]</th>
                         {% endfor %}
                         </tr>
                     </thead>
