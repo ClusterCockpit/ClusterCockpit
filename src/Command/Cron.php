@@ -27,10 +27,13 @@ namespace App\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use App\Adapter\LdapManager;
 use App\Service\JobCache;
 use App\Entity\User;
@@ -39,6 +42,7 @@ use Psr\Log\LoggerInterface;
 use App\Service\Configuration;
 use \DateTimeZone;
 use \DateTime;
+use \DateInterval;
 
 class Cron extends Command
 {
@@ -46,6 +50,7 @@ class Cron extends Command
     private $_em;
     private $_ldap;
     private $_jobCache;
+    private $_cache;
     private $_configuration;
     private $_timer;
 
@@ -55,7 +60,8 @@ class Cron extends Command
         Configuration $configuration,
         EntityManagerInterface $em,
         StopWatch $stopwatch,
-        JobCache $jobCache
+        JobCache $jobCache,
+        AdapterInterface $cache
     )
     {
         $this->_logger = $logger;
@@ -64,6 +70,7 @@ class Cron extends Command
         $this->_timer = $stopwatch;
         $this->_configuration = $configuration;
         $this->_jobCache = $jobCache;
+        $this->_cache = $cache;
 
         parent::__construct();
     }
@@ -81,14 +88,121 @@ class Cron extends Command
                     $job, $this->_configuration->getConfig());
                 $this->_em->persist($job);
                 $this->_em->flush();
-	    } else {
-            $output->writeln(["Search jobs from $starttime to $stoptime"]);
-	    }
+            }
         }
         $event = $this->_timer->stop('WarmupCache');
         $duration = $event->getDuration()/ 1000;
         $count = count($jobs);
         $this->_logger->info("CRON:warmupCache $count jobs in $duration s");
+    }
+
+    private function updateCache($output, $interactive)
+    {
+        $this->_timer->start('UpdateCache');
+        $repository = $this->_em->getRepository(\App\Entity\Job::class);
+
+        /* cleanup jobs with isCached flag set but cache not existing */
+        $jobs = $repository->findCachedJobs();
+
+        if ( $interactive ){
+            $output->writeln(["STAGE 1: Sanitize"]);
+            $jobCount = count($jobs);
+            $progressBar = new ProgressBar($output, $jobCount);
+            $progressBar->setRedrawFrequency(25);
+            $progressBar->start();
+        }
+
+        foreach ( $jobs as $job ){
+
+            if ( $interactive ){
+                $progressBar->advance();
+            }
+
+            $item = $this->_cache->getItem($job->getJobId().'view');
+
+            if ( ! $item->isHit()) {
+                $job->isCached = false;
+                $this->_em->persist($job);
+                $this->_em->flush();
+            }
+        }
+
+        if ( $interactive ){
+            $progressBar->finish();
+            $progressBar->clear();
+        }
+
+        $config = $this->_configuration->getConfig();
+        $days = $config['data_cache_period']->value;
+        $timestamp = strtotime("-$days day");
+
+        /* delete cache for jobs outside grace period */
+        $jobs = $repository->findJobsToClean($timestamp);
+
+        if ( $interactive ){
+            $output->writeln(["STAGE 2: Cleanup"]);
+            $jobCount = count($jobs);
+            $progressBar->setMaxSteps($jobCount);
+            $progressBar->start();
+        }
+
+        foreach ( $jobs as $job ){
+
+            if ( $interactive ){
+                $progressBar->advance();
+            }
+
+            $this->_jobCache->dropCache($job);
+            $this->_em->persist($job);
+            $this->_em->flush();
+        }
+
+        if ( $interactive ){
+            $progressBar->finish();
+            $progressBar->clear();
+        }
+
+        /* build cache for jobs inside grace period */
+        $jobs = $repository->findJobsToBuild($timestamp);
+
+        if ( $interactive ){
+            $output->writeln(["STAGE 3: Rebuild cache"]);
+            $jobCount = count($jobs);
+            $progressBar->setMaxSteps($jobCount);
+            $progressBar->start();
+        }
+
+        foreach ( $jobs as $job ){
+
+            if ( $interactive ){
+                $progressBar->advance();
+            }
+
+            $this->_jobCache->warmupCache(
+                $job, $this->_configuration->getConfig());
+            $this->_em->persist($job);
+            $this->_em->flush();
+        }
+
+        $event = $this->_timer->stop('UpdateCache');
+        $seconds =  floor($event->getDuration()/ 1000);
+
+        if ( $interactive ){
+            $d1 = new DateTime();
+            $d2 = new DateTime();
+            $d2->add(new DateInterval('PT'.$seconds.'S'));
+            $iv = $d2->diff($d1);
+
+            $output->writeln([
+                'Total runtime:',
+                $iv->format('%h h %i m')
+            ]);
+
+            $progressBar->finish();
+            $progressBar->clear();
+        } else {
+            $this->_logger->info("CRON:updateCache $seconds s");
+        }
     }
 
     private function syncUsers($output)
@@ -246,6 +360,7 @@ class Cron extends Command
             ->setDescription('Cron job execution manager.')
             ->setHelp('This command allows to sync users and groups from a ldap server.')
             ->addArgument('task', InputArgument::REQUIRED, 'Task to perform')
+            ->addOption( 'interactive', 'i', InputOption::VALUE_NONE, 'Progress output on stdout.')
         ;
     }
 
@@ -254,12 +369,15 @@ class Cron extends Command
         $d = new DateTime('NOW', new DateTimeZone('Europe/Berlin'));
         $datestr = $d->format('Y-m-d\TH:i:s');
         $task = $input->getArgument('task');
+        $interactive = $input->getOption('interactive');
         $this->_logger->info("CRON Start $task at $datestr");
 
         if ( $task === 'syncUsers' ){
             $this->syncUsers($output);
         } else if ( $task === 'warmupCache' ){
             $this->warmupCache($output);
+        } else if ( $task === 'updateCache' ){
+            $this->updateCache($output, $interactive);
         } else {
             $output->writeln("CRON Error: Unknown command $task !");
         }

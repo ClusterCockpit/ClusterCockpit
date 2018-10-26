@@ -66,7 +66,7 @@ class JobRepository extends ServiceEntityRepository
         }
     }
 
-    public function getSettings($control): array
+    private function getSettings($control): array
     {
         $single = true;
         $clusterId = $control->getCluster();
@@ -253,7 +253,7 @@ class JobRepository extends ServiceEntityRepository
 
         if (array_key_exists ( 'runningJobs', $jobQuery )) {
             $qb->andWhere("j.isRunning = true");
-            $qb->andWhere("j.isCached = true");
+            /* $qb->andWhere("j.isCached = true"); */
 
         } elseif (array_key_exists ( 'clusterId', $jobQuery )) {
 
@@ -290,13 +290,36 @@ class JobRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findCachedJobs($starttime)
+    public function findCachedJobs()
+    {
+        $qb = $this->createQueryBuilder('j');
+
+        return $qb
+            ->where("j.isRunning = false")
+            ->where("j.isCached = true")
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findJobsToClean($timestamp)
     {
         $qb = $this->createQueryBuilder('j');
 
         return $qb
             ->where("j.isCached = true")
-            ->andWhere($qb->expr()->lt( 'j.startTime', $starttime))
+            ->andWhere($qb->expr()->lt( 'j.startTime', $timestamp))
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findJobsToBuild($timestamp)
+    {
+        $qb = $this->createQueryBuilder('j');
+
+        return $qb
+            ->where("j.isRunning = false")
+            ->andWhere("j.isCached = false")
+            ->andWhere($qb->expr()->gt( 'j.startTime', $timestamp))
             ->getQuery()
             ->getResult();
     }
@@ -479,6 +502,10 @@ class JobRepository extends ServiceEntityRepository
             }
 
             foreach ( $users as $id => &$user ){
+                /* TODO Remove workaround */
+                if ( is_null($id) ){
+                    $id = 1;
+                }
                 $user['userId'] = $id;
                 $user['totalWalltime'] = 0;
                 $user['totalJobs'] = 0;

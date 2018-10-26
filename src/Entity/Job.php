@@ -283,8 +283,6 @@ class Job
         return $this->nodes[$id];
     }
 
-
-
     public function getJobScript()
     {
         return $this->jobScript;
