@@ -33,7 +33,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use App\Adapter\LdapManager;
 use App\Service\JobCache;
 use App\Entity\User;
@@ -60,8 +59,7 @@ class Cron extends Command
         Configuration $configuration,
         EntityManagerInterface $em,
         StopWatch $stopwatch,
-        JobCache $jobCache,
-        AdapterInterface $cache
+        JobCache $jobCache
     )
     {
         $this->_logger = $logger;
@@ -70,7 +68,6 @@ class Cron extends Command
         $this->_timer = $stopwatch;
         $this->_configuration = $configuration;
         $this->_jobCache = $jobCache;
-        $this->_cache = $cache;
 
         parent::__construct();
     }
@@ -91,9 +88,9 @@ class Cron extends Command
             }
         }
         $event = $this->_timer->stop('WarmupCache');
-        $duration = $event->getDuration()/ 1000;
+        $seconds =  floor($event->getDuration()/ 1000);
         $count = count($jobs);
-        $this->_logger->info("CRON:warmupCache $count jobs in $duration s");
+        $this->_logger->info("CRON:warmupCache $count jobs in $seconds s");
     }
 
     private function updateCache($output, $interactive)
@@ -118,9 +115,8 @@ class Cron extends Command
                 $progressBar->advance();
             }
 
-            $item = $this->_cache->getItem($job->getJobId().'view');
 
-            if ( ! $item->isHit()) {
+            if ( ! $this->_jobCache->hasCache($job, 'view') ) {
                 $job->isCached = false;
                 $this->_em->persist($job);
                 $this->_em->flush();
@@ -349,8 +345,8 @@ class Cron extends Command
         $userRepo->resetActiveUsers($activeUsers);
 
         $event = $this->_timer->stop('syncUsers');
-        $duration = $event->getDuration()/ 1000;
-        $this->_logger->info("CRON:syncUsers  $duration s");
+        $seconds =  floor($event->getDuration()/ 1000);
+        $this->_logger->info("CRON:syncUsers  $seconds s");
     }
 
     protected function configure()

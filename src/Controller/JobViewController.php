@@ -279,8 +279,6 @@ class JobViewController extends Controller
             ));
     }
 
-
-
     public function show(
         Job $job,
         Configuration $configuration,

@@ -301,6 +301,21 @@ class JobCache
         }
     }
 
+    public function hasCache(
+        $job,
+        $mode
+    )
+    {
+        $this->_initJob($job);
+        $item = $this->_cache->getItem($job->getJobId().$mode);
+
+        if ($item->isHit()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function checkCache(
         $job,
         $mode,
