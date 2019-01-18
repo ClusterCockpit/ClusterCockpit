@@ -25,6 +25,9 @@ joblist:
 index:
     path: /
     controller:  App\Controller\IndexViewController::home
+init:
+    path: /init/{slug}
+    controller:  App\Controller\IndexViewController::init
 list_jobs:
     path: /monitoring/listjobs/
     controller:  App\Controller\JobViewController::list
