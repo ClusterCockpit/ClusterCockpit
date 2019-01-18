@@ -38,6 +38,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 
 class ClusterType extends AbstractType
 {
@@ -49,6 +50,9 @@ class ClusterType extends AbstractType
             ->add('flopRateScalar', NumberType::class)
             ->add('flopRateSimd', NumberType::class)
             ->add('memoryBandwidth', NumberType::class)
+            ->add('nodeFile', FileType::class, array(
+                'label' => 'Nodelist (Text file)',
+                'required' => false))
             ->add('save', SubmitType::class, array('label' => 'Save changes'))
             ->add('cancel', SubmitType::class, array('label' => 'Cancel'));
     }
@@ -60,4 +64,3 @@ class ClusterType extends AbstractType
         ));
     }
 }
-
