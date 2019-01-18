@@ -33,6 +33,7 @@ class Configuration
     private $_logger;
     private $_repository;
     private $_config;
+    private $_isInit;
 
     public function __construct(
         LoggerInterface $logger,
@@ -42,20 +43,33 @@ class Configuration
         $this->_logger = $logger;
         $this->_repository = $em->getRepository(\App\Entity\Configuration::class);
         $this->_config =  $this->_repository->findAllDefault();
+        $this->_isInit = count($this->_config);
     }
 
     public function getUserConfig($user)
     {
+        if ( $this->_isInit == 0 ) {
+            return false;
+        }
+
         return $this->_repository->findAllScope(array($user->getUsername()));
     }
 
     public function getConfig()
     {
-        return $this->_repository->findAllDefault();
+        if ( $this->_isInit == 0 ) {
+            return false;
+        }
+
+        return $this->_config;
     }
 
     public function getValue($key)
     {
+        if ( $this->_isInit == 0 ) {
+            return false;
+        }
+
         return $this->_config[$key]->value;
     }
 }

@@ -131,11 +131,14 @@ class ColorMap
     )
     {
         $config = $configuration->getConfig();
-        $file = $config['plot_general_colorscheme']->value.'.php';
-        $map = 'COLOR_'.$config['plot_general_colorscheme']->value;
-        include "$projectDir/src/Colormaps/$file";
-        $this->_color = constant($map);
-        $this->_projectRoot = $projectDir;
+
+        if ( $config ) {
+            $file = $config['plot_general_colorscheme']->value.'.php';
+            $map = 'COLOR_'.$config['plot_general_colorscheme']->value;
+            include "$projectDir/src/Colormaps/$file";
+            $this->_color = constant($map);
+            $this->_projectRoot = $projectDir;
+        }
     }
 
     public function getAllColorMaps()
