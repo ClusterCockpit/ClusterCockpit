@@ -22,6 +22,7 @@ class Data
      */
     private $epoch;
 
+
     /**
      *  @ORM\Column(type="float", nullable=true)
      */

@@ -27,11 +27,11 @@ namespace App\Service;
 
 class NodeFileReader
 {
-    private function parsePbs(String $buffer){
+    private function parsePbs(String $buffer)
+    {
         $records = preg_split("/\n{2,}/", $buffer);
-        /* $nodes = array(); */
 
-        foreach ( $records as  $node ) {
+        foreach ( $records as  $record ) {
             $parameters = preg_split("/\n/", $record);
             preg_match("/(.*)/", $parameters[0], $matches);
 
@@ -42,44 +42,60 @@ class NodeFileReader
             $node['parameters'] = array();
 
             /* parse node parameters */
-            for ($i=1; i<count($parameters); $i++) {
-                if (preg_match("/[ ]+([a-z_]+) = (.*)/", $parameters[$i], $matches)) {
-                    $node['parameters'][$matches[0]] = $matches[1];
+            for ($i=1; $i<count($parameters); $i++) {
+                if (preg_match("/([a-z_]+) = (.*)/", $parameters[$i], $matches)) {
+                    $node['parameters'][$matches[1]] = $matches[2];
                 }
             }
 
-            $node['properties'] =  preg_split("/,/", $node['parameters']['properties']);
+            if( array_key_exists('properties', $node['parameters']) ) {
+                $node['properties'] =  preg_split("/,/", $node['parameters']['properties']);
 
-            /* parse status parameters */
-            preg_match("/[  ]+status = (.*)/", $node['parameters']['status'], $matches);
-            $status = preg_split("/,/", $matches[0]);
-            $node['status'] = array();
+                /* parse status parameters */
+                $status = preg_split("/,/", $node['parameters']['status']);
+                $node['status'] = array();
 
-            foreach ( $status as $prop ) {
-                preg_match("/([a-z]+)=(.*)/", $prop, $matches);
-                $node['status'][$matches[0]] = "$matches[1]";
+                foreach ( $status as $prop ) {
+                    preg_match("/([a-z]+)=(.*)/", $prop, $matches);
+                    $node['status'][$matches[1]] = "$matches[2]";
+                }
+
+
+                $nodes[] = $node;
             }
-
-            $nodes[] = $node;
         }
 
         return $nodes;
     }
 
-    private function parseSlurm(String $buffer){
-
+    private function parseSlurm(String $buffer)
+    {
         $nodelines = preg_split("/\n/", $buffer);
         $columnKeys = preg_split("/[ ]+/", $nodelines[1]);
+        $lookup = array();
 
-        for ($i=2; i<count($nodelines); $i++) {
+        for ($i=2; $i<count($nodelines); $i++) {
             $columns = preg_split("/[ ]+/", $nodelines[$i]);
-            $nodeInfo = array();
 
-            for ($j=2; j<count($nodelines); $j++) {
-                $nodeInfo[$columnKeys[$j] = $columns[$j];
+            if (count($columns) == count($columnKeys)){
+                for ($j=0; $j<count($columnKeys); $j++) {
+                    $nodeInfo[$columnKeys[$j]] = $columns[$j];
+                }
+
+                $nodeId = $nodeInfo['NODELIST'];
+
+                if ( ! array_key_exists($nodeId, $lookup) ){
+                    $lookup[$nodeId] = 1;
+                    $topology = preg_split("/:/", $nodeInfo['S:C:T']);
+
+                    $nodes[] = array(
+                        'nodeId' => $nodeId,
+                        'cores' => (int) $topology[1],
+                        'processors' => $topology[1]*$topology[2],
+                        'nodeinfo' => $nodeInfo
+                    );
+                }
             }
-
-            $nodes[] = $nodeInfo;
         }
 
         return $nodes;
@@ -88,7 +104,12 @@ class NodeFileReader
     public function parse(String $filename)
     {
         $string = file_get_contents($filename, FALSE);
+        $test = preg_split("/\n/", $string);
 
-        parsePbs($string);
+        if (preg_match("/NODELIST/", $test[1], $matches)) {
+            return $this->parseSlurm($string);
+        } else {
+            return $this->parsePbs($string);
+        }
     }
 }
