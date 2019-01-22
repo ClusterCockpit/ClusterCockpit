@@ -1,0 +1,3319 @@
+w1001
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573311.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451575,macaddr=00:25:90:60:4e:f8,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573311.wadm1.rrze.uni-erlangen.de(cput=35308,energy_used=0,mem=2323312kb,vmem=373900kb,walltime=8842,session_id=1449),state=free,netload=909422892315,gres=,loadave=4.00,ncpus=4,physmem=8158864kb,availmem=15848276kb,totmem=16158348kb,idletime=2318283,nusers=2,nsessions=2,sessions=1449 17189,uname=Linux w1001 4.15.0-38-generic #41-Ubuntu SMP Wed Oct 10 10:59:38 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1002
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573310.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451568,macaddr=00:25:90:60:4e:3c,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573310.wadm1.rrze.uni-erlangen.de(cput=35540,energy_used=0,mem=430624kb,vmem=379292kb,walltime=8900,session_id=12205),state=free,netload=1961274434938,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=15870904kb,totmem=16158352kb,idletime=2744353,nusers=1,nsessions=1,sessions=12205,uname=Linux w1002 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1003
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573309.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451575,macaddr=00:25:90:60:4b:c4,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573309.wadm1.rrze.uni-erlangen.de(cput=35665,energy_used=0,mem=466072kb,vmem=379288kb,walltime=8921,session_id=7552),state=free,netload=1587111782287,gres=,loadave=4.01,ncpus=8,physmem=8158116kb,availmem=15849416kb,totmem=16157600kb,idletime=7107273,nusers=2,nsessions=2,sessions=7552 23418,uname=Linux w1003 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1004
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573308.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451582,macaddr=00:25:90:60:4e:e8,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573308.wadm1.rrze.uni-erlangen.de(cput=35571,energy_used=0,mem=404248kb,vmem=379292kb,walltime=8907,session_id=16874),state=free,netload=1712045799597,gres=,loadave=4.04,ncpus=4,physmem=8158868kb,availmem=15868700kb,totmem=16158352kb,idletime=7107236,nusers=2,nsessions=2,sessions=306 16874,uname=Linux w1004 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1005
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573307.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451561,macaddr=00:25:90:60:4f:70,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573307.wadm1.rrze.uni-erlangen.de(cput=35569,energy_used=0,mem=406864kb,vmem=379288kb,walltime=8907,session_id=18422),state=free,netload=389973245237,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=15875580kb,totmem=16158352kb,idletime=7107246,nusers=2,nsessions=2,sessions=1848 18422,uname=Linux w1005 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1006
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573306.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451576,macaddr=00:25:90:3d:0e:ba,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573306.wadm1.rrze.uni-erlangen.de(cput=35658,energy_used=0,mem=462900kb,vmem=379076kb,walltime=8930,session_id=15870),state=free,netload=269557588220,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=15883068kb,totmem=16158352kb,idletime=7107219,nusers=2,nsessions=2,sessions=15870 31793,uname=Linux w1006 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1007
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573305.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451570,macaddr=00:25:90:60:50:8a,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573305.wadm1.rrze.uni-erlangen.de(cput=36292,energy_used=0,mem=473824kb,vmem=379080kb,walltime=9089,session_id=10075),state=free,netload=1090522446425,gres=,loadave=4.09,ncpus=4,physmem=8158872kb,availmem=15868772kb,totmem=16158356kb,idletime=6481970,nusers=2,nsessions=2,sessions=10075 26245,uname=Linux w1007 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1008
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573304.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451569,macaddr=00:25:90:60:4b:ba,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573304.wadm1.rrze.uni-erlangen.de(cput=36264,energy_used=0,mem=468800kb,vmem=379080kb,walltime=9082,session_id=23733),state=free,netload=1077889746969,gres=,loadave=4.00,ncpus=4,physmem=8158872kb,availmem=15882500kb,totmem=16158356kb,idletime=7107179,nusers=2,nsessions=2,sessions=23733 7493,uname=Linux w1008 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1009
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573219.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451563,macaddr=00:25:90:60:4e:e0,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573219.wadm1.rrze.uni-erlangen.de(cput=49209,energy_used=0,mem=3170988kb,vmem=9349372kb,walltime=12365,session_id=20375),state=free,netload=1235559813620,gres=,loadave=4.09,ncpus=4,physmem=8158872kb,availmem=15023244kb,totmem=16158356kb,idletime=7107213,nusers=1,nsessions=1,sessions=20375,uname=Linux w1009 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1010
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573303.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451573,macaddr=00:25:90:3d:10:00,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573303.wadm1.rrze.uni-erlangen.de(cput=36315,energy_used=0,mem=475616kb,vmem=379076kb,walltime=9095,session_id=31202),state=free,netload=2943026327262,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=15881484kb,totmem=16158352kb,idletime=6485911,nusers=2,nsessions=2,sessions=31202 14967,uname=Linux w1010 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1011
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573302.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451587,macaddr=00:25:90:3d:0f:76,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573302.wadm1.rrze.uni-erlangen.de(cput=36359,energy_used=0,mem=476020kb,vmem=379292kb,walltime=9105,session_id=28751),state=free,netload=1457516012781,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=15879748kb,totmem=16158352kb,idletime=1554514,nusers=2,nsessions=2,sessions=28751 12505,uname=Linux w1011 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1012
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573298.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451572,macaddr=00:25:90:60:4d:f6,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573298.wadm1.rrze.uni-erlangen.de(cput=41532,energy_used=0,mem=1167676kb,vmem=376232kb,walltime=10400,session_id=29028),state=free,netload=653967663449,gres=,loadave=4.00,ncpus=4,physmem=8158872kb,availmem=15852944kb,totmem=16158356kb,idletime=7107202,nusers=1,nsessions=1,sessions=29028,uname=Linux w1012 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1013
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573297.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451557,macaddr=00:25:90:60:4d:78,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573297.wadm1.rrze.uni-erlangen.de(cput=41612,energy_used=0,mem=1167676kb,vmem=376228kb,walltime=10420,session_id=10222),state=free,netload=1749570965,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=15876516kb,totmem=16158352kb,idletime=180499,nusers=1,nsessions=1,sessions=10222,uname=Linux w1013 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1014
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573296.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451554,macaddr=00:25:90:60:4b:1a,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573296.wadm1.rrze.uni-erlangen.de(cput=41591,energy_used=0,mem=1167548kb,vmem=376228kb,walltime=10414,session_id=23306),state=free,netload=2068196949474,gres=,loadave=4.00,ncpus=4,physmem=8158884kb,availmem=15851976kb,totmem=16158368kb,idletime=7107233,nusers=2,nsessions=2,sessions=23306 7348,uname=Linux w1014 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1015
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573295.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451573,macaddr=00:25:90:60:4b:ca,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573295.wadm1.rrze.uni-erlangen.de(cput=41634,energy_used=0,mem=1165256kb,vmem=376256kb,walltime=10426,session_id=30908),state=free,netload=691331460776,gres=,loadave=4.00,ncpus=4,physmem=8158872kb,availmem=15839260kb,totmem=16158356kb,idletime=7107214,nusers=2,nsessions=2,sessions=30908 17063,uname=Linux w1015 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1016
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573294.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451581,macaddr=00:25:90:3d:0e:c4,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573294.wadm1.rrze.uni-erlangen.de(cput=41572,energy_used=0,mem=1164980kb,vmem=376228kb,walltime=10410,session_id=31764),state=free,netload=435051211593,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=15853148kb,totmem=16158352kb,idletime=3046992,nusers=2,nsessions=2,sessions=31764 17863,uname=Linux w1016 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1017
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573293.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451573,macaddr=00:25:90:60:4f:74,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573293.wadm1.rrze.uni-erlangen.de(cput=41801,energy_used=0,mem=1372256kb,vmem=376384kb,walltime=10468,session_id=16963),state=free,netload=461809757863,gres=,loadave=4.05,ncpus=4,physmem=8158884kb,availmem=15852676kb,totmem=16158368kb,idletime=524268,nusers=1,nsessions=1,sessions=16963,uname=Linux w1017 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1018
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573292.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451561,macaddr=00:25:90:60:4f:f4,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573292.wadm1.rrze.uni-erlangen.de(cput=41721,energy_used=0,mem=1375448kb,vmem=376380kb,walltime=10448,session_id=6047),state=free,netload=1777892717885,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=15773432kb,totmem=16158352kb,idletime=7107214,nusers=1,nsessions=1,sessions=6047,uname=Linux w1018 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1019
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573291.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451574,macaddr=00:25:90:60:4c:2c,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573291.wadm1.rrze.uni-erlangen.de(cput=41836,energy_used=0,mem=1375532kb,vmem=376380kb,walltime=10477,session_id=6530),state=free,netload=1122996711365,gres=,loadave=4.04,ncpus=4,physmem=8158868kb,availmem=15852256kb,totmem=16158352kb,idletime=7107185,nusers=2,nsessions=2,sessions=6530 25146,uname=Linux w1019 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1020
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573290.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451577,macaddr=00:25:90:60:4f:fc,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573290.wadm1.rrze.uni-erlangen.de(cput=41815,energy_used=0,mem=1371688kb,vmem=376380kb,walltime=10471,session_id=29969),state=free,netload=3040944789103,gres=,loadave=4.06,ncpus=4,physmem=8158872kb,availmem=15853428kb,totmem=16158356kb,idletime=7107253,nusers=2,nsessions=2,sessions=29969 16183,uname=Linux w1020 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1021
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573287.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451562,macaddr=00:25:90:60:50:08,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573287.wadm1.rrze.uni-erlangen.de(cput=42166,energy_used=0,mem=599768kb,vmem=379052kb,walltime=10559,session_id=22931),state=free,netload=1025113075220,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=15868160kb,totmem=16158352kb,idletime=7107189,nusers=2,nsessions=2,sessions=22931 9300,uname=Linux w1021 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1022
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573286.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451588,macaddr=00:25:90:60:4d:b2,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573286.wadm1.rrze.uni-erlangen.de(cput=42380,energy_used=0,mem=606380kb,vmem=379056kb,walltime=10613,session_id=11897),state=free,netload=2199892016412,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=15864668kb,totmem=16158352kb,idletime=7107259,nusers=1,nsessions=1,sessions=11897,uname=Linux w1022 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1023
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573301.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451566,macaddr=00:25:90:3c:9c:28,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573301.wadm1.rrze.uni-erlangen.de(cput=36305,energy_used=0,mem=479720kb,vmem=379288kb,walltime=9092,session_id=7733),state=free,netload=1296821712738,gres=,loadave=4.01,ncpus=4,physmem=8158872kb,availmem=15859892kb,totmem=16158356kb,idletime=5290114,nusers=2,nsessions=2,sessions=7733 23912,uname=Linux w1023 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1024
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573285.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451573,macaddr=00:25:90:66:21:ba,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573285.wadm1.rrze.uni-erlangen.de(cput=42256,energy_used=0,mem=603672kb,vmem=378820kb,walltime=10582,session_id=26296),state=free,netload=398883493277,gres=,loadave=4.01,ncpus=4,physmem=8158864kb,availmem=15871520kb,totmem=16158348kb,idletime=1564645,nusers=1,nsessions=1,sessions=26296,uname=Linux w1024 4.15.0-39-generic #42-Ubuntu SMP Tue Oct 23 15:48:01 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1025
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573284.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451569,macaddr=00:25:90:3c:9b:36,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573284.wadm1.rrze.uni-erlangen.de(cput=42218,energy_used=0,mem=603060kb,vmem=378844kb,walltime=10573,session_id=31186),state=free,netload=3057846725276,gres=,loadave=4.00,ncpus=4,physmem=8158872kb,availmem=15856712kb,totmem=16158356kb,idletime=7107242,nusers=1,nsessions=1,sessions=31186,uname=Linux w1025 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1026
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573283.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451560,macaddr=00:25:90:60:4f:92,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573283.wadm1.rrze.uni-erlangen.de(cput=42242,energy_used=0,mem=600520kb,vmem=378840kb,walltime=10578,session_id=32602),state=free,netload=1594170774299,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=15860752kb,totmem=16158352kb,idletime=7107213,nusers=2,nsessions=2,sessions=32602 19032,uname=Linux w1026 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1027
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573281.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451564,macaddr=00:25:90:60:4e:64,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573281.wadm1.rrze.uni-erlangen.de(cput=42952,energy_used=0,mem=714816kb,vmem=378416kb,walltime=10756,session_id=24232),state=free,netload=1745880260788,gres=,loadave=4.06,ncpus=4,physmem=8158868kb,availmem=15879032kb,totmem=16158352kb,idletime=7107169,nusers=1,nsessions=1,sessions=24232,uname=Linux w1027 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1028
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573282.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451570,macaddr=00:25:90:3d:1d:ec,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573282.wadm1.rrze.uni-erlangen.de(cput=42994,energy_used=0,mem=714880kb,vmem=378632kb,walltime=10767,session_id=25659),state=free,netload=4180754887886,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=15864280kb,totmem=16158352kb,idletime=7107164,nusers=1,nsessions=1,sessions=25659,uname=Linux w1028 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1029
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573280.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451558,macaddr=00:25:90:3c:9b:58,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573280.wadm1.rrze.uni-erlangen.de(cput=42988,energy_used=0,mem=712708kb,vmem=378420kb,walltime=10765,session_id=20273),state=free,netload=3669367597322,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=15861972kb,totmem=16158352kb,idletime=7107181,nusers=1,nsessions=1,sessions=20273,uname=Linux w1029 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1030
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573542.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451569,macaddr=00:25:90:60:4c:22,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573542.wadm1.rrze.uni-erlangen.de(cput=10355,energy_used=0,mem=298604kb,vmem=382732kb,walltime=2595,session_id=2414),state=free,netload=290655974025,gres=,loadave=4.07,ncpus=4,physmem=8158868kb,availmem=15873292kb,totmem=16158352kb,idletime=7107200,nusers=1,nsessions=1,sessions=2414,uname=Linux w1030 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1031
+     state = free
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0/5572769.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451566,macaddr=00:25:90:3c:9b:4c,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572769.wadm1.rrze.uni-erlangen.de(cput=78495,energy_used=0,mem=59988kb,vmem=134380kb,walltime=78545,session_id=27218),state=free,netload=509557549712,gres=,loadave=1.00,ncpus=4,physmem=8158868kb,availmem=15858904kb,totmem=16158352kb,idletime=7107210,nusers=1,nsessions=1,sessions=27218,uname=Linux w1031 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 1
+
+w1032
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573196.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451590,macaddr=00:25:90:60:4c:c4,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573196.wadm1.rrze.uni-erlangen.de(cput=61474,energy_used=0,mem=2947708kb,vmem=9253264kb,walltime=15458,session_id=25946),state=free,netload=3166326950854,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=13292388kb,totmem=16158352kb,idletime=7107190,nusers=1,nsessions=1,sessions=25946,uname=Linux w1032 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1033
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5572840.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451598,macaddr=00:25:90:60:4c:7a,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572840.wadm1.rrze.uni-erlangen.de(cput=94998,energy_used=0,mem=3171404kb,vmem=9332680kb,walltime=23877,session_id=10200),state=free,netload=2257282699209,gres=,loadave=4.05,ncpus=4,physmem=8158868kb,availmem=15319920kb,totmem=16158352kb,idletime=7107229,nusers=1,nsessions=1,sessions=10200,uname=Linux w1033 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1034
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5572825.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451566,macaddr=00:25:90:3d:0f:ca,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572825.wadm1.rrze.uni-erlangen.de(cput=116728,energy_used=0,mem=3184644kb,vmem=9342500kb,walltime=29343,session_id=14192),state=free,netload=506632181262,gres=,loadave=4.01,ncpus=4,physmem=8158868kb,availmem=13174348kb,totmem=16158352kb,idletime=7107147,nusers=2,nsessions=2,sessions=14192 15860,uname=Linux w1034 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1035
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573289.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451562,macaddr=00:25:90:3c:9a:dc,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573289.wadm1.rrze.uni-erlangen.de(cput=41757,energy_used=0,mem=1374344kb,vmem=376384kb,walltime=10457,session_id=26120),state=free,netload=3037836668316,gres=,loadave=4.00,ncpus=4,physmem=8158868kb,availmem=15861640kb,totmem=16158352kb,idletime=7107187,nusers=1,nsessions=1,sessions=26120,uname=Linux w1035 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1036
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5572823.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451597,macaddr=00:25:90:3c:9a:d6,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572823.wadm1.rrze.uni-erlangen.de(cput=116892,energy_used=0,mem=2891780kb,vmem=9303896kb,walltime=29389,session_id=10507),state=free,netload=5717639032698,gres=,loadave=4.15,ncpus=4,physmem=8158868kb,availmem=13345292kb,totmem=16158352kb,idletime=7107182,nusers=1,nsessions=1,sessions=10507,uname=Linux w1036 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1037
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573279.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451574,macaddr=00:25:90:60:50:54,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573279.wadm1.rrze.uni-erlangen.de(cput=43033,energy_used=0,mem=710840kb,vmem=378420kb,walltime=10776,session_id=31137),state=free,netload=2100422606152,gres=,loadave=4.01,ncpus=4,physmem=8158872kb,availmem=15875956kb,totmem=16158356kb,idletime=7107194,nusers=2,nsessions=2,sessions=31137 17936,uname=Linux w1037 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1038
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573278.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451558,macaddr=00:25:90:60:50:88,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573278.wadm1.rrze.uni-erlangen.de(cput=43098,energy_used=0,mem=710944kb,vmem=378628kb,walltime=10795,session_id=21142),state=free,netload=1903656753651,gres=,loadave=4.11,ncpus=4,physmem=8158872kb,availmem=15791896kb,totmem=16158356kb,idletime=428843,nusers=1,nsessions=1,sessions=21142,uname=Linux w1038 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1039
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     jobs = 0-3/5573198.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451556,macaddr=00:25:90:60:4b:be,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573198.wadm1.rrze.uni-erlangen.de(cput=57455,energy_used=0,mem=3165048kb,vmem=9334880kb,walltime=14450,session_id=22814),state=free,netload=1716192419943,gres=,loadave=4.03,ncpus=4,physmem=8158868kb,availmem=13202248kb,totmem=16158352kb,idletime=7107150,nusers=2,nsessions=2,sessions=22814 24789,uname=Linux w1039 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1040
+     state = free
+     power_state = Running
+     np = 4
+     properties = sb,avx,any,turbo,noturbo,f3.5,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,likwid
+     ntype = cluster
+     status = rectime=1544451580,macaddr=00:25:90:60:4f:8a,cpuclock=PowerSave:1600MHz,varattr=,jobs=,state=free,netload=527340055302,gres=,loadave=0.00,ncpus=4,physmem=8158872kb,availmem=15907180kb,totmem=16158356kb,idletime=525372,nusers=0,nsessions=0,uname=Linux w1040 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1101
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451585,macaddr=00:25:90:c7:a4:82,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=1335149749636,gres=,loadave=0.00,ncpus=4,physmem=8127728kb,availmem=15838456kb,totmem=16127212kb,idletime=2322488,nusers=0,nsessions=0,uname=Linux w1101 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1102
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451558,macaddr=00:25:90:c6:77:e6,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=1926515019556,gres=,loadave=0.00,ncpus=4,physmem=8127888kb,availmem=15841224kb,totmem=16127372kb,idletime=7107076,nusers=1,nsessions=1,sessions=24413,uname=Linux w1102 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1103
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451565,macaddr=00:25:90:c6:76:b8,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=2129201637161,gres=,loadave=0.00,ncpus=4,physmem=8127728kb,availmem=15828568kb,totmem=16127212kb,idletime=7107113,nusers=0,nsessions=0,uname=Linux w1103 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1104
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451572,macaddr=00:25:90:c7:a7:40,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=1523560813254,gres=,loadave=0.00,ncpus=4,physmem=8127720kb,availmem=15828108kb,totmem=16127204kb,idletime=7107083,nusers=0,nsessions=0,uname=Linux w1104 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1105
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451582,macaddr=00:25:90:c7:a4:d4,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=938867366783,gres=,loadave=0.07,ncpus=4,physmem=8127720kb,availmem=15839784kb,totmem=16127204kb,idletime=7107099,nusers=0,nsessions=0,uname=Linux w1105 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1106
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451576,macaddr=00:25:90:c6:77:b0,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=185561189679,gres=,loadave=0.00,ncpus=4,physmem=8127888kb,availmem=15838036kb,totmem=16127372kb,idletime=7107130,nusers=0,nsessions=0,uname=Linux w1106 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1107
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451579,macaddr=00:25:90:c6:76:aa,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=201764935046,gres=,loadave=0.00,ncpus=4,physmem=8127888kb,availmem=15835528kb,totmem=16127372kb,idletime=7107100,nusers=0,nsessions=0,uname=Linux w1107 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1108
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451593,macaddr=00:25:90:c6:76:b6,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=2254990318972,gres=,loadave=0.00,ncpus=4,physmem=8127888kb,availmem=15876048kb,totmem=16127372kb,idletime=7107135,nusers=0,nsessions=0,uname=Linux w1108 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1109
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451588,macaddr=00:25:90:c6:78:0a,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=186871723297,gres=,loadave=0.00,ncpus=4,physmem=8127888kb,availmem=15874200kb,totmem=16127372kb,idletime=7107095,nusers=0,nsessions=0,uname=Linux w1109 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1110
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451587,macaddr=00:25:90:c4:ca:c2,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=488779369236,gres=,loadave=0.00,ncpus=4,physmem=8127916kb,availmem=15874872kb,totmem=16127400kb,idletime=7107094,nusers=0,nsessions=0,uname=Linux w1110 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1111
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573154.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451576,macaddr=0c:c4:7a:57:5b:0e,cpuclock=OnDemand:800MHz,varattr=,jobs=5573154.wadm1.rrze.uni-erlangen.de(cput=16338,energy_used=0,mem=176204kb,vmem=882452kb,walltime=16375,session_id=24613),state=free,netload=195510120916,gres=,loadave=1.00,ncpus=4,physmem=8127720kb,availmem=15613276kb,totmem=16127204kb,idletime=273165,nusers=1,nsessions=1,sessions=24613,uname=Linux w1111 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1112
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573151.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451578,macaddr=00:25:90:c6:76:ac,cpuclock=OnDemand:1000MHz,varattr=,jobs=5573151.wadm1.rrze.uni-erlangen.de(cput=32698,energy_used=0,mem=182212kb,vmem=1122688kb,walltime=16358,session_id=28174),state=free,netload=215484691872,gres=,loadave=2.08,ncpus=4,physmem=8127916kb,availmem=15797092kb,totmem=16127400kb,idletime=7107110,nusers=1,nsessions=1,sessions=28174,uname=Linux w1112 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1113
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451564,macaddr=00:25:90:c7:a4:80,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=1144513399845,gres=,loadave=0.00,ncpus=4,physmem=8127908kb,availmem=15873596kb,totmem=16127392kb,idletime=7107075,nusers=0,nsessions=0,uname=Linux w1113 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1114
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573150.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451568,macaddr=00:25:90:c4:ca:c0,cpuclock=OnDemand:1000MHz,varattr=,jobs=5573150.wadm1.rrze.uni-erlangen.de(cput=32745,energy_used=0,mem=182052kb,vmem=1122484kb,walltime=16381,session_id=22657),state=free,netload=263820918391,gres=,loadave=2.00,ncpus=4,physmem=8127916kb,availmem=15778240kb,totmem=16127400kb,idletime=7107110,nusers=1,nsessions=1,sessions=22657,uname=Linux w1114 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1115
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451583,macaddr=00:25:90:c7:a4:a8,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=154070785521,gres=,loadave=0.00,ncpus=4,physmem=8127916kb,availmem=15873016kb,totmem=16127400kb,idletime=7107079,nusers=0,nsessions=0,uname=Linux w1115 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1116
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573070.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451579,macaddr=00:25:90:c4:ca:ba,cpuclock=OnDemand:800MHz,varattr=,jobs=5573070.wadm1.rrze.uni-erlangen.de(cput=33145,energy_used=0,mem=177632kb,vmem=1123612kb,walltime=16580,session_id=4773),state=free,netload=250665395948,gres=,loadave=2.00,ncpus=4,physmem=8127912kb,availmem=15762252kb,totmem=16127396kb,idletime=7107096,nusers=1,nsessions=1,sessions=4773,uname=Linux w1116 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1117
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451595,macaddr=00:25:90:c6:77:ec,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=168146102683,gres=,loadave=0.03,ncpus=4,physmem=8127916kb,availmem=15873284kb,totmem=16127400kb,idletime=7107071,nusers=0,nsessions=0,uname=Linux w1117 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1118
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451585,macaddr=00:25:90:c7:a4:96,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=211036076946,gres=,loadave=0.00,ncpus=4,physmem=8127912kb,availmem=15873676kb,totmem=16127396kb,idletime=7107098,nusers=0,nsessions=0,uname=Linux w1118 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1119
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451583,macaddr=00:25:90:c6:78:10,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=2514628156,gres=,loadave=0.07,ncpus=4,physmem=8127908kb,availmem=15890760kb,totmem=16127392kb,idletime=423007,nusers=0,nsessions=0,uname=Linux w1119 4.15.0-42-generic #45-Ubuntu SMP Thu Nov 15 19:32:57 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1120
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451590,macaddr=00:25:90:c6:78:06,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=241262175121,gres=,loadave=0.00,ncpus=4,physmem=8127916kb,availmem=15873052kb,totmem=16127400kb,idletime=7107104,nusers=0,nsessions=0,uname=Linux w1120 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1121
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451579,macaddr=00:25:90:c6:76:ae,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=234732599553,gres=,loadave=0.00,ncpus=4,physmem=8127908kb,availmem=15875984kb,totmem=16127392kb,idletime=7107055,nusers=0,nsessions=0,uname=Linux w1121 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1122
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451587,macaddr=00:25:90:c4:ca:c4,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=768193777980,gres=,loadave=0.00,ncpus=4,physmem=8127908kb,availmem=15867540kb,totmem=16127392kb,idletime=7107100,nusers=0,nsessions=0,uname=Linux w1122 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1123
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451572,macaddr=00:25:90:c7:a4:94,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=2141776776549,gres=,loadave=0.00,ncpus=4,physmem=8127916kb,availmem=15861416kb,totmem=16127400kb,idletime=7107095,nusers=0,nsessions=0,uname=Linux w1123 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1124
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451573,macaddr=00:25:90:c6:76:b0,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=214014569048,gres=,loadave=0.00,ncpus=4,physmem=8127720kb,availmem=15852988kb,totmem=16127204kb,idletime=7106948,nusers=0,nsessions=0,uname=Linux w1124 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1125
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451590,macaddr=00:25:90:c6:77:aa,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=2515410884679,gres=,loadave=0.02,ncpus=4,physmem=8127908kb,availmem=15858988kb,totmem=16127392kb,idletime=7107121,nusers=0,nsessions=0,uname=Linux w1125 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1126
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451578,macaddr=00:25:90:c6:76:b4,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=1649073603178,gres=,loadave=0.00,ncpus=4,physmem=8127916kb,availmem=15862024kb,totmem=16127400kb,idletime=7107050,nusers=0,nsessions=0,uname=Linux w1126 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1127
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451587,macaddr=00:25:90:c6:76:ee,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=1326450838361,gres=,loadave=0.22,ncpus=4,physmem=8127916kb,availmem=15874788kb,totmem=16127400kb,idletime=7107082,nusers=0,nsessions=0,uname=Linux w1127 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1128
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573639.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451584,macaddr=00:25:90:c7:a7:96,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573639.wadm1.rrze.uni-erlangen.de(cput=9120,energy_used=0,mem=246256kb,vmem=382960kb,walltime=2284,session_id=32365),state=free,netload=6650033146,gres=,loadave=4.09,ncpus=4,physmem=8127900kb,availmem=15865764kb,totmem=16127384kb,idletime=428926,nusers=1,nsessions=1,sessions=32365,uname=Linux w1128 4.15.0-42-generic #45-Ubuntu SMP Thu Nov 15 19:32:57 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1129
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573541.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451568,macaddr=00:25:90:c6:77:e4,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573541.wadm1.rrze.uni-erlangen.de(cput=10338,energy_used=0,mem=349372kb,vmem=382312kb,walltime=2589,session_id=31970),state=free,netload=7069847126,gres=,loadave=4.06,ncpus=4,physmem=8127908kb,availmem=15864196kb,totmem=16127392kb,idletime=428938,nusers=1,nsessions=1,sessions=31970,uname=Linux w1129 4.15.0-42-generic #45-Ubuntu SMP Thu Nov 15 19:32:57 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1130
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573540.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451575,macaddr=00:25:90:c6:78:00,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573540.wadm1.rrze.uni-erlangen.de(cput=10362,energy_used=0,mem=351120kb,vmem=382332kb,walltime=2595,session_id=25240),state=free,netload=234162640424,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15850604kb,totmem=16127400kb,idletime=7107046,nusers=1,nsessions=1,sessions=25240,uname=Linux w1130 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1131
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573539.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451576,macaddr=00:25:90:c7:a4:92,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573539.wadm1.rrze.uni-erlangen.de(cput=10417,energy_used=0,mem=348496kb,vmem=382332kb,walltime=2609,session_id=27974),state=free,netload=297323153634,gres=,loadave=4.00,ncpus=4,physmem=8127908kb,availmem=15851356kb,totmem=16127392kb,idletime=7107092,nusers=1,nsessions=1,sessions=27974,uname=Linux w1131 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1132
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451563,macaddr=00:25:90:c4:ca:b0,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=3332761699,gres=,loadave=0.18,ncpus=4,physmem=8127908kb,availmem=15891564kb,totmem=16127392kb,idletime=422995,nusers=0,nsessions=0,uname=Linux w1132 4.15.0-42-generic #45-Ubuntu SMP Thu Nov 15 19:32:57 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1133
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573133.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451583,macaddr=00:25:90:c6:78:02,cpuclock=OnDemand:800MHz,varattr=,jobs=5573133.wadm1.rrze.uni-erlangen.de(cput=16399,energy_used=0,mem=182260kb,vmem=602620kb,walltime=16408,session_id=28254),state=free,netload=309472512340,gres=,loadave=1.00,ncpus=4,physmem=8127908kb,availmem=15823652kb,totmem=16127392kb,idletime=7107070,nusers=1,nsessions=1,sessions=28254,uname=Linux w1133 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1134
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451584,macaddr=00:25:90:c4:ca:be,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=3439052684,gres=,loadave=0.03,ncpus=4,physmem=8127900kb,availmem=15889156kb,totmem=16127384kb,idletime=423041,nusers=0,nsessions=0,uname=Linux w1134 4.15.0-42-generic #45-Ubuntu SMP Thu Nov 15 19:32:57 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1135
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573657.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451590,macaddr=00:25:90:c6:77:f4,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573657.wadm1.rrze.uni-erlangen.de(cput=7914,energy_used=0,mem=290380kb,vmem=381156kb,walltime=1982,session_id=12860),state=free,netload=266126527631,gres=,loadave=4.00,ncpus=4,physmem=8127720kb,availmem=15836216kb,totmem=16127204kb,idletime=7107080,nusers=2,nsessions=2,sessions=12860 15933,uname=Linux w1135 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1136
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573656.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451581,macaddr=00:25:90:c6:77:f8,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573656.wadm1.rrze.uni-erlangen.de(cput=7878,energy_used=0,mem=287096kb,vmem=381156kb,walltime=1973,session_id=1230),state=free,netload=241673988076,gres=,loadave=4.02,ncpus=4,physmem=8126772kb,availmem=15852484kb,totmem=16126256kb,idletime=7107086,nusers=1,nsessions=1,sessions=1230,uname=Linux w1136 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1137
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573655.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451582,macaddr=00:25:90:e1:a5:3a,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573655.wadm1.rrze.uni-erlangen.de(cput=7925,energy_used=0,mem=293480kb,vmem=381008kb,walltime=1985,session_id=20051),state=free,netload=323975288169,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15694888kb,totmem=16127400kb,idletime=7107045,nusers=1,nsessions=1,sessions=20051,uname=Linux w1137 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1138
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573654.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451578,macaddr=00:25:90:e1:a5:42,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573654.wadm1.rrze.uni-erlangen.de(cput=7910,energy_used=0,mem=290804kb,vmem=379980kb,walltime=1981,session_id=32069),state=free,netload=2025647630394,gres=,loadave=4.00,ncpus=4,physmem=8127908kb,availmem=15845588kb,totmem=16127392kb,idletime=7107064,nusers=2,nsessions=2,sessions=32069 2717,uname=Linux w1138 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1139
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573653.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451571,macaddr=00:25:90:e1:a3:b4,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573653.wadm1.rrze.uni-erlangen.de(cput=7936,energy_used=0,mem=294032kb,vmem=379980kb,walltime=1988,session_id=32199),state=free,netload=287422575959,gres=,loadave=4.17,ncpus=4,physmem=8127916kb,availmem=15849540kb,totmem=16127400kb,idletime=7107011,nusers=2,nsessions=2,sessions=32199 2918,uname=Linux w1139 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1140
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573172.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451575,macaddr=00:25:90:e1:a7:e4,cpuclock=OnDemand:800MHz,varattr=,jobs=5573172.wadm1.rrze.uni-erlangen.de(cput=16285,energy_used=0,mem=182592kb,vmem=602904kb,walltime=16289,session_id=6945),state=free,netload=2631171210616,gres=,loadave=1.20,ncpus=4,physmem=8127908kb,availmem=15820992kb,totmem=16127392kb,idletime=7107073,nusers=1,nsessions=1,sessions=6945,uname=Linux w1140 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1141
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573652.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451579,macaddr=00:25:90:e1:a5:36,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573652.wadm1.rrze.uni-erlangen.de(cput=7913,energy_used=0,mem=294056kb,vmem=381156kb,walltime=1982,session_id=14626),state=free,netload=1408230629114,gres=,loadave=4.06,ncpus=4,physmem=8127908kb,availmem=15853736kb,totmem=16127392kb,idletime=7107039,nusers=1,nsessions=1,sessions=14626,uname=Linux w1141 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1142
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573651.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451565,macaddr=00:25:90:e1:a5:44,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573651.wadm1.rrze.uni-erlangen.de(cput=7996,energy_used=0,mem=293536kb,vmem=381104kb,walltime=2003,session_id=2295),state=free,netload=269247293825,gres=,loadave=4.00,ncpus=4,physmem=8127908kb,availmem=15852216kb,totmem=16127392kb,idletime=7107043,nusers=1,nsessions=1,sessions=2295,uname=Linux w1142 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1143
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573650.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451570,macaddr=00:25:90:e1:a5:48,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573650.wadm1.rrze.uni-erlangen.de(cput=8002,energy_used=0,mem=291052kb,vmem=381156kb,walltime=2004,session_id=6882),state=free,netload=584177658733,gres=,loadave=4.02,ncpus=4,physmem=8127908kb,availmem=15839008kb,totmem=16127392kb,idletime=7107014,nusers=1,nsessions=1,sessions=6882,uname=Linux w1143 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1144
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573649.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451593,macaddr=00:25:90:e1:a5:3e,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573649.wadm1.rrze.uni-erlangen.de(cput=8013,energy_used=0,mem=289876kb,vmem=381156kb,walltime=2007,session_id=31523),state=free,netload=1181838363914,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15839896kb,totmem=16127400kb,idletime=7107064,nusers=2,nsessions=2,sessions=31523 2250,uname=Linux w1144 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1145
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573648.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451574,macaddr=00:25:90:e1:a3:d4,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573648.wadm1.rrze.uni-erlangen.de(cput=8033,energy_used=0,mem=287828kb,vmem=381160kb,walltime=2012,session_id=2750),state=free,netload=282296712470,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15848324kb,totmem=16127400kb,idletime=7107004,nusers=1,nsessions=1,sessions=2750,uname=Linux w1145 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1146
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573647.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451572,macaddr=00:25:90:e1:a3:f6,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573647.wadm1.rrze.uni-erlangen.de(cput=9033,energy_used=0,mem=251508kb,vmem=382804kb,walltime=2263,session_id=15788),state=free,netload=326110349851,gres=,loadave=4.00,ncpus=4,physmem=8127908kb,availmem=15836340kb,totmem=16127392kb,idletime=7107026,nusers=2,nsessions=2,sessions=15788 19280,uname=Linux w1146 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1147
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573646.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451557,macaddr=00:25:90:e1:a3:d8,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573646.wadm1.rrze.uni-erlangen.de(cput=9061,energy_used=0,mem=248104kb,vmem=383156kb,walltime=2269,session_id=18011),state=free,netload=319888612301,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15830568kb,totmem=16127400kb,idletime=7064374,nusers=2,nsessions=2,sessions=18011 21506,uname=Linux w1147 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1148
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573645.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451558,macaddr=00:25:90:e1:a5:4c,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573645.wadm1.rrze.uni-erlangen.de(cput=9025,energy_used=0,mem=248104kb,vmem=383136kb,walltime=2260,session_id=26669),state=free,netload=8839912298,gres=,loadave=4.00,ncpus=4,physmem=8127908kb,availmem=15865144kb,totmem=16127392kb,idletime=423311,nusers=1,nsessions=1,sessions=26669,uname=Linux w1148 4.15.0-42-generic #45-Ubuntu SMP Thu Nov 15 19:32:57 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1149
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573644.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451557,macaddr=00:25:90:e1:a1:5e,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573644.wadm1.rrze.uni-erlangen.de(cput=8965,energy_used=0,mem=250616kb,vmem=382804kb,walltime=2245,session_id=15735),state=free,netload=312098289577,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15835708kb,totmem=16127400kb,idletime=7106800,nusers=1,nsessions=1,sessions=15735,uname=Linux w1149 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1150
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573643.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451567,macaddr=00:25:90:e1:9d:24,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573643.wadm1.rrze.uni-erlangen.de(cput=9102,energy_used=0,mem=248504kb,vmem=383156kb,walltime=2280,session_id=32218),state=free,netload=1522455585639,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15691976kb,totmem=16127400kb,idletime=7106767,nusers=2,nsessions=2,sessions=32218 3348,uname=Linux w1150 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1151
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573642.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451580,macaddr=00:25:90:e1:a1:56,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573642.wadm1.rrze.uni-erlangen.de(cput=9062,energy_used=0,mem=245016kb,vmem=383332kb,walltime=2269,session_id=1116),state=free,netload=1109626132737,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15696108kb,totmem=16127400kb,idletime=7106819,nusers=1,nsessions=1,sessions=1116,uname=Linux w1151 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1152
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573641.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451572,macaddr=00:25:90:e1:a0:9e,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573641.wadm1.rrze.uni-erlangen.de(cput=9074,energy_used=0,mem=247860kb,vmem=382980kb,walltime=2272,session_id=14582),state=free,netload=1607589667445,gres=,loadave=4.02,ncpus=4,physmem=8127908kb,availmem=15844552kb,totmem=16127392kb,idletime=7106770,nusers=1,nsessions=1,sessions=14582,uname=Linux w1152 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1153
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573640.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451561,macaddr=00:25:90:e1:9d:20,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573640.wadm1.rrze.uni-erlangen.de(cput=9046,energy_used=0,mem=244996kb,vmem=383156kb,walltime=2265,session_id=29520),state=free,netload=1224398965391,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15841716kb,totmem=16127400kb,idletime=7106794,nusers=1,nsessions=1,sessions=29520,uname=Linux w1153 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1154
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573132.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451577,macaddr=00:25:90:e1:a0:a2,cpuclock=OnDemand:1000MHz,varattr=,jobs=5573132.wadm1.rrze.uni-erlangen.de(cput=32806,energy_used=0,mem=181940kb,vmem=1122384kb,walltime=16411,session_id=17429),state=free,netload=1468323342527,gres=,loadave=2.00,ncpus=4,physmem=8127916kb,availmem=15799016kb,totmem=16127400kb,idletime=7106763,nusers=1,nsessions=1,sessions=17429,uname=Linux w1154 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1155
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573638.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451587,macaddr=00:25:90:e1:a0:ae,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573638.wadm1.rrze.uni-erlangen.de(cput=9232,energy_used=0,mem=244220kb,vmem=383160kb,walltime=2315,session_id=29045),state=free,netload=282738011835,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15836536kb,totmem=16127400kb,idletime=7106788,nusers=1,nsessions=1,sessions=29045,uname=Linux w1155 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1156
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573547.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451577,macaddr=00:25:90:e1:a0:5c,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573547.wadm1.rrze.uni-erlangen.de(cput=10193,energy_used=0,mem=354320kb,vmem=382456kb,walltime=2553,session_id=18041),state=free,netload=872379580193,gres=,loadave=4.07,ncpus=4,physmem=8127916kb,availmem=15852140kb,totmem=16127400kb,idletime=7106748,nusers=1,nsessions=1,sessions=18041,uname=Linux w1156 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1157
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573546.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451575,macaddr=00:25:90:e1:a0:58,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573546.wadm1.rrze.uni-erlangen.de(cput=10269,energy_used=0,mem=353372kb,vmem=382332kb,walltime=2572,session_id=29445),state=free,netload=306967571529,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15850440kb,totmem=16127400kb,idletime=7106782,nusers=1,nsessions=1,sessions=29445,uname=Linux w1157 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1158
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573544.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451583,macaddr=00:25:90:e1:a1:5c,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573544.wadm1.rrze.uni-erlangen.de(cput=10378,energy_used=0,mem=351584kb,vmem=382328kb,walltime=2599,session_id=15569),state=free,netload=276754319319,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15850564kb,totmem=16127400kb,idletime=7106806,nusers=1,nsessions=1,sessions=15569,uname=Linux w1158 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1159
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573545.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451582,macaddr=00:25:90:e1:9f:ce,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573545.wadm1.rrze.uni-erlangen.de(cput=10321,energy_used=0,mem=354764kb,vmem=382332kb,walltime=2585,session_id=4188),state=free,netload=639437345224,gres=,loadave=4.00,ncpus=4,physmem=8127908kb,availmem=15841920kb,totmem=16127392kb,idletime=7106780,nusers=1,nsessions=1,sessions=4188,uname=Linux w1159 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1160
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573543.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451582,macaddr=00:25:90:e1:9f:c6,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573543.wadm1.rrze.uni-erlangen.de(cput=10258,energy_used=0,mem=351444kb,vmem=382456kb,walltime=2569,session_id=5572),state=free,netload=280713376838,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15850328kb,totmem=16127400kb,idletime=7106774,nusers=1,nsessions=1,sessions=5572,uname=Linux w1160 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1161
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573538.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451585,macaddr=00:25:90:e1:a5:22,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573538.wadm1.rrze.uni-erlangen.de(cput=10313,energy_used=0,mem=354736kb,vmem=382328kb,walltime=2583,session_id=9013),state=free,netload=2448754444566,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15849716kb,totmem=16127400kb,idletime=7106790,nusers=2,nsessions=2,sessions=9013 12981,uname=Linux w1161 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1162
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573321.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451578,macaddr=00:25:90:e1:a5:1e,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573321.wadm1.rrze.uni-erlangen.de(cput=30950,energy_used=0,mem=3212304kb,vmem=9490060kb,walltime=7778,session_id=30704),state=free,netload=1457589251615,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=13084932kb,totmem=16127400kb,idletime=7106756,nusers=1,nsessions=1,sessions=30704,uname=Linux w1162 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1163
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573320.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451586,macaddr=00:25:90:e1:a5:30,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573320.wadm1.rrze.uni-erlangen.de(cput=35099,energy_used=0,mem=2369564kb,vmem=373928kb,walltime=8787,session_id=6340),state=free,netload=3523930769366,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15812192kb,totmem=16127400kb,idletime=7106777,nusers=1,nsessions=1,sessions=6340,uname=Linux w1163 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1164
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573319.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451573,macaddr=00:25:90:e1:a5:0a,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573319.wadm1.rrze.uni-erlangen.de(cput=35098,energy_used=0,mem=2366052kb,vmem=374336kb,walltime=8786,session_id=25836),state=free,netload=922373112438,gres=,loadave=4.02,ncpus=4,physmem=8127916kb,availmem=15804312kb,totmem=16127400kb,idletime=7106574,nusers=2,nsessions=2,sessions=25836 6771,uname=Linux w1164 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     note = HDD-defekt
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1165
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573318.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451578,macaddr=00:25:90:e1:a5:26,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573318.wadm1.rrze.uni-erlangen.de(cput=35119,energy_used=0,mem=2370404kb,vmem=373932kb,walltime=8791,session_id=1187),state=free,netload=1654074104019,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15800928kb,totmem=16127400kb,idletime=7106771,nusers=2,nsessions=2,sessions=1187 14481,uname=Linux w1165 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1166
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573317.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451563,macaddr=00:25:90:e1:9b:d8,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573317.wadm1.rrze.uni-erlangen.de(cput=35098,energy_used=0,mem=2366172kb,vmem=373928kb,walltime=8786,session_id=22999),state=free,netload=2327016629224,gres=,loadave=4.00,ncpus=4,physmem=8127908kb,availmem=15663008kb,totmem=16127392kb,idletime=7106776,nusers=1,nsessions=1,sessions=22999,uname=Linux w1166 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1167
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573316.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451578,macaddr=00:25:90:e1:a5:28,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573316.wadm1.rrze.uni-erlangen.de(cput=35226,energy_used=0,mem=2370376kb,vmem=373932kb,walltime=8818,session_id=26328),state=free,netload=60572715602,gres=,loadave=4.05,ncpus=4,physmem=8127916kb,availmem=15808360kb,totmem=16127400kb,idletime=2588457,nusers=1,nsessions=1,sessions=26328,uname=Linux w1167 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1168
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573315.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451586,macaddr=00:25:90:e1:9a:5a,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573315.wadm1.rrze.uni-erlangen.de(cput=35329,energy_used=0,mem=2875756kb,vmem=373648kb,walltime=8844,session_id=24306),state=free,netload=940477534678,gres=,loadave=4.04,ncpus=4,physmem=8127908kb,availmem=15798004kb,totmem=16127392kb,idletime=6485843,nusers=1,nsessions=1,sessions=24306,uname=Linux w1168 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1169
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573314.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451568,macaddr=00:25:90:e1:a5:ae,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573314.wadm1.rrze.uni-erlangen.de(cput=35253,energy_used=0,mem=2880896kb,vmem=373648kb,walltime=8825,session_id=12168),state=free,netload=1349006312714,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15799104kb,totmem=16127400kb,idletime=7106728,nusers=1,nsessions=1,sessions=12168,uname=Linux w1169 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1170
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573313.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451580,macaddr=00:25:90:e1:a5:1c,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573313.wadm1.rrze.uni-erlangen.de(cput=35382,energy_used=0,mem=2882812kb,vmem=373648kb,walltime=8860,session_id=11176),state=free,netload=869120127482,gres=,loadave=4.00,ncpus=4,physmem=8127916kb,availmem=15786112kb,totmem=16127400kb,idletime=7106730,nusers=1,nsessions=1,sessions=11176,uname=Linux w1170 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1171
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     jobs = 0-3/5573312.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451579,macaddr=00:25:90:e1:9f:96,cpuclock=OnDemand:3401MHz,varattr=,jobs=5573312.wadm1.rrze.uni-erlangen.de(cput=35318,energy_used=0,mem=2877404kb,vmem=373508kb,walltime=8846,session_id=7189),state=free,netload=475817305353,gres=,loadave=4.00,ncpus=4,physmem=8127728kb,availmem=15776244kb,totmem=16127212kb,idletime=7106753,nusers=2,nsessions=2,sessions=7189 20576,uname=Linux w1171 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1172
+     state = free
+     power_state = Running
+     np = 4
+     properties = hw,avx,any,turbo,noturbo,f3.4,f3.2,f3.0,f2.8,f2.7,f2.5,f2.3,f2.1,f1.9,f1.7,f1.6,f1.4,f1.2,f1.0,f0.8,likwid
+     ntype = cluster
+     status = rectime=1544451586,macaddr=00:25:90:e1:9f:9c,cpuclock=PowerSave:800MHz,varattr=,jobs=,state=free,netload=500035519290,gres=,loadave=0.00,ncpus=4,physmem=8127728kb,availmem=15873604kb,totmem=16127212kb,idletime=7106779,nusers=0,nsessions=0,uname=Linux w1172 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1201
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl16g
+     ntype = cluster
+     jobs = 0-3/5572835.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451580,macaddr=0c:c4:7a:b5:f9:0a,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572835.wadm1.rrze.uni-erlangen.de(cput=102245,energy_used=0,mem=10462124kb,vmem=13051784kb,walltime=25642,session_id=18057),state=free,netload=432316592962,gres=,loadave=4.00,ncpus=4,physmem=16246016kb,availmem=18118224kb,totmem=24245500kb,idletime=7106614,nusers=1,nsessions=1,sessions=18057,uname=Linux w1201 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1202
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl16g
+     ntype = cluster
+     jobs = 0-3/5572783.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451573,macaddr=0c:c4:7a:b5:f9:06,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572783.wadm1.rrze.uni-erlangen.de(cput=66081,energy_used=0,mem=3952532kb,vmem=2830924kb,walltime=66105,session_id=3461),state=free,netload=714550888104,gres=,loadave=1.01,ncpus=4,physmem=16246016kb,availmem=21429448kb,totmem=24245500kb,idletime=7106633,nusers=1,nsessions=1,sessions=3461,uname=Linux w1202 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1203
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl16g
+     ntype = cluster
+     jobs = 0-3/5573658.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451563,macaddr=0c:c4:7a:b5:fa:ee,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573658.wadm1.rrze.uni-erlangen.de(cput=3572,energy_used=0,mem=12020660kb,vmem=15461552kb,walltime=908,session_id=30501),state=free,netload=1947124575893,gres=,loadave=4.05,ncpus=4,physmem=16246016kb,availmem=16434412kb,totmem=24245500kb,idletime=7106585,nusers=1,nsessions=1,sessions=30501,uname=Linux w1203 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1204
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl16g
+     ntype = cluster
+     jobs = 0-3/5572833.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451579,macaddr=0c:c4:7a:b5:f1:8c,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572833.wadm1.rrze.uni-erlangen.de(cput=103654,energy_used=0,mem=10661732kb,vmem=13363844kb,walltime=25994,session_id=14621),state=free,netload=945215565651,gres=,loadave=4.07,ncpus=4,physmem=16246016kb,availmem=18277228kb,totmem=24245500kb,idletime=7106636,nusers=2,nsessions=2,sessions=1235 14621,uname=Linux w1204 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1205
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl16g
+     ntype = cluster
+     jobs = 0-3/5572804.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451570,macaddr=0c:c4:7a:b5:fd:52,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572804.wadm1.rrze.uni-erlangen.de(cput=131502,energy_used=0,mem=10688228kb,vmem=13331752kb,walltime=32990,session_id=29743),state=free,netload=1286454096438,gres=,loadave=4.05,ncpus=4,physmem=16246008kb,availmem=18337148kb,totmem=24245492kb,idletime=7106581,nusers=2,nsessions=2,sessions=29743 30103,uname=Linux w1205 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     note = DISKFAIL
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1206
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl16g
+     ntype = cluster
+     jobs = 0-3/5573194.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451572,macaddr=0c:c4:7a:b5:f1:e2,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573194.wadm1.rrze.uni-erlangen.de(cput=65949,energy_used=0,mem=15650116kb,vmem=22240596kb,walltime=16562,session_id=17055),state=free,netload=2012425210233,gres=,loadave=4.00,ncpus=4,physmem=16246016kb,availmem=13538640kb,totmem=24245500kb,idletime=6053937,nusers=1,nsessions=1,sessions=17055,uname=Linux w1206 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1207
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl16g
+     ntype = cluster
+     jobs = 0-3/5572800.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451566,macaddr=0c:c4:7a:b5:fd:50,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572800.wadm1.rrze.uni-erlangen.de(cput=152851,energy_used=0,mem=15596520kb,vmem=20870236kb,walltime=38322,session_id=5338),state=free,netload=1564948611657,gres=,loadave=4.00,ncpus=4,physmem=16246012kb,availmem=14138352kb,totmem=24245496kb,idletime=4038774,nusers=1,nsessions=1,sessions=5338,uname=Linux w1207 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1208
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl16g
+     ntype = cluster
+     jobs = 0-3/5572831.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451566,macaddr=0c:c4:7a:b5:f1:b8,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572831.wadm1.rrze.uni-erlangen.de(cput=104393,energy_used=0,mem=15586208kb,vmem=20861144kb,walltime=26210,session_id=7685),state=free,netload=1666076811057,gres=,loadave=4.01,ncpus=4,physmem=16246012kb,availmem=13430636kb,totmem=24245496kb,idletime=7106589,nusers=1,nsessions=1,sessions=7685,uname=Linux w1208 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1301
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573270.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451562,macaddr=0c:c4:7a:98:b9:52,cpuclock=OnDemand:800MHz,varattr=,jobs=5573270.wadm1.rrze.uni-erlangen.de(cput=11095,energy_used=0,mem=20854464kb,vmem=20199788kb,walltime=11183,session_id=21879),state=free,netload=564401460658,gres=,loadave=1.16,ncpus=4,physmem=32761124kb,availmem=23416128kb,totmem=40760608kb,idletime=7106389,nusers=1,nsessions=1,sessions=21879,uname=Linux w1301 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1302
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573274.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451571,macaddr=0c:c4:7a:98:b9:54,cpuclock=OnDemand:800MHz,varattr=,jobs=5573274.wadm1.rrze.uni-erlangen.de(cput=1816,energy_used=0,mem=32208848kb,vmem=20026948kb,walltime=9330,session_id=8554),state=free,netload=1115055892563,gres=,loadave=1.01,ncpus=4,physmem=32761124kb,availmem=35555860kb,totmem=40760608kb,idletime=7106365,nusers=1,nsessions=1,sessions=8554,uname=Linux w1302 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1303
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573268.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451575,macaddr=0c:c4:7a:98:b9:4e,cpuclock=OnDemand:800MHz,varattr=,jobs=5573268.wadm1.rrze.uni-erlangen.de(cput=11116,energy_used=0,mem=24568324kb,vmem=20237764kb,walltime=11266,session_id=25500),state=free,netload=2156673836262,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=21525744kb,totmem=40760608kb,idletime=7106405,nusers=1,nsessions=1,sessions=25500,uname=Linux w1303 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1304
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573267.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451554,macaddr=0c:c4:7a:98:b9:50,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573267.wadm1.rrze.uni-erlangen.de(cput=2189,energy_used=0,mem=32193692kb,vmem=20027196kb,walltime=11251,session_id=2647),state=free,netload=1060150825436,gres=,loadave=1.02,ncpus=4,physmem=32761124kb,availmem=35486652kb,totmem=40760608kb,idletime=7106324,nusers=2,nsessions=2,sessions=2647 23374,uname=Linux w1304 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1305
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573563.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451579,macaddr=0c:c4:7a:98:bd:2a,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573563.wadm1.rrze.uni-erlangen.de(cput=1055,energy_used=0,mem=25038676kb,vmem=25247092kb,walltime=1059,session_id=27134),state=free,netload=564737427123,gres=,loadave=1.00,ncpus=4,physmem=32761116kb,availmem=17857708kb,totmem=40760600kb,idletime=7106331,nusers=2,nsessions=2,sessions=27134 29263,uname=Linux w1305 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1306
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573265.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451572,macaddr=0c:c4:7a:98:bd:2c,cpuclock=OnDemand:1000MHz,varattr=,jobs=5573265.wadm1.rrze.uni-erlangen.de(cput=1765,energy_used=0,mem=32199040kb,vmem=20026864kb,walltime=11346,session_id=10077),state=free,netload=605909639843,gres=,loadave=1.02,ncpus=4,physmem=32761124kb,availmem=35579660kb,totmem=40760608kb,idletime=7106335,nusers=2,nsessions=2,sessions=10077 30912,uname=Linux w1306 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1307
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573264.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451584,macaddr=0c:c4:7a:98:bd:02,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573264.wadm1.rrze.uni-erlangen.de(cput=45127,energy_used=0,mem=18494444kb,vmem=18770020kb,walltime=11337,session_id=19025),state=free,netload=1305608624178,gres=,loadave=4.00,ncpus=4,physmem=32761124kb,availmem=28703988kb,totmem=40760608kb,idletime=1049076,nusers=1,nsessions=1,sessions=19025,uname=Linux w1307 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1308
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573261.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451572,macaddr=0c:c4:7a:98:bd:04,cpuclock=OnDemand:3100MHz,varattr=,jobs=5573261.wadm1.rrze.uni-erlangen.de(cput=2243,energy_used=0,mem=32200660kb,vmem=20026800kb,walltime=11412,session_id=26248),state=free,netload=860625518703,gres=,loadave=1.05,ncpus=4,physmem=32761124kb,availmem=35596308kb,totmem=40760608kb,idletime=7106318,nusers=2,nsessions=2,sessions=14844 26248,uname=Linux w1308 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1309
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573258.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451584,macaddr=0c:c4:7a:98:b9:3e,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573258.wadm1.rrze.uni-erlangen.de(cput=8706,energy_used=0,mem=32127280kb,vmem=20048064kb,walltime=11562,session_id=23755),state=free,netload=448263217240,gres=,loadave=2.39,ncpus=4,physmem=32761124kb,availmem=21420484kb,totmem=40760608kb,idletime=7106310,nusers=2,nsessions=2,sessions=12693 23755,uname=Linux w1309 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1310
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573257.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451593,macaddr=0c:c4:7a:98:b9:40,cpuclock=OnDemand:800MHz,varattr=,jobs=5573257.wadm1.rrze.uni-erlangen.de(cput=11551,energy_used=0,mem=15683184kb,vmem=21028852kb,walltime=11576,session_id=9900),state=free,netload=521428066891,gres=,loadave=1.06,ncpus=4,physmem=32761124kb,availmem=26703424kb,totmem=40760608kb,idletime=7106306,nusers=2,nsessions=2,sessions=9900 31319,uname=Linux w1310 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1311
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573564.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451587,macaddr=0c:c4:7a:98:b9:2a,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573564.wadm1.rrze.uni-erlangen.de(cput=137,energy_used=0,mem=22665832kb,vmem=22854992kb,walltime=140,session_id=2735),state=free,netload=604696864310,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=17860192kb,totmem=40760608kb,idletime=524189,nusers=2,nsessions=2,sessions=2735 3186,uname=Linux w1311 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1312
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573300.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451583,macaddr=0c:c4:7a:98:b9:2c,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573300.wadm1.rrze.uni-erlangen.de(cput=34076,energy_used=0,mem=9796668kb,vmem=12140240kb,walltime=8579,session_id=11648),state=free,netload=2278153822166,gres=,loadave=4.07,ncpus=4,physmem=32761124kb,availmem=36828108kb,totmem=40760608kb,idletime=7106274,nusers=1,nsessions=1,sessions=11648,uname=Linux w1312 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1313
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573254.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451561,macaddr=0c:c4:7a:98:b9:42,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573254.wadm1.rrze.uni-erlangen.de(cput=6528,energy_used=0,mem=32211968kb,vmem=20044456kb,walltime=11645,session_id=15157),state=free,netload=912057376814,gres=,loadave=1.01,ncpus=4,physmem=32761124kb,availmem=34471300kb,totmem=40760608kb,idletime=7106280,nusers=1,nsessions=1,sessions=15157,uname=Linux w1313 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1314
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573253.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451589,macaddr=0c:c4:7a:98:b9:44,cpuclock=OnDemand:800MHz,varattr=,jobs=5573253.wadm1.rrze.uni-erlangen.de(cput=11653,energy_used=0,mem=20077756kb,vmem=21308128kb,walltime=11686,session_id=4231),state=free,netload=2726295396815,gres=,loadave=1.02,ncpus=4,physmem=32761124kb,availmem=22862632kb,totmem=40760608kb,idletime=7106347,nusers=2,nsessions=2,sessions=4231 25881,uname=Linux w1314 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1315
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573271.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451571,macaddr=0c:c4:7a:98:b9:76,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573271.wadm1.rrze.uni-erlangen.de(cput=6626,energy_used=0,mem=32167420kb,vmem=20039776kb,walltime=11151,session_id=27562),state=free,netload=474001774897,gres=,loadave=1.02,ncpus=4,physmem=32761124kb,availmem=29600796kb,totmem=40760608kb,idletime=7106276,nusers=1,nsessions=1,sessions=27562,uname=Linux w1315 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1316
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573241.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451576,macaddr=0c:c4:7a:98:b9:78,cpuclock=OnDemand:800MHz,varattr=,jobs=5573241.wadm1.rrze.uni-erlangen.de(cput=11757,energy_used=0,mem=11991408kb,vmem=20792816kb,walltime=11782,session_id=2115),state=free,netload=878951107308,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=29967400kb,totmem=40760608kb,idletime=7106346,nusers=2,nsessions=2,sessions=2115 23984,uname=Linux w1316 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1317
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573240.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451576,macaddr=0c:c4:7a:98:bd:16,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573240.wadm1.rrze.uni-erlangen.de(cput=7174,energy_used=0,mem=32209340kb,vmem=20047360kb,walltime=11789,session_id=13205),state=free,netload=594339525661,gres=,loadave=1.13,ncpus=4,physmem=32761124kb,availmem=21572300kb,totmem=40760608kb,idletime=7106289,nusers=2,nsessions=2,sessions=2626 13205,uname=Linux w1317 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1318
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573565.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451583,macaddr=0c:c4:7a:98:bd:18,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573565.wadm1.rrze.uni-erlangen.de(cput=88,energy_used=0,mem=22665840kb,vmem=22854992kb,walltime=92,session_id=23426),state=free,netload=497915859295,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=17858148kb,totmem=40760608kb,idletime=7106295,nusers=1,nsessions=1,sessions=23426,uname=Linux w1318 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1319
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573233.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451586,macaddr=0c:c4:7a:98:b7:42,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573233.wadm1.rrze.uni-erlangen.de(cput=9025,energy_used=0,mem=32223324kb,vmem=20048812kb,walltime=11953,session_id=4664),state=free,netload=561374065453,gres=,loadave=2.86,ncpus=4,physmem=32761124kb,availmem=21265776kb,totmem=40760608kb,idletime=5705914,nusers=1,nsessions=1,sessions=4664,uname=Linux w1319 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1320
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573227.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451583,macaddr=0c:c4:7a:98:b7:44,cpuclock=OnDemand:800MHz,varattr=,jobs=5573227.wadm1.rrze.uni-erlangen.de(cput=11990,energy_used=0,mem=15680352kb,vmem=21029636kb,walltime=12005,session_id=1498),state=free,netload=1098510141098,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=26727056kb,totmem=40760608kb,idletime=7106296,nusers=1,nsessions=1,sessions=1498,uname=Linux w1320 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1321
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572819.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451561,macaddr=0c:c4:7a:98:b8:72,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572819.wadm1.rrze.uni-erlangen.de(cput=116481,energy_used=0,mem=24627032kb,vmem=29733456kb,walltime=29304,session_id=10720),state=free,netload=590064940053,gres=,loadave=4.10,ncpus=4,physmem=32761124kb,availmem=25329052kb,totmem=40760608kb,idletime=7106255,nusers=2,nsessions=2,sessions=1812 10720,uname=Linux w1321 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1322
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572816.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451580,macaddr=0c:c4:7a:98:b8:74,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572816.wadm1.rrze.uni-erlangen.de(cput=116976,energy_used=0,mem=24391764kb,vmem=29385956kb,walltime=29348,session_id=9027),state=free,netload=401130637197,gres=,loadave=4.00,ncpus=4,physmem=32761124kb,availmem=27908676kb,totmem=40760608kb,idletime=7106334,nusers=1,nsessions=1,sessions=9027,uname=Linux w1322 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1323
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572827.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451563,macaddr=0c:c4:7a:98:ba:1e,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572827.wadm1.rrze.uni-erlangen.de(cput=116231,energy_used=0,mem=9767656kb,vmem=12108200kb,walltime=29241,session_id=11266),state=free,netload=487971539657,gres=,loadave=4.00,ncpus=4,physmem=32761124kb,availmem=35332724kb,totmem=40760608kb,idletime=7106247,nusers=1,nsessions=1,sessions=11266,uname=Linux w1323 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1324
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572812.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451582,macaddr=0c:c4:7a:98:ba:20,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572812.wadm1.rrze.uni-erlangen.de(cput=115931,energy_used=0,mem=16830748kb,vmem=31864220kb,walltime=29360,session_id=672),state=free,netload=541493918067,gres=,loadave=4.04,ncpus=4,physmem=32761116kb,availmem=29510728kb,totmem=40760600kb,idletime=7106325,nusers=1,nsessions=1,sessions=672,uname=Linux w1324 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1325
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572821.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451581,macaddr=0c:c4:7a:98:b9:72,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572821.wadm1.rrze.uni-erlangen.de(cput=116585,energy_used=0,mem=13450628kb,vmem=16293236kb,walltime=29296,session_id=21850),state=free,netload=871279674803,gres=,loadave=4.06,ncpus=4,physmem=32761124kb,availmem=32230708kb,totmem=40760608kb,idletime=7106323,nusers=2,nsessions=2,sessions=21850 13302,uname=Linux w1325 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1326
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572824.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451574,macaddr=0c:c4:7a:98:b9:74,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572824.wadm1.rrze.uni-erlangen.de(cput=116373,energy_used=0,mem=10450192kb,vmem=12860828kb,walltime=29259,session_id=27947),state=free,netload=1253560409761,gres=,loadave=4.11,ncpus=4,physmem=32761124kb,availmem=35012640kb,totmem=40760608kb,idletime=7106290,nusers=2,nsessions=2,sessions=27947 20428,uname=Linux w1326 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1327
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572809.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451559,macaddr=0c:c4:7a:98:bd:3e,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572809.wadm1.rrze.uni-erlangen.de(cput=117358,energy_used=0,mem=9610204kb,vmem=12174976kb,walltime=29548,session_id=22170),state=free,netload=790245733629,gres=,loadave=4.00,ncpus=4,physmem=32761124kb,availmem=33704976kb,totmem=40760608kb,idletime=7106282,nusers=1,nsessions=1,sessions=22170,uname=Linux w1327 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1328
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572807.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451568,macaddr=0c:c4:7a:98:bd:40,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572807.wadm1.rrze.uni-erlangen.de(cput=117820,energy_used=0,mem=26003944kb,vmem=31364892kb,walltime=29557,session_id=2904),state=free,netload=729938568220,gres=,loadave=4.00,ncpus=4,physmem=32761124kb,availmem=30872960kb,totmem=40760608kb,idletime=272928,nusers=1,nsessions=1,sessions=2904,uname=Linux w1328 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1329
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572811.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451576,macaddr=0c:c4:7a:98:b9:32,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572811.wadm1.rrze.uni-erlangen.de(cput=117189,energy_used=0,mem=26073584kb,vmem=31359384kb,walltime=29417,session_id=23420),state=free,netload=557257122307,gres=,loadave=4.07,ncpus=4,physmem=32761124kb,availmem=27188364kb,totmem=40760608kb,idletime=7106290,nusers=1,nsessions=1,sessions=23420,uname=Linux w1329 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1330
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572810.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451568,macaddr=0c:c4:7a:98:b9:34,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572810.wadm1.rrze.uni-erlangen.de(cput=117537,energy_used=0,mem=25601164kb,vmem=32020868kb,walltime=29467,session_id=30593),state=free,netload=2297408878611,gres=,loadave=4.09,ncpus=4,physmem=32761124kb,availmem=27403864kb,totmem=40760608kb,idletime=7106208,nusers=1,nsessions=1,sessions=30593,uname=Linux w1330 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1331
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573225.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451575,macaddr=0c:c4:7a:98:b9:56,cpuclock=OnDemand:800MHz,varattr=,jobs=5573225.wadm1.rrze.uni-erlangen.de(cput=12043,energy_used=0,mem=21342144kb,vmem=21311008kb,walltime=12076,session_id=14166),state=free,netload=560803897891,gres=,loadave=1.07,ncpus=4,physmem=32761124kb,availmem=21579496kb,totmem=40760608kb,idletime=7106324,nusers=1,nsessions=1,sessions=14166,uname=Linux w1331 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1332
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573559.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451582,macaddr=0c:c4:7a:98:b9:58,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573559.wadm1.rrze.uni-erlangen.de(cput=1067,energy_used=0,mem=25038876kb,vmem=25247092kb,walltime=1071,session_id=4730),state=free,netload=500425066531,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=17858664kb,totmem=40760608kb,idletime=7106241,nusers=2,nsessions=2,sessions=4730 6858,uname=Linux w1332 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1333
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573224.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451571,macaddr=0c:c4:7a:98:bb:b6,cpuclock=OnDemand:800MHz,varattr=,jobs=5573224.wadm1.rrze.uni-erlangen.de(cput=12012,energy_used=0,mem=30509296kb,vmem=20048876kb,walltime=12107,session_id=29115),state=free,netload=2045302812559,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=21282804kb,totmem=40760608kb,idletime=7106256,nusers=1,nsessions=1,sessions=29115,uname=Linux w1333 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1334
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572756.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451570,macaddr=0c:c4:7a:98:bb:b8,cpuclock=OnDemand:800MHz,varattr=,jobs=5572756.wadm1.rrze.uni-erlangen.de(cput=55293,energy_used=0,mem=32257368kb,vmem=35055396kb,walltime=55859,session_id=8271),state=free,netload=3651758861925,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=6806672kb,totmem=40760608kb,idletime=7106258,nusers=1,nsessions=1,sessions=8271,uname=Linux w1334 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1335
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573558.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451583,macaddr=0c:c4:7a:98:b7:36,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573558.wadm1.rrze.uni-erlangen.de(cput=1068,energy_used=0,mem=25038348kb,vmem=25247092kb,walltime=1072,session_id=32428),state=free,netload=2288270613883,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=17860144kb,totmem=40760608kb,idletime=7106271,nusers=2,nsessions=2,sessions=2143 32428,uname=Linux w1335 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1336
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573273.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451567,macaddr=0c:c4:7a:98:b7:38,cpuclock=OnDemand:800MHz,varattr=,jobs=5573273.wadm1.rrze.uni-erlangen.de(cput=9768,energy_used=0,mem=21739964kb,vmem=20215340kb,walltime=9982,session_id=16557),state=free,netload=455911033965,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=22957460kb,totmem=40760608kb,idletime=7106264,nusers=1,nsessions=1,sessions=16557,uname=Linux w1336 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1337
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573007.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451583,macaddr=0c:c4:7a:98:b9:6e,cpuclock=OnDemand:1000MHz,varattr=,jobs=5573007.wadm1.rrze.uni-erlangen.de(cput=33526,energy_used=0,mem=182528kb,vmem=1122256kb,walltime=16775,session_id=27608),state=free,netload=803165073711,gres=,loadave=2.00,ncpus=4,physmem=32761124kb,availmem=40390848kb,totmem=40760608kb,idletime=3477688,nusers=1,nsessions=1,sessions=27608,uname=Linux w1337 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1338
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573562.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451561,macaddr=0c:c4:7a:98:b9:70,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573562.wadm1.rrze.uni-erlangen.de(cput=1058,energy_used=0,mem=25039116kb,vmem=25247092kb,walltime=1064,session_id=802),state=free,netload=922096736102,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=17775568kb,totmem=40760608kb,idletime=7106265,nusers=2,nsessions=2,sessions=802 2952,uname=Linux w1338 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1339
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573561.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451573,macaddr=0c:c4:7a:c2:9d:ba,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573561.wadm1.rrze.uni-erlangen.de(cput=1055,energy_used=0,mem=25037436kb,vmem=25247092kb,walltime=1059,session_id=24414),state=free,netload=1182140323976,gres=,loadave=1.06,ncpus=4,physmem=32761124kb,availmem=17847880kb,totmem=40760608kb,idletime=7106263,nusers=1,nsessions=1,sessions=24414,uname=Linux w1339 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1340
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573537.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451575,macaddr=0c:c4:7a:c2:9d:bc,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573537.wadm1.rrze.uni-erlangen.de(cput=9971,energy_used=0,mem=3090772kb,vmem=9260168kb,walltime=2515,session_id=7673),state=free,netload=1796794569217,gres=,loadave=4.00,ncpus=4,physmem=32761124kb,availmem=37811984kb,totmem=40760608kb,idletime=7106315,nusers=2,nsessions=2,sessions=7673 15885,uname=Linux w1340 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     note = Partner-defekt
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1341
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573536.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451571,macaddr=0c:c4:7a:98:b9:7e,cpuclock=OnDemand:800MHz,varattr=,jobs=5573536.wadm1.rrze.uni-erlangen.de(cput=1269,energy_used=0,mem=32023656kb,vmem=20047980kb,walltime=2538,session_id=12641),state=free,netload=526709919242,gres=,loadave=1.06,ncpus=4,physmem=32761124kb,availmem=35295048kb,totmem=40760608kb,idletime=7106222,nusers=1,nsessions=1,sessions=12641,uname=Linux w1341 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1342
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573277.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451578,macaddr=0c:c4:7a:98:b9:80,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573277.wadm1.rrze.uni-erlangen.de(cput=1992,energy_used=0,mem=31977412kb,vmem=20032652kb,walltime=8661,session_id=5082),state=free,netload=544071292077,gres=,loadave=4.29,ncpus=4,physmem=32761124kb,availmem=34900972kb,totmem=40760608kb,idletime=7106300,nusers=1,nsessions=1,sessions=5082,uname=Linux w1342 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1343
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572947.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451567,macaddr=0c:c4:7a:98:b7:2a,cpuclock=OnDemand:800MHz,varattr=,jobs=5572947.wadm1.rrze.uni-erlangen.de(cput=16918,energy_used=0,mem=176812kb,vmem=603260kb,walltime=16933,session_id=32424),state=free,netload=1115709290290,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=40325884kb,totmem=40760608kb,idletime=7106271,nusers=1,nsessions=1,sessions=32424,uname=Linux w1343 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1344
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572946.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451561,macaddr=0c:c4:7a:98:b7:2c,cpuclock=OnDemand:800MHz,varattr=,jobs=5572946.wadm1.rrze.uni-erlangen.de(cput=24759,energy_used=0,mem=178920kb,vmem=1122408kb,walltime=16921,session_id=559),state=free,netload=512995773436,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=40406316kb,totmem=40760608kb,idletime=7106275,nusers=1,nsessions=1,sessions=559,uname=Linux w1344 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1345
+     state = offline
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     status = rectime=1544451575,macaddr=0c:c4:7a:98:bc:ee,cpuclock=OnDemand:800MHz,varattr=,jobs=,state=free,netload=142953705177,gres=,loadave=0.00,ncpus=4,physmem=32761124kb,availmem=39803956kb,totmem=40760608kb,idletime=357828,nusers=1,nsessions=1,sessions=4821,uname=Linux w1345 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 0
+
+w1346
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573220.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451581,macaddr=0c:c4:7a:98:bc:f0,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573220.wadm1.rrze.uni-erlangen.de(cput=49236,energy_used=0,mem=24664444kb,vmem=29799132kb,walltime=12377,session_id=31148),state=free,netload=469197115854,gres=,loadave=4.02,ncpus=4,physmem=32761124kb,availmem=27834876kb,totmem=40760608kb,idletime=7106283,nusers=2,nsessions=2,sessions=31148 22904,uname=Linux w1346 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1347
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572759.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451582,macaddr=0c:c4:7a:98:b9:2e,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572759.wadm1.rrze.uni-erlangen.de(cput=52027,energy_used=0,mem=32255384kb,vmem=34672256kb,walltime=52618,session_id=19073),state=free,netload=740917795528,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=7812220kb,totmem=40760608kb,idletime=7106274,nusers=2,nsessions=2,sessions=18389 19073,uname=Linux w1347 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1348
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573195.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451560,macaddr=0c:c4:7a:98:b9:30,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573195.wadm1.rrze.uni-erlangen.de(cput=65709,energy_used=0,mem=9588720kb,vmem=11859864kb,walltime=16541,session_id=27176),state=free,netload=502375110282,gres=,loadave=4.09,ncpus=4,physmem=32761124kb,availmem=35302792kb,totmem=40760608kb,idletime=7106221,nusers=1,nsessions=1,sessions=27176,uname=Linux w1348 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1349
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572847.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451591,macaddr=0c:c4:7a:98:b6:d6,cpuclock=OnDemand:800MHz,varattr=,jobs=5572847.wadm1.rrze.uni-erlangen.de(cput=19646,energy_used=0,mem=3052952kb,vmem=2850472kb,walltime=19656,session_id=32260),state=free,netload=636997284565,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=38001704kb,totmem=40760608kb,idletime=7106316,nusers=2,nsessions=2,sessions=3603 32260,uname=Linux w1349 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1350
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572760.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451585,macaddr=0c:c4:7a:98:b6:d8,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572760.wadm1.rrze.uni-erlangen.de(cput=51304,energy_used=0,mem=32261776kb,vmem=34453220kb,walltime=51876,session_id=28555),state=free,netload=284262097966,gres=,loadave=1.01,ncpus=4,physmem=32761124kb,availmem=7824268kb,totmem=40760608kb,idletime=2967747,nusers=1,nsessions=1,sessions=28555,uname=Linux w1350 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1351
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572758.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451570,macaddr=0c:c4:7a:98:bd:2e,cpuclock=OnDemand:3501MHz,varattr=,jobs=5572758.wadm1.rrze.uni-erlangen.de(cput=51999,energy_used=0,mem=32254404kb,vmem=33686932kb,walltime=52601,session_id=10825),state=free,netload=1133793536170,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=7768212kb,totmem=40760608kb,idletime=7106203,nusers=2,nsessions=2,sessions=10036 10825,uname=Linux w1351 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1352
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573535.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451564,macaddr=0c:c4:7a:98:bd:30,cpuclock=OnDemand:800MHz,varattr=,jobs=5573535.wadm1.rrze.uni-erlangen.de(cput=2204,energy_used=0,mem=31486716kb,vmem=20047128kb,walltime=2506,session_id=15238),state=free,netload=521672913453,gres=,loadave=1.18,ncpus=4,physmem=32761124kb,availmem=35213444kb,totmem=40760608kb,idletime=7106214,nusers=1,nsessions=1,sessions=15238,uname=Linux w1352 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1353
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573534.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451578,macaddr=0c:c4:7a:98:bd:1e,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573534.wadm1.rrze.uni-erlangen.de(cput=9008,energy_used=0,mem=5384804kb,vmem=29590848kb,walltime=2520,session_id=12649),state=free,netload=775832883198,gres=,loadave=3.73,ncpus=4,physmem=32761124kb,availmem=35667724kb,totmem=40760608kb,idletime=7106288,nusers=1,nsessions=1,sessions=12649,uname=Linux w1353 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1354
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573560.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451560,macaddr=0c:c4:7a:98:bd:20,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573560.wadm1.rrze.uni-erlangen.de(cput=1056,energy_used=0,mem=25038532kb,vmem=25247092kb,walltime=1067,session_id=5227),state=free,netload=1473480208565,gres=,loadave=1.04,ncpus=4,physmem=32761124kb,availmem=17847412kb,totmem=40760608kb,idletime=7106216,nusers=2,nsessions=2,sessions=5227 7320,uname=Linux w1354 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1355
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5572757.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451576,macaddr=0c:c4:7a:98:bb:ba,cpuclock=OnDemand:800MHz,varattr=,jobs=5572757.wadm1.rrze.uni-erlangen.de(cput=53794,energy_used=0,mem=32258624kb,vmem=35657572kb,walltime=54401,session_id=15685),state=free,netload=541046177848,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=6826704kb,totmem=40760608kb,idletime=7106227,nusers=2,nsessions=2,sessions=15685 18332,uname=Linux w1355 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+
+w1356
+     state = job-exclusive
+     power_state = Running
+     np = 4
+     properties = turbo,noturbo,f3.5,f3.3,f3.1,f2.9,f2.7,f2.5,f2.3,f2.1,f2.0,f1.8,f1.6,f1.4,f1.2,f1.0,f0.8,likwid,sl,avx,any,sl32g
+     ntype = cluster
+     jobs = 0-3/5573557.wadm1.rrze.uni-erlangen.de
+     status = rectime=1544451581,macaddr=0c:c4:7a:98:bb:bc,cpuclock=OnDemand:3501MHz,varattr=,jobs=5573557.wadm1.rrze.uni-erlangen.de(cput=1064,energy_used=0,mem=25037528kb,vmem=25247092kb,walltime=1070,session_id=20036),state=free,netload=389415217307,gres=,loadave=1.00,ncpus=4,physmem=32761124kb,availmem=17808356kb,totmem=40760608kb,idletime=7106237,nusers=1,nsessions=1,sessions=20036,uname=Linux w1356 4.15.0-34-generic #37-Ubuntu SMP Mon Aug 27 15:21:48 UTC 2018 x86_64,opsys=linux
+     mom_service_port = 15002
+     mom_manager_port = 15003
+     total_sockets = 1
+     total_numa_nodes = 1
+     total_cores = 4
+     total_threads = 4
+     dedicated_sockets = 0
+     dedicated_numa_nodes = 0
+     dedicated_cores = 0
+     dedicated_threads = 4
+

@@ -38,10 +38,6 @@ class QueryLdap extends Command
 
     public function __construct()
     {
-	    $url = getenv('LDAP_URL');
-        $this->_ldap = Ldap::create('ext_ldap', array(
-		'connection_string' => $url
-        ));
 
         parent::__construct();
     }
@@ -57,7 +53,12 @@ class QueryLdap extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-          $password = getenv('LDAP_PW');
+	    $url = getenv('LDAP_URL');
+        $this->_ldap = Ldap::create('ext_ldap', array(
+		'connection_string' => $url
+        ));
+
+        $password = getenv('LDAP_PW');
 	  /*$dn = 'cn=hpcmonitoring,ou=roadm,ou=profile,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de';*/
 	  $dn = getenv('LDAP_DN');
 	  $this->_ldap->bind($dn, $password);

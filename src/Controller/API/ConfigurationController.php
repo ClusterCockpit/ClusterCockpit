@@ -121,4 +121,3 @@ class ConfigurationController extends FOSRestController
         return $this->handleView($view);
     } // "patch_configuration"           [PATCH] api/configurations/$id
 }
-

@@ -26,12 +26,78 @@
 namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Request;
+use App\Service\Configuration;
 
 class IndexViewController extends Controller
 {
-    public function home()
+    private function createAdminUser(
+        $request,
+        $page,
+        UserPasswordEncoderInterface $passwordEncoder
+    )
     {
+        $user = new User();
+        $form = $this->createForm(UserType::class, $user);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            if ( $form->get('save')->isClicked() )  {
+                $user = $form->getData();
+                $user->setUid(0);
+                $user->setName('Local account');
+                $password = $passwordEncoder->encodePassword($user, $user->getPlainPassword());
+                $user->setPassword($password);
+                $em = $this->getDoctrine()->getManager();
+                $em->persist($user);
+                $em->flush();
+            }
+
+            return $this->redirectToRoute('init', array('slug' => $page++));
+        }
+
+        return $this->render("init/page-$page.html.twig",
+            array(
+                'form' => $form->createView(),
+            ));
+    }
+
+    private function addCluster()
+    {
+
+    }
+
+    public function init(Request $request, Configuration $configuration, $slug)
+    {
+        $page = (int) $slug;
+
+        switch ( $page ){
+        case 1:
+            $configuration->initConfig();
+
+            return $this->render("init/page-$page.html.twig",
+                array(
+                    'form' => $form->createView(),
+                ));
+        case 2:
+            createAdminUser($request, $page);
+        case 3:
+            addCluster($request, $page);
+
+        default:
+        throw $this->createNotFoundException('The page does not exist');
+        }
+
+    }
+
+    public function home(Configuration $configuration)
+    {
+        if ( count($configuration->getConfig()) == 0 ){
+            return $this->redirectToRoute('init', array('slug' => 1));
+        }
+
         return $this->render('default/index.html.twig');
     }
 }
