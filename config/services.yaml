@@ -2,6 +2,7 @@
 # https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
 parameters:
     upload_directory: '%kernel.project_dir%/var/upload'
+    locale: 'en'
 
 services:
     # default configuration for services in *this* file

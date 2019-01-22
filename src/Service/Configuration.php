@@ -32,10 +32,8 @@ class Configuration
 {
     private $_logger;
     private $_repository;
-<<<<<<< HEAD
     private $_config;
     private $_isInit;
-=======
     private $_em;
 
     private static $_defaultConfig = array(
@@ -55,7 +53,6 @@ class Configuration
         array('data_cache_period',            '40',     'default', 'Cache grace time',                    '[0-9]+',     'Enter a positive integer'),
         array('data_cache_numpoints',         '40',     'default', 'Cache build threshold',               '[0-9]+',     'Enter a positive integer'),
     );
->>>>>>> 147c84f02b6072279322459252751cc56ebc1757
 
     public function __construct(
         LoggerInterface $logger,
