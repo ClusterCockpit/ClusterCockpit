@@ -32,7 +32,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 /**
 *  @ORM\Entity(repositoryClass="App\Repository\JobRepository")
-*  @ORM\Table(name="job",indexes={@ORM\Index(name="search_idx", columns={"is_running"})})
+*  @ORM\Table(name="job",indexes={@ORM\Index(name="search_idx", columns={"is_running","cluster_id"})})
 */
 class Job
 {
@@ -245,6 +245,17 @@ class Job
     }
 
     public function getNodeIdArray()
+    {
+        $arr;
+
+        foreach ( $this->nodes as $node ) {
+            $arr[] = $node->getNodeId();
+        }
+
+        return $arr;
+    }
+
+    public function getNodeNameArray()
     {
         $arr;
 

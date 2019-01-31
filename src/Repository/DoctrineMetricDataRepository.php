@@ -53,7 +53,7 @@ class DoctrineMetricDataRepository implements MetricDataRepository
         $flopsSlot = sprintf("slot_%d", $flopsAny->slot);
 
         $sql = "
-        SELECT ROUND($flopsSlot*0.001,2) AS y, case when $bwSlot=0 then 0 else ROUND($flopsSlot/$bwSlot,2) end as x
+        SELECT ROUND($flopsSlot*{$flopsAny->scale},2) AS y, case when $bwSlot=0 then 0 else ROUND($flopsSlot/$bwSlot,2) end as x
         FROM data
         INNER JOIN jobs_nodes ON data.node_id = jobs_nodes.node_id
         WHERE jobs_nodes.job_id=$id
@@ -67,7 +67,6 @@ class DoctrineMetricDataRepository implements MetricDataRepository
     public function hasProfile($job)
     {
         $nodes = $job->getNodes();
-        $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
 
         if ( count($nodes) < 1 ){
             return false;
