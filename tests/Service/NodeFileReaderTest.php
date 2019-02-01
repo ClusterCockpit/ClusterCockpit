@@ -32,7 +32,7 @@ class NodeFileReaderTest extends TestCase
 {
     public function testParsePBS_1()
     {
-        $path = '/home/jan/prg/web/ClusterCockpit-pg/tests/InputFiles/emmy-nodes.txt';
+        $path = '/Users/jan/Sites/ClusterCockpit/tests/InputFiles/emmy-nodes.txt';
         $fileReader = new NodeFileReader();
         $nodes = $fileReader->parse($path);
         /* var_dump($nodes); */
@@ -41,16 +41,16 @@ class NodeFileReaderTest extends TestCase
 
     public function testParsePBS_2()
     {
-        $path = '/home/jan/prg/web/ClusterCockpit-pg/tests/InputFiles/woody-nodes.txt';
+        $path = '/Users/jan/Sites/ClusterCockpit/tests/InputFiles/woody-nodes.txt';
         $fileReader = new NodeFileReader();
         $nodes = $fileReader->parse($path);
-        /* var_dump($nodes); */
+        var_dump($nodes);
         $this->assertCount(176, $nodes);
     }
 
     public function testParseSlurm()
     {
-        $path = '/home/jan/prg/web/ClusterCockpit-pg/tests/InputFiles/meggie-nodes.txt';
+        $path = '/Users/jan/Sites/ClusterCockpit/tests/InputFiles/meggie-nodes.txt';
         $fileReader = new NodeFileReader();
         $nodes = $fileReader->parse($path);
         /* var_dump($nodes); */

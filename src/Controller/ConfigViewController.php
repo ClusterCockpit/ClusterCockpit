@@ -35,6 +35,7 @@ use App\Form\ApiKeyType;
 use App\Entity\ApiKey;
 use App\Form\ClusterType;
 use App\Entity\Cluster;
+use App\Entity\Node;
 use App\Entity\Configuration;
 use App\Form\UserType;
 use App\Entity\User;
@@ -597,10 +598,11 @@ class ConfigViewController extends AbstractController
                 if (! is_null($file)){
 
                     $fileName = $this->generateUniqueFileName().'.'.$file->guessExtension();
+                    $filePath = $this->getParameter('upload_directory');
 
                     try {
                         $file->move(
-                            $this->getParameter('upload_directory'),
+                            $filePath,
                             $fileName
                         );
                     } catch (FileException $e) {
@@ -609,6 +611,33 @@ class ConfigViewController extends AbstractController
                 }
 
                 $em = $this->getDoctrine()->getManager();
+                $fileReader = new NodeFileReader();
+                $nodes = $fileReader->parse($filePath.'/'.$fileName);
+                $currentNodes = $cluster->getNodes();
+                $nodeLookup = array();
+
+                if ( count($currentNodes) > 0 ){
+                    foreach ( $currentNodes as  $node ) {
+                        $nodeLookup[$node->nodeId] = 1;
+                    }
+                }
+
+                foreach ( $nodes as  $node ) {
+                    if ( array_key_exists($node['nodeId'], $nodeLookup) ) {
+                        /* TODO: Sync new data */
+
+                    } else {
+                        $newNode = new Node();
+                        $newNode->nodeId = $node['nodeId'];
+                        $newNode->cluster = $cluster->getId();
+                        $newNode->numProcessors = $node['processors'];
+                        if ( array_key_exists('cores, '$node) ) {
+                            $newNode->numCores = $node['cores'];
+                        }
+                        $em->persist($newNode);
+                    }
+                }
+
                 $em->persist($cluster);
                 $em->flush();
             }

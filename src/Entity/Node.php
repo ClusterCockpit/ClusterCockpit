@@ -38,7 +38,7 @@ class Node
     public $cluster;
 
     /**
-     *  @ORM\Column(type="integer")
+     *  @ORM\Column(type="integer",nullable=true)
      */
     public $numCores;
 

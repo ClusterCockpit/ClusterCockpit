@@ -102,8 +102,8 @@ class JobCache
     private function _initJob($job)
     {
         if ( $job->isRunning()) {
-            $job->stopTime = time();
-            /* $job->stopTime = 1521057932; */
+            /* $job->stopTime = time(); */
+            $job->stopTime = 1521057932;
             $job->duration = $job->stopTime - $job->startTime;
         }
     }

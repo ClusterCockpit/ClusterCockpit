@@ -145,7 +145,11 @@ class Cluster
 
     public function getNodes(): ?array
     {
-        return $this->nodes;
+        if ( is_array($this->nodes) ){
+            return $this->nodes;
+        } else {
+            return array();
+        }
     }
 
     public function setNodes(array $nodes): self

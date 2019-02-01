@@ -60,9 +60,15 @@ class NodeFileReader
                     $node['status'][$matches[1]] = "$matches[2]";
                 }
 
+                $node['processors'] = (int) $node['parameters']['np'];
+
+                if ( array_key_exists('total_cores, '$node['parameters']) ){
+                    $node['cores'] = (int) $node['parameters']['np'];
+                }
 
                 $nodes[] = $node;
             }
+
         }
 
         return $nodes;
