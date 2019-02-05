@@ -48,6 +48,11 @@ class Cluster
     public $name;
 
     /**
+     *  @ORM\Column(type="string",)
+     */
+    public $database;
+
+    /**
      *  @ORM\Column(type="integer",)
      */
     public $coresPerNode;

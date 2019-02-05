@@ -62,7 +62,7 @@ class NodeFileReader
 
                 $node['processors'] = (int) $node['parameters']['np'];
 
-                if ( array_key_exists('total_cores, '$node['parameters']) ){
+                if ( array_key_exists('total_cores', $node['parameters']) ){
                     $node['cores'] = (int) $node['parameters']['np'];
                 }
 
