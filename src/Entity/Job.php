@@ -64,11 +64,6 @@ class Job
     private $cluster;
 
     /**
-     *  @ORM\Column(type="string", nullable=true)
-     */
-    private $queue;
-
-    /**
      *  @ORM\Column(type="integer")
      */
     public $numNodes;

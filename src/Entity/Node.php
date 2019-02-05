@@ -23,35 +23,9 @@ class Node
     public $nodeId;
 
     /**
-     *  @ORM\Column(type="string",nullable=true)
-     */
-    public $rackId;
-
-    /**
-     *  @ORM\Column(type="string",nullable=true)
-     */
-    public $uarch;
-
-    /**
      *  @ORM\Column(type="integer")
      */
     public $cluster;
-
-    /**
-     *  @ORM\Column(type="integer",nullable=true)
-     */
-    public $numCores;
-
-    /**
-     *  @ORM\Column(type="integer")
-     */
-    public $numProcessors;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Property")
-     * @ORM\JoinTable(name="nodes_properties", joinColumns={@ORM\JoinColumn(name="node_id", referencedColumnName="id")}, inverseJoinColumns={@ORM\JoinColumn(name="property_id", referencedColumnName="id")})
-     */
-    public $properties;
 
     /**
      *  @ORM\Column(type="string",options={"default":"active"})

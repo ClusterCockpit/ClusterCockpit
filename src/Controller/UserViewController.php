@@ -115,29 +115,6 @@ class UserViewController extends Controller
                 'users' => $usersD,
             ));
     }
-    public function editGroup(UnixGroup $group, GroupFacade $groupFacade, Request $request)
-    {
-        $updateGroupRequest = UpdateGroupRequest::fromUnixGroup($group);
-
-        $form = $this->createForm(UnixGroupType::class, $updateGroupRequest);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            $groupFacade->updateUnixGroup(
-                $group,
-                $updateGroupRequest->organisation,
-                $updateGroupRequest->contact
-            );
-
-            return $this->redirectToRoute('show_group',array('id'=>$group->getId()));
-        }
-
-        return $this->render('users/editGroup.html.twig',
-            array(
-                'form' => $form->createView(),
-            ));
-    }
     public function show(
         User $user,
         JobCache $jobCache,
