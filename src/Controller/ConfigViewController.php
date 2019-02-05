@@ -631,7 +631,8 @@ class ConfigViewController extends AbstractController
                         $newNode->nodeId = $node['nodeId'];
                         $newNode->cluster = $cluster->getId();
                         $newNode->numProcessors = $node['processors'];
-                        if ( array_key_exists('cores, '$node) ) {
+                        $newNode->status = 'active';
+                        if ( array_key_exists('cores', $node) ) {
                             $newNode->numCores = $node['cores'];
                         }
                         $em->persist($newNode);

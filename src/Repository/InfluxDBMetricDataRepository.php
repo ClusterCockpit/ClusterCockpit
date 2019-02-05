@@ -163,7 +163,6 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
             $nodeStat[] = $nodeData;
         }
 
-
         return $points;
     }
 }
