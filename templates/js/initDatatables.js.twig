@@ -16,6 +16,7 @@ $(document).ready( function () {
             "processing": true,
             "stateSave": true,
             "deferRender": true,
+            "pageLength": 50,
             "initComplete": function( settings, json ) {
                     $('#info_message').text('Showing '+json.recordsTotal+' jobs.');
             },
