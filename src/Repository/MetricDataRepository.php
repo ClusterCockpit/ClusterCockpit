@@ -28,6 +28,8 @@ namespace App\Repository;
 interface MetricDataRepository
 {
     public function getJobRoofline($job, $metrics);
+    public function hasProfile($job);
     public function getJobStats($job, $metrics);
     public function getMetricData($job, $metrics);
+    public function getMetricCount($job, $metrics);
 }

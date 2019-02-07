@@ -31,11 +31,9 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
     private $_timing;
     private $_database;
 
-    public function __construct(
-        Stopwatch $stopwatch
-    )
+    public function __construct()
     {
-        $this->_timer = $stopwatch;
+        $this->_timer = new Stopwatch();
         $client = new \InfluxDB\Client('localhost', '8086');
         $this->_database = $client->selectDB('ClusterCockpit');
     }
@@ -264,5 +262,24 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
         }
 
         return $data;
+    }
+
+    public function getMetricCount($job, $metrics)
+    {
+        $nodes = $job->getNodes();
+        $id = $nodes->first()->getNodeId();
+        $startTime = $job->getStartTime();
+        $stopTime = $job->getStopTime();
+        $metric = $metrics->first();
+
+        $query = "SELECT COUNT({$metric->name})
+            FROM {$metric->measurement}
+            WHERE  time >= {$job->startTime}s AND time <= {$job->stopTime}s
+            AND host = '$id'";
+
+        $result = $this->_database->query($query, ['epoch' => 's']);
+        $count =  $result->getPoints();
+
+        return $count[0]['count'] * count($nodes) * count($metrics);
     }
 }
