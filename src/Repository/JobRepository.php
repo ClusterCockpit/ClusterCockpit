@@ -355,7 +355,7 @@ class JobRepository extends ServiceEntityRepository
         $qb->andWhere($qb->expr()->between('j.numNodes',$search->getnumNodesFrom(),$search->getnumNodesTo()));
         $qb->andWhere($qb->expr()->between( 'j.duration', $durationFrom, $durationTo));
         $qb->andWhere($qb->expr()->between( 'j.startTime', $startFrom, $startTo));
-        $qb->andWhere('j.cluster =1');
+        $qb->andWhere("j.cluster = {$search->getClusterId()}");
 
         return $qb
             ->orderBy('j.startTime', 'DESC')
