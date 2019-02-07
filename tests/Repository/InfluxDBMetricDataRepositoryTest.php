@@ -103,6 +103,21 @@ class InfluxDBMetricDataRepositoryTest extends KernelTestCase
         $this->assertCount(17, $returnValue);
     }
 
+    public function testGetMetricCount()
+    {
+        $job = $this->entityManager
+                    ->getRepository(Job::class)
+                    /* ->find('523286'); */
+                    ->find('579945');
+        $metrics = $job->getCluster()->getMetricList('list')->getMetrics();
+
+        $metricData = new InfluxDBMetricDataRepository();
+        $returnValue = $metricData->getMetricCount($job, $metrics);
+        /* var_dump($returnValue); */
+        $this->assertEquals(1400, $returnValue);
+    }
+
+
     protected function tearDown()
     {
         parent::tearDown();
