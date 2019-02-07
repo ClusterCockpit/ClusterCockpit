@@ -73,7 +73,7 @@ class JobViewController extends Controller
             $job = $jobRepo->findOneBy(['jobId' => $searchId]);
 
             if (!$job) {
-                $user = $userRepo->findOneBy(['userId' => $searchId]);
+                $user = $userRepo->findOneBy(['username' => $searchId]);
 
                 if (!$user) {
                     return $this->render('error/message.html.twig',
@@ -115,7 +115,7 @@ class JobViewController extends Controller
         $search->setNumNodesTo(64);
         $search->setDurationFrom(new DateInterval('PT1H'));
         $search->setDurationTo(new DateInterval('PT24H'));
-        $search->setDateFrom(1520640000);
+        $search->setDateFrom(floor(time()/60)*60-2592000);
         $search->setDateTo(floor(time()/60)*60);
 
         $form = $this->createFormBuilder($search)
