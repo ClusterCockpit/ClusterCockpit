@@ -2,9 +2,8 @@
 NOTICE
 --------------------------------------------------------------------------------
 
-ClusterCockpit is currently still work in progress and not yet ready for
-general production use. One main component which is not yet finalized is
-a generic way to map to metric lists to different profling database backends.
+ClusterCockpit is work in progress and not yet ready for
+general production use.
 
 If you want to help develop ClusterCockpit you may want to take a look at [open issues](https://github.com/ClusterCockpit/ClusterCockpit/issues?q=is%3Aopen+is%3Aissue).
 A good starting point about the software design of ClusterCockpit are the Wiki
@@ -13,7 +12,7 @@ and [naming conventions](https://github.com/ClusterCockpit/ClusterCockpit/wiki/D
 used.
 
 Currently ClusterCockpit is not yet ready to be used by external users. I
-currently develop the missing pieces as a web based installer and will update
+currently develop the missing pieces: a web based installer and will update
 this notice as soon as a usable BETA is available.
 
 --------------------------------------------------------------------------------
@@ -21,7 +20,7 @@ Introduction
 --------------------------------------------------------------------------------
 
 This is a web frontend for job specific performance monitoring. It is based on
-the [Symfony](https://symfony.com) PHP Framework. The application uses
+the [Symfony 4](https://symfony.com) PHP Framework. The application uses
 [Bootstrap 4](http://getbootstrap.com) for layout and styling,
 [DataTables](https://datatables.net) for interactive Ajax tables and
 [plotly.js](https://plot.ly/javascript/) for graph generation.
@@ -30,15 +29,12 @@ the [Symfony](https://symfony.com) PHP Framework. The application uses
 Dependencies
 --------------------------------------------------------------------------------
 
-To install and use ClusterCockpit you need the following packages:
+To install and use ClusterCockpit you need the following dependencies:
 - PHP 7.1 or newer
 - MySQL 5.7
 - [Composer](https://getcomposer.org) - PHP package manager
-
-On Ubuntu systems you usually need an additional
-[repository](https://launchpad.net/~ondrej/+archive/ubuntu/php) to install newer
-PHP version. ClusterCockpit can be installed on any operating system where PHP
-is available.
+- Optional: Apache web server for production use
+- Optional: InfluxDB time series database
 
 --------------------------------------------------------------------------------
 Setup project
@@ -47,7 +43,7 @@ Setup project
 Symfony applications are operated in so called environments.  The `dev`
 environment is for development and testing and is usually used together with
 the builtin PHP web server listening on a local port. For production the
-environment is should be switched from `dev` to `prod`. This enables
+environment should be switched from `dev` to `prod`. This enables
 performance optimisations and is usually used together with a web server, as
 e.g. Apache. Below instructions apply to a development setup and are intended
 to be used by someone developing or testing ClusterCockpit. Please refer to the
@@ -96,23 +92,17 @@ $mysql> quit
 
 4. Configure Symfony access to MySQL:
 
-Everything is currently in one database. Symfony uses the
-[Doctrine](https://www.doctrine-project.org) ORM for mapping PHP classes on
-database tables. Database access for Doctrine is configured in the local only
-.env file. This file is not committed. You first need to copy the .env.dist
-file to .env and adopt it to your needs.
+Symfony uses the [Doctrine](https://www.doctrine-project.org) ORM for mapping
+PHP classes on  database tables. Database access for Doctrine is configured in
+the local only .env file. This file is not committed. You first need to copy
+the .env.dist file to .env and adopt it to your needs.
 
-To configure mysql credentials open the .env file in you project root and add the following line (enter above username and password for the placeholders):
+To configure mysql credentials open the .env file in you project root and add
+the following line (enter above username and password for the placeholders): 
 
 ```
 DATABASE_URL=mysql://<username>:<mypass>@127.0.0.1:3306/ClusterCockpit
 
-```
-
-Please contact me to get recent test DB dumps. You can import the sql dumps with:
-
-```
-$ mysql -h localhost -u <username> -p  ClusterCockpit < dump.sql
 ```
 
 5. Install Symfony packages
@@ -154,7 +144,7 @@ $ php bin/console debug:router
 
 7. Start up local web server:
 
-To start the web server with the integrated Symfony profiler console run:
+To start the web server with integrated Symfony profiler console run:
 ```
 $ php bin/console server:run
 ```
@@ -169,7 +159,6 @@ To update PHP packages in project run:
 ```
 $ composer update
 ```
-Please do not push the composer lock files to git.
 
 
 
