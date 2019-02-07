@@ -46,7 +46,6 @@ class ClusterType extends AbstractType
     {
         $builder
             ->add('name', TextType::class)
-            ->add('database', TextType::class)
             ->add('coresPerNode', IntegerType::class)
             ->add('flopRateScalar', NumberType::class)
             ->add('flopRateSimd', NumberType::class)

@@ -593,6 +593,7 @@ class ConfigViewController extends AbstractController
 
             if ( $form->get('save')->isClicked() )  {
                 $cluster = $form->getData();
+                $em = $this->getDoctrine()->getManager();
                 $file = $cluster->getNodeFile();
 
                 if (! is_null($file)){
@@ -608,34 +609,33 @@ class ConfigViewController extends AbstractController
                     } catch (FileException $e) {
                         // ... handle exception if something happens during file upload
                     }
-                }
 
-                $em = $this->getDoctrine()->getManager();
-                $fileReader = new NodeFileReader();
-                $nodes = $fileReader->parse($filePath.'/'.$fileName);
-                $currentNodes = $cluster->getNodes();
-                $nodeLookup = array();
+                    $fileReader = new NodeFileReader();
+                    $nodes = $fileReader->parse($filePath.'/'.$fileName);
+                    $currentNodes = $cluster->getNodes();
+                    $nodeLookup = array();
 
-                if ( count($currentNodes) > 0 ){
-                    foreach ( $currentNodes as  $node ) {
-                        $nodeLookup[$node->nodeId] = 1;
-                    }
-                }
-
-                foreach ( $nodes as  $node ) {
-                    if ( array_key_exists($node['nodeId'], $nodeLookup) ) {
-                        /* TODO: Sync new data */
-
-                    } else {
-                        $newNode = new Node();
-                        $newNode->nodeId = $node['nodeId'];
-                        $newNode->cluster = $cluster->getId();
-                        $newNode->numProcessors = $node['processors'];
-                        $newNode->status = 'active';
-                        if ( array_key_exists('cores', $node) ) {
-                            $newNode->numCores = $node['cores'];
+                    if ( count($currentNodes) > 0 ){
+                        foreach ( $currentNodes as  $node ) {
+                            $nodeLookup[$node->nodeId] = 1;
                         }
-                        $em->persist($newNode);
+                    }
+
+                    foreach ( $nodes as  $node ) {
+                        if ( array_key_exists($node['nodeId'], $nodeLookup) ) {
+                            /* TODO: Sync new data */
+
+                        } else {
+                            $newNode = new Node();
+                            $newNode->nodeId = $node['nodeId'];
+                            $newNode->cluster = $cluster->getId();
+                            $newNode->numProcessors = $node['processors'];
+                            $newNode->status = 'active';
+                            if ( array_key_exists('cores', $node) ) {
+                                $newNode->numCores = $node['cores'];
+                            }
+                            $em->persist($newNode);
+                        }
                     }
                 }
 

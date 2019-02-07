@@ -49,11 +49,6 @@ class Job
     private $jobId;
 
     /**
-     *  @ORM\ManyToOne(targetEntity="Project")
-     */
-    private $project;
-
-    /**
      *  @ORM\ManyToOne(targetEntity="User")
      */
     private $user;

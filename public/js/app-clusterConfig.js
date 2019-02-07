@@ -27,7 +27,7 @@ function findTables(){
         var list = {};
         list['name'] = $(this).attr('id');
         if ( list['name'] != null ){
-            list['rows'] = collectTableData($(this), 9);
+            list['rows'] = collectTableData($(this), 10);
             lists.push(list);
         }
     });
@@ -37,7 +37,7 @@ function findTables(){
 function editTableRow(row, rowData) {
     var formRow = $("<tr/>").insertAfter(row);
     $.each(rowData, function(i, c) {
-        if ( i < 9 ){
+        if ( i < 10 ){
             formRow.append($('<td/>').html("<input class=\"form-control text-center\" type=\"text\" value=\""+c+"\">"));
         }
     });
@@ -48,7 +48,7 @@ function editTableRow(row, rowData) {
 }
 function addTableRow(row) {
     var formRow = $("<tr/>").insertAfter(row);
-    var rowData = new Array(9);
+    var rowData = new Array(10);
 
     $.each(rowData, function(colIndex, c) {
         formRow.append($('<td/>').html("<input class=\"form-control text-center\" type=\"text\" >"));
@@ -76,7 +76,7 @@ $( document ).ready(function() {
             var fields = $row.find('input');
 
             $prevRow.find('td').each(function(index, col ) {
-                if ( index < 9 ){
+                if ( index < 10 ){
                     $(col).text($(fields[index]).val());
                 }
             });

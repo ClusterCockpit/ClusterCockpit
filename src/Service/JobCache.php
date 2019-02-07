@@ -31,6 +31,7 @@ use App\Entity\Data;
 use App\Entity\NodeStat;
 use App\Entity\StatisticCache;
 use App\Repository\DoctrineMetricDataRepository;
+use App\Repository\InfluxDBMetricDataRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
@@ -56,7 +57,8 @@ class JobCache
         TimeseriesHelper $tsHelper,
         EntityManagerInterface $em,
         PlotGenerator $plotGenerator,
-        DoctrineMetricDataRepository $metricRepo,
+        InfluxDBMetricDataRepository $metricRepo,
+        /* DoctrineMetricDataRepository $metricRepo, */
         AdapterInterface $cache
     )
     {

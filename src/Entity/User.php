@@ -83,15 +83,6 @@ class User implements UserInterface, \Serializable
      */
     private $isActive;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="Project")
-     * @ORM\JoinTable(name="users_projects",joinColumns={
-     * @ORM\JoinColumn(name="user_id",referencedColumnName="id")},inverseJoinColumns={
-     * @ORM\JoinColumn(name="project_id",referencedColumnName="id")}
-     * )
-     */
-    private $projects;
-
     public function __construct(
     )
     {

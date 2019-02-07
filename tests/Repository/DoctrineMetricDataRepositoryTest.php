@@ -25,16 +25,13 @@
 
 namespace App\Repository\Service;
 
-use App\Repository\InfluxDBMetricDataRepository;
+use App\Repository\DoctrineMetricDataRepository;
 use App\Entity\Job;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-/* 579945 */
-/* '523286' */
-
-class InfluxDBMetricDataRepositoryTest extends KernelTestCase
+class DoctrineMetricDataRepositoryTest extends KernelTestCase
 {
     private $entityManager;
 
@@ -51,11 +48,11 @@ class InfluxDBMetricDataRepositoryTest extends KernelTestCase
     {
         $job = $this->entityManager
                     ->getRepository(Job::class)
-                    /* ->find('523286'); */
                     ->find('579945');
+                    /* ->find('523286'); */
         $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
 
-        $metricData = new InfluxDBMetricDataRepository();
+        $metricData = new DoctrineMetricDataRepository($this->entityManager);
         $returnValue = $metricData->getJobRoofline($job, $metrics);
         /* var_dump($returnValue); */
 
@@ -66,10 +63,10 @@ class InfluxDBMetricDataRepositoryTest extends KernelTestCase
     {
         $job = $this->entityManager
                     ->getRepository(Job::class)
-                    /* ->find('523286'); */
                     ->find('579945');
+                    /* ->find('523286'); */
 
-        $metricData = new InfluxDBMetricDataRepository();
+        $metricData = new DoctrineMetricDataRepository($this->entityManager);
         $returnValue = $metricData->hasProfile($job);
 
         $this->assertTrue($returnValue);
@@ -79,25 +76,25 @@ class InfluxDBMetricDataRepositoryTest extends KernelTestCase
     {
         $job = $this->entityManager
                     ->getRepository(Job::class)
-                    /* ->find('523286'); */
                     ->find('579945');
+                    /* ->find('523286'); */
         $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
 
-        $metricData = new InfluxDBMetricDataRepository();
+        $metricData = new DoctrineMetricDataRepository($this->entityManager);
         $returnValue = $metricData->getJobStats($job, $metrics);
         /* var_dump($returnValue); */
-        $this->assertCount(16, $returnValue);
+        $this->assertCount(17, $returnValue);
     }
 
     public function testGetMetricData()
     {
         $job = $this->entityManager
                     ->getRepository(Job::class)
-                    /* ->find('523286'); */
                     ->find('579945');
+                    /* ->find('523286'); */
         $metrics = $job->getCluster()->getMetricList('list')->getMetrics();
 
-        $metricData = new InfluxDBMetricDataRepository();
+        $metricData = new DoctrineMetricDataRepository($this->entityManager);
         $returnValue = $metricData->getMetricData($job, $metrics);
         /* var_dump($returnValue); */
         $this->assertCount(17, $returnValue);

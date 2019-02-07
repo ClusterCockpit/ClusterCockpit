@@ -52,11 +52,19 @@ class ClusterController extends FOSRestController
 
     private function _copyMetric( $metricEntry, $metric )
     {
-        $metricEntry->name = $metric['name'];
-        $metricEntry->unit = $metric['unit'];
-        $metricEntry->scale = $metric['scale'];
-        $metricEntry->position = $metric['position'];
-        $metricEntry->slot = $metric['slot'];
+        foreach ( $metricEntry as $key => $value ){
+            if ( array_key_exists($key, $metric)){
+                $metricEntry->$key = $metric[$key];
+            }
+        }
+
+/*         $metricEntry->name = $metric['name']; */
+/*         $metricEntry->unit = $metric['unit']; */
+/*         $metricEntry->scale = $metric['scale']; */
+/*         $metricEntry->position = $metric['position']; */
+/*         $metricEntry->slot = $metric['slot']; */
+/*         $metricEntry->measurement = $metric['measurement']; */
+
         if ( $metric['peak'] === "" ) {
             $metricEntry->peak = NULL;
         } else {
