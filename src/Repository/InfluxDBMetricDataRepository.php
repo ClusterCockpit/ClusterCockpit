@@ -34,8 +34,10 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
     public function __construct()
     {
         $this->_timer = new Stopwatch();
-        $client = new \InfluxDB\Client('localhost', '8086');
-        $this->_database = $client->selectDB('ClusterCockpit');
+        /* $client = new \InfluxDB\Client('localhost', '8086'); */
+        /* $this->_database = $client->selectDB('ClusterCockpit'); */
+        $influxdbURL = getenv('INFLUXDB_URL');
+        $this->_database = \InfluxDB\Client::fromDSN($influxdbURL);
     }
 
     public function getJobRoofline($job, $metrics)
