@@ -48,6 +48,11 @@ class Cluster
     public $name;
 
     /**
+     *  @ORM\Column(type="integer",)
+     */
+    public $coresPerNode;
+
+    /**
      *  @ORM\Column(type="float")
      */
     public $flopRateScalar;

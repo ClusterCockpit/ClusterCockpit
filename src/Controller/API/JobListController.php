@@ -53,14 +53,17 @@ class JobListController extends FOSRestController
 {
     private $_jobCache;
     private $_authChecker;
+    private $_em;
 
     public function __construct(
         JobCache $jobCache,
-        AuthorizationCheckerInterface $authChecker
+        AuthorizationCheckerInterface $authChecker,
+        EntityManagerInterface $em
     )
     {
         $this->_jobCache = $jobCache;
         $this->_authChecker = $authChecker;
+        $this->_em = $em;
     }
 
     private function _createJobSorting($columns, $index, $direction, $sortMetrics)
@@ -90,7 +93,7 @@ class JobListController extends FOSRestController
 
     private function _addJobPerformanceProfile($job, $mode, $sortMetrics = NULL)
     {
-        $configuration = new Configuration();
+        $configuration = new Configuration($this->_em);
         $config = $configuration->getUserConfig($this->getUser());
 
         $this->_jobCache->checkCache(
@@ -186,7 +189,7 @@ class JobListController extends FOSRestController
     public function getAction($slug)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $configuration = new Configuration();
+        $configuration = new Configuration($this->_em);
         $config = $configuration->getUserConfig($this->getUser());
         $userId = 0;
 

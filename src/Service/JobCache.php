@@ -223,6 +223,8 @@ class JobCache
             $options['legend'] = false;
         }
 
+        $options['lineWidth'] =  $config['plot_general_lineWidth']->value;
+
         $metrics = $job->getCluster()->getMetricList($mode)->getMetrics();
         $data = $this->_metricDataRepository->getMetricData( $job, $metrics);
 

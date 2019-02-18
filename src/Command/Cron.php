@@ -356,7 +356,7 @@ class Cron extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $d = new DateTime('NOW', new DateTimeZone('Europe/Berlin'));
-        $this->_configuration = new Configuration();
+        $this->_configuration = new Configuration($this->_em);
         $this->_jobCache = new JobCache();
         $datestr = $d->format('Y-m-d\TH:i:s');
         $task = $input->getArgument('task');

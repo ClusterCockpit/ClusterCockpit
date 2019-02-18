@@ -183,8 +183,6 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
     }
     public function generateLine(&$data, $name, &$x, &$y, $options)
     {
-        $configuration = new Configuration();
-
         $line = array(
             "x" => $x,
             "y" => $y,
@@ -192,7 +190,7 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
             "name" => "$name",
             "line" => array(
                 "color" => $options['color'],
-                "width" => $configuration->getValue('plot_general_lineWidth')
+                "width" => $options['lineWidth']
             )
         );
 

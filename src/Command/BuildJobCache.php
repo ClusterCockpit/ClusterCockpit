@@ -58,7 +58,7 @@ class BuildJobCache extends Command
     private $_jobCache;
 
     public function __construct(
-        EntityManagerInterface $em,
+        EntityManagerInterface $em
     )
     {
         $this->_em = $em;
