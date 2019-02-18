@@ -59,7 +59,7 @@ class AddUser extends Command
             ->addArgument('username', InputArgument::REQUIRED, 'The user name of the new account.')
             ->addArgument('password', InputArgument::REQUIRED, 'Password of new account')
             ->addArgument('email', InputArgument::REQUIRED, 'Email address of user.')
-            ->addArgument('roles', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'List of user roles')
+            ->addArgument('roles', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'List of user roles (ROLE_USER, ROLE_ADMIN, ROLE_API, ROLE_ANALYST)')
             ;
     }
 
@@ -79,7 +79,7 @@ class AddUser extends Command
 
         $output->writeln([
             'Create user ',$username,
-            'Roles',
+            'with roles', implode(',',$roles),
             '',
         ]);
 
@@ -88,7 +88,9 @@ class AddUser extends Command
 
         $user->setUsername($username);
         $user->setPassword($password);
+        $user->setName('Local account');
         $user->setEmail($email);
+        $user->setUid(0);
 
         foreach ( $roles as $role ){
             $user->addRole($role);
