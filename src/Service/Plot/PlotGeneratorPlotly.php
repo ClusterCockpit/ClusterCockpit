@@ -25,24 +25,12 @@
 
 namespace App\Service\Plot;
 
-use Psr\Log\LoggerInterface;
 use App\Entity\Trace;
 use App\Entity\Plot;
 use App\Service\Configuration;
 
 class PlotGeneratorPlotly implements PlotGeneratorInterface
 {
-    private $_logger;
-    private $_configuration;
-
-    public function __construct(
-        LoggerInterface $logger,
-        Configuration $configuration
-    )
-    {
-        $this->_logger = $logger;
-        $this->_configuration = $configuration;
-    }
     public function generateScatterPlot( $plot, &$data, $options)
     {
         $colorscale = array(
@@ -195,6 +183,8 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
     }
     public function generateLine(&$data, $name, &$x, &$y, $options)
     {
+        $configuration = new Configuration();
+
         $line = array(
             "x" => $x,
             "y" => $y,
@@ -202,7 +192,7 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
             "name" => "$name",
             "line" => array(
                 "color" => $options['color'],
-                "width" => $this->_configuration->getValue('plot_general_lineWidth')
+                "width" => $configuration->getValue('plot_general_lineWidth')
             )
         );
 

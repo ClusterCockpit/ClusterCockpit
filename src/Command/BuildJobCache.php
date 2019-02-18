@@ -55,18 +55,13 @@ use \DateInterval;
 class BuildJobCache extends Command
 {
     private $_em;
-    private $_configuration;
     private $_jobCache;
 
     public function __construct(
         EntityManagerInterface $em,
-        Configuration $configuration,
-        JobCache $jobCache
     )
     {
         $this->_em = $em;
-        $this->_configuration = $configuration;
-        $this->_jobCache = $jobCache;
 
         parent::__construct();
     }
@@ -85,6 +80,8 @@ class BuildJobCache extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $stopwatch = new Stopwatch();
+        $configuration = new Configuration();
+        $jobCache = new JobCache();
         $jobs;
         $day = $input->getArgument('day');
 
@@ -127,8 +124,8 @@ class BuildJobCache extends Command
             $progressBar->advance();
 
             if ( $job->getNumNodes() > 0 ) {
-                $this->_jobCache->warmupCache(
-                    $job, $this->_configuration->getConfig(), $numpoints);
+                $jobCache->warmupCache(
+                    $job, $configuration->getConfig(), $numpoints);
                 $this->_em->persist($job);
                 $this->_em->flush();
             }

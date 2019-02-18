@@ -32,53 +32,48 @@ use App\Service\Configuration;
 
 class LdapManager
 {
-    private $_logger;
-    private $_ldap;
-    private $_configuration;
-
-    public function __construct(
-        LoggerInterface $logger,
-        Configuration $configuration
-    )
-    {
-        $this->_logger = $logger;
-        $this->_configuration = $configuration;
-        $this->_ldap = Ldap::create('ext_ldap', array(
-            'connection_string' => $this->_configuration->getValue('ldap_connection_url')
-        ));
-    }
-
     public function bindUser($uid, $password)
     {
-        $base = $this->_configuration->getValue('ldap_user_base');
-        $key = $this->_configuration->getValue('ldap_user_key');
+        $configuration = new Configuration();
+        $ldap = Ldap::create('ext_ldap', array(
+            'connection_string' => $configuration->getValue('ldap_connection_url')
+        ));
+        $base = $configuration->getValue('ldap_user_base');
+        $key = $configuration->getValue('ldap_user_key');
         $dn = $key.'='.$uid.','.$base;
-        $this->_logger->info('BIND', array($dn));
         /* $username = $this->_ldap->escape($dn, '', LdapInterface::ESCAPE_DN); */
 
-        $this->_ldap->bind($dn, $password);
+        $ldap->bind($dn, $password);
     }
 
     public function queryUsers()
     {
-          $password = getenv('LDAP_PW');
-          $dn = $this->_configuration->getValue('ldap_search_dn');
-          $baseDn = $this->_configuration->getValue('ldap_user_base');
-          $filter = $this->_configuration->getValue('ldap_user_filter');
-          $this->_ldap->bind($dn, $password);
+        $configuration = new Configuration();
+        $ldap = Ldap::create('ext_ldap', array(
+            'connection_string' => $configuration->getValue('ldap_connection_url')
+        ));
+        $password = getenv('LDAP_PW');
+        $dn = $configuration->getValue('ldap_search_dn');
+        $baseDn = $configuration->getValue('ldap_user_base');
+        $filter = $configuration->getValue('ldap_user_filter');
+        $ldap->bind($dn, $password);
 
-          return $this->_ldap->query($baseDn, $filter)->execute()->toArray();
+        return $ldap->query($baseDn, $filter)->execute()->toArray();
     }
 
     public function queryGroups()
     {
-          $password = getenv('LDAP_PW');
-          $dn = $this->_configuration->getValue('ldap_search_dn');
-          $baseDn = $this->_configuration->getValue('ldap_group_base');
-          $filter = $this->_configuration->getValue('ldap_group_filter');
-          $this->_ldap->bind($dn, $password);
+        $configuration = new Configuration();
+        $ldap = Ldap::create('ext_ldap', array(
+            'connection_string' => $configuration->getValue('ldap_connection_url')
+        ));
+        $password = getenv('LDAP_PW');
+        $dn = $configuration->getValue('ldap_search_dn');
+        $baseDn = $configuration->getValue('ldap_group_base');
+        $filter = $configuration->getValue('ldap_group_filter');
+        $ldap->bind($dn, $password);
 
-          return $this->_ldap->query($baseDn, $filter)->execute()->toArray();
+        return $ldap->query($baseDn, $filter)->execute()->toArray();
     }
 }
 

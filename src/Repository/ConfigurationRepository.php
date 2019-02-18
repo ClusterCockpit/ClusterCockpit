@@ -29,12 +29,6 @@ use App\Entity\Configuration;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
-/**
- * @method Configuration|null find($id, $lockMode = null, $lockVersion = null)
- * @method Configuration|null findOneBy(array $criteria, array $orderBy = null)
- * @method Configuration[]    findAll()
- * @method Configuration[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
- */
 class ConfigurationRepository extends ServiceEntityRepository
 {
     private $_connection;
@@ -47,19 +41,6 @@ class ConfigurationRepository extends ServiceEntityRepository
         $this->_connection = $this->getEntityManager()->getConnection();
     }
 
-    public function isInit()
-    {
-        $sql = "SELECT COUNT(*) AS count FROM configuration";
-        $stmt = $this->_connection->prepare($sql);
-        $stmt->execute();
-        $count = $stmt->fetch();
-
-        if ($count > 0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     public function findAllDefault()
     {

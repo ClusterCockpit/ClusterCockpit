@@ -166,7 +166,7 @@ class JobViewController extends Controller
                 $config = $configuration->getUserConfig($this->getUser());
                 $sortMetrics = $this->getDoctrine()
                                     ->getRepository(\App\Entity\TableSortConfig::class)
-                                    ->findMetrics(1);
+                                    ->findMetrics();
 
                 $count = count($sortMetrics);
                 $end = $count+1;
@@ -206,7 +206,7 @@ class JobViewController extends Controller
         $config = $configuration->getUserConfig($this->getUser());
         $sortMetrics = $this->getDoctrine()
                             ->getRepository(\App\Entity\TableSortConfig::class)
-                            ->findMetrics(1);
+                            ->findMetrics();
 
         $count = count($sortMetrics);
         $end = $count+1;
@@ -259,7 +259,7 @@ class JobViewController extends Controller
         $config = $configuration->getUserConfig($this->getUser());
         $sortMetrics = $this->getDoctrine()
                             ->getRepository(\App\Entity\TableSortConfig::class)
-                            ->findMetrics(1);
+                            ->findMetrics();
 
         $count = count($sortMetrics);
         $end = $count+1;

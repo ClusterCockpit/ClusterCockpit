@@ -44,16 +44,13 @@ use Symfony\Component\Cache\Adapter\AdapterInterface;
  */
 class JobCache
 {
-    private $_logger;
     private $_em;
     private $_cache;
-    private $_jobRepository;
     private $_plotGenerator;
     private $_tsHelper;
     private $_metricDataRepository;
 
     public function __construct(
-        LoggerInterface $logger,
         TimeseriesHelper $tsHelper,
         EntityManagerInterface $em,
         PlotGenerator $plotGenerator,
@@ -62,11 +59,9 @@ class JobCache
         AdapterInterface $cache
     )
     {
-        $this->_logger = $logger;
         $this->_tsHelper = $tsHelper;
         $this->_em = $em;
         $this->_plotGenerator = $plotGenerator;
-        $this->_jobRepository = $em->getRepository(\App\Entity\Job::class);
         $this->_metricDataRepository = $metricRepo;
         $this->_cache = $cache;
     }
@@ -85,7 +80,7 @@ class JobCache
     {
         $stat = new StatisticCache();
 
-        $tmp = $this->_jobRepository->findStatByUser($userId, $control);
+        $tmp = $this->_em->getRepository(\App\Entity\Job::class)->findStatByUser($userId, $control);
         $stat->setYear($control->getYear());
         $stat->setMonth($control->getMonth());
         $stat->setClusterId($control->getCluster());

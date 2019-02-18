@@ -26,7 +26,6 @@
 namespace App\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use App\Service\Plot\PlotGeneratorInterface;
 use App\Service\Plot\FilePlotGeneratorXmGrace;
 use App\Service\ColorMap;
@@ -34,14 +33,12 @@ use App\Entity\Plot;
 
 class PlotGenerator
 {
-    private $_logger;
     private $_plotter;
     private $_filePlotter;
     private $_color;
     private $_tsHelper;
 
     public function __construct(
-        LoggerInterface $logger,
         TimeseriesHelper $tsHelper,
         FilePlotGeneratorXmGrace $filePlotter,
         ColorMap $color,
@@ -49,7 +46,6 @@ class PlotGenerator
         PlotGeneratorInterface $plotter
     )
     {
-        $this->_logger = $logger;
         $this->_tsHelper = $tsHelper;
         $this->_filePlotter = $filePlotter;
         $this->_plotter = $plotter;

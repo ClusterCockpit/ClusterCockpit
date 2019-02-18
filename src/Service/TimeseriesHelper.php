@@ -32,12 +32,10 @@ class TimeseriesHelper
     private $_config;
 
     public function __construct(
-        LoggerInterface $logger,
-        Configuration $config
+        /* Configuration $config */
     )
     {
-        $this->_logger = $logger;
-        $this->_config = $config->getConfig();
+        /* $this->_config = $config->getConfig(); */
     }
 
     public function scaleMetric(&$y, $scale)
@@ -49,10 +47,13 @@ class TimeseriesHelper
 
     public function scaleTime(&$x):array
     {
+        $configuration = new Configuration();
+        $config = $configuration->getConfig();
+
         $unit = 'm';
         $dtick = 1;
         $scale = 60;
-        $round = (int) $this->_config['data_time_digits']->value;
+        $round = (int) $config['data_time_digits']->value;
         $range = end($x) - $x[0];
         $minutes = $range / 60;
 

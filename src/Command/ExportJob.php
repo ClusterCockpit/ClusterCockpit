@@ -55,22 +55,16 @@ use \DateInterval;
 class ExportJob extends Command
 {
     private $_em;
-    private $_configuration;
-    private $_jobCache;
     private $_filesystem;
     private $_root;
 
     public function __construct(
         EntityManagerInterface $em,
-        Configuration $configuration,
         $projectDir,
-        JobCache $jobCache,
         FileSystem $filesystem
     )
     {
         $this->_em = $em;
-        $this->_configuration = $configuration;
-        $this->_jobCache = $jobCache;
         $this->_filesystem = $filesystem;
         $this->_root = $projectDir.'/var/export/';
 
@@ -91,9 +85,9 @@ class ExportJob extends Command
     {
         $id = $input->getArgument('id');
         $repository = $this->_em->getRepository(\App\Entity\Job::class);
-
+        $configuration = new Configuration();
+        $jobCache = new JobCache();
         $userRep = $this->_em->getRepository(\App\Entity\User::class);
-
         $users = $userRep->findAll();
 
         foreach ( $users as $user ) {
@@ -137,12 +131,12 @@ class ExportJob extends Command
             ->setRows($rows);
         $table->render();
 
-        $this->_jobCache->checkCache(
+        $jobCache->checkCache(
             $job,
             array(
                 'mode' => 'data'
             ),
-            $this->_configuration->getConfig()
+            $configuration->getConfig()
         );
 
         if ( $job->hasProfile ) {

@@ -45,7 +45,6 @@ use \DateInterval;
 
 class Cron extends Command
 {
-    private $_logger;
     private $_em;
     private $_ldap;
     private $_jobCache;
@@ -55,19 +54,13 @@ class Cron extends Command
 
     public function __construct(
         LdapManager $ldap,
-        LoggerInterface $logger,
-        Configuration $configuration,
         EntityManagerInterface $em,
-        StopWatch $stopwatch,
-        JobCache $jobCache
+        StopWatch $stopwatch
     )
     {
-        $this->_logger = $logger;
         $this->_em = $em;
         $this->_ldap = $ldap;
         $this->_timer = $stopwatch;
-        $this->_configuration = $configuration;
-        $this->_jobCache = $jobCache;
 
         parent::__construct();
     }
@@ -363,6 +356,8 @@ class Cron extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $d = new DateTime('NOW', new DateTimeZone('Europe/Berlin'));
+        $this->_configuration = new Configuration();
+        $this->_jobCache = new JobCache();
         $datestr = $d->format('Y-m-d\TH:i:s');
         $task = $input->getArgument('task');
         $interactive = $input->getOption('interactive');

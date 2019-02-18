@@ -191,7 +191,7 @@ class UserViewController extends Controller
 
         $sortMetrics = $this->getDoctrine()
                             ->getRepository(\App\Entity\TableSortConfig::class)
-                            ->findMetrics(1);
+                            ->findMetrics();
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());

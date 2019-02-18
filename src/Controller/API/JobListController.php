@@ -52,17 +52,14 @@ use \DateInterval;
 class JobListController extends FOSRestController
 {
     private $_jobCache;
-    private $_configuration;
     private $_authChecker;
 
     public function __construct(
         JobCache $jobCache,
-        AuthorizationCheckerInterface $authChecker,
-        Configuration $configuration
+        AuthorizationCheckerInterface $authChecker
     )
     {
         $this->_jobCache = $jobCache;
-        $this->_configuration = $configuration;
         $this->_authChecker = $authChecker;
     }
 
@@ -93,7 +90,8 @@ class JobListController extends FOSRestController
 
     private function _addJobPerformanceProfile($job, $mode, $sortMetrics = NULL)
     {
-        $config = $this->_configuration->getUserConfig($this->getUser());
+        $configuration = new Configuration();
+        $config = $configuration->getUserConfig($this->getUser());
 
         $this->_jobCache->checkCache(
             $job,
@@ -188,7 +186,8 @@ class JobListController extends FOSRestController
     public function getAction($slug)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $config = $this->_configuration->getUserConfig($this->getUser());
+        $configuration = new Configuration();
+        $config = $configuration->getUserConfig($this->getUser());
         $userId = 0;
 
         if ( false === $this->_authChecker->isGranted('ROLE_ADMIN') ) {
@@ -238,7 +237,7 @@ class JobListController extends FOSRestController
 
         $sortMetrics = $this->getDoctrine()
                             ->getRepository(\App\Entity\TableSortConfig::class)
-                            ->findMetrics(1);
+                            ->findMetrics();
 
         $sorting = $this->_createJobSorting(
             $columns,
