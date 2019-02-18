@@ -37,6 +37,30 @@ To install and use ClusterCockpit you need the following dependencies:
 - Optional: InfluxDB time series database
 
 --------------------------------------------------------------------------------
+Configure PHP installation
+--------------------------------------------------------------------------------
+
+The default PHP memory limit is too low for most Symfony applications. You may
+also need to enable some PHP extensions. Please note that these settings are
+required to run Symfony at all. Please consult the Symfony documentation for
+performance optimized PHP settings in production mode.
+
+Please check and if required set or uncomment the following settings in
+`php.ini` (Ususally located in `/etc/php/php.ini`):
+
+```
+memory_limit = 1G
+
+...
+
+extension=curl
+extension=iconv
+extension=ldap
+extension=mysqli
+extension=pdo_mysql
+```
+
+--------------------------------------------------------------------------------
 Setup project
 --------------------------------------------------------------------------------
 
@@ -61,26 +85,17 @@ if you have a github account or you can use https:
 $ git clone https://github.com/ClusterCockpit/ClusterCockpit.git ClusterCockpit
 ```
 
-2. Install required PHP version on Ubuntu
+2. Install required PHP version
 
-You need at least PHP 7.1. On Ubuntu 16.04 this requires to add an additional repository:
-```
-$ add-apt-repository ppa:ondrej/php
-$ apt-get update
-$ apt-get install php7.1 php7.1-xml php7.1-mysql
-```
+You need at least PHP 7.1.3 (prefered is PHP 7.2 or higher) . Please refer to
+Google for how to install PHP on your operating system.
 
-3. Setup MySQL
+3. Setup database backends
 
-At the moment all development was done using a MySQL server. MariaDB or
-PostgresSQL where not tested but should also work. On Ubuntu you need to
-install the following packages to install MySQL:
+At the moment all development was done using  MySQL. MariaDB or
+PostgresSQL where not tested but should also work.
 
-```
-$ apt-get install mysql-server mysql-client
-```
-
-Create symfony database user and database:
+Create symfony database user and ClusterCockpit database:
 
 ```
 $ mysql -u root  -p
@@ -90,51 +105,112 @@ $mysql> GRANT ALL PRIVILEGES ON ClusterCockpit.* TO 'username'@'localhost';
 $mysql> quit
 ```
 
-4. Configure Symfony access to MySQL:
+We recommend InfluxDB as database backend for the metric data. The following
+are optimizes settings in `influxdb.yml` to start with. Still due to the
+complexity of this topic for optimized settings for mySQL as well as influxDB
+refer to documentation on the web.
+
+```
+[data]
+   index-version = "tsi1"
+   wal-fsync-delay = "100ms"
+   cache-max-memory-size = "2g"
+   cache-snapshot-memory-size = "1g"
+
+[http]
+   auth-enabled = true 
+   reporting-disabled = true
+   log-enabled = false
+
+[data]
+   query-log-enabled = false
+
+[continuous_queries]
+   log-enabled = false
+   run-interval = "1m"
+```
+
+The following steps need to be executed to setup InfluxDB. Enter influx shell:
+
+```
+influx   -precision=s
+```
+
+Create admin user for influxDB and ClusterCockpit metric database:
+
+```
+> CREATE USER admin WITH PASSWORD 'pass' WITH ALL PRIVILEGES
+> CREATE DATABASE ClusterCockpit WITH DURATION 540d NAME data
+```
+
+On subsequent influx shell sessions you have to authenticate, for example by
+entering the auth command in the influx shell. To create more users enter for
+example:
+
+```
+> auth
+username: admin
+password:
+> CREATE USER "symfony" WITH PASSWORD 'password'
+> GRANT READ ON "ClusterCockpit" TO "symfony"
+> CREATE USER "telegraf" WITH PASSWORD 'password'
+> GRANT WRITE ON "ClusterCockpit" TO "telegraf"
+
+```
+
+
+4. Configure Symfony access to MySQL and InfluxDB:
 
 Symfony uses the [Doctrine](https://www.doctrine-project.org) ORM for mapping
 PHP classes on  database tables. Database access for Doctrine is configured in
 the local only .env file. This file is not committed. You first need to copy
 the .env.dist file to .env and adopt it to your needs.
 
-To configure mysql credentials open the .env file in you project root and add
-the following line (enter above username and password for the placeholders): 
+To configure database backend credentials open the .env file in your project
+root and add the following lines (enter above username and password for the
+placeholders): 
 
 ```
-DATABASE_URL=mysql://<username>:<mypass>@127.0.0.1:3306/ClusterCockpit
-
+DATABASE_URL=mysql://<username>:<password>@127.0.0.1:3306/ClusterCockpit
+INFLUXDB_URL=influxdb://<username>:<password>@127.0.0.1:8086/ClusterCockpit
 ```
 
-5. Install Symfony packages
+5. Setup ClusterCockpit:
 
-It is recommended to install a recent composer locally as described [here](https://getcomposer.org/download/).
-All packages will be installed locally in the Symfony project tree.
+It is recommended to install a recent composer locally as described
+[here](https://getcomposer.org/download/). All packages will be installed
+locally in the ClusterCockpit project tree.
+
+Install Symfony packages:
 
 ```
 $ cd ClusterCockpit
 $ composer install
 ```
 
-If you did not import a database dump before with the correct schema this
-command will end with an error. In this case you have to execute
+First create the database schema with:
 
 ```
 $ php bin/console doctrine:schema:update --force
 ```
 
-first to create the database schema. A subsequent call to composer install should then run through cleanly.
+Then load minimum database initialization:
+
+```
+$ php bin/console  doctrine:fixtures:load
+```
+
+Create admin account:
+
+```
+$ php bin/console  app:user admin  <password>  '<email>' ROLE_ADMIN ROLE_ANALYST ROLE_USER
+```
 
 6. Sanity checks
 
 Check if database is setup correctly:
 ```
 $ php bin/console doctrine:schema:validate
-```
-
-The common way to update a database schema is to adapt the according entity PHP classes and then do:
-```
-$ php bin/console doctrine:schema:update --dump-sql
-$ php bin/console doctrine:schema:update --force
 ```
 
 You can get a list of all configured routes (URLs) with:
