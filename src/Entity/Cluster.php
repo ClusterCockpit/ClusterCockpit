@@ -48,11 +48,6 @@ class Cluster
     public $name;
 
     /**
-     *  @ORM\Column(type="integer",)
-     */
-    public $coresPerNode;
-
-    /**
      *  @ORM\Column(type="float")
      */
     public $flopRateScalar;
@@ -120,7 +115,8 @@ class Cluster
 
     public function addMetricList(MetricList $metricList): self
     {
-        $this->metricLists[$metricList->name] = $metricList;
+        $this->metricLists[$metricList->getName()] = $metricList;
+        $metricList->setCluster($this);
         return $this;
 
         /* if (!$this->metricLists->contains($metricList)) { */

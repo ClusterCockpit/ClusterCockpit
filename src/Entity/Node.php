@@ -32,10 +32,6 @@ class Node
      */
     public $status;
 
-    public function __construct() {
-        $this->properties = new \Doctrine\Common\Collections\ArrayCollection();
-    }
-
     public function getId()
     {
         return $this->id;

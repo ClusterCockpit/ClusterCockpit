@@ -41,10 +41,6 @@ class TableSortConfig
      */
     private $accessKey;
 
-    /**
-     * @ORM\Column(type="integer")
-     */
-    private $clusterId;
 
     public function getId(): ?int
     {
@@ -107,18 +103,6 @@ class TableSortConfig
     public function setAccessKey(string $accessKey): self
     {
         $this->accessKey = $accessKey;
-
-        return $this;
-    }
-
-    public function getClusterId(): ?int
-    {
-        return $this->clusterId;
-    }
-
-    public function setClusterId(int $clusterId): self
-    {
-        $this->clusterId = $clusterId;
 
         return $this;
     }

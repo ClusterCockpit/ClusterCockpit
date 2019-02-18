@@ -35,6 +35,7 @@ use App\Form\ApiKeyType;
 use App\Entity\ApiKey;
 use App\Form\ClusterType;
 use App\Entity\Cluster;
+use App\Entity\MetricList;
 use App\Entity\Node;
 use App\Entity\Configuration;
 use App\Form\UserType;
@@ -203,10 +204,7 @@ class ConfigViewController extends AbstractController
     {
         return $this->render('config/index.html.twig',
             array(
-                'sidebar' => $this->_sidebar(),
-                'init' => $this->getDoctrine()
-                     ->getRepository(\App\Entity\Configuration::class)
-                     ->isInit()
+                'sidebar' => $this->_sidebar()
             ));
     }
 
@@ -214,10 +212,7 @@ class ConfigViewController extends AbstractController
     {
         return $this->render('config/index.html.twig',
             array(
-                'sidebar' => $this->_userSidebar(),
-                'init' => $this->getDoctrine()
-                     ->getRepository(\App\Entity\Configuration::class)
-                     ->isInit()
+                'sidebar' => $this->_userSidebar()
             ));
     }
 
@@ -629,11 +624,7 @@ class ConfigViewController extends AbstractController
                             $newNode = new Node();
                             $newNode->nodeId = $node['nodeId'];
                             $newNode->cluster = $cluster->getId();
-                            $newNode->numProcessors = $node['processors'];
                             $newNode->status = 'active';
-                            if ( array_key_exists('cores', $node) ) {
-                                $newNode->numCores = $node['cores'];
-                            }
                             $em->persist($newNode);
                         }
                     }
@@ -668,29 +659,60 @@ class ConfigViewController extends AbstractController
 
             if ( $form->get('save')->isClicked() )  {
                 $cluster = $form->getData();
+                $em = $this->getDoctrine()->getManager();
                 $file = $cluster->getNodeFile();
+                $em->persist($cluster);
+                $em->flush();
+
+                foreach ( array('list','view','stat','sort') as $listName ) {
+                    $list = new MetricList();
+                    $list->setName($listName);
+                    $cluster->addMetricList($list);
+                    $em->persist($list);
+                }
+
+                $em->persist($cluster);
+                $em->flush();
 
                 if (! is_null($file)){
 
                     $fileName = $this->generateUniqueFileName().'.'.$file->guessExtension();
+                    $filePath = $this->getParameter('upload_directory');
 
                     try {
                         $file->move(
-                            $this->getParameter('upload_directory'),
+                            $filePath,
                             $fileName
                         );
                     } catch (FileException $e) {
                         // ... handle exception if something happens during file upload
                     }
 
-                    $fileReader->parse($filename);
+                    $fileReader = new NodeFileReader();
+                    $nodes = $fileReader->parse($filePath.'/'.$fileName);
+                    $currentNodes = $cluster->getNodes();
+                    $nodeLookup = array();
+
+                    if ( count($currentNodes) > 0 ){
+                        foreach ( $currentNodes as  $node ) {
+                            $nodeLookup[$node->nodeId] = 1;
+                        }
+                    }
+
+                    foreach ( $nodes as  $node ) {
+                        if ( array_key_exists($node['nodeId'], $nodeLookup) ) {
+                            /* TODO: Sync new data */
+
+                        } else {
+                            $newNode = new Node();
+                            $newNode->nodeId = $node['nodeId'];
+                            $newNode->cluster = $cluster->getId();
+                            $newNode->status = 'active';
+                            $em->persist($newNode);
+                        }
+                    }
+                    $em->flush();
                 }
-
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($cluster);
-                $em->flush();
-
-                /* TODO init metric lists */
             }
 
             return $this->redirectToRoute('list_clusters');

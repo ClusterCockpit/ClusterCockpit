@@ -54,11 +54,9 @@ class TableSortConfigRepository extends ServiceEntityRepository
         );
     }
 
-    public function findMetrics($clusterId)
+    public function findMetrics()
     {
         return $this->createQueryBuilder('t', 't.accessKey')
-            ->andWhere('t.clusterId = :val')
-            ->setParameter('val', $clusterId)
             ->orderBy('t.position','asc')
             ->getQuery()
             ->getResult()

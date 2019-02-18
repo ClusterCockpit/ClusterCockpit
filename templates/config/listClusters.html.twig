@@ -23,7 +23,6 @@
                             <th scope="col">Id</th>
                             <th scope="col">Name</th>
                             <th scope="col"># Nodes</th>
-                            <th scope="col">Cores per node</th>
                             <th scope="col">Edit</th>
                             <th scope="col">Delete</th>
                         </tr>
@@ -36,7 +35,6 @@
                                 </th>
                                 <td class="align-middle text-center">{{ cluster.name }}</td>
                                 <td class="align-middle text-center">{{ cluster.nodes | length }}</td>
-                                <td class="align-middle text-center">{{ cluster.coresPerNode }}</td>
                                 <td class="align-middle text-center">
                                     <a class="btn btn-success" href="/admin/clusters/{{ cluster.id }}" aria-label="Edit">
                                         <span class="fas fa-pen-square fa-lg" aria-hidden="true"></span>
