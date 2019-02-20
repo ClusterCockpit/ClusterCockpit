@@ -8,8 +8,8 @@ framework:
         engines: ['twig']
     default_locale: 'en'
     trusted_hosts: ~
-    cache:
-        app: cache.adapter.redis
+    # cache:
+    #     app: cache.adapter.redis
     session:
         handler_id: session.handler.native_file
         save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
@@ -18,4 +18,3 @@ framework:
     assets: ~
     php_errors:
         log: true
-
