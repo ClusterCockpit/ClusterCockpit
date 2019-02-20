@@ -37,20 +37,11 @@
                             </a>
                         </li>
                         {% if is_granted('ROLE_ADMIN') %}
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">
-                                    Statistics
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ path('user_stat') }}">
+                                    User Statistics
                                     <i class="fas fa-database"></i>
                                 </a>
-                                <div class="dropdown-menu">
-                                    <a class="dropdown-item" href="{{ path('user_stat') }}">
-                                        User Statistics
-                                    </a>
-                                    <a class="dropdown-item" href="{{ path('group_stat') }}">
-                                        Group Statistics
-                                    </a>
-                                    <!-- <a class="dropdown-item" href="{{ path('cluster_stat') }}">Cluster Statistics</a> -->
-                                </div>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ path('job_tag_types') }}">
@@ -131,7 +122,7 @@
         {% block footer %}
             <footer>
                 <div class="container text-center">
-                    <p>Copyright &copy; RRZE 2018</p>
+                    <p>Copyright &copy; RRZE 2019</p>
                     <p><a href="https://www.rrze.fau.de/impressum/">Impressum</a>
                 </div>
             </footer>
