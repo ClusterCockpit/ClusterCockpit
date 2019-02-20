@@ -158,6 +158,18 @@ password:
 
 ```
 
+The default caching backend is file system based cache. For production the use
+of [Redis](https://redis.io) as caching backend is recommended. Redis provides
+a simpler usage if using Apache as web server, provides a slighly better
+performance compared to a SSD based files system cache and is more scalable for
+heavy load. To enable redis as caching backend uncomment the following lines in
+`config/packages/framework.yaml`:
+
+```
+cache:
+    app: cache.adapter.redis
+  
+```
 
 4. Configure Symfony access to MySQL and InfluxDB:
 
