@@ -85,28 +85,28 @@ class ExportJob extends Command
     {
         $id = $input->getArgument('id');
         $repository = $this->_em->getRepository(\App\Entity\Job::class);
-        $configuration = new Configuration();
+        $configuration = new Configuration($this->_em);
         $jobCache = new JobCache();
         $userRep = $this->_em->getRepository(\App\Entity\User::class);
         $users = $userRep->findAll();
 
-        foreach ( $users as $user ) {
+/*         foreach ( $users as $user ) { */
 
-            $name = $user->getName(true);
-            $userID = $user->getUserId(true);
-            $email = $user->getEmail(true);
-            $pass = $user->getPassword();
+/*             $name = $user->getName(true); */
+/*             $userID = $user->getUserId(true); */
+/*             $email = $user->getEmail(true); */
+/*             $pass = $user->getPassword(); */
 
-            /* $output->writeln([ 'TRY ', $name, $pass]); */
+/*             /1* $output->writeln([ 'TRY ', $name, $pass]); *1/ */
 
-                $user->setName($name);
-                $user->setUsername($userID);
-                $user->setEmail($email);
-                $this->_em->persist($user);
-        }
-                $this->_em->flush();
+/*                 $user->setName($name); */
+/*                 $user->setUsername($userID); */
+/*                 $user->setEmail($email); */
+/*                 $this->_em->persist($user); */
+/*         } */
+/*                 $this->_em->flush(); */
 
-        exit;
+/*         exit; */
 
         $output->writeln([
             'Job File Export',
@@ -131,12 +131,17 @@ class ExportJob extends Command
             ->setRows($rows);
         $table->render();
 
+        $options['plot_view_showPolarplot']      = $configuration->getValue('plot_view_showPolarplot');
+        $options['plot_view_showRoofline']       = $configuration->getValue('plot_view_showRoofline');
+        $options['plot_view_showStatTable']      = $configuration->getValue('plot_view_showStatTable');
+        $options['plot_list_samples']            = $configuration->getValue('plot_list_samples');
+        $options['plot_general_colorBackground'] = $configuration->getValue('plot_general_colorBackground');
+        $options['plot_general_lineWidth']       = $configuration->getValue('plot_general_lineWidth');
+
         $jobCache->checkCache(
             $job,
-            array(
-                'mode' => 'data'
-            ),
-            $configuration->getConfig()
+            'data',
+            $options
         );
 
         if ( $job->hasProfile ) {

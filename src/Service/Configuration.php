@@ -58,7 +58,6 @@ class Configuration
         return $this->_repository->findAllScope(array($user->getUsername()));
     }
 
-
     public function getConfig()
     {
         if ( $this->_isInit == 0 ) {

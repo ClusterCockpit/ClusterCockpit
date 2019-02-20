@@ -60,6 +60,7 @@ class StatisticsViewController extends Controller
             'repository' => $this->getDoctrine()->getRepository(\App\Entity\Job::class)
         );
     }
+
     public function users(Request $request)
     {
         $control = $this->_init($request);
@@ -72,6 +73,7 @@ class StatisticsViewController extends Controller
                 'users' => $users,
             ));
     }
+
     public function groups(Request $request)
     {
         $control = $this->_init($request);
@@ -84,6 +86,7 @@ class StatisticsViewController extends Controller
                 'groups' => $groups,
             ));
     }
+
     public function clusters(
         Request $request,
         JobCache $jobCache,
@@ -117,5 +120,3 @@ class StatisticsViewController extends Controller
             ));
     }
 }
-
-

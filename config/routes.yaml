@@ -25,9 +25,6 @@ joblist:
 index:
     path: /
     controller:  App\Controller\IndexViewController::home
-init:
-    path: /init/{slug}
-    controller:  App\Controller\IndexViewController::init
 list_jobs:
     path: /monitoring/listjobs/
     controller:  App\Controller\JobViewController::list
@@ -46,15 +43,15 @@ show_job:
 search_id:
     path: /monitoring/searchId
     controller:  App\Controller\JobViewController::searchId
-cluster_stat:
-    path: /monitoring/cluster/statistics/
-    controller:  App\Controller\StatisticsViewController::clusters
+# cluster_stat:
+#     path: /monitoring/cluster/statistics/
+#     controller:  App\Controller\StatisticsViewController::clusters
 user_stat:
     path: /monitoring/user/statistics/
     controller:  App\Controller\StatisticsViewController::users
-group_stat:
-    path: /monitoring/group/statistics
-    controller:  App\Controller\StatisticsViewController::groups
+# group_stat:
+#     path: /monitoring/group/statistics
+#     controller:  App\Controller\StatisticsViewController::groups
 show_user:
     path: /monitoring/user/{id}
     controller:  App\Controller\UserViewController::show

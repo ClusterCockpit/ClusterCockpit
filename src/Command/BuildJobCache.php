@@ -80,7 +80,7 @@ class BuildJobCache extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $stopwatch = new Stopwatch();
-        $configuration = new Configuration();
+        $configuration = new Configuration($this->_em);
         $jobCache = new JobCache();
         $jobs;
         $day = $input->getArgument('day');

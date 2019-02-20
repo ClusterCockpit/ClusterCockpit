@@ -33,7 +33,6 @@ use App\Entity\StatisticCache;
 use App\Repository\DoctrineMetricDataRepository;
 use App\Repository\InfluxDBMetricDataRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 
 /**
@@ -54,8 +53,8 @@ class JobCache
         TimeseriesHelper $tsHelper,
         EntityManagerInterface $em,
         PlotGenerator $plotGenerator,
-        InfluxDBMetricDataRepository $metricRepo,
-        /* DoctrineMetricDataRepository $metricRepo, */
+        /* InfluxDBMetricDataRepository $metricRepo, */
+        DoctrineMetricDataRepository $metricRepo,
         AdapterInterface $cache
     )
     {
@@ -100,7 +99,7 @@ class JobCache
     {
         if ( $job->isRunning()) {
             $job->stopTime = time();
-            /* $job->stopTime = 1521057932; */
+            $job->stopTime = 1540353335;
             $job->duration = $job->stopTime - $job->startTime;
         }
     }
@@ -177,16 +176,16 @@ class JobCache
     private function _generatePlots(
         $job,
         $mode,
-        $config,
+        $options,
         $live = false
     )
     {
         $job->jobCache = new \App\Entity\JobCache();
 
         if ( $mode === 'view' or $live == false ){
-            if ( $config['plot_view_showPolarplot']->value == 'true' or
-                $config['plot_view_showStatTable']->value == 'true' or
-                $config['plot_general_colorBackground']->value == 'true'
+            if ( $options['plot_view_showPolarplot'] == 'true' or
+                $options['plot_view_showStatTable'] == 'true' or
+                $options['plot_general_colorBackground'] == 'true'
             ) {
                 /* collect all metrics required for node table and job table sorting */
                 $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
@@ -200,30 +199,30 @@ class JobCache
             $options['sample'] = 0;
             $options['legend'] = false;
 
-            if ( $config['plot_view_showRoofline']->value == 'true' ) {
+            if ( $options['plot_view_showRoofline'] == 'true' ) {
                 $this->_plotGenerator->generateJobRoofline(
                     $job, $this->_metricDataRepository->getJobRoofline($job, $metrics)
                 );
             }
 
-            if ( $config['plot_view_showPolarplot']->value == 'true' ) {
+            if ( $options['plot_view_showPolarplot'] == 'true' ) {
                 $this->_plotGenerator->generateJobPolarPlot(
                     $job, $metrics, $stats
                 );
             }
 
-            if ( $config['plot_view_showStatTable']->value == 'true' ) {
+            if ( $options['plot_view_showStatTable'] == 'true' ) {
                 $job->jobCache->nodeStat = $stats['nodeStats'];
             } else {
                 $job->jobCache->nodeStat = false;
             }
         } else if ( $mode === 'list' ) { /* Job list  */
             $options['mode'] = 'list';
-            $options['sample'] = $config['plot_list_samples']->value;
+            $options['sample'] = $options['plot_list_samples'];
             $options['legend'] = false;
         }
 
-        $options['lineWidth'] =  $config['plot_general_lineWidth']->value;
+        $options['lineWidth'] =  $options['plot_general_lineWidth'];
 
         $metrics = $job->getCluster()->getMetricList($mode)->getMetrics();
         $data = $this->_metricDataRepository->getMetricData( $job, $metrics);
@@ -236,7 +235,7 @@ class JobCache
         foreach ($metrics as $metric){
 
             if ( $mode === 'view' or $live == false ) {
-                if ( $config['plot_general_colorBackground']->value === 'true' ) {
+                if ( $options['plot_general_colorBackground'] === 'true' ) {
                     $this->_colorBackground($options, $metric, $stats);
                 }
             }
@@ -252,8 +251,7 @@ class JobCache
 
     public function warmupCache(
         $job,
-        $config,
-        $points = 0
+        $options
     )
     {
         $this->_initJob($job);
@@ -264,18 +262,15 @@ class JobCache
 
         $viewMetrics = $job->getCluster()->getMetricList('view')->getMetrics();
         $pointsJob = $this->_metricDataRepository->getMetricCount($job, $viewMetrics);
-
-        if ( $points == 0 ){
-            $points = (int) $config['data_cache_numpoints']->value;
-        }
+        $points = (int) $options['data_cache_numpoints'];
 
         if ( $pointsJob > $points ){
-            $this->_generatePlots($job, 'view', $config);
+            $this->_generatePlots($job, 'view', $options);
             $item = $this->_cache->getItem($job->getJobId().'view');
             $this->_cache->save($item->set($job->jobCache));
 
             $job->jobCache = NULL;
-            $this->_generatePlots($job, 'list', $config);
+            $this->_generatePlots($job, 'list', $options);
             $item = $this->_cache->getItem($job->getJobId().'list');
             $this->_cache->save($item->set($job->jobCache));
             $job->isCached = true;
@@ -323,7 +318,7 @@ class JobCache
     public function checkCache(
         $job,
         $mode,
-        $config
+        $options
     )
     {
         $this->_initJob($job);
@@ -339,7 +334,7 @@ class JobCache
             $job->hasProfile = false;
         } else {
             $job->hasProfile = true;
-            $this->_generatePlots($job, $mode, $config, true);
+            $this->_generatePlots($job, $mode, $options, true);
         }
     }
 }

@@ -36,7 +36,6 @@ use App\Entity\RunningJob;
 use App\Entity\Cluster;
 use App\Entity\User;
 use App\Entity\Node;
-use App\Entity\Project;
 use App\Service\JobCache;
 use App\Service\Configuration;
 use FOS\RestBundle\Controller\FOSRestController;
@@ -91,15 +90,26 @@ class JobListController extends FOSRestController
         return $sorting;
     }
 
-    private function _addJobPerformanceProfile($job, $mode, $sortMetrics = NULL)
+    private function _addJobPerformanceProfile(
+        $job,
+        $mode,
+        $sortMetrics = NULL)
     {
         $configuration = new Configuration($this->_em);
         $config = $configuration->getUserConfig($this->getUser());
 
+        $options['plot_view_showPolarplot']      = $config['plot_view_showPolarplot']->value;
+        $options['plot_view_showRoofline']       = $config['plot_view_showRoofline']->value;
+        $options['plot_view_showStatTable']      = $config['plot_view_showStatTable']->value;
+        $options['plot_list_samples']            = $config['plot_list_samples']->value;
+        $options['plot_general_colorBackground'] = $config['plot_general_colorBackground']->value;
+        $options['plot_general_lineWidth']       = $config['plot_general_lineWidth']->value;
+        $options['data_time_digits']             = $config['data_time_digits']->value;
+
         $this->_jobCache->checkCache(
             $job,
             $mode,
-            $config
+            $options
         );
 
         $d1 = new DateTime();
@@ -162,14 +172,7 @@ class JobListController extends FOSRestController
                     'data' => $plot->data
                 );
 
-                if ( $config['plot_general_interactive']->value === 'false' ) {
-                    $plotOptions = '{staticPlot: true}';
-                } else {
-                    $plotOptions = '{modeBarButtonsToRemove: [\'sendDataToCloud\']}';
-                }
-
                 $jobData['nodeStats'] = $job->jobCache->nodeStat;
-                /* $jobData['plotOptions'] = $plotOptions; */
             }
         } else {
             if ( $mode === 'list' ){
@@ -204,9 +207,7 @@ class JobListController extends FOSRestController
             throw new HttpException(400, "No such job $slug.");
         }
 
-        $jobData = $this->_addJobPerformanceProfile(
-            $job,
-            'view');
+        $jobData = $this->_addJobPerformanceProfile($job, 'view');
 
         $view = $this->view($jobData);
         return $this->handleView($view);
@@ -223,12 +224,12 @@ class JobListController extends FOSRestController
      */
     public function cgetAction( ParamFetcher $paramFetcher)
     {
-        $draw = $paramFetcher->get('draw');
-        $start = $paramFetcher->get('start');
-        $length = $paramFetcher->get('length');
-        $order = $paramFetcher->get('order');
-        $search = $paramFetcher->get('search');
-        $columns = $paramFetcher->get('columns');
+        $draw     = $paramFetcher->get('draw');
+        $start    = $paramFetcher->get('start');
+        $length   = $paramFetcher->get('length');
+        $order    = $paramFetcher->get('order');
+        $search   = $paramFetcher->get('search');
+        $columns  = $paramFetcher->get('columns');
         $jobQuery = $paramFetcher->get('jobQuery');
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -285,11 +286,12 @@ class JobListController extends FOSRestController
         }
 
         $view = $this->view(array(
-            "draw" => (int) $draw,
-            "recordsTotal" => $total,
+            "draw"            => (int) $draw,
+            "recordsTotal"    => $total,
             "recordsFiltered" => $filtered,
-            "data" => $tableData
+            "data"            => $tableData
         ));
+
         return $this->handleView($view);
     } // "get_jobs"             [GET] /web/joblist/
 }

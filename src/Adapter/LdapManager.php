@@ -27,53 +27,47 @@ namespace App\Adapter;
 
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Ldap\LdapInterface;
-use Psr\Log\LoggerInterface;
-use App\Service\Configuration;
 
 class LdapManager
 {
-    public function bindUser($uid, $password)
+    public function bindUser($config, $uid, $password)
     {
-        $configuration = new Configuration();
         $ldap = Ldap::create('ext_ldap', array(
-            'connection_string' => $configuration->getValue('ldap_connection_url')
+            'connection_string' => $config['ldap_connection_url']
         ));
-        $base = $configuration->getValue('ldap_user_base');
-        $key = $configuration->getValue('ldap_user_key');
+        $base = $config['ldap_user_base'];
+        $key = $config['ldap_user_key'];
         $dn = $key.'='.$uid.','.$base;
         /* $username = $this->_ldap->escape($dn, '', LdapInterface::ESCAPE_DN); */
 
         $ldap->bind($dn, $password);
     }
 
-    public function queryUsers()
+    public function queryUsers($config)
     {
-        $configuration = new Configuration();
         $ldap = Ldap::create('ext_ldap', array(
-            'connection_string' => $configuration->getValue('ldap_connection_url')
+            'connection_string' => $config['ldap_connection_url']
         ));
         $password = getenv('LDAP_PW');
-        $dn = $configuration->getValue('ldap_search_dn');
-        $baseDn = $configuration->getValue('ldap_user_base');
-        $filter = $configuration->getValue('ldap_user_filter');
+        $dn = $config['ldap_search_dn'];
+        $baseDn = $config['ldap_user_base'];
+        $filter = $config['ldap_user_filter'];
         $ldap->bind($dn, $password);
 
         return $ldap->query($baseDn, $filter)->execute()->toArray();
     }
 
-    public function queryGroups()
+    public function queryGroups($config)
     {
-        $configuration = new Configuration();
         $ldap = Ldap::create('ext_ldap', array(
-            'connection_string' => $configuration->getValue('ldap_connection_url')
+            'connection_string' => $config['ldap_connection_url']
         ));
         $password = getenv('LDAP_PW');
-        $dn = $configuration->getValue('ldap_search_dn');
-        $baseDn = $configuration->getValue('ldap_group_base');
-        $filter = $configuration->getValue('ldap_group_filter');
+        $dn = $config['ldap_search_dn'];
+        $baseDn = $config['ldap_group_base'];
+        $filter = $config['ldap_group_filter'];
         $ldap->bind($dn, $password);
 
         return $ldap->query($baseDn, $filter)->execute()->toArray();
     }
 }
-

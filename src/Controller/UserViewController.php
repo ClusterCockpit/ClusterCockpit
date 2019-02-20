@@ -54,6 +54,7 @@ class UserViewController extends Controller
                 'users' => $users,
             ));
     }
+
     public function showGroup(
         UnixGroup $group,
         Request $request)
@@ -99,8 +100,7 @@ class UserViewController extends Controller
             );
         }
 
-        $settings = $jobRepository->getSettings($control);
-        $stat = $jobRepository->findStatByGroup($group->getId(), $settings);
+        $stat = $jobRepository->findStatByGroup($group->getId(), $control);
 
         return $this->render('users/showGroup.html.twig',
             array(
@@ -115,6 +115,7 @@ class UserViewController extends Controller
                 'users' => $usersD,
             ));
     }
+
     public function show(
         User $user,
         JobCache $jobCache,

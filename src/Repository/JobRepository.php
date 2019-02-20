@@ -553,8 +553,9 @@ class JobRepository extends ServiceEntityRepository
         return $stat;
     }
 
-    public function findStatByGroup($groupId, $settings)
+    public function findStatByGroup($groupId, $control)
     {
+        $settings = $this->getSettings($control);
         $join = "INNER JOIN users_groups ON job.user_id = users_groups.user_id ";
         $constraint = "AND users_groups.group_id=$groupId";
         $stat['stat'] = $this->getStats($settings,$constraint, $join);

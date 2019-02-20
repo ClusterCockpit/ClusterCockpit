@@ -43,13 +43,16 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
 use Symfony\Component\Security\Http\Util\TargetPathTrait;
 use Symfony\Component\Ldap\Exception\ConnectionException;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use App\Service\Configuration;
 use App\Adapter\LdapManager;
 
 class LdapAuthenticator extends AbstractFormLoginAuthenticator
 {
     use TargetPathTrait;
 
+    private $_em;
     private $_logger;
     private $_ldap;
     private $_security;
@@ -59,6 +62,7 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
 
     public function __construct(
         LoggerInterface $logger,
+        EntityManagerInterface $em,
         RouterInterface $router,
         UserPasswordEncoderInterface $passwordEncoder,
         CsrfTokenManagerInterface $csrfTokenManager,
@@ -67,6 +71,7 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
     )
     {
         $this->_logger = $logger;
+        $this->_em = $em;
         $this->_ldap = $ldap;
         $this->_security = $security;
         $this->_router = $router;
@@ -122,6 +127,9 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
     {
         $username = $credentials['username'];
         $password = $credentials['password'];
+        $configuration = new Configuration($this->_em);
+        $config['ldap_user_base'] = $configuration->getValue('ldap_user_base');
+        $config['ldap_user_key'] = $configuration->getValue('ldap_user_key');
 
         if ('' === (string) $password) {
             throw new BadCredentialsException('The presented password must not be empty.');
@@ -132,7 +140,7 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
         if ( empty($dbPassword) ) {
             /* authenticate with ldap bind */
             try {
-                $this->_ldap->bindUser($username, $password);
+                $this->_ldap->bindUser($config, $username, $password);
             } catch (ConnectionException $e) {
                 throw new BadCredentialsException('Invalid credentials.');
             }

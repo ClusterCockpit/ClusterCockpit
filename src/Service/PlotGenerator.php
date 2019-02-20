@@ -240,7 +240,7 @@ class PlotGenerator
             /* get max y for axis range */
             $maxVal = max($maxVal,max($y));
             /* adjust x axis time unit */
-            $xAxis = $this->_tsHelper->scaleTime($x);
+            $xAxis = $this->_tsHelper->scaleTime($options, $x);
 
             /* downsample data frequency */
             if ( $options['sample'] > 0 ){

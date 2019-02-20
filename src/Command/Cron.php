@@ -46,10 +46,10 @@ use \DateInterval;
 class Cron extends Command
 {
     private $_em;
+    private $_configuration;
     private $_ldap;
     private $_jobCache;
     private $_cache;
-    private $_configuration;
     private $_timer;
 
     public function __construct(
@@ -70,12 +70,20 @@ class Cron extends Command
         $repository = $this->_em->getRepository(\App\Entity\Job::class);
         $jobs = $repository->findRunningJobs();
 
+        $options['plot_view_showPolarplot']      = $this->_configuration->getValue('plot_view_showPolarplot');
+        $options['plot_view_showRoofline']       = $this->_configuration->getValue('plot_view_showRoofline');
+        $options['plot_view_showStatTable']      = $this->_configuration->getValue('plot_view_showStatTable');
+        $options['plot_list_samples']            = $this->_configuration->getValue('plot_list_samples');
+        $options['plot_general_colorBackground'] = $this->_configuration->getValue('plot_general_colorBackground');
+        $options['plot_general_lineWidth']       = $this->_configuration->getValue('plot_general_lineWidth');
+        $options['data_cache_numpoints']         = $this->_configuration->getValue('data_cache_numpoints');
+
         $this->_timer->start('WarmupCache');
         foreach ( $jobs as $job ){
 
             if ( $job->getNumNodes() > 0 ) {
                 $this->_jobCache->warmupCache(
-                    $job, $this->_configuration->getConfig());
+                    $job, $options);
                 $this->_em->persist($job);
                 $this->_em->flush();
             }
@@ -121,8 +129,15 @@ class Cron extends Command
             $progressBar->clear();
         }
 
-        $config = $this->_configuration->getConfig();
-        $days = $config['data_cache_period']->value;
+        $options['plot_view_showPolarplot']      = $this->_configuration->getValue('plot_view_showPolarplot');
+        $options['plot_view_showRoofline']       = $this->_configuration->getValue('plot_view_showRoofline');
+        $options['plot_view_showStatTable']      = $this->_configuration->getValue('plot_view_showStatTable');
+        $options['plot_list_samples']            = $this->_configuration->getValue('plot_list_samples');
+        $options['plot_general_colorBackground'] = $this->_configuration->getValue('plot_general_colorBackground');
+        $options['plot_general_lineWidth']       = $this->_configuration->getValue('plot_general_lineWidth');
+        $options['data_cache_numpoints']         = $this->_configuration->getValue('data_cache_numpoints');
+
+        $days = $this->_configuration->getValue('data_cache_period');
         $timestamp = strtotime("-$days day");
 
         /* delete cache for jobs outside grace period */
@@ -167,8 +182,7 @@ class Cron extends Command
                 $progressBar->advance();
             }
 
-            $this->_jobCache->warmupCache(
-                $job, $this->_configuration->getConfig());
+            $this->_jobCache->warmupCache($job, $options);
             $this->_em->persist($job);
             $this->_em->flush();
         }
@@ -196,8 +210,15 @@ class Cron extends Command
 
     private function syncUsers($output)
     {
+        $config['ldap_connection_url'] = $this->_configuration->getValue('ldap_connection_url');
+        $config['ldap_search_dn'] = $this->_configuration->getValue('ldap_search_dn');
+        $config['ldap_user_base'] = $this->_configuration->getValue('ldap_user_base');
+        $config['ldap_user_filter'] = $this->_configuration->getValue('ldap_user_filter');
+        $config['ldap_group_base'] = $this->_configuration->getValue('ldap_group_base');
+        $config['ldap_group_filter'] = $this->_configuration->getValue('ldap_group_filter');
+
         $this->_timer->start('syncUsers');
-        $results = $this->_ldap->queryGroups();
+        $results = $this->_ldap->queryGroups($config);
         $groups = array();
         $userGroup = array();
         $activeUsers = array();
@@ -234,7 +255,7 @@ class Cron extends Command
             }
         }
 
-        $results = $this->_ldap->queryUsers();
+        $results = $this->_ldap->queryUsers($config);
         $users = array();
 
         foreach ( $results as $entry ) {

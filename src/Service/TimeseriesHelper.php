@@ -24,20 +24,9 @@
  */
 
 namespace App\Service;
-use Psr\Log\LoggerInterface;
 
 class TimeseriesHelper
 {
-    private $_logger;
-    private $_config;
-
-    public function __construct(
-        /* Configuration $config */
-    )
-    {
-        /* $this->_config = $config->getConfig(); */
-    }
-
     public function scaleMetric(&$y, $scale)
     {
         for($i=0; $i<count($y); $i++) {
@@ -45,15 +34,12 @@ class TimeseriesHelper
         }
     }
 
-    public function scaleTime(&$x):array
+    public function scaleTime($options, &$x):array
     {
-        $configuration = new Configuration();
-        $config = $configuration->getConfig();
-
         $unit = 'm';
         $dtick = 1;
         $scale = 60;
-        $round = (int) $config['data_time_digits']->value;
+        $round = (int) $options['data_time_digits'];
         $range = end($x) - $x[0];
         $minutes = $range / 60;
 
@@ -163,4 +149,3 @@ class TimeseriesHelper
         return "$hours h $minutes m";
     }
 }
-

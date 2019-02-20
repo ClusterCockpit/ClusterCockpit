@@ -89,6 +89,11 @@ class Job
      */
     private $nodes;
 
+     /**
+     *  @ORM\ManyToOne(targetEntity="Project")
+     */
+    private $project;
+
     public $jobCache;
 
     /**
