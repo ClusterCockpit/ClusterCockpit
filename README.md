@@ -2,18 +2,11 @@
 NOTICE
 --------------------------------------------------------------------------------
 
-ClusterCockpit is work in progress and not yet ready for
-general production use.
-
 If you want to help develop ClusterCockpit you may want to take a look at [open issues](https://github.com/ClusterCockpit/ClusterCockpit/issues?q=is%3Aopen+is%3Aissue).
 A good starting point about the software design of ClusterCockpit are the Wiki
 pages about the [overall structure](https://github.com/ClusterCockpit/ClusterCockpit/wiki/DEV-Software-structure)
 and [naming conventions](https://github.com/ClusterCockpit/ClusterCockpit/wiki/DEV-Conventions)
 used.
-
-Currently ClusterCockpit is not yet ready to be used by external users. I
-currently develop the missing pieces: a web based installer and will update
-this notice as soon as a usable BETA is available.
 
 --------------------------------------------------------------------------------
 Introduction
@@ -230,7 +223,7 @@ You can get a list of all configured routes (URLs) with:
 $ php bin/console debug:router
 ```
 
-7. Start up local web server:
+7. Start up local web server
 
 To start the web server with integrated Symfony profiler console run:
 ```
@@ -241,12 +234,12 @@ The web application can be accessed with any web browser on localhost port 8000.
 
 A log file is available in var/log/dev.log .
 
-8. Maintenance:
+8. Initial configuration of ClusterCockpit
 
-To update PHP packages in project run:
-```
-$ composer update
-```
+Open the URL `http://localhost:8000` in a web browser. Click on the
+JobMonitoring button and login with the credentials of you admin user.
 
+Please refer to the [Wiki pages](https://github.com/ClusterCockpit/ClusterCockpit/wiki) how to setup a
+cluster and other required data sources.
 
 
