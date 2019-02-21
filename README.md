@@ -205,6 +205,9 @@ Then load minimum database initialization:
 $ php bin/console  doctrine:fixtures:load
 ```
 
+Please note that loading the data fixtures wipe out all previous data in the
+database and should only be done during installation.
+
 Create admin account:
 
 ```
