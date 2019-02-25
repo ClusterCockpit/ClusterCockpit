@@ -81,12 +81,15 @@ class JobRepository extends ServiceEntityRepository
                 );
             }
             $single = false;
-        } else {
-            $clusters[] =  array(
-                'id' => $clusterId,
-                'coresPerNode' => $this->_clusters[$clusterId]['coresPerNode'],
-                'name' => $this->_clusters[$clusterId]['name']
-            );
+	} else {
+	    if(isset($this->_clusters[$clusterId]))
+            {
+                $clusters[] =  array(
+                    'id' => $clusterId,
+                    'coresPerNode' => $this->_clusters[$clusterId]['coresPerNode'],
+                    'name' => $this->_clusters[$clusterId]['name']
+                );
+	    }
         }
 
         $month = $control->getMonth();
@@ -444,7 +447,7 @@ class JobRepository extends ServiceEntityRepository
         $users = array();
         $lookup;
 
-        if ( $settings['oneSystem'] ){
+        if ( $settings['oneSystem'] && isset($settings['clusters'][0])){
             $cluster = $settings['clusters'][0];
 
             $sql = "
