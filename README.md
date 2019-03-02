@@ -33,7 +33,7 @@ To install and use ClusterCockpit you need the following dependencies:
 - Optional: InfluxDB time series database
 
 --------------------------------------------------------------------------------
-Configure PHP installation
+Configure PHP
 --------------------------------------------------------------------------------
 
 The default PHP memory limit is too low for most Symfony applications. You may
@@ -57,7 +57,7 @@ extension=pdo_mysql
 ```
 
 --------------------------------------------------------------------------------
-Setup project
+Setup ClusterCockpit
 --------------------------------------------------------------------------------
 
 Symfony applications are operated in so called environments.  The `dev`
@@ -68,6 +68,8 @@ performance optimisations and is usually used together with a web server, as
 e.g. Apache. Below instructions apply to a development setup and are intended
 to be used by someone developing or testing ClusterCockpit. Please refer to the
 Wiki if you want to install ClusterCockpit in a production environment.
+
+## Preparation
 
 1. Clone repository
 
@@ -183,7 +185,9 @@ DATABASE_URL=mysql://<username>:<password>@127.0.0.1:3306/ClusterCockpit
 INFLUXDB_URL=influxdb://<username>:<password>@127.0.0.1:8086/ClusterCockpit
 ```
 
-5. Setup ClusterCockpit:
+## Initialization
+
+1. Setup ClusterCockpit:
 
 It is recommended to install a recent composer locally as described
 [here](https://getcomposer.org/download/). All packages will be installed
@@ -217,7 +221,7 @@ Create admin account:
 $ php bin/console  app:user admin  <password>  '<email>' ROLE_ADMIN ROLE_ANALYST ROLE_USER
 ```
 
-6. Sanity checks
+2. Sanity checks
 
 Check if database is setup correctly:
 ```
@@ -229,7 +233,7 @@ You can get a list of all configured routes (URLs) with:
 $ php bin/console debug:router
 ```
 
-7. Start up local web server
+3. Start up local web server
 
 To start the web server with integrated Symfony profiler console run:
 ```
@@ -240,10 +244,10 @@ The web application can be accessed with any web browser on localhost port 8000.
 
 A log file is available in var/log/dev.log .
 
-8. Initial configuration of ClusterCockpit
+## Setup
 
 Open the URL `http://localhost:8000` in a web browser. Click on the
-JobMonitoring button and login with the credentials of you admin user.
+JobMonitoring button and login with the credentials of your admin user.
 
 Please refer to the [Wiki pages](https://github.com/ClusterCockpit/ClusterCockpit/wiki) how to setup a
 cluster and other required data sources.
