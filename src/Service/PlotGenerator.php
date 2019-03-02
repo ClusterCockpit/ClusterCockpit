@@ -34,22 +34,22 @@ use App\Entity\Plot;
 class PlotGenerator
 {
     private $_plotter;
-    private $_filePlotter;
-    private $_color;
+    /* private $_filePlotter; */
+    /* private $_color; */
     private $_tsHelper;
 
     public function __construct(
         TimeseriesHelper $tsHelper,
-        FilePlotGeneratorXmGrace $filePlotter,
-        ColorMap $color,
+        /* FilePlotGeneratorXmGrace $filePlotter, */
+        /* ColorMap $color, */
         EntityManagerInterface $em,
         PlotGeneratorInterface $plotter
     )
     {
         $this->_tsHelper = $tsHelper;
-        $this->_filePlotter = $filePlotter;
+        /* $this->_filePlotter = $filePlotter; */
         $this->_plotter = $plotter;
-        $this->_color = $color;
+        /* $this->_color = $color; */
     }
 
     private function _createClusterRoof(&$cluster)
@@ -229,7 +229,9 @@ class PlotGenerator
         $plot = new  Plot();
         $plot->name = $metricName;
         $nodes = $job->getNodes();
-        $this->_color->init($colorState, count($nodes));
+
+        $color = new ColorMap();
+        $color->init($colorState, count($nodes));
 
         foreach ($nodes as $node){
 
@@ -247,7 +249,7 @@ class PlotGenerator
                 $this->_tsHelper->downsampling($x,$y,$options['sample']);
             }
 
-            $options['color'] = $this->_color->getColor($colorState);
+            $options['color'] = $color->getColor($colorState);
 
             $this->_plotter->generateLine(
                 $lineData,
