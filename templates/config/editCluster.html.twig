@@ -38,8 +38,12 @@
     {{ parent() }}
     <script src="{{ asset('js/feather.min.js') }}"/></script>
     <script src="{{ asset('js/app-clusterConfig.js') }}"/></script>
+    <script src="{{ asset('js/bs-custom-file-input.min.js') }}"/></script>
     <script>
-        feather.replace()
+        $(document).ready(function () {
+            bsCustomFileInput.init()
+            feather.replace()
+        })
     </script>
 {% endblock %}
 
