@@ -89,10 +89,6 @@ class Job
      */
     private $nodes;
 
-     /**
-     *  @ORM\ManyToOne(targetEntity="Project")
-     */
-    private $project;
 
     public $jobCache;
 
@@ -167,16 +163,6 @@ class Job
     public function setJobId($jobId)
     {
         $this->jobId = $jobId;
-    }
-
-    public function getProject()
-    {
-        return $this->project;
-    }
-
-    public function setProject($project)
-    {
-        $this->project = $project;
     }
 
     public function getUser()
@@ -343,7 +329,4 @@ class Job
 
         return $this;
     }
-
 }
-
-

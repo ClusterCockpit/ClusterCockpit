@@ -28,7 +28,6 @@ namespace App\Controller;
 use App\Entity\Job;
 use App\Entity\JobSearch;
 use App\Entity\User;
-use App\Entity\UnixGroup;
 use App\Entity\UpdateGroupRequest;
 use App\Entity\StatisticsControl;
 use App\Service\Configuration;
@@ -52,67 +51,6 @@ class UserViewController extends Controller
         return $this->render('users/listUsers.html.twig',
             array(
                 'users' => $users,
-            ));
-    }
-
-    public function showGroup(
-        UnixGroup $group,
-        Request $request)
-    {
-        $year = $request->query->get('year');
-        $month = $request->query->get('month');
-        $cluster = $request->query->get('cluster');
-
-        $control = new StatisticsControl();
-
-        if ( $year ) {
-            $control->setYear($year);
-        } else {
-            $control->setYear(date("Y"));
-        }
-        if ( $month ) {
-            $control->setMonth($month);
-        } else {
-            $control->setMonth(date("m"));
-        }
-        if ( $cluster ) {
-            $control->setCluster($cluster);
-        } else {
-            $control->setCluster(0);
-        }
-
-        $form = $this->createForm(StatisticsControlType::class, $control);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $control = $form->getData();
-        }
-
-        $repository = $this->getDoctrine()->getRepository(\App\Entity\User::class);
-        $jobRepository = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
-        $users = $repository->findByGroupId($group->getId(), $control);
-        $usersD = array();
-
-        foreach ( $users as $user ){
-            $usersD[] = array(
-                'meta' => $user,
-                'stat' => $jobRepository->findStatByUser($user->getId(), $control, false),
-            );
-        }
-
-        $stat = $jobRepository->findStatByGroup($group->getId(), $control);
-
-        return $this->render('users/showGroup.html.twig',
-            array(
-                'form' => $form->createView(),
-                'group' => $group,
-                'control' => $control,
-                'stat' => $stat['stat'],
-                /* 'histo_runtime' => $stat['histoPlotRuntime']['trace'], */
-                /* 'layout_runtime' => $stat['histoPlotRuntime']['layout'], */
-                /* 'histo_numnodes' => $stat['histoPlotNumnodes']['trace'], */
-                /* 'layout_numnodes' => $stat['histoPlotNumnodes']['layout'], */
-                'users' => $usersD,
             ));
     }
 

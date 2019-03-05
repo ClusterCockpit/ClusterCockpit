@@ -15,9 +15,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 */
 class User implements UserInterface, \Serializable
 {
-    private $_configuration;
-
-
     /**
      *  @ORM\Id
      *  @ORM\GeneratedValue(strategy="AUTO")
@@ -65,30 +62,9 @@ class User implements UserInterface, \Serializable
     private $email;
 
     /**
-     *  @ORM\Column(type="string", nullable=true)
-     */
-    private $phone;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="UnixGroup")
-     * @ORM\JoinTable(name="users_groups", joinColumns={
-     * @ORM\JoinColumn(name="user_id",referencedColumnName="id")}, inverseJoinColumns={
-     * @ORM\JoinColumn(name="group_id",referencedColumnName="id")}
-     * )
-     */
-    private $groups;
-
-    /**
      * @ORM\Column(type="boolean", nullable=true)
      */
     private $isActive;
-
-    public function __construct(
-    )
-    {
-        $this->groups = new \Doctrine\Common\Collections\ArrayCollection();
-        $this->projects = new \Doctrine\Common\Collections\ArrayCollection();
-    }
 
     public function getId()
     {
@@ -178,7 +154,6 @@ class User implements UserInterface, \Serializable
         return $this;
     }
 
-
     public function getUsername(): ?string
     {
         return $this->username;
@@ -241,39 +216,6 @@ class User implements UserInterface, \Serializable
         $this->phone = $phone;
     }
 
-    public function getGroups()
-    {
-        return $this->groups;
-    }
-
-    public function addGroup(UnixGroup $group): self
-    {
-        if (!$this->groups->contains($group)) {
-            $this->groups[] = $group;
-        }
-
-        return $this;
-    }
-
-    public function removeGroup(UnixGroup $group): self
-    {
-        if ($this->groups->contains($group)) {
-            $this->groups->removeElement($group);
-        }
-
-        return $this;
-    }
-
-    public function getProjects()
-    {
-        return $this->projects;
-    }
-
-    public function setProjects($projects)
-    {
-        $this->projects = $projects;
-    }
-
     public function getIsActive(): ?bool
     {
         return $this->isActive;
@@ -285,5 +227,4 @@ class User implements UserInterface, \Serializable
 
         return $this;
     }
-
 }
