@@ -30,7 +30,8 @@ To install and use ClusterCockpit you need the following dependencies:
 - MySQL 5.7
 - [Composer](https://getcomposer.org) - PHP package manager
 - Optional: Apache web server for production use
-- Optional: InfluxDB time series database
+- Optional: [InfluxDB](https://docs.influxdata.com/influxdb/v1.7/introduction/getting-started/) time series database
+- Optional: [Redis](https://redis.io/) caching backend
 
 --------------------------------------------------------------------------------
 Configure PHP
