@@ -29,15 +29,22 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Ldap\Ldap;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Adapter\LdapManager;
 
 
 class QueryLdap extends Command
 {
     private $_ldap;
+    private $_configuration;
 
-    public function __construct()
+    public function __construct(
+        LdapManager $ldap,
+        EntityManagerInterface $em
+    )
     {
+        $this->_em = $em;
+        $this->_ldap = $ldap;
 
         parent::__construct();
     }
@@ -48,88 +55,86 @@ class QueryLdap extends Command
             ->setName('app:user:ldap')
             ->setDescription('Query ldap directory.')
             ->setHelp('This command allows to sync users and groups from a ldap server.')
-            ;
+        ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-	    $url = getenv('LDAP_URL');
+        $this->_configuration = new Configuration($this->_em);
+        $url = getenv('LDAP_URL');
         $this->_ldap = Ldap::create('ext_ldap', array(
-		'connection_string' => $url
+            'connection_string' => $url
         ));
 
         $password = getenv('LDAP_PW');
-	  /*$dn = 'cn=hpcmonitoring,ou=roadm,ou=profile,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de';*/
-	  $dn = getenv('LDAP_DN');
-	  $this->_ldap->bind($dn, $password);
+        $dn = getenv('LDAP_DN');
+        $this->_ldap->bind($dn, $password);
 
-	  $query = $this->_ldap->query('ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de', '(&(objectclass=posixAccount)(uid=*))');
-	  $results = $query->execute()->toArray();
-	  $users = array();
+        $query = $this->_ldap->query('ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de', '(&(objectclass=posixAccount)(uid=*))');
+        $results = $query->execute()->toArray();
+        $users = array();
 
-	  var_dump($results);
+        var_dump($results);
 
-	  foreach ( $results as $entry ) {
+        foreach ( $results as $entry ) {
 
-		  $user_id;
-		  $uid;
-		  $name;
+            $user_id;
+            $uid;
+            $name;
 
-		  if ( $entry->hasAttribute('uid') ) {
-			  $user_id = $entry->getAttribute('uid')[0];
-		  }
-		  if ( $entry->hasAttribute('uidNumber') ) {
-			  $uid = $entry->getAttribute('uidNumber')[0];
-		  }
-		  if ( $entry->hasAttribute('gecos') ) {
-			  $name = $entry->getAttribute('gecos')[0];
-		  }
+            if ( $entry->hasAttribute('uid') ) {
+                $user_id = $entry->getAttribute('uid')[0];
+            }
+            if ( $entry->hasAttribute('uidNumber') ) {
+                $uid = $entry->getAttribute('uidNumber')[0];
+            }
+            if ( $entry->hasAttribute('gecos') ) {
+                $name = $entry->getAttribute('gecos')[0];
+            }
 
-		  $users[$user_id] = array(
-			  'user_id' => $user_id,
-			  'uid' => $uid,
-			  'name' => $name
-		  );
-	  }
+            $users[$user_id] = array(
+                'user_id' => $user_id,
+                'uid' => $uid,
+                'name' => $name
+            );
+        }
 
-	  $query = $this->_ldap->query('ou=Group,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de', '(&(objectclass=posixGroup)(cn=*))');
-	  $results = $query->execute()->toArray();
-	  $groups = array();
-	  $userGroup = array();
-	  $activeUsers = array();
+        $query = $this->_ldap->query('ou=Group,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de', '(&(objectclass=posixGroup)(cn=*))');
+        $results = $query->execute()->toArray();
+        $groups = array();
+        $userGroup = array();
+        $activeUsers = array();
 
-	  foreach ( $results as $entry ) {
+        foreach ( $results as $entry ) {
 
-		  $group_id;
-		  $gid;
-		  $members;
+            $group_id;
+            $gid;
+            $members;
 
-		  if ( $entry->hasAttribute('cn') ) {
-			  $group_id = $entry->getAttribute('cn')[0];
-		  }
-		  if ( $entry->hasAttribute('gidNumber') ) {
-			  $gid = $entry->getAttribute('gidNumber')[0];
-		  }
-		  if ( $entry->hasAttribute('memberUid') ) {
-			  $members = $entry->getAttribute('memberUid');
-		  }
+            if ( $entry->hasAttribute('cn') ) {
+                $group_id = $entry->getAttribute('cn')[0];
+            }
+            if ( $entry->hasAttribute('gidNumber') ) {
+                $gid = $entry->getAttribute('gidNumber')[0];
+            }
+            if ( $entry->hasAttribute('memberUid') ) {
+                $members = $entry->getAttribute('memberUid');
+            }
 
-		  $groups[$group_id] = array(
-			  'group_id' => $group_id,
-			  'gid' => $gid,
-			  'members' => $members
-		  );
+            $groups[$group_id] = array(
+                'group_id' => $group_id,
+                'gid' => $gid,
+                'members' => $members
+            );
 
-		  foreach ( $members as $user ) {
-			  $userGroup[$user][] = $group_id;
+            foreach ( $members as $user ) {
+                $userGroup[$user][] = $group_id;
 
-			  if ( $group_id === 'infohpc' ) {
-				  $ctiveUsers[$user] = 1;
-			  }
-		  }
-
-	  }
-
+                if ( $group_id === 'infohpc' ) {
+                    $ctiveUsers[$user] = 1;
+                }
+            }
+        }
     }
 }
 
