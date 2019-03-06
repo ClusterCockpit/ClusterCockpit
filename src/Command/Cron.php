@@ -35,10 +35,11 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Adapter\LdapManager;
 use App\Service\JobCache;
+use App\Service\PasswdFileReader;
+use App\Service\Configuration;
 use App\Entity\User;
 use App\Entity\UnixGroup;
 use Psr\Log\LoggerInterface;
-use App\Service\Configuration;
 use \DateTimeZone;
 use \DateTime;
 use \DateInterval;
@@ -51,16 +52,21 @@ class Cron extends Command
     private $_jobCache;
     private $_cache;
     private $_timer;
+    private $_logger;
 
     public function __construct(
         LdapManager $ldap,
         EntityManagerInterface $em,
+        LoggerInterface $logger,
+        JobCache $jobcache,
         StopWatch $stopwatch
     )
     {
         $this->_em = $em;
         $this->_ldap = $ldap;
         $this->_timer = $stopwatch;
+        $this->_logger = $logger;
+        $this->_jobCache = $jobcache;
 
         parent::__construct();
     }
@@ -208,58 +214,25 @@ class Cron extends Command
         }
     }
 
+    private function importUsers($output, $filename)
+    {
+        $fileReader = new PasswdFileReader();
+        $users = $fileReader->parse($filename, $this->_configuration->getValue('general_user_emailbase'));
+        var_dump($users);
+    }
+
     private function syncUsers($output)
     {
         $config['ldap_connection_url'] = $this->_configuration->getValue('ldap_connection_url');
         $config['ldap_search_dn'] = $this->_configuration->getValue('ldap_search_dn');
         $config['ldap_user_base'] = $this->_configuration->getValue('ldap_user_base');
         $config['ldap_user_filter'] = $this->_configuration->getValue('ldap_user_filter');
-        $config['ldap_group_base'] = $this->_configuration->getValue('ldap_group_base');
-        $config['ldap_group_filter'] = $this->_configuration->getValue('ldap_group_filter');
 
         $this->_timer->start('syncUsers');
-        $results = $this->_ldap->queryGroups($config);
-        $groups = array();
-        $userGroup = array();
-        $activeUsers = array();
-
-        foreach ( $results as $entry ) {
-
-            $group_id = 'no_group';
-            $gid= '000';
-            $members = array();
-
-            if ( $entry->hasAttribute('cn') ) {
-                $str = $entry->getAttribute('cn')[0];
-                $group_id = str_replace("hpc_","", $str);
-            }
-            if ( $entry->hasAttribute('gidNumber') ) {
-                $gid = $entry->getAttribute('gidNumber')[0];
-            }
-            if ( $entry->hasAttribute('memberUid') ) {
-                $members = $entry->getAttribute('memberUid');
-            }
-
-            $groups[$group_id] = array(
-                'group_id' => $group_id,
-                'gid' => $gid,
-                'members' => $members
-            );
-
-            foreach ( $members as $user ) {
-                $userGroup[$user][] = $group_id;
-
-                if ( $group_id === 'infohpc' ) {
-                    $activeUsers[$user] = 1;
-                }
-            }
-        }
-
         $results = $this->_ldap->queryUsers($config);
         $users = array();
 
         foreach ( $results as $entry ) {
-
             $user_id;
             $uid;
             $name;
@@ -275,49 +248,21 @@ class Cron extends Command
             if ( $entry->hasAttribute('gecos') ) {
                 $name = $entry->getAttribute('gecos')[0];
             }
-            if ( array_key_exists($user_id, $activeUsers) ) {
-                $active = 1;
-            } else {
-                $active = 0;
-            }
-            if ( array_key_exists($user_id, $userGroup) ) {
-                $groupsUser = $userGroup[$user_id];
-            } else {
-                $groupsUser = array();
-            }
+
+            $active = 1;
 
             $users[$user_id] = array(
                 'user_id'  => $user_id,
                 'uid'      => $uid,
                 'name'     => $name,
-                'email'    => $user_id.'@mailhub.uni-erlangen.de',
-                'active'   => $active,
-                'groups'   => $groupsUser
+                'email'    => $user_id.$this->_configuration->getValue('general_user_emailbase'),
+                'active'   => $active
             );
         }
 
         /* get current DB tables */
         $userRepo = $this->_em->getRepository(\App\Entity\User::class);
         $usersDB = $userRepo->findAll();
-
-        $groupRepo = $this->_em->getRepository(\App\Entity\UnixGroup::class);
-        $groupsDB = $groupRepo->findAll();
-
-        /* update groups */
-        foreach  ( $groups as $group ){
-            $groupId = $group['group_id'];
-
-            if (! array_key_exists($groupId, $groupsDB) ) {
-                $this->_logger->info("CRON:syncUsers Add group $groupId");
-                $output->writeln("Add group $groupId");
-
-                $newGroup = new UnixGroup();
-                $newGroup->setGroupId($group['group_id']);
-                $newGroup->setGid($group['gid']);
-                $this->_em->persist($newGroup);
-            }
-        }
-        $this->_em->flush();
 
         /* update users */
         foreach  ( $users as $user ){
@@ -343,14 +288,6 @@ class Cron extends Command
                 $newUser->setName($user['name']);
                 $newUser->setEmail($user['email']);
                 $newUser->setIsActive('false');
-
-                foreach  ( $user['groups'] as $group ) {
-                    $output->writeln("Add user $userId to $group");
-                    $this->_logger->info("CRON:syncUsers Add $userId to $group");
-                    $dbGroup = $groupRepo->findOneBy(['groupId' => $group]);
-                    $newUser->addGroup($dbGroup);
-                }
-
                 $this->_em->persist($newUser);
             }
         }
@@ -368,24 +305,39 @@ class Cron extends Command
         $this
             ->setName('app:cron')
             ->setDescription('Cron job execution manager.')
-            ->setHelp('This command allows to sync users and groups from a ldap server.')
+            ->setHelp('This command allows to execute the following tasks: syncUsers, importUsers, warmupCache, updateCache')
             ->addArgument('task', InputArgument::REQUIRED, 'Task to perform')
-            ->addOption( 'interactive', 'i', InputOption::VALUE_NONE, 'Progress output on stdout.')
+            ->addOption(
+                'interactive',
+                'i', InputOption::VALUE_NONE,
+                'Progress output on stdout.')
+            ->addOption(
+                'filename',
+                'f', InputOption::VALUE_REQUIRED,
+                'Input file.', false)
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output)
     {
         $d = new DateTime('NOW', new DateTimeZone('Europe/Berlin'));
         $this->_configuration = new Configuration($this->_em);
-        $this->_jobCache = new JobCache();
         $datestr = $d->format('Y-m-d\TH:i:s');
         $task = $input->getArgument('task');
         $interactive = $input->getOption('interactive');
+        $filename = $input->getOption('filename');
         $this->_logger->info("CRON Start $task at $datestr");
 
         if ( $task === 'syncUsers' ){
             $this->syncUsers($output);
+        } else if ( $task === 'importUsers' ){
+            if ( $filename !== false ){
+                $this->importUsers($output, $filename);
+            } else {
+                $output->writeln("CRON Error: You have to specify the filename option for the importUsers task !");
+            }
         } else if ( $task === 'warmupCache' ){
             $this->warmupCache($output);
         } else if ( $task === 'updateCache' ){
