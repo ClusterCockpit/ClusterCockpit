@@ -26,7 +26,7 @@ Dependencies
 --------------------------------------------------------------------------------
 
 To install and use ClusterCockpit you need the following dependencies:
-- PHP 7.1 or newer
+- PHP 7.2 or newer
 - MySQL 5.7
 - [Composer](https://getcomposer.org) - PHP package manager
 - Optional: Apache web server for production use
