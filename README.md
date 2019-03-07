@@ -42,20 +42,16 @@ also need to enable some PHP extensions. Please note that these settings are
 required to run Symfony at all. Please consult the Symfony documentation for
 performance optimized PHP settings in production mode.
 
-Please check and if required set or uncomment the following settings in
+Please check and if required set or uncomment the following setting in
 `php.ini` (Ususally located in `/etc/php/php.ini`):
 
 ```
 memory_limit = 1G
-
-...
-
-extension=curl
-extension=iconv
-extension=ldap
-extension=mysqli
-extension=pdo_mysql
 ```
+
+Symfony requires the following PHP extension which are usually included in the
+standard PHP installation: `curl, iconv, ldap, mysqli, pdo_mysql`. Please refer
+to a Google search how to install PHP extensions on your OS if an extension is missing.
 
 --------------------------------------------------------------------------------
 Setup ClusterCockpit
