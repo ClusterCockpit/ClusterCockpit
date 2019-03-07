@@ -27,7 +27,7 @@ Dependencies
 
 To install and use ClusterCockpit you need the following dependencies:
 - PHP 7.2 or newer
-- MySQL 5.7 (MariaDB 20.3 is currently not supported by the Doctrine ORM)
+- MySQL 5.7 (MariaDB 10.3 is currently not supported by the Doctrine ORM)
 - [Composer](https://getcomposer.org) - PHP package manager
 - Optional: Apache web server for production use
 - Optional: [InfluxDB](https://docs.influxdata.com/influxdb/v1.7/introduction/getting-started/) time series database
