@@ -214,11 +214,49 @@ class Cron extends Command
         }
     }
 
+    private function _syncUsers($output, $users)
+    {
+        /* get current DB tables */
+        $userRepo = $this->_em->getRepository(\App\Entity\User::class);
+        $usersDB = $userRepo->findAll();
+
+        /* update users */
+        foreach  ( $users as $user ){
+            $userId = $user['user_id'];
+
+            if ( array_key_exists($userId, $usersDB) ) {
+                $name = $user['name'];
+                $DbUser = $usersDB[$userId];
+
+                if ( $name !== $DbUser->getName() ){
+                    $output->writeln("Change name for $userId");
+                    $this->_logger->info("CRON:syncUsers Change name for $userId");
+                    $DbUser->setName($name);
+                    $this->_em->persist($DbUser);
+                }
+            } else {
+                $output->writeln("Add user $userId");
+                $this->_logger->info("CRON:syncUsers Add user $userId");
+
+                $newUser = new User();
+                $newUser->setUsername($user['user_id']);
+                $newUser->setUid($user['uid']);
+                $newUser->setName($user['name']);
+                $newUser->setEmail($user['email']);
+                $newUser->setIsActive('true');
+                $this->_em->persist($newUser);
+            }
+        }
+        $this->_em->flush();
+
+        /* $userRepo->resetActiveUsers($activeUsers); */
+    }
+
     private function importUsers($output, $filename)
     {
         $fileReader = new PasswdFileReader();
         $users = $fileReader->parse($filename, $this->_configuration->getValue('general_user_emailbase'));
-        var_dump($users);
+        $this->_syncUsers($output, $users);
     }
 
     private function syncUsers($output)
@@ -260,41 +298,7 @@ class Cron extends Command
             );
         }
 
-        /* get current DB tables */
-        $userRepo = $this->_em->getRepository(\App\Entity\User::class);
-        $usersDB = $userRepo->findAll();
-
-        /* update users */
-        foreach  ( $users as $user ){
-            $userId = $user['user_id'];
-
-            if ( array_key_exists($userId, $usersDB) ) {
-                $name = $user['name'];
-                $DbUser = $usersDB[$userId];
-
-                if ( $name !== $DbUser->getName() ){
-                    $output->writeln("Change name for $userId");
-                    $this->_logger->info("CRON:syncUsers Change name for $userId");
-                    $DbUser->setName($name);
-                    $this->_em->persist($DbUser);
-                }
-            } else {
-                $output->writeln("Add user $userId");
-                $this->_logger->info("CRON:syncUsers Add user $userId");
-
-                $newUser = new User();
-                $newUser->setUsername($user['user_id']);
-                $newUser->setUid($user['uid']);
-                $newUser->setName($user['name']);
-                $newUser->setEmail($user['email']);
-                $newUser->setIsActive('false');
-                $this->_em->persist($newUser);
-            }
-        }
-        $this->_em->flush();
-
-        $userRepo->resetActiveUsers($activeUsers);
-
+        $this->_syncUsers($output, $users);
         $event = $this->_timer->stop('syncUsers');
         $seconds =  floor($event->getDuration()/ 1000);
         $this->_logger->info("CRON:syncUsers  $seconds s");

@@ -38,7 +38,7 @@ class PasswdFileReader
             $name    = $entries[4];
             $email   = $entries[0].$emailbase;
 
-            $users[] = array(
+            $users[$user_id] = array(
                 'user_id' => $user_id,
                 'uid'     => $uid,
                 'name'    => $name,

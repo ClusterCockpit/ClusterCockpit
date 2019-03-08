@@ -38,8 +38,6 @@ class AppFixtures extends Fixture
         array('ldap_user_key',                '',       'default', 'Key user id',                         '',           ''),
         array('ldap_search_dn',               '',       'default', 'Search DN',                           '',           ''),
         array('ldap_user_filter',             '',       'default', 'User query filter',                   '',           ''),
-        array('ldap_group_base',              '',       'default', 'Base DN groups',                      '',           ''),
-        array('ldap_group_filter',            '',       'default', 'Group query filter',                  '',           ''),
         array('general_user_scramble',        'false',  'default', 'Anonymize user names',                '',           ''),
         array('general_user_emailbase',            '@mail.de',  'default', 'Email base adress used in user imports',                '',           ''),
     );

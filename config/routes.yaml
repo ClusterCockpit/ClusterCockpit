@@ -43,15 +43,9 @@ show_job:
 search_id:
     path: /monitoring/searchId
     controller:  App\Controller\JobViewController::searchId
-# cluster_stat:
-#     path: /monitoring/cluster/statistics/
-#     controller:  App\Controller\StatisticsViewController::clusters
 user_stat:
     path: /monitoring/user/statistics/
     controller:  App\Controller\StatisticsViewController::users
-# group_stat:
-#     path: /monitoring/group/statistics
-#     controller:  App\Controller\StatisticsViewController::groups
 show_user:
     path: /monitoring/user/{id}
     controller:  App\Controller\UserViewController::show
@@ -82,6 +76,10 @@ color_options:
 default_options:
     path: /admin/default
     controller:  App\Controller\ConfigViewController::defaultOptions
+general_options:
+    path: /admin/general
+    controller:  App\Controller\ConfigViewController::generalOptions
+cache_options:
 ldap_options:
     path: /admin/ldap
     controller:  App\Controller\ConfigViewController::ldapOptions

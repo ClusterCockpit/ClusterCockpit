@@ -109,7 +109,13 @@ class ConfigViewController extends AbstractController
                         'addlink' => false,
                         'active' => false
                     ),
-
+                    array(
+                        'label' => 'General',
+                        'icon' => 'settings',
+                        'link' => '/admin/general',
+                        'addlink' => false,
+                        'active' => false
+                    ),
                 )
             ),
             array(
@@ -325,6 +331,22 @@ class ConfigViewController extends AbstractController
                 'defaultmode' => true,
                 'sidebar' => $this->_sidebar(
                     array('menu'=>1,'item'=>4)
+                )
+            ));
+    }
+
+    public function generalOptions(Request $request)
+    {
+        $config = $this->getDoctrine()
+                       ->getRepository(\App\Entity\Configuration::class)
+                       ->findAllDefaultHierarchy();
+
+        return $this->render('config/editConfigOptions.html.twig',
+            array(
+                'configHash' => $config['general'],
+                'defaultmode' => true,
+                'sidebar' => $this->_sidebar(
+                    array('menu'=>1,'item'=>5)
                 )
             ));
     }
