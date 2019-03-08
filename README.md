@@ -82,7 +82,7 @@ $ git clone https://github.com/ClusterCockpit/ClusterCockpit.git ClusterCockpit
 
 2. Install required PHP version
 
-You need at least PHP 7.1.3 (prefered is PHP 7.2 or higher) . Please refer to
+You need at least PHP 7.2 or higher. Please refer to
 Google for how to install PHP on your operating system.
 
 3. Setup database backends
