@@ -203,19 +203,10 @@ First create the database schema with:
 $ php bin/console doctrine:schema:update --force
 ```
 
-Then load minimum database initialization:
+Use the following command to initialize database and create an admin user:
 
 ```
-$ php bin/console  doctrine:fixtures:load
-```
-
-Please note that loading the data fixtures wipe out all previous data in the
-database and should only be done during installation.
-
-Create admin account:
-
-```
-$ php bin/console  app:user admin  <password>  '<email>' ROLE_ADMIN ROLE_ANALYST ROLE_USER
+$ php bin/console  app:init
 ```
 
 2. Sanity checks
