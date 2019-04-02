@@ -8,11 +8,9 @@
     {{ parent() }}
     <script src="{{ asset('js/feather.min.js') }}"/></script>
     <script>
-        feather.replace()
-
         $(document).ready(function () {
+        feather.replace()
             $('input[type=radio][name=colorMap]').change(function(){
-
                 data = {
                     id: {{ current.id }},
                     value: $(this).attr("value"),
@@ -22,7 +20,7 @@
 
                 $.ajax({
                     type: "PATCH",
-                    url: {{ path('patch_configuration', {id : current.id}) }},
+                    url: "{{ path('patch_configuration', {id : current.id}) }}",
                     data: JSON.stringify(data),
                     processData: false,
                     contentType : 'application/json',

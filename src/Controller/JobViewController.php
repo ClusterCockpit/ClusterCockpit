@@ -313,4 +313,3 @@ class JobViewController extends Controller
             ));
     }
 }
-
