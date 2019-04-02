@@ -22,7 +22,7 @@
 
                 $.ajax({
                     type: "PATCH",
-                    url: "/web/configurations/{{ current.id }}",
+                    url: {{ path('patch_configuration', {id : current.id}) }},
                     data: JSON.stringify(data),
                     processData: false,
                     contentType : 'application/json',
@@ -64,7 +64,7 @@
                     </div>
                     {% endif %}
                     <div class="col-5">
-                        <img src="/img/colormaps/{{ color }}.png" class="rounded mx-auto d-block">
+                        <img src={{ asset("img/colormaps/#{color}.png") }} class="rounded mx-auto d-block">
                     </div>
                 </div>
                 {% endfor %}

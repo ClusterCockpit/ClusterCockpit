@@ -42,12 +42,12 @@
                                     {{ key.enabled ? 'Yes':'No' }}
                                 </td>
                                 <td class="align-middle text-center">
-                                    <a class="btn btn-success" href="/admin/apiKeys/{{ key.id }}" aria-label="Edit">
+                                    <a class="btn btn-success" href="{{ path('edit_api_key', {id : key.id}) }}" aria-label="Edit">
                                         <span class="fas fa-pen-square fa-lg" aria-hidden="true"></span>
                                     </a>
                                 </td>
                                 <td class="align-middle text-center">
-                                    <a class="btn btn-danger" href="/admin/delete_apiKey/{{ key.id }}" onclick="return confirm('Are you sure? This cannot be undone!')" aria-label="Delete">
+                                    <a class="btn btn-danger" href="{{ path('delete_api_key', {id : key.id}) }}" onclick="return confirm('Are you sure? This cannot be undone!')" aria-label="Delete">
                                         <span class="fas fa-times fa-lg" aria-hidden="true"></span>
                                     </a>
                                 </td>

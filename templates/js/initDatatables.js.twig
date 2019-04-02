@@ -7,7 +7,7 @@ $(document).ready( function () {
     var tablelist =  $('#jobs').DataTable(
         {
             "ajax": {
-                "url": "/web/jobs",
+                "url": "{{ path('cget_jobs') }}",
                 "data": {
                     "jobQuery": {{ jobQuery|raw }}
                 }
@@ -30,14 +30,14 @@ $(document).ready( function () {
                     "data": "jobinfo",
                     "render": function ( data, type, row ) {
                         var content = '<strong>'+data.jobid+'</strong></br>'+
-                            '<a href="/monitoring/user/'+data.userid+'">'+data.username+'</a></br>'+
+                            '<a href=\"{{ path('show_user_base') }}'+data.userid+'\">'+data.username+'</a></br>'+
                             data.numnodes+' nodes</br></br>'+
                             '<strong>Duration:</strong></br>'+data.runtime+'</br></br>'+
                             '<strong>Started:</strong></br>'+timeConverter(data.starttime);
                             content += '</br>';
 
                         for (let tag of data.tags) {
-                            content += '<a href="/monitoring/listjobs/'+tag.id+'" class="badge badge-pill badge-warning mt-1">'+tag.name+'</a></br>';
+                            content += '<a href="{{ path('list_jobs') }}'+tag.id+'" class="badge badge-pill badge-warning mt-1">'+tag.name+'</a></br>';
                         }
 
                         return content;
@@ -50,7 +50,7 @@ $(document).ready( function () {
                     "data": "plots",
                         "render": function ( data, type, row ) {
                             if ( data ){
-                                var content = '<a href=\"/monitoring/job/'+data.id+'\" target=\"_blank\">';
+                                var content = '<a href=\"{{ path('show_job_base') }}'+data.id+'\" target=\"_blank\">';
                                 content += '<div class=\"row\">';
                                 var count = data.plots.length;
 

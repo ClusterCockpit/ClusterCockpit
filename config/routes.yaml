@@ -40,6 +40,9 @@ search_jobs:
 show_job:
     path: /monitoring/job/{id}
     controller:  App\Controller\JobViewController::show
+show_job_base:
+    path: /monitoring/job/
+    controller:  App\Controller\JobViewController::show
 search_id:
     path: /monitoring/searchId
     controller:  App\Controller\JobViewController::searchId
@@ -48,6 +51,9 @@ user_stat:
     controller:  App\Controller\StatisticsViewController::users
 show_user:
     path: /monitoring/user/{id}
+    controller:  App\Controller\UserViewController::show
+show_user_base:
+    path: /monitoring/user/
     controller:  App\Controller\UserViewController::show
 show_group:
     path: /monitoring/group/show/{id}
@@ -79,7 +85,6 @@ default_options:
 general_options:
     path: /admin/general
     controller:  App\Controller\ConfigViewController::generalOptions
-cache_options:
 ldap_options:
     path: /admin/ldap
     controller:  App\Controller\ConfigViewController::ldapOptions

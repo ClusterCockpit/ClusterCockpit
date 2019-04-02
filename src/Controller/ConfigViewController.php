@@ -58,15 +58,15 @@ class ConfigViewController extends AbstractController
                     array(
                         'label' => 'Users',
                         'icon' => 'users',
-                        'link' => '/admin/userAccounts',
-                        'addlink' => '/admin/create_userAccount',
+                        'link' => 'list_user_accounts',
+                        'addlink' => 'create_user_account',
                         'active' => false
                     ),
                     array(
                         'label' => 'ApiKeys',
                         'icon' => 'lock',
-                        'link' => '/admin/apiKeys',
-                        'addlink' => '/admin/create_apiKey',
+                        'link' => 'list_api_keys',
+                        'addlink' => 'create_api_key',
                         'active' => false
                     ),
                 )
@@ -77,42 +77,42 @@ class ConfigViewController extends AbstractController
                     array(
                         'label' => 'Plot defaults',
                         'icon' => 'bar-chart-2',
-                        'link' => '/admin/default',
+                        'link' => 'default_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'Plot user',
                         'icon' => 'bar-chart-2',
-                        'link' => '/admin/user',
+                        'link' => 'user_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'Colormap',
                         'icon' => 'edit',
-                        'link' => '/admin/colormap',
+                        'link' => 'color_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'Cache',
                         'icon' => 'copy',
-                        'link' => '/admin/cache',
+                        'link' => 'cache_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'Ldap',
                         'icon' => 'database',
-                        'link' => '/admin/ldap',
+                        'link' => 'ldap_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'General',
                         'icon' => 'settings',
-                        'link' => '/admin/general',
+                        'link' => 'general_options',
                         'addlink' => false,
                         'active' => false
                     ),
@@ -124,15 +124,15 @@ class ConfigViewController extends AbstractController
                    array(
                         'label' => 'Metrics',
                         'icon' => 'activity',
-                        'link' => '/admin/metrics',
+                        'link' => 'metric_list',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'Clusters',
                         'icon' => 'server',
-                        'link' => '/admin/clusters',
-                        'addlink' => '/admin/create_cluster',
+                        'link' => 'list_clusters',
+                        'addlink' => 'create_cluster',
                         'active' => false
                     ),
                 )
@@ -155,14 +155,14 @@ class ConfigViewController extends AbstractController
                     array(
                         'label' => 'Plot',
                         'icon' => 'bar-chart-2',
-                        'link' => '/config/plot',
+                        'link' => 'config_plot',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'Colormap',
                         'icon' => 'edit',
-                        'link' => '/config/colormap',
+                        'link' => 'config_color',
                         'addlink' => false,
                         'active' => false
                     ),
@@ -750,4 +750,3 @@ class ConfigViewController extends AbstractController
             ));
     }
 }
-

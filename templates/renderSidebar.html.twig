@@ -9,15 +9,15 @@
             {% for item in submenu.items %}
                 <li class="nav-item d-flex justify-content-between  align-items-center px-3 ">
                     {% if item.active %}
-                        <a class="nav-link active" href="{{ item.link }}">
+                        <a class="nav-link active" href="{{ path((item.link)) }}">
                     {% else %}
-                        <a class="nav-link" href="{{ item.link }}">
+                        <a class="nav-link" href="{{ path((item.link)) }}">
                     {% endif %}
                            <span data-feather="{{ item.icon }}"></span>
                            {{ item.label }}
                         </a>
                         {% if item.addlink %}
-                        <a class="d-flex align-items-center text-muted" href="{{ item.addlink }}">
+                            <a class="d-flex align-items-center text-muted" href="{{ path(item.addlink) }}">
                             <span data-feather="plus-circle"></span>
                         </a>
                         {% endif %}
