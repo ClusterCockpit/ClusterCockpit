@@ -53,8 +53,8 @@ class JobCache
         TimeseriesHelper $tsHelper,
         EntityManagerInterface $em,
         PlotGenerator $plotGenerator,
-        InfluxDBMetricDataRepository $metricRepo,
-        /* DoctrineMetricDataRepository $metricRepo, */
+        /* InfluxDBMetricDataRepository $metricRepo, */
+        DoctrineMetricDataRepository $metricRepo,
         AdapterInterface $cache
     )
     {

@@ -24,12 +24,10 @@
  */
 
 namespace App\Service;
-use App\Service\Configuration;
 
 class ColorMap
 {
     private $_colors;
-    private $_projectRoot;
 
     private $_COLORMAPS = array(
         'Set3',
@@ -125,22 +123,6 @@ class ColorMap
         'Rainbow'
     );
 
-    public function __construct(
-        Configuration $configuration,
-        $projectDir
-    )
-    {
-        $config = $configuration->getConfig();
-
-        if ( $config ) {
-            $file = $config['plot_general_colorscheme']->value.'.php';
-            $map = 'COLOR_'.$config['plot_general_colorscheme']->value;
-            include "$projectDir/src/Colormaps/$file";
-            $this->_color = constant($map);
-            $this->_projectRoot = $projectDir;
-        }
-    }
-
     public function getAllColorMaps()
     {
         return $this->_COLORMAPS;
@@ -156,11 +138,11 @@ class ColorMap
 
     public function init(&$state, $count, $offset=0)
     {
-        $state['scale'] = count($this->_color);
+        $state['scale'] = count($this->_colors);
         $state['offset'] = $offset;
 
         if ( $offset ) {
-            $state['scale'] = count($this->_color)-$offset;
+            $state['scale'] = count($this->_colors)-$offset;
             $state['offset'] = $offset;
         }
 
@@ -172,13 +154,12 @@ class ColorMap
         }
     }
 
-    public function setColormap($name)
+    public function setColormap($name, $projectDir)
     {
-        $projectDir = $this->_projectRoot;
         $file = $name.'.php';
         $map = 'COLOR_'.$name;
         include "$projectDir/src/Colormaps/$file";
-        $this->_color = constant($map);
+        $this->_colors = constant($map);
     }
 
     public function setColorscale(&$state, $colorscale)
@@ -215,7 +196,7 @@ class ColorMap
         $state['index']++;
         $state['mapping'] = $index;
 
-        return $this->_color[$index];
+        return $this->_colors[$index];
     }
 
     public function getColorMap($mode = 'default'):array
@@ -223,7 +204,7 @@ class ColorMap
         if ($mode == 'xmgrace') {
             $colormap;
             $index = 0;
-            foreach ( $this->_color as $color ){
+            foreach ( $this->_colors as $color ){
                 $str = str_replace('rgb', "", $color);
 
                 $colormap[] = array(
@@ -247,7 +228,7 @@ class ColorMap
             return $colormap;
         }
 
-        return $this->_color;
+        return $this->_colors;
     }
 }
 

@@ -11,6 +11,9 @@ services:
         public: false       # Allows optimizing the container by removing unused services; this also means
                             # fetching services directly from the container via $container->get() won't work.
                             # The best practice is to be explicit about your dependencies anyway.
+        bind:
+            $projectDir: '%kernel.project_dir%'
+
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -30,11 +33,11 @@ services:
     App\Service\Plot\PlotGeneratorChartJs: ~
     App\Service\Plot\PlotGeneratorFlot: ~
 
-    App\Command\ExportJob:
-        $projectDir: '%kernel.project_dir%'
+    # App\Command\ExportJob:
+    #     $projectDir: '%kernel.project_dir%'
 
-    App\Service\ColorMap:
-        $projectDir: '%kernel.project_dir%'
+    # App\Service\ColorMap:
+    #     $projectDir: '%kernel.project_dir%'
 
     App\Service\Plot\PlotGeneratorInterface: '@App\Service\Plot\PlotGeneratorPlotly'
 

@@ -57,14 +57,17 @@ class ExportJob extends Command
     private $_em;
     private $_filesystem;
     private $_root;
+    private $_jobcache;
 
     public function __construct(
         EntityManagerInterface $em,
+        JobCache $jobCache,
         $projectDir,
         FileSystem $filesystem
     )
     {
         $this->_em = $em;
+        $this->_jobcache = $jobCache;
         $this->_filesystem = $filesystem;
         $this->_root = $projectDir.'/var/export/';
 
@@ -86,7 +89,6 @@ class ExportJob extends Command
         $id = $input->getArgument('id');
         $repository = $this->_em->getRepository(\App\Entity\Job::class);
         $configuration = new Configuration($this->_em);
-        $jobCache = new JobCache();
         $userRep = $this->_em->getRepository(\App\Entity\User::class);
         $users = $userRep->findAll();
 
@@ -136,11 +138,13 @@ class ExportJob extends Command
         $options['plot_view_showStatTable']      = $configuration->getValue('plot_view_showStatTable');
         $options['plot_list_samples']            = $configuration->getValue('plot_list_samples');
         $options['plot_general_colorBackground'] = $configuration->getValue('plot_general_colorBackground');
+        $options['plot_general_colorscheme']     = $configuration->getValue('plot_general_colorscheme');
         $options['plot_general_lineWidth']       = $configuration->getValue('plot_general_lineWidth');
+        $options['data_time_digits']             = $configuration->getValue('data_time_digits');
 
-        $jobCache->checkCache(
+        $this->_jobcache->checkCache(
             $job,
-            'data',
+            'view',
             $options
         );
 
@@ -155,6 +159,7 @@ class ExportJob extends Command
 
             /* dump meta information */
             $nodestring = implode(", ",$job->getNodeIdArray());
+            $tagstring = implode(", ",$job->getTagsArray());
 
             $meta = <<<EOT
 job_id: {$job->getJobId()}
@@ -164,6 +169,7 @@ num_nodes: {$job->getNumNodes()}
 start_time: {$job->getStartTime()}
 stop_time: {$job->getStopTime()}
 duration: {$job->getDuration()}
+tags: [$tagstring]
 nodes: [$nodestring]
 EOT;
 

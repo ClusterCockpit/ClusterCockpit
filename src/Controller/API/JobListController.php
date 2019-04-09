@@ -103,6 +103,7 @@ class JobListController extends FOSRestController
         $options['plot_view_showStatTable']      = $config['plot_view_showStatTable']->value;
         $options['plot_list_samples']            = $config['plot_list_samples']->value;
         $options['plot_general_colorBackground'] = $config['plot_general_colorBackground']->value;
+        $options['plot_general_colorscheme']     = $config['plot_general_colorscheme']->value;
         $options['plot_general_lineWidth']       = $config['plot_general_lineWidth']->value;
         $options['data_time_digits']             = $config['data_time_digits']->value;
 

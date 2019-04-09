@@ -36,7 +36,6 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use App\Repository\JobRepository;
 use App\Repository\RunningJobRepository;
 use App\Service\JobCache;
-use App\Service\ColorMap;
 use App\Service\Configuration;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\JobSearch;

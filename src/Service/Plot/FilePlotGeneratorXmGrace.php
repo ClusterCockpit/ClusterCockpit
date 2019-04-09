@@ -17,13 +17,11 @@ class FilePlotGeneratorXmGrace
 
     public function __construct(
         Environment $twig,
-        ColorMap $color,
         Filesystem $fileSystem,
         LoggerInterface $logger )
     {
         $this->_logger = $logger;
         $this->_fileSystem = $fileSystem;
-        $this->_color = $color;
         $this->_twig = $twig;
     }
 
