@@ -25,6 +25,8 @@
 
 namespace App\Service;
 
+/* use App\ColorMaps\Accent; */
+
 class ColorMap
 {
     private $_colors;
@@ -158,7 +160,7 @@ class ColorMap
     {
         $file = $name.'.php';
         $map = 'COLOR_'.$name;
-        include "$projectDir/src/Colormaps/$file";
+        include_once "$projectDir/src/Colormaps/$file";
         $this->_colors = constant($map);
     }
 

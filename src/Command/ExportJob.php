@@ -92,23 +92,23 @@ class ExportJob extends Command
         $userRep = $this->_em->getRepository(\App\Entity\User::class);
         $users = $userRep->findAll();
 
-/*         foreach ( $users as $user ) { */
+        /*         foreach ( $users as $user ) { */
 
-/*             $name = $user->getName(true); */
-/*             $userID = $user->getUserId(true); */
-/*             $email = $user->getEmail(true); */
-/*             $pass = $user->getPassword(); */
+        /*             $name = $user->getName(true); */
+        /*             $userID = $user->getUserId(true); */
+        /*             $email = $user->getEmail(true); */
+        /*             $pass = $user->getPassword(); */
 
-/*             /1* $output->writeln([ 'TRY ', $name, $pass]); *1/ */
+        /*             /1* $output->writeln([ 'TRY ', $name, $pass]); *1/ */
 
-/*                 $user->setName($name); */
-/*                 $user->setUsername($userID); */
-/*                 $user->setEmail($email); */
-/*                 $this->_em->persist($user); */
-/*         } */
-/*                 $this->_em->flush(); */
+        /*                 $user->setName($name); */
+        /*                 $user->setUsername($userID); */
+        /*                 $user->setEmail($email); */
+        /*                 $this->_em->persist($user); */
+        /*         } */
+        /*                 $this->_em->flush(); */
 
-/*         exit; */
+        /*         exit; */
 
         $output->writeln([
             'Job File Export',
@@ -156,49 +156,99 @@ class ExportJob extends Command
             }
 
             $jobCache = $job->jobCache;
+            /* dump($jobCache); */
+            /* exit; */
 
             /* dump meta information */
-            $nodestring = implode(", ",$job->getNodeIdArray());
-            $tagstring = implode(", ",$job->getTagsArray());
 
-            $meta = <<<EOT
-job_id: {$job->getJobId()}
-user_id: {$job->getUser()->getUserId()}
-cluster_id: {$job->getCluster()->getName()}
-num_nodes: {$job->getNumNodes()}
-start_time: {$job->getStartTime()}
-stop_time: {$job->getStopTime()}
-duration: {$job->getDuration()}
-tags: [$tagstring]
-nodes: [$nodestring]
-EOT;
+            $jsonData = array();
+            $jsonData['job_id'] = $job->getJobId();
+            $jsonData['user_id'] = $job->getUser()->getUserId();
+            $jsonData['cluster_id'] = $job->getCluster()->getName();
+            $jsonData['num_nodes'] = $job->getNumNodes();
+            $jsonData['start_time'] = $job->getStartTime();
+            $jsonData['stop_time'] = $job->getStopTime();
+            $jsonData['duration'] = $job->getDuration();
+            $jsonData['nodes'] = $job->getNodeIdArray();
+            $jsonData['tags'] = $job->getTagsArray();
+
+/*             $nodestring = implode(", ",$job->getNodeIdArray()); */
+/*             $tagstring = implode(", ",$job->getTagsArray()); */
+
+/*             $meta = <<<EOT */
+/* job_id: {$job->getJobId()} */
+/* user_id: {$job->getUser()->getUserId()} */
+/* cluster_id: {$job->getCluster()->getName()} */
+/* num_nodes: {$job->getNumNodes()} */
+/* start_time: {$job->getStartTime()} */
+/* stop_time: {$job->getStopTime()} */
+/* duration: {$job->getDuration()} */
+/* tags: [$tagstring] */
+/* nodes: [$nodestring] */
+/* EOT; */
+
+/*             $this->_filesystem->dumpFile($this->_root.$job->getJobId().'/meta.yml', $meta); */
 
             $output->writeln(['Export to ',
                 $this->_root.$job->getJobId()]);
 
-            $this->_filesystem->dumpFile($this->_root.$job->getJobId().'/meta.yml', $meta);
             $plots = $jobCache->getPlots();
+
+            if (isset($plots['roofline'])) {
+                unset($plots['roofline']);
+            }
+
+            if (isset($plots['polarplot'])) {
+                unset($plots['polarplot']);
+            }
+
+            $footprint = array();
 
             foreach ( $plots as $plot ) {
                 $nodes = $plot->getData();
 
-                $nodeCache;
-                $data = $nodes->first();
+                $nodeCache = array();
+                $data = $nodes[0];
                 $length = count($data['x']);
 
                 for ($j=0; $j<$length; $j++) {
-                    $nodeCache[$j] = "{$data['x'][$j]}";
+                    $nodeCache[] = "{$data['x'][$j]}";
                 }
 
+                $statData = array();
+
                 foreach ($nodes as $node){
+                    if ($length > count($node['y'])) {
+                        $length = count($node['y']);
+                    }
+
                     for ($j=0; $j<$length; $j++) {
+                        $statData[] = $node['y'][$j];
                         $nodeCache[$j] .= " {$node['y'][$j]}";
                     }
                 }
 
+                $avg = array_sum($statData) / count($statData);
+                $options = $plot->getOptions();
+
+                if (! isset($jsonData['time_unit'])) {
+                    if (preg_match("/runtime \[([mh])\]/", $options['xaxis']['title'], $matches)){
+                        $jsonData['time_unit'] = $matches[1];
+                    }
+                }
+
+
+                $footprint[$plot->name] = array(
+                    'unit' => $options['yaxis']['title'],
+                    'avg'  => $avg
+                );
+
                 $datastring = implode("\n",$nodeCache);
                 $this->_filesystem->dumpFile($this->_root.$job->getJobId()."/{$plot->name}.dat", $datastring);
             }
+
+            $jsonData['footprint'] = $footprint;
+            $this->_filesystem->dumpFile($this->_root.$job->getJobId().'/meta.json', json_encode($jsonData));
         }
     }
 }
