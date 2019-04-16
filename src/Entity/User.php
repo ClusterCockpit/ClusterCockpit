@@ -163,16 +163,6 @@ class User implements UserInterface, \Serializable
         }
     }
 
-    public function getUid()
-    {
-        return $this->uid;
-    }
-
-    public function setUid($uid)
-    {
-        $this->uid = $uid;
-    }
-
     public function getName($hide=false)
     {
         if( $hide === true ) {
