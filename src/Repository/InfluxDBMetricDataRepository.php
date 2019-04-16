@@ -25,15 +25,20 @@
 namespace App\Repository;
 
 use Symfony\Component\Stopwatch\Stopwatch;
+use Psr\Log\LoggerInterface;
 
 class InfluxDBMetricDataRepository implements MetricDataRepository
 {
     private $_timing;
     private $_database;
+    private $_logger;
 
-    public function __construct()
+    public function __construct(
+        LoggerInterface $logger
+    )
     {
         $this->_timer = new Stopwatch();
+        $this->_logger = $logger;
         /* $client = new \InfluxDB\Client('localhost', '8086'); */
         /* $this->_database = $client->selectDB('ClusterCockpit'); */
         $influxdbURL = getenv('INFLUXDB_URL');
@@ -96,6 +101,7 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
             WHERE  time >= {$job->startTime}s AND time <= {$job->stopTime}s
             AND host = '{$nodes->first()->getNodeId()}'";
 
+        $this->_logger->info("InfluxDB QUERY: query");
         $result = $this->_database->query($query);
         $points = $result->getPoints();
         $count = $points[0]['count'];
