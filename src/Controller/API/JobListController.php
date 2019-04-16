@@ -158,20 +158,24 @@ class JobListController extends FOSRestController
                 $jobData["plots"] = $job->jobCache->getPlotsArray(
                     $job->getCluster()->getMetricList($mode)->getMetrics());
 
-                $plot = $job->jobCache->getPlot('roofline');
-                $jobData["plots"][] =  array(
-                    'name' => $plot->name,
-                    'options' => $plot->options,
-                    'data' => $plot->data
-                );
+                if ( $options['plot_view_showRoofline'] === 'true' ){
+                    $plot = $job->jobCache->getPlot('roofline');
+                    $jobData["plots"][] =  array(
+                        'name' => $plot->name,
+                        'options' => $plot->options,
+                        'data' => $plot->data
+                    );
+                }
 
-                $plot = $job->jobCache->getPlot('polarplot');
+                if ( $options['plot_view_showPolarplot'] === 'true' ){
+                    $plot = $job->jobCache->getPlot('polarplot');
 
-                $jobData["plots"][] =  array(
-                    'name' => $plot->name,
-                    'options' => $plot->options,
-                    'data' => $plot->data
-                );
+                    $jobData["plots"][] =  array(
+                        'name' => $plot->name,
+                        'options' => $plot->options,
+                        'data' => $plot->data
+                    );
+                }
 
                 $jobData['nodeStats'] = $job->jobCache->nodeStat;
             }
