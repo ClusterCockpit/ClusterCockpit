@@ -40,11 +40,6 @@ class User implements UserInterface, \Serializable
     private $password;
 
     /**
-     *  @ORM\Column(type="integer")
-     */
-    private $uid;
-
-    /**
      *  @ORM\Column(type="string")
      */
     private $name;

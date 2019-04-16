@@ -89,8 +89,8 @@ class ExportJob extends Command
         $id = $input->getArgument('id');
         $repository = $this->_em->getRepository(\App\Entity\Job::class);
         $configuration = new Configuration($this->_em);
-        $userRep = $this->_em->getRepository(\App\Entity\User::class);
-        $users = $userRep->findAll();
+        /* $userRep = $this->_em->getRepository(\App\Entity\User::class); */
+        /* $users = $userRep->findAll(); */
 
         /*         foreach ( $users as $user ) { */
 
@@ -156,11 +156,6 @@ class ExportJob extends Command
             }
 
             $jobCache = $job->jobCache;
-            /* dump($jobCache); */
-            /* exit; */
-
-            /* dump meta information */
-
             $jsonData = array();
             $jsonData['job_id'] = $job->getJobId();
             $jsonData['user_id'] = $job->getUser()->getUserId();
@@ -171,23 +166,6 @@ class ExportJob extends Command
             $jsonData['duration'] = $job->getDuration();
             $jsonData['nodes'] = $job->getNodeIdArray();
             $jsonData['tags'] = $job->getTagsArray();
-
-/*             $nodestring = implode(", ",$job->getNodeIdArray()); */
-/*             $tagstring = implode(", ",$job->getTagsArray()); */
-
-/*             $meta = <<<EOT */
-/* job_id: {$job->getJobId()} */
-/* user_id: {$job->getUser()->getUserId()} */
-/* cluster_id: {$job->getCluster()->getName()} */
-/* num_nodes: {$job->getNumNodes()} */
-/* start_time: {$job->getStartTime()} */
-/* stop_time: {$job->getStopTime()} */
-/* duration: {$job->getDuration()} */
-/* tags: [$tagstring] */
-/* nodes: [$nodestring] */
-/* EOT; */
-
-/*             $this->_filesystem->dumpFile($this->_root.$job->getJobId().'/meta.yml', $meta); */
 
             $output->writeln(['Export to ',
                 $this->_root.$job->getJobId()]);
@@ -208,11 +186,13 @@ class ExportJob extends Command
                 $nodes = $plot->getData();
 
                 $nodeCache = array();
+                $numCols = array();
                 $data = $nodes[0];
                 $length = count($data['x']);
 
                 for ($j=0; $j<$length; $j++) {
                     $nodeCache[] = "{$data['x'][$j]}";
+                    $numCols[] = 0;
                 }
 
                 $statData = array();
@@ -225,6 +205,7 @@ class ExportJob extends Command
                     for ($j=0; $j<$length; $j++) {
                         $statData[] = $node['y'][$j];
                         $nodeCache[$j] .= " {$node['y'][$j]}";
+                        $numCols[$j]++;
                     }
                 }
 
@@ -237,11 +218,16 @@ class ExportJob extends Command
                     }
                 }
 
-
                 $footprint[$plot->name] = array(
                     'unit' => $options['yaxis']['title'],
                     'avg'  => $avg
                 );
+
+                for ($j=1; $j < count($nodeCache); $j++) {
+                    if ( $numCols[$j] < $numCols[0] ){
+                        $nodeCache[$j] = '';
+                    }
+                }
 
                 $datastring = implode("\n",$nodeCache);
                 $this->_filesystem->dumpFile($this->_root.$job->getJobId()."/{$plot->name}.dat", $datastring);
@@ -249,6 +235,8 @@ class ExportJob extends Command
 
             $jsonData['footprint'] = $footprint;
             $this->_filesystem->dumpFile($this->_root.$job->getJobId().'/meta.json', json_encode($jsonData));
+        } else {
+            $output->writeln("Job has no profile!");
         }
     }
 }
