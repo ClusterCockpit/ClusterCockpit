@@ -240,7 +240,6 @@ class Cron extends Command
 
                 $newUser = new User();
                 $newUser->setUsername($user['user_id']);
-                $newUser->setUid($user['uid']);
                 $newUser->setName($user['name']);
                 $newUser->setEmail($user['email']);
                 $newUser->setIsActive('true');
@@ -272,16 +271,12 @@ class Cron extends Command
 
         foreach ( $results as $entry ) {
             $user_id;
-            $uid;
             $name;
             $active;
             $groupsUser;
 
             if ( $entry->hasAttribute('uid') ) {
                 $user_id = $entry->getAttribute('uid')[0];
-            }
-            if ( $entry->hasAttribute('uidNumber') ) {
-                $uid = $entry->getAttribute('uidNumber')[0];
             }
             if ( $entry->hasAttribute('gecos') ) {
                 $name = $entry->getAttribute('gecos')[0];
@@ -291,7 +286,6 @@ class Cron extends Command
 
             $users[$user_id] = array(
                 'user_id'  => $user_id,
-                'uid'      => $uid,
                 'name'     => $name,
                 'email'    => $user_id.$this->_configuration->getValue('general_user_emailbase'),
                 'active'   => $active

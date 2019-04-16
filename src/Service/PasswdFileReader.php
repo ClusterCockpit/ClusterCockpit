@@ -34,13 +34,11 @@ class PasswdFileReader
         foreach ( $lines as  $line ) {
             $entries = preg_split("/:/", $line);
             $user_id = $entries[0];
-            $uid     = $entries[2];
             $name    = $entries[4];
             $email   = $entries[0].$emailbase;
 
             $users[$user_id] = array(
                 'user_id' => $user_id,
-                'uid'     => $uid,
                 'name'    => $name,
                 'email'   => $email,
                 'active'  => 1

@@ -73,6 +73,10 @@ class Configuration
             $this->_initConfig();
         }
 
-        return $this->_config[$key]->value;
+        if ( array_key_exists ( $key , $this->_config) ){
+            return $this->_config[$key]->value;
+        } else {
+            return false;
+        }
     }
 }
