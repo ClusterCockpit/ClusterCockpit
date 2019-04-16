@@ -139,6 +139,10 @@ class LdapAuthenticator extends AbstractFormLoginAuthenticator
 
         if ( empty($dbPassword) ) {
             /* authenticate with ldap bind */
+            if ( $config['ldap_user_base'] === false || $config['ldap_user_key'] === false ){
+                throw new BadCredentialsException('Ldap not supported.');
+            }
+
             try {
                 $this->_ldap->bindUser($config, $username, $password);
             } catch (ConnectionException $e) {
