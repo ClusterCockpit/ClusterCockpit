@@ -57,7 +57,7 @@ class Bootstrap extends Command
         array('plot_list_sortDirection',      'desc',   'default', 'Default sort direction',              'asc|desc',   'Enter asc or desc'),
         array('plot_general_colorscheme',     'Accent', 'default', 'Plot color scheme',                   '',           ''),
         array('plot_general_interactive',     'false',  'default', 'Interactive plots in job view',       'true|false', 'Enter true or false'),
-        array('plot_general_linewidth',       '2',      'default', 'Line width for plots',                '[0-9]+',     'Enter a positive integer'),
+        array('plot_general_lineWidth',       '2',      'default', 'Line width for plots',                '[0-9]+',     'Enter a positive integer'),
         array('plot_general_colorBackground', 'true',   'default', 'Color plot background',               'true|false', 'Enter true or false'),
         array('data_time_digits',             '2',      'default', 'Timestamp rounding digits',           '[0-9]+',     'Enter a positive integer'),
         array('data_metric_digits',           '1',      'default', 'Metric rounding digits',              '[0-9]+',     'Enter a positive integer'),

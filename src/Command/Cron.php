@@ -82,12 +82,14 @@ class Cron extends Command
         $options['plot_list_samples']            = $this->_configuration->getValue('plot_list_samples');
         $options['plot_general_colorBackground'] = $this->_configuration->getValue('plot_general_colorBackground');
         $options['plot_general_lineWidth']       = $this->_configuration->getValue('plot_general_lineWidth');
+        $options['plot_general_colorscheme']     = $this->_configuration->getValue('plot_general_colorscheme');
         $options['data_cache_numpoints']         = $this->_configuration->getValue('data_cache_numpoints');
+        $options['data_time_digits']             = $this->_configuration->getValue('data_time_digits');
 
         $this->_timer->start('WarmupCache');
         foreach ( $jobs as $job ){
 
-            if ( $job->getNumNodes() > 0 ) {
+            if ( $job->getNumNodes() > 0 && $job->duration > 400 ) {
                 $this->_jobCache->warmupCache(
                     $job, $options);
                 $this->_em->persist($job);
