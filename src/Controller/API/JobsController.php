@@ -40,19 +40,6 @@ use FOS\RestBundle\Controller\Annotations\QueryParam;
 
 class JobsController extends FOSRestController
 {
-    /* public function getJobAction($slug) */
-    /* { */
-    /*     $repository = $this->getDoctrine()->getRepository(\App\Entity\Job::class); */
-    /*     $job = $repository->findOneByJobId($slug); */
-    /*     //$data = $repository->find($id); */
-
-    /*     if (empty($job)) { */
-    /*         throw new HttpException(400, "No such job ID."); */
-    /*     } */
-    /*     $view = $this->view($job); */
-    /*     return $this->handleView($view); */
-    /* } // "get_job"             [GET] api/jobs/$slug */
-
     public function postJobsAction(Request $request)
     {
         $jobId = $request->request->get('job_id');

@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2019 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -188,7 +188,7 @@ class JobRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('j');
 
         $qb->select('count(j)')
-	   ->where("j.duration > 300");
+           ->where("j.duration > 300");
 
         if ( $userId ){
             $qb->andWhere("j.user = $userId");
@@ -200,9 +200,7 @@ class JobRepository extends ServiceEntityRepository
         }
 
         if (array_key_exists ( 'runningJobs', $jobQuery )) {
-
             $qb->andWhere("j.isRunning = true");
-            $qb->andWhere("j.isCached = true");
         } elseif (array_key_exists ( 'clusterId', $jobQuery )) {
 
             $qb->andWhere($qb->expr()->between('j.numNodes',$jobQuery['numNodesFrom'],$jobQuery['numNodesTo']));
@@ -219,7 +217,7 @@ class JobRepository extends ServiceEntityRepository
 
         } elseif (array_key_exists ( 'jobTag', $jobQuery )) {
             $qb->innerJoin('j.tags', 't', 'WITH', 't.id = :tagId')
-            ->setParameter('tagId', $jobQuery['jobTag']);
+               ->setParameter('tagId', $jobQuery['jobTag']);
         }
 
         return $qb
@@ -253,8 +251,6 @@ class JobRepository extends ServiceEntityRepository
 
         if (array_key_exists ( 'runningJobs', $jobQuery )) {
             $qb->andWhere("j.isRunning = true");
-            /* $qb->andWhere("j.isCached = true"); */
-
         } elseif (array_key_exists ( 'clusterId', $jobQuery )) {
 
             $qb->andWhere($qb->expr()->between('j.numNodes',$jobQuery['numNodesFrom'],$jobQuery['numNodesTo']));
@@ -271,7 +267,7 @@ class JobRepository extends ServiceEntityRepository
 
         } elseif (array_key_exists ( 'jobTag', $jobQuery )) {
             $qb->innerJoin('j.tags', 't', 'WITH', 't.id = :tagId')
-            ->setParameter('tagId', $jobQuery['jobTag']);
+               ->setParameter('tagId', $jobQuery['jobTag']);
         }
 
         return $qb
@@ -334,82 +330,6 @@ class JobRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findByJobSearch(JobSearch $search)
-    {
-        $qb = $this->createQueryBuilder('j');
-        $userId = $search->getUserId();
-
-        if (isset($userId)){
-            $user_rep = $this->getEntityManager()->getRepository(User::class);
-            $user = $user_rep->findOneByUserId($search->getUserId());
-
-            $qb->andWhere("j.user =".$user->getId());
-        }
-
-        /* Convert to seconds */
-        $durationFrom = $search->getDurationFrom()->h*3600+$search->getDurationFrom()->m*60;
-        $durationTo = $search->getDurationTo()->h*3600+$search->getDurationFrom()->m*60;
-        $startFrom = $search->getDateFrom();
-        $startTo = $search->getDateTo();
-
-        $qb->andWhere($qb->expr()->between('j.numNodes',$search->getnumNodesFrom(),$search->getnumNodesTo()));
-        $qb->andWhere($qb->expr()->between( 'j.duration', $durationFrom, $durationTo));
-        $qb->andWhere($qb->expr()->between( 'j.startTime', $startFrom, $startTo));
-        $qb->andWhere("j.cluster = {$search->getClusterId()}");
-
-        return $qb
-            ->orderBy('j.startTime', 'DESC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findAvgTodo($startTime, $stopTime)
-    {
-        $qb = $this->createQueryBuilder('j');
-        $qb->select('j')
-           ->where($qb->expr()->between( 'j.startTime', $startTime, $stopTime))
-           ->andWhere("j.duration > 300");
-
-        return $qb
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findByUser($userId, $limit, $control )
-    {
-        $settings = $this->getSettings($control);
-        $qb = $this->createQueryBuilder('j');
-
-        $startTime = $settings['startTime'];
-        $stopTime = $settings['stopTime'];
-
-        $qb->select('j')
-           ->where('j.user = ?1')
-           ->orderBy('j.startTime', 'DESC')
-           ->setMaxResults( $limit )
-           ->setParameter(1, $userId);
-        $qb->andWhere($qb->expr()->between( 'j.startTime', $startTime, $stopTime));
-
-        return $qb
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findBySystem($control)
-    {
-        $qb = $this->createQueryBuilder('j');
-
-        $qb->select('j')
-           ->where('j.cluster = ?1')
-           ->orderBy('j.numNodes', 'DESC')
-           ->setMaxResults( 20 )
-           ->setParameter(1, $control->getCluster());
-
-        return $qb
-            ->getQuery()
-            ->getResult();
-    }
-
     public function findStatByUser($userId, $control, $full=true)
     {
         $stat = array();
@@ -423,16 +343,6 @@ class JobRepository extends ServiceEntityRepository
             $stat['histo_numnodes'] = $this->getHisto($settings,
                 'num_nodes-1',"AND job.user_id=$userId");
         }
-        return $stat;
-    }
-
-    public function statClusters($control)
-    {
-        $stat = array();
-        $settings = $this->getSettings($control);
-        $stat['stat'] = $this->getStats($settings);
-        $stat['histo_runtime'] = $this->getHisto($settings,'floor(duration/3600)+1');
-        $stat['histo_numnodes'] = $this->getHisto($settings,'num_nodes');
         return $stat;
     }
 
@@ -534,53 +444,6 @@ class JobRepository extends ServiceEntityRepository
         return $users;
     }
 
-    public function statGroups($control)
-    {
-        $settings = $this->getSettings($control);
-        $stat = array();
-
-        $sql = "SELECT id, group_id FROM unix_group";
-        $groups = $this->_connection->fetchAll($sql);
-
-        foreach ( $groups as $group ){
-            $stat[] = array(
-                'groupId' => $group['id'],
-                'groupName' => $group['group_id'],
-                'stat' => $this->findStatByGroup((int) $group['id'], $settings)
-            );
-        }
-
-        return $stat;
-    }
-
-    public function findStatByGroup($groupId, $control)
-    {
-        $settings = $this->getSettings($control);
-        $join = "INNER JOIN users_groups ON job.user_id = users_groups.user_id ";
-        $constraint = "AND users_groups.group_id=$groupId";
-        $stat['stat'] = $this->getStats($settings,$constraint, $join);
-        $stat['histo_runtime'] = $this->getHisto($settings,'floor(duration/3600)+1',$constraint, $join);
-        $stat['histo_numnodes'] = $this->getHisto($settings,'num_nodes',$constraint, $join);
-        return $stat;
-    }
-
-    public function getNumUsers()
-    {
-        $sql = "SELECT COUNT(DISTINCT(user_id)) AS count FROM job WHERE status='running'";
-        $stmt = $this->_connection->prepare($sql);
-        $stmt->execute();
-
-        return $stmt->fetch();
-    }
-
-    public function persistJobSeverity($job){
-        $id = $job->getId();
-        $severity = $job->severity;
-
-        $sql = "UPDATE job SET severity=$severity WHERE id=$id";
-        $stmt = $this->_connection->prepare($sql);
-        $stmt->execute();
-    }
 
     public function findJobById($jobId, $userId)
     {
