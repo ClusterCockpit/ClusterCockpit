@@ -54,16 +54,16 @@ class ClusterController extends FOSRestController
     {
         foreach ( $metricEntry as $key => $value ){
             if ( array_key_exists($key, $metric)){
-                $metricEntry->$key = $metric[$key];
+                $metricEntry->key = $metric[$key];
             }
         }
 
-/*         $metricEntry->name = $metric['name']; */
-/*         $metricEntry->unit = $metric['unit']; */
-/*         $metricEntry->scale = $metric['scale']; */
-/*         $metricEntry->position = $metric['position']; */
-/*         $metricEntry->slot = $metric['slot']; */
-/*         $metricEntry->measurement = $metric['measurement']; */
+        $metricEntry->name = $metric['name'];
+        $metricEntry->unit = $metric['unit'];
+        $metricEntry->scale = $metric['scale'];
+        $metricEntry->position = $metric['position'];
+        $metricEntry->measurement = $metric['measurement'];
+        $metricEntry->sampletime = $metric['sampletime'];
 
         if ( $metric['peak'] === "" ) {
             $metricEntry->peak = NULL;
@@ -83,7 +83,7 @@ class ClusterController extends FOSRestController
         if ( $metric['alert'] === "" ) {
             $metricEntry->alert = NULL;
         } else {
-        $metricEntry->alert = $metric['alert'];
+            $metricEntry->alert = $metric['alert'];
         }
     }
 
@@ -148,6 +148,7 @@ class ClusterController extends FOSRestController
                         $logger->info("ADD",array($listName, $name));
                     }
                     $em->persist($metricEntry);
+        $em->flush();
                 }
             }
             $em->persist($currentList);

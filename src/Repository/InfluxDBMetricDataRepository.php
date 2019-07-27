@@ -117,29 +117,6 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
 
     public function getJobStats($job, $metrics)
     {
-        /* $metricString = ''; */
-
-        /* foreach ( $metrics as $metric ){ */
-        /*     $name = $metric->name; */
-        /*     $scale = sprintf("%f",$metric->scale); */
-
-        /*     $metricString .= ",MEAN($name) * $scale AS {$name}_avg"; */
-        /*     $metricString .= ",MIN($name)  * $scale AS {$name}_min"; */
-        /*     $metricString .= ",MAX($name)  * $scale AS {$name}_max"; */
-        /* } */
-        /* $metricString = substr($metricString,1); */
-        /* $nodes = $job->getNodeNameArray(); */
-        /* $nodes = implode('|', $nodes); */
-
-        /* $query = "SELECT */
-        /*     $metricString */
-        /*     FROM data */
-        /*     WHERE  time >= {$job->startTime}s AND time <= {$job->stopTime}s */
-        /*     AND host =~ /$nodes/ GROUP BY host"; */
-
-        /* $result = $this->_database->query($query); */
-        /* $series = $result->getSeries(); */
-
         $nodes = $job->getNodeNameArray();
         $nodes = implode('|', $nodes);
 
@@ -197,59 +174,39 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
             $nodeStat[] = $node;
         }
 
-
-/*         $query = "SELECT */
-/*             $metricString */
-/*             FROM data */
-/*             WHERE  time >= {$job->startTime}s AND time <= {$job->stopTime}s */
-/*             AND host =~ /$nodes/"; */
-
-/*         $result = $this->_database->query($query); */
-/*         $points = $result->getPoints(); */
-/*         $stats = $points[0]; */
-
         $stats['nodeStats'] = $nodeStat;
 
         return $stats;
     }
 
-    public function getMetricData($job, $metrics)
+    public function getMetricData($job, $metrics, $options)
     {
-        /* $metricString = ''; */
-
-        /* foreach ( $metrics as $metric ){ */
-        /*     $name = $metric->name; */
-        /*     $scale = sprintf("%f",$metric->scale); */
-        /*     $metricString .= ",MEAN($name) * $scale AS {$name}"; */
-        /* } */
-
-        /* $metricString = substr($metricString,1); */
-        /* $nodes = $job->getNodeNameArray(); */
-        /* $nodes = implode('|', $nodes); */
-
-        /* $query = "SELECT $metricString FROM data */
-        /*     WHERE  time >= {$job->startTime}s AND time <= {$job->stopTime}s */
-        /*     AND host =~ /$nodes/ GROUP BY time(1m), host FILL(linear)"; */
-
         $nodes = $job->getNodeNameArray();
         $nodes = implode('|', $nodes);
+        $sampletime = 0;
+
+        if ( $options['sample'] > 0 ){
+            $sampletime = intdiv($job->duration, $options['sample']);
+        }
 
 
         foreach ( $metrics as $metric ){
             $scale = sprintf("%f",$metric->scale);
+            if ( $sampletime < $metric->sampletime ) {
+                $sampletime = $metric->sampletime;
+            }
 
             $query = "SELECT
                 MEAN({$metric->name}) * $scale AS {$metric->name}
                 FROM {$metric->measurement}
                 WHERE  time >= {$job->startTime}s AND time <= {$job->stopTime}s
-                AND host =~ /$nodes/ GROUP BY time(1m), host FILL(linear)";
+                AND host =~ /$nodes/ GROUP BY time({$sampletime}s), host";
 
             $this->_timer->start( 'InfluxDB');
             $result = $this->_database->query($query, ['epoch' => 's']);
             $queries[] = $result->getSeries();
             $this->_timer->stop( 'InfluxDB');
         }
-
 
         $data = array();
 

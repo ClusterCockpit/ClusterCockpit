@@ -122,7 +122,7 @@ class UserViewController extends Controller
             $search->setClusterId($control->getCluster());
         }
 
-        $statCache = $jobCache->checkStatisticCache(
+        $statCache = $jobCache->getUserStatistic(
             $user->getId(),
             $control,
             $control->getCluster(),

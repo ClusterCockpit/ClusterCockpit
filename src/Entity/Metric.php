@@ -60,9 +60,14 @@ class Metric
     public $position;
 
     /**
+     *  @ORM\Column(type="string")
+     */
+    public $measurement;
+
+    /**
      *  @ORM\Column(type="integer")
      */
-    public $slot;
+    public $sampletime;
 
     /**
      * @ORM\Column(type="float", nullable=true)

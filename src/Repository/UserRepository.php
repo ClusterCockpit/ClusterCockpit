@@ -60,20 +60,6 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
                     ->getResult();
     }
 
-    public function findByGroupId($groupId)
-    {
-        $qb = $this->createQueryBuilder('u');
-
-        $qb->select('u')
-           ->innerJoin('u.groups', 'g')
-           ->where('g.id = :group_id')
-           ->setParameter('group_id', $groupId);
-
-        return $qb
-            ->getQuery()
-            ->getResult();
-    }
-
     public function loadUserByUsername($username)
     {
         return $this->createQueryBuilder('u')

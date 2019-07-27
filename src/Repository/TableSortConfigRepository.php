@@ -41,11 +41,9 @@ class TableSortConfigRepository extends ServiceEntityRepository
         $cluster = $job->getCluster();
         $metrics = $cluster->getMetricList('sort')->getMetrics();
         $info = $this->createQueryBuilder('t', 't.accessKey')
-            ->andWhere('t.clusterId = :cluster')
             ->andWhere('t.type = :type')
             ->getQuery()
             ->setParameter('type', 'data')
-            ->setParameter('cluster', $cluster->getId())
             ->getResult();
 
         return array(

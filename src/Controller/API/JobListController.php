@@ -78,7 +78,7 @@ class JobListController extends FOSRestController
 
             $sorting = array(
                 'col'   => $column,
-                'order' =>$direction
+                'order' => $direction
             );
         } else {
             $sorting = array(

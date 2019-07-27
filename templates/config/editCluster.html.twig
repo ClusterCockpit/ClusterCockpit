@@ -119,10 +119,10 @@
                         <table id="{{ list.name }}" class="table table-striped table-bordered  table-hover">
                             <thead class="thead-light">
                                 <th>Position</th>
-                                <th>Slot</th>
                                 <th>Measurement</th>
                                 <th>Name</th>
                                 <th>Unit</th>
+                                <th>Sampletime</th>
                                 <th>Scale</th>
                                 <th>Peak</th>
                                 <th>Normal</th>
@@ -135,10 +135,10 @@
                                 {% for metric in list.metrics %}
                                     <tr>
                                         <td class="align-middle text-center">{{ metric.position }}</td>
-                                        <td class="align-middle text-center">{{ metric.slot }}</td>
                                         <td class="align-middle text-center">{{ metric.measurement }}</td>
                                         <td class="align-middle text-center">{{ metric.name }}</td>
                                         <td class="align-middle text-center">{{ metric.unit }}</td>
+                                        <td class="align-middle text-center">{{ metric.sampletime }}</td>
                                         <td class="align-middle text-center">{{ metric.scale }}</td>
                                         <td class="align-middle text-center">{{ metric.peak }}</td>
                                         <td class="align-middle text-center">{{ metric.normal }}</td>
