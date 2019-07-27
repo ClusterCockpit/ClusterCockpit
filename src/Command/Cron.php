@@ -90,7 +90,7 @@ class Cron extends Command
         $this->_timer->start('WarmupCache');
         foreach ( $jobs as $job ){
 
-            if ( $job->getNumNodes() > 0 ) {
+            if ( $job->getNumNodes() > 0 && $job->duration > 400 ) {
                 $this->_jobCache->warmupCache(
                     $job, $options);
                 $this->_em->persist($job);

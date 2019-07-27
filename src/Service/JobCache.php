@@ -54,7 +54,6 @@ class JobCache
         EntityManagerInterface $em,
         PlotGenerator $plotGenerator,
         InfluxDBMetricDataRepository $metricRepo,
-        /* DoctrineMetricDataRepository $metricRepo, */
         AdapterInterface $cache
     )
     {

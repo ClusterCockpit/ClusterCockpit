@@ -101,7 +101,7 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
             WHERE  time >= {$job->startTime}s AND time <= {$job->stopTime}s
             AND host = '{$nodes->first()->getNodeId()}'";
 
-        $this->_logger->info("InfluxDB QUERY: query");
+        $this->_logger->info("InfluxDB QUERY: $query");
         $result = $this->_database->query($query);
         $points = $result->getPoints();
         $count = $points[0]['count'];
@@ -131,6 +131,7 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
                 FROM {$metric->measurement}
                 WHERE  time >= {$job->startTime}s AND time <= {$job->stopTime}s
                 AND host =~ /$nodes/ GROUP BY host";
+	    $this->_logger->info("InfluxDB QUERY: $query");
 
             $this->_timer->start( 'InfluxDB');
             $result = $this->_database->query($query);
@@ -145,6 +146,7 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
                 WHERE  time >= {$job->startTime}s AND time <= {$job->stopTime}s
                 AND host =~ /$nodes/";
 
+	    $this->_logger->info("InfluxDB JobStat QUERY: $query");
             $this->_timer->start( 'InfluxDB');
             $result = $this->_database->query($query);
             $points = $result->getPoints();
@@ -242,9 +244,14 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
             WHERE  time >= {$job->startTime}s AND time <= {$job->stopTime}s
             AND host = '$id'";
 
+        $this->_logger->info("InfluxDB QUERY: $query");
         $result = $this->_database->query($query, ['epoch' => 's']);
         $count =  $result->getPoints();
 
-        return $count[0]['count'] * count($nodes) * count($metrics);
+	if ( array_key_exists(0, $count) ) {
+		return $count[0]['count'] * count($nodes) * count($metrics);
+	} else {
+		return 0;
+	}
     }
 }
