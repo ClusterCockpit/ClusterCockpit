@@ -45,13 +45,6 @@ use App\Entity\Plot;
 use App\Entity\User;
 use \DateInterval;
 
-/**
- * Class: ExportJob
- *
- * @see Command
- * @author Jan Eitzinger
- * @version 0.1
- */
 class ExportJob extends Command
 {
     private $_em;
@@ -69,7 +62,7 @@ class ExportJob extends Command
         $this->_em = $em;
         $this->_jobcache = $jobCache;
         $this->_filesystem = $filesystem;
-        $this->_root = $projectDir.'/var/export/';
+        $this->_root = $projectDir.'/var/export';
 
         parent::__construct();
     }
@@ -89,26 +82,6 @@ class ExportJob extends Command
         $id = $input->getArgument('id');
         $repository = $this->_em->getRepository(\App\Entity\Job::class);
         $configuration = new Configuration($this->_em);
-        /* $userRep = $this->_em->getRepository(\App\Entity\User::class); */
-        /* $users = $userRep->findAll(); */
-
-        /*         foreach ( $users as $user ) { */
-
-        /*             $name = $user->getName(true); */
-        /*             $userID = $user->getUserId(true); */
-        /*             $email = $user->getEmail(true); */
-        /*             $pass = $user->getPassword(); */
-
-        /*             /1* $output->writeln([ 'TRY ', $name, $pass]); *1/ */
-
-        /*                 $user->setName($name); */
-        /*                 $user->setUsername($userID); */
-        /*                 $user->setEmail($email); */
-        /*                 $this->_em->persist($user); */
-        /*         } */
-        /*                 $this->_em->flush(); */
-
-        /*         exit; */
 
         $output->writeln([
             'Job File Export',
@@ -133,108 +106,83 @@ class ExportJob extends Command
             ->setRows($rows);
         $table->render();
 
-        $options['plot_view_showPolarplot']      = $configuration->getValue('plot_view_showPolarplot');
-        $options['plot_view_showRoofline']       = $configuration->getValue('plot_view_showRoofline');
-        $options['plot_view_showStatTable']      = $configuration->getValue('plot_view_showStatTable');
-        $options['plot_list_samples']            = $configuration->getValue('plot_list_samples');
-        $options['plot_general_colorBackground'] = $configuration->getValue('plot_general_colorBackground');
-        $options['plot_general_colorscheme']     = $configuration->getValue('plot_general_colorscheme');
-        $options['plot_general_lineWidth']       = $configuration->getValue('plot_general_lineWidth');
-        $options['data_time_digits']             = $configuration->getValue('data_time_digits');
-
-        $this->_jobcache->checkCache(
-            $job,
-            'view',
-            $options
-        );
+        $this->_jobcache->getArchive($job);
 
         if ( $job->hasProfile ) {
+            $jobID = $job->getJobId();
+            $jobID = str_replace(".eadm", "", $jobID);
+            $level1 = $jobID/1000;
+            $level2 = $jobID%1000;
+            $dstPath = sprintf("%s/%d/%03d", $this->_root, $level1, $level2);
+
             try {
-                $this->_filesystem->mkdir($this->_root.$job->getJobId());
+                $this->_filesystem->mkdir($dstPath);
             } catch (IOExceptionInterface $exception) {
                 echo "An error occurred while creating job export directory at ".$exception->getPath();
             }
 
+            $duration = $job->getDuration();
             $jobCache = $job->jobCache;
-            $jsonData = array();
-            $jsonData['job_id'] = $job->getJobId();
-            $jsonData['user_id'] = $job->getUser()->getUserId();
-            $jsonData['cluster_id'] = $job->getCluster()->getName();
-            $jsonData['num_nodes'] = $job->getNumNodes();
-            $jsonData['start_time'] = $job->getStartTime();
-            $jsonData['stop_time'] = $job->getStopTime();
-            $jsonData['duration'] = $job->getDuration();
-            $jsonData['nodes'] = $job->getNodeIdArray();
-            $jsonData['tags'] = $job->getTagsArray();
-
-            $output->writeln(['Export to ',
-                $this->_root.$job->getJobId()]);
+            $jsonMeta = array();
+            $jsonMeta['job_id'] = $job->getJobId();
+            $jsonMeta['user_id'] = $job->getUser()->getUserId();
+            $jsonMeta['project_id'] = 'no project';
+            $jsonMeta['cluster_id'] = $job->getCluster()->getName();
+            $jsonMeta['num_nodes'] = $job->getNumNodes();
+            $jsonMeta['start_time'] = $job->getStartTime();
+            $jsonMeta['stop_time'] = $job->getStopTime();
+            $jsonMeta['duration'] = $duration;
+            $jsonMeta['nodes'] = $job->getNodeIdArray();
+            $jsonMeta['tags'] = $job->getTagsArray();
+            $output->writeln(['Export to ', $dstPath]);
 
             $plots = $jobCache->getPlots();
-
-            if (isset($plots['roofline'])) {
-                unset($plots['roofline']);
-            }
-
-            if (isset($plots['polarplot'])) {
-                unset($plots['polarplot']);
-            }
-
-            $footprint = array();
+            $statistic = array();
 
             foreach ( $plots as $plot ) {
                 $nodes = $plot->getData();
-
-                $nodeCache = array();
-                $numCols = array();
-                $data = $nodes[0];
-                $length = count($data['x']);
-
-                for ($j=0; $j<$length; $j++) {
-                    $nodeCache[] = "{$data['x'][$j]}";
-                    $numCols[] = 0;
-                }
-
+                $options = $plot->getOptions();
                 $statData = array();
 
+                $metricData     = array(
+                    'name'     => $plot->name,
+                    'unit'     => $options['unit'],
+                    'timestep' => $options['timestep'],
+                    'series'   => array()
+                );
+
                 foreach ($nodes as $node){
-                    if ($length > count($node['y'])) {
-                        $length = count($node['y']);
+                    $length = count($node['y']);
+                    $data = array();
+
+                    for ($j=1; $j<$length-1; $j++) {
+                        if (is_null($node['y'][$j])) {
+                            $data[] = NULL;
+                        } else {
+                            $statData[] = $node['y'][$j];
+                            $data[] = round($node['y'][$j],2);
+                        }
                     }
 
-                    for ($j=0; $j<$length; $j++) {
-                        $statData[] = $node['y'][$j];
-                        $nodeCache[$j] .= " {$node['y'][$j]}";
-                        $numCols[$j]++;
-                    }
+                    $metricData['series'][] = array(
+                        'name' => $node['name'],
+                        'data' => $data
+                    );
                 }
 
-                $avg = array_sum($statData) / count($statData);
-                $options = $plot->getOptions();
+                $avg =  round(array_sum($statData) / count($statData), 2);
 
-                if (! isset($jsonData['time_unit'])) {
-                    if (preg_match("/runtime \[([mh])\]/", $options['xaxis']['title'], $matches)){
-                        $jsonData['time_unit'] = $matches[1];
-                    }
-                }
-
-                $footprint[$plot->name] = array(
-                    'unit' => $options['yaxis']['title'],
+                $statistic[$plot->name] = array(
+                    'unit' => $options['unit'],
                     'avg'  => $avg
                 );
 
-                for ($j=1; $j < count($nodeCache); $j++) {
-                    if ( $numCols[$j] < $numCols[0] ){
-                        $nodeCache[$j] = '';
-                    }
-                }
-
-                $datastring = implode("\n",$nodeCache);
-                $this->_filesystem->dumpFile($this->_root.$job->getJobId()."/{$plot->name}.dat", $datastring);
+                $this->_filesystem->dumpFile(
+                    $dstPath.'/'.$plot->name.'.json', json_encode($metricData));
             }
 
-            $jsonData['footprint'] = $footprint;
-            $this->_filesystem->dumpFile($this->_root.$job->getJobId().'/meta.json', json_encode($jsonData));
+            $jsonMeta['statistics'] = $statistic;
+            $this->_filesystem->dumpFile($dstPath.'/meta.json', json_encode($jsonMeta));
         } else {
             $output->writeln("Job has no profile!");
         }
