@@ -70,11 +70,6 @@ class Metric
     public $sampletime;
 
     /**
-     *      *  @ORM\Column(type="string")
-     *           */
-    public $measurement;
-
-    /**
      * @ORM\Column(type="float", nullable=true)
      */
     public $peak;
