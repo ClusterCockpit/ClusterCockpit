@@ -129,7 +129,7 @@ $( document ).ready(function() {
                 <!-- alert('Success!'); -->
             },
             error: function(result) {
-                <!-- alert('Error!'); -->
+                alert('Error!');
             }
         });
     });
