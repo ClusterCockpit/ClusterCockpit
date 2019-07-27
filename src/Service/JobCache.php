@@ -53,8 +53,8 @@ class JobCache
         TimeseriesHelper $tsHelper,
         EntityManagerInterface $em,
         PlotGenerator $plotGenerator,
-        /* InfluxDBMetricDataRepository $metricRepo, */
-        DoctrineMetricDataRepository $metricRepo,
+        InfluxDBMetricDataRepository $metricRepo,
+        /* DoctrineMetricDataRepository $metricRepo, */
         AdapterInterface $cache
     )
     {
@@ -63,36 +63,6 @@ class JobCache
         $this->_plotGenerator = $plotGenerator;
         $this->_metricDataRepository = $metricRepo;
         $this->_cache = $cache;
-    }
-
-    public function getBackend()
-    {
-        return $this->_plotGenerator->getBackend();
-    }
-
-    public function checkStatisticCache(
-        $userId,
-        $control,
-        $cluster,
-        &$status
-    )
-    {
-        $stat = new StatisticCache();
-
-        $tmp = $this->_em->getRepository(\App\Entity\Job::class)->findStatByUser($userId, $control);
-        $stat->setYear($control->getYear());
-        $stat->setMonth($control->getMonth());
-        $stat->setClusterId($control->getCluster());
-        $stat->setUserId($userId);
-
-        $stat->jobCount = $tmp['stat']['jobCount'] ;
-        $stat->totalWalltime = $tmp['stat']['totalWalltime'];
-        $stat->totalCoreHours = $tmp['stat']['totalCoreHours'];
-
-        $this->_plotGenerator->generateJobHistograms($stat, $tmp);
-        /* $data = $repository->fetchJobCloudData($userId, $control); */
-        /* $this->_plotGenerator->createJobCloud($stat,$cluster, $data, $status); */
-        return $stat;
     }
 
     private function _initJob($job)
@@ -145,9 +115,11 @@ class JobCache
         $flopsAnyMetric = $metrics['flops_any'];
         $flopsAnySlot = 'slot_'.$info['flops_any']->getSlot();
 
-        if ( $job->{$memBwSlot} < $memBwMetric->alert  and  $job->{$flopsAnySlot} < $flopsAnyMetric->alert ){
+        if ( $job->{$memBwSlot} < $memBwMetric->alert  and
+            $job->{$flopsAnySlot} < $flopsAnyMetric->alert ){
             $severity += 400;
-        } else if ( $job->{$memBwSlot} < $memBwMetric->caution  and  $job->{$flopsAnySlot} < $flopsAnyMetric->caution ){
+        } else if ( $job->{$memBwSlot} < $memBwMetric->caution  and
+            $job->{$flopsAnySlot} < $flopsAnyMetric->caution ){
             $severity += 200;
         } else if ( $job->{$flopsAnySlot} < $flopsAnyMetric->alert ){
             $severity += 100;
@@ -225,7 +197,7 @@ class JobCache
         $options['lineWidth'] =  $options['plot_general_lineWidth'];
 
         $metrics = $job->getCluster()->getMetricList($mode)->getMetrics();
-        $data = $this->_metricDataRepository->getMetricData( $job, $metrics);
+        $data = $this->_metricDataRepository->getMetricData( $job, $metrics, $options);
 
         if ( $data == false ) {
             $job->hasProfile = false;
@@ -247,6 +219,77 @@ class JobCache
                 $data
             );
         }
+    }
+
+    public function getArchive($job)
+    {
+        if ( ! $job->isRunning()) {
+            if ( $this->_metricDataRepository->hasProfile($job) ) {
+                $job->jobCache = new \App\Entity\JobCache();
+                $metrics = $job->getCluster()->getMetricList('view')->getMetrics();
+                $data = $this->_metricDataRepository->getMetricData($job, $metrics, array('sample' => 0));
+                $nodes = $job->getNodes();
+
+                foreach ($metrics as $metric) {
+                    $metricName = $metric->getName();
+                    $plot = new  Plot();
+                    $plot->name = $metricName;
+                    $lineData  = array();
+
+                    foreach ($nodes as $node) {
+                        $nodeId = $node->getNodeId();
+                        $lineData[] = array(
+                            'x'     => $data[$metricName][$nodeId]['x'],
+                            'y'     => $data[$metricName][$nodeId]['y'],
+                            'name'  => $node->getNodeId()
+                        );
+                    }
+
+                    $plot->setOptions(array(
+                        'unit' => $metric->getUnit(),
+                        'timestep' => $metric->sampletime
+                    ));
+                    $plot->setData($lineData);
+                    $job->jobCache->addPlot($plot);
+                }
+
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+
+    public function getBackend()
+    {
+        return $this->_plotGenerator->getBackend();
+    }
+
+
+    public function getUserStatistic(
+        $userId,
+        $control,
+        $cluster,
+        &$status
+    )
+    {
+        $stat = new StatisticCache();
+
+        $tmp = $this->_em->getRepository(\App\Entity\Job::class)->findStatByUser($userId, $control);
+        $stat->setYear($control->getYear());
+        $stat->setMonth($control->getMonth());
+        $stat->setClusterId($control->getCluster());
+        $stat->setUserId($userId);
+
+        $stat->jobCount = $tmp['stat']['jobCount'] ;
+        $stat->totalWalltime = $tmp['stat']['totalWalltime'];
+        $stat->totalCoreHours = $tmp['stat']['totalCoreHours'];
+
+        $this->_plotGenerator->generateJobHistograms($stat, $tmp);
+        /* $data = $repository->fetchJobCloudData($userId, $control); */
+        /* $this->_plotGenerator->createJobCloud($stat,$cluster, $data, $status); */
+        return $stat;
     }
 
     public function warmupCache(
@@ -330,10 +373,7 @@ class JobCache
             return;
         }
 
-        if (! $this->_metricDataRepository->hasProfile($job)){
-            $job->hasProfile = false;
-        } else {
-            $job->hasProfile = true;
+        if ( $this->_metricDataRepository->hasProfile($job)){
             $this->_generatePlots($job, $mode, $options, true);
         }
     }

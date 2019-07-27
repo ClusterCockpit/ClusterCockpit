@@ -75,13 +75,16 @@ class Cron extends Command
     {
         $repository = $this->_em->getRepository(\App\Entity\Job::class);
         $jobs = $repository->findRunningJobs();
+        $this->_configuration = new Configuration($this->_em);
 
         $options['plot_view_showPolarplot']      = $this->_configuration->getValue('plot_view_showPolarplot');
         $options['plot_view_showRoofline']       = $this->_configuration->getValue('plot_view_showRoofline');
         $options['plot_view_showStatTable']      = $this->_configuration->getValue('plot_view_showStatTable');
         $options['plot_list_samples']            = $this->_configuration->getValue('plot_list_samples');
         $options['plot_general_colorBackground'] = $this->_configuration->getValue('plot_general_colorBackground');
+        $options['plot_general_colorscheme']     = $this->_configuration->getValue('plot_general_colorscheme');
         $options['plot_general_lineWidth']       = $this->_configuration->getValue('plot_general_lineWidth');
+        $options['data_time_digits']             = $this->_configuration->getValue('data_time_digits');
         $options['data_cache_numpoints']         = $this->_configuration->getValue('data_cache_numpoints');
 
         $this->_timer->start('WarmupCache');

@@ -242,10 +242,10 @@ class PlotGenerator
             /* adjust x axis time unit */
             $xAxis = $this->_tsHelper->scaleTime($options, $x);
 
-            /* downsample data frequency */
-            if ( $options['sample'] > 0 ){
-                $this->_tsHelper->downsampling($x,$y,$options['sample']);
-            }
+/*             /1* downsample data frequency *1/ */
+/*             if ( $options['sample'] > 0 ){ */
+/*                 $this->_tsHelper->downsampling($x,$y,$options['sample']); */
+/*             } */
 
             $options['color'] = $color->getColor($colorState);
 
