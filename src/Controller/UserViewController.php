@@ -36,12 +36,12 @@ use App\Service\PlotGenerator;
 use App\Service\GroupFacade;
 use App\Form\UnixGroupType;
 use App\Form\StatisticsControlType;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Finder\Finder;
 
-class UserViewController extends Controller
+class UserViewController extends AbstractController
 {
     public function list(Request $request)
     {

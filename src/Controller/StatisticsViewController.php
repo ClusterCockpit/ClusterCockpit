@@ -32,13 +32,13 @@ use App\Service\PlotGenerator;
 use App\Service\JobCache;
 use App\Repository\JobRepository;
 use App\Form\StatisticsControlType;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Finder\Finder;
 use Psr\Log\LoggerInterface;
 use \DateInterval;
 
-class StatisticsViewController extends Controller
+class StatisticsViewController extends AbstractController
 {
     private function _init($request)
     {

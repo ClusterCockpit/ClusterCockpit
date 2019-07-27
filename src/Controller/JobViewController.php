@@ -29,7 +29,7 @@ use App\Entity\Job;
 use App\Entity\JobTag;
 use App\Entity\JobSearch;
 use App\Repository\JobRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -46,7 +46,7 @@ use Psr\Log\LoggerInterface;
 use \DateTime;
 use \DateInterval;
 
-class JobViewController extends Controller
+class JobViewController extends AbstractController
 {
     public function searchId(Request $request, AuthorizationCheckerInterface $authChecker)
     {
