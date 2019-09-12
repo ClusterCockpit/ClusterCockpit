@@ -176,7 +176,6 @@ class Bootstrap extends Command
                 $user->setUsername('admin');
                 $user->setName('Local account');
                 $user->setEmail($email);
-                $user->setUid(0);
                 $user->addRole('ROLE_USER');
                 $user->addRole('ROLE_ANALYST');
                 $user->addRole('ROLE_ADMIN');

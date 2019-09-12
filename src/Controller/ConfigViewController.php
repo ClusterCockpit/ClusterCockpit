@@ -501,7 +501,6 @@ class ConfigViewController extends AbstractController
 
             if ( $form->get('save')->isClicked() )  {
                 $user = $form->getData();
-                $user->setUid(0);
                 $user->setName('Local account');
                 $password = $passwordEncoder->encodePassword($user, $user->getPlainPassword());
                 $user->setPassword($password);
