@@ -1,7 +1,3 @@
-user:
-    type:     rest
-    resource: App\Controller\API\UsersController
-    prefix:  "api"
 job:
     type:     rest
     resource: App\Controller\API\JobsController

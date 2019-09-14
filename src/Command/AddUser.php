@@ -90,7 +90,6 @@ class AddUser extends Command
         $user->setPassword($password);
         $user->setName('Local account');
         $user->setEmail($email);
-        $user->setUid(0);
 
         foreach ( $roles as $role ){
             $user->addRole($role);
