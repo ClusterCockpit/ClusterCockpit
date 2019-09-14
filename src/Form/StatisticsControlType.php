@@ -52,7 +52,13 @@ class StatisticsControlType extends AbstractType
             $systems[$cluster->getName()] = $cluster->getId();
         }
 
-        return $systems;
+	if(isset($systems))
+        {
+	    return $systems;
+	} else
+	{
+            return NULL;
+	}
     }
 
     private function getMonth(){
