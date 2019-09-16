@@ -30,17 +30,11 @@ use App\Entity\Plot;
 use App\Entity\Data;
 use App\Entity\NodeStat;
 use App\Entity\StatisticCache;
-use App\Repository\DoctrineMetricDataRepository;
+/* use App\Repository\DoctrineMetricDataRepository; */
 use App\Repository\InfluxDBMetricDataRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 
-/**
- * Class: JobCache
- *
- * @author Jan Eitzinger
- * @version 0.1
- */
 class JobCache
 {
     private $_em;
@@ -54,6 +48,7 @@ class JobCache
         EntityManagerInterface $em,
         PlotGenerator $plotGenerator,
         InfluxDBMetricDataRepository $metricRepo,
+        /* DoctrineMetricDataRepository $metricRepo, */
         AdapterInterface $cache
     )
     {
@@ -226,7 +221,8 @@ class JobCache
             if ( $this->_metricDataRepository->hasProfile($job) ) {
                 $job->jobCache = new \App\Entity\JobCache();
                 $metrics = $job->getCluster()->getMetricList('view')->getMetrics();
-                $data = $this->_metricDataRepository->getMetricData($job, $metrics, array('sample' => 0));
+                $data = $this->_metricDataRepository->getMetricData(
+                    $job, $metrics, array('sample' => 0));
                 $nodes = $job->getNodes();
 
                 foreach ($metrics as $metric) {
@@ -275,7 +271,8 @@ class JobCache
     {
         $stat = new StatisticCache();
 
-        $tmp = $this->_em->getRepository(\App\Entity\Job::class)->findStatByUser($userId, $control);
+        $tmp = $this->_em->getRepository(
+            \App\Entity\Job::class)->findStatByUser($userId, $control);
         $stat->setYear($control->getYear());
         $stat->setMonth($control->getMonth());
         $stat->setClusterId($control->getCluster());
@@ -318,7 +315,8 @@ class JobCache
             $job->isCached = true;
         }
 
-        $tableSortRepository = $this->_em->getRepository(\App\Entity\TableSortConfig::class);
+        $tableSortRepository = $this->_em->getRepository(
+            \App\Entity\TableSortConfig::class);
         $sortMetrics = $tableSortRepository->findDataMetrics($job);
         $this->_computeAverages($job, $sortMetrics);
         $this->_computeSeverity($job, $sortMetrics);

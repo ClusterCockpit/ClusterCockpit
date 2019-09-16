@@ -33,17 +33,17 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Doctrine\ORM\EntityManagerInterface;
+use \DateInterval;
 
 use App\Repository\JobRepository;
 use App\Service\JobCache;
 use App\Service\ColorMap;
 use App\Service\Configuration;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\JobSearch;
 use App\Entity\Job;
 use App\Entity\Plot;
 use App\Entity\User;
-use \DateInterval;
 
 class ExportJob extends Command
 {
@@ -129,6 +129,8 @@ class ExportJob extends Command
             $jsonMeta['project_id'] = 'no project';
             $jsonMeta['cluster_id'] = $job->getCluster()->getName();
             $jsonMeta['num_nodes'] = $job->getNumNodes();
+            $jsonMeta['walltime'] = 10;
+            $jsonMeta['job_state'] = 'completed';
             $jsonMeta['start_time'] = $job->getStartTime();
             $jsonMeta['stop_time'] = $job->getStopTime();
             $jsonMeta['duration'] = $duration;
@@ -136,8 +138,9 @@ class ExportJob extends Command
             $jsonMeta['tags'] = $job->getTagsArray();
             $output->writeln(['Export to ', $dstPath]);
 
+            $jsonData = array();
             $plots = $jobCache->getPlots();
-            $statistic = array();
+            $statistics = array();
 
             foreach ( $plots as $plot ) {
                 $nodes = $plot->getData();
@@ -145,44 +148,66 @@ class ExportJob extends Command
                 $statData = array();
 
                 $metricData     = array(
-                    'name'     => $plot->name,
                     'unit'     => $options['unit'],
+                    'scope'    => 'node',
                     'timestep' => $options['timestep'],
                     'series'   => array()
                 );
 
+                $sum = 0.0;
+                $max = 0.0;
+                $min = PHP_FLOAT_MAX;
+                $count = 0;
+
                 foreach ($nodes as $node){
                     $length = count($node['y']);
                     $data = array();
+                    $sum_node = 0.0;
+                    $max_node = 0.0;
+                    $min_node = PHP_FLOAT_MAX;
+                    $count_node = 0;
 
                     for ($j=1; $j<$length-1; $j++) {
                         if (is_null($node['y'][$j])) {
                             $data[] = NULL;
                         } else {
-                            $statData[] = $node['y'][$j];
+                            $sum_node += $node['y'][$j];
+                            $max_node = $max_node>$node['y'][$j]?$max_node:$node['y'][$j];
+                            $min_node = $min_node<$node['y'][$j]?$min_node:$node['y'][$j];
+                            $count_node++;
                             $data[] = round($node['y'][$j],2);
                         }
                     }
 
+                    $sum += $sum_node;
+                    $max = $max>$max_node?$max:$max_node;
+                    $min = $min<$min_node?$min:$min_node;
+                    $count += $count_node;
+
                     $metricData['series'][] = array(
-                        'name' => $node['name'],
+                        'node_id' => $node['name'],
+                        'statistics' => array(
+                            'avg'  => round($sum_node / $count_node, 2),
+                            'min'  => round($min_node, 2),
+                            'max'  => round($max_node, 2)
+                        ),
                         'data' => $data
                     );
                 }
 
-                $avg =  round(array_sum($statData) / count($statData), 2);
-
-                $statistic[$plot->name] = array(
+                $statistics[$plot->name] = array(
                     'unit' => $options['unit'],
-                    'avg'  => $avg
+                    'avg'  => round($sum / $count, 2),
+                    'min'  => round($min, 2),
+                    'max'  => round($max, 2)
                 );
 
-                $this->_filesystem->dumpFile(
-                    $dstPath.'/'.$plot->name.'.json', json_encode($metricData));
+                $jsonData[$plot->name] = $metricData;
             }
 
-            $jsonMeta['statistics'] = $statistic;
+            $jsonMeta['statistics'] = $statistics;
             $this->_filesystem->dumpFile($dstPath.'/meta.json', json_encode($jsonMeta));
+            $this->_filesystem->dumpFile($dstPath.'/data.json', json_encode($jsonData));
         } else {
             $output->writeln("Job has no profile!");
         }
