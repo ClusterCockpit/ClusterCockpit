@@ -37,9 +37,10 @@
 {% block javascript %}
     {{ parent() }}
     <script src="{{ asset('js/feather.min.js') }}"/></script>
-    <script src="{{ asset('js/app-clusterConfig.js') }}"/></script>
     <script src="{{ asset('js/bs-custom-file-input.min.js') }}"/></script>
     <script>
+        {{ include('js/app-clusterConfig.js.twig') }}
+
         $(document).ready(function () {
             bsCustomFileInput.init()
             feather.replace()

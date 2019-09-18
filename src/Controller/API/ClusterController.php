@@ -95,7 +95,7 @@ class ClusterController extends FOSRestController
 
         $view = $this->view($config);
         return $this->handleView($view);
-    } // "get_configuration"          [GET] api/clusters/$id
+    } // "get_configuration"          [GET] web/clusters/$id
 
     public function patchClusterAction(
         Cluster $id,
@@ -161,6 +161,6 @@ class ClusterController extends FOSRestController
         $view->setStatusCode(200);
         $view->setData("SUCCESS");
         return $this->handleView($view);
-    } // "patch_configuration"           [PATCH] api/clusters/$id
+    } // "patch_configuration"           [PATCH] web/clusters/$id
 }
 

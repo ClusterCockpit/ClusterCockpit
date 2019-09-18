@@ -47,7 +47,7 @@ class ConfigurationController extends FOSRestController
 
         $view = $this->view($config);
         return $this->handleView($view);
-    } // "get_configuration"          [GET] api/configurations/$slug
+    } // "get_configuration"          [GET] web/configurations/$slug
 
     public function postConfigurationAction(Request $request)
     {
@@ -78,7 +78,7 @@ class ConfigurationController extends FOSRestController
         $view->setStatusCode(200);
         $view->setData("SUCCESS");
         return $this->handleView($view);
-    } // "post_configuation"           [POST] /api/configurations
+    } // "post_configuation"           [POST] web/configurations
 
     public function patchConfigurationAction(Configuration $id, Request $request)
     {
@@ -100,7 +100,7 @@ class ConfigurationController extends FOSRestController
         $view->setStatusCode(200);
         $view->setData("SUCCESS");
         return $this->handleView($view);
-    } // "patch_configuration"           [PATCH] api/configurations/$id
+    } // "patch_configuration"           [PATCH] web/configurations/$id
 
     public function deleteConfigurationAction(Configuration $id)
     {
@@ -119,5 +119,5 @@ class ConfigurationController extends FOSRestController
         $view->setStatusCode(200);
         $view->setData("SUCCESS");
         return $this->handleView($view);
-    } // "patch_configuration"           [PATCH] api/configurations/$id
+    } // "patch_configuration"           [PATCH] web/configurations/$id
 }

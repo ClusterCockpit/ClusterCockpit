@@ -16,10 +16,11 @@
     <script src="{{ asset('js/datatables.min.js') }}"/></script>
     <script src="{{ asset('js/plotly.min.js') }}"/></script>
     <script src="{{ asset('js/bootstrap3-typeahead.min.js') }}"/></script>
-    <script src="{{ asset('js/app.js') }}"/></script>
-    <script src="{{ asset('js/tag-control.js') }}"/></script>
 
     <script>
+        {{ include('js/app.js.twig') }}
+        {{ include('js/tag-control.js.twig') }}
+
         var searchtags = [
             {% for tag in tags %}
                 { id:{{ tag.id }}, name:'{{ tag.name }}', type:'{{ tag.type }}' },

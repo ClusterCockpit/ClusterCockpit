@@ -8,8 +8,9 @@
     <script src="{{ asset('js/popper.min.js') }}"/></script>
     {{ parent() }}
     <script src="{{ asset('js/feather.min.js') }}"/></script>
-    <script src="{{ asset('js/app-config.js') }}"/></script>
     <script>
+      {{ include('js/app-config.js.twig') }}
+
       feather.replace()
     </script>
 {% endblock %}
