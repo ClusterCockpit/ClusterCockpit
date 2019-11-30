@@ -27,14 +27,14 @@ namespace App\Repository;
 
 use App\Entity\Configuration;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 class ConfigurationRepository extends ServiceEntityRepository
 {
     private $_connection;
 
     public function __construct(
-        RegistryInterface $registry
+        ManagerRegistry $registry
     )
     {
         parent::__construct($registry, Configuration::class);

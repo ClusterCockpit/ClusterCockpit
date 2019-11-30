@@ -28,7 +28,7 @@ namespace App\Repository;
 use App\Entity\Cluster;
 use App\Entity\Node;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\RegistryInterface;
+use Doctrine\Common\Persistence\ManagerRegistry;
 
 class ClusterRepository extends ServiceEntityRepository
 {
@@ -36,7 +36,7 @@ class ClusterRepository extends ServiceEntityRepository
     private $_nodeRepository;
 
     public function __construct(
-        RegistryInterface $registry
+        ManagerRegistry $registry
     )
     {
         parent::__construct($registry, Cluster::class);

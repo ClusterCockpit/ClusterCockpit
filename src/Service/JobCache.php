@@ -30,7 +30,7 @@ use App\Entity\Plot;
 use App\Entity\Data;
 use App\Entity\NodeStat;
 use App\Entity\StatisticCache;
-/* use App\Repository\DoctrineMetricDataRepository; */
+use App\Repository\DoctrineMetricDataRepository;
 use App\Repository\InfluxDBMetricDataRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
