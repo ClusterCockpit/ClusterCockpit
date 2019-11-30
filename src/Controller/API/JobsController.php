@@ -34,11 +34,11 @@ use App\Entity\Cluster;
 use App\Entity\User;
 use App\Entity\Node;
 use App\Entity\Project;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 
-class JobsController extends FOSRestController
+class JobsController extends AbstractFOSRestController
 {
     public function postJobsAction(Request $request)
     {
@@ -140,4 +140,3 @@ class JobsController extends FOSRestController
         return $this->handleView($view);
     } // "patch_jobs"           [PATCH] api/jobs/$id?stop_time=xxx
 }
-

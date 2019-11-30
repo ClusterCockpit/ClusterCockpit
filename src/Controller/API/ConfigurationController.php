@@ -29,12 +29,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\View\View;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use App\Entity\Configuration;
 
-class ConfigurationController extends FOSRestController
+class ConfigurationController extends AbstractFOSRestController
 {
     public function getConfigurationAction($slug)
     {

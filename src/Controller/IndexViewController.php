@@ -25,17 +25,15 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpFoundation\Request;
 use App\Service\Configuration;
 
-class IndexViewController extends Controller
+class IndexViewController extends AbstractController
 {
     public function home(Configuration $configuration)
     {
         return $this->render('default/index.html.twig');
     }
 }
-
-

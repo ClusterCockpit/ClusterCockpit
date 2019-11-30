@@ -38,7 +38,7 @@ use App\Entity\User;
 use App\Entity\Node;
 use App\Service\JobCache;
 use App\Service\Configuration;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
@@ -48,7 +48,7 @@ use \DateInterval;
 /**
  * @RouteResource("Jobs", pluralize=false)
  */
-class JobListController extends FOSRestController
+class JobListController extends AbstractFOSRestController
 {
     private $_jobCache;
     private $_authChecker;

@@ -29,14 +29,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\View\View;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
 use Psr\Log\LoggerInterface;
 use App\Entity\Cluster;
 use App\Entity\Metric;
 
-class ClusterController extends FOSRestController
+class ClusterController extends AbstractFOSRestController
 {
     private function _hasMetric( $list, $name )
     {
@@ -163,4 +163,3 @@ class ClusterController extends FOSRestController
         return $this->handleView($view);
     } // "patch_configuration"           [PATCH] web/clusters/$id
 }
-
