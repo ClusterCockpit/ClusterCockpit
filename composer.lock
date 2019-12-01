@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "09a734c021006638fc7acc7f4cc20138",
+    "content-hash": "2825c06c1bb534cd299f57e53e583d61",
     "packages": [
         {
             "name": "doctrine/annotations",
@@ -2420,6 +2420,28 @@
             "time": "2019-11-12T09:31:26+00:00"
         },
         {
+            "name": "symfony/apache-pack",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/apache-pack.git",
+                "reference": "3aa5818d73ad2551281fc58a75afd9ca82622e6c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/apache-pack/zipball/3aa5818d73ad2551281fc58a75afd9ca82622e6c",
+                "reference": "3aa5818d73ad2551281fc58a75afd9ca82622e6c",
+                "shasum": ""
+            },
+            "type": "symfony-pack",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A pack for Apache support in Symfony",
+            "time": "2017-12-12T01:46:35+00:00"
+        },
+        {
             "name": "symfony/asset",
             "version": "v4.4.0",
             "source": {
@@ -2556,20 +2578,20 @@
         },
         {
             "name": "symfony/cache-contracts",
-            "version": "v2.0.0",
+            "version": "v2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/cache-contracts.git",
-                "reference": "a91281de82119a7a07481b892f709d88da592cd3"
+                "reference": "23ed8bfc1a4115feca942cb5f1aacdf3dcdf3c16"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/cache-contracts/zipball/a91281de82119a7a07481b892f709d88da592cd3",
-                "reference": "a91281de82119a7a07481b892f709d88da592cd3",
+                "url": "https://api.github.com/repos/symfony/cache-contracts/zipball/23ed8bfc1a4115feca942cb5f1aacdf3dcdf3c16",
+                "reference": "23ed8bfc1a4115feca942cb5f1aacdf3dcdf3c16",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2.9",
+                "php": "^7.2.5",
                 "psr/cache": "^1.0"
             },
             "suggest": {
@@ -2610,7 +2632,7 @@
                 "interoperability",
                 "standards"
             ],
-            "time": "2019-11-09T09:18:34+00:00"
+            "time": "2019-11-18T17:27:11+00:00"
         },
         {
             "name": "symfony/config",
@@ -3311,16 +3333,16 @@
         },
         {
             "name": "symfony/flex",
-            "version": "v1.4.8",
+            "version": "v1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/flex.git",
-                "reference": "f5bfc79c1f5bed6b2bb4ca9e49a736c2abc03e8f"
+                "reference": "97d4d94bff1b6bd9e9c5750ddbe248185ecb588b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/flex/zipball/f5bfc79c1f5bed6b2bb4ca9e49a736c2abc03e8f",
-                "reference": "f5bfc79c1f5bed6b2bb4ca9e49a736c2abc03e8f",
+                "url": "https://api.github.com/repos/symfony/flex/zipball/97d4d94bff1b6bd9e9c5750ddbe248185ecb588b",
+                "reference": "97d4d94bff1b6bd9e9c5750ddbe248185ecb588b",
                 "shasum": ""
             },
             "require": {
@@ -3336,7 +3358,7 @@
             "type": "composer-plugin",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.4-dev"
+                    "dev-master": "1.5-dev"
                 },
                 "class": "Symfony\\Flex\\Flex"
             },
@@ -3356,7 +3378,7 @@
                 }
             ],
             "description": "Composer plugin for Symfony",
-            "time": "2019-11-14T09:25:51+00:00"
+            "time": "2019-11-30T11:43:11+00:00"
         },
         {
             "name": "symfony/form",
@@ -4186,7 +4208,7 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.13.0",
+            "version": "v1.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
@@ -4244,7 +4266,7 @@
         },
         {
             "name": "symfony/polyfill-intl-icu",
-            "version": "v1.13.0",
+            "version": "v1.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-icu.git",
@@ -4302,7 +4324,7 @@
         },
         {
             "name": "symfony/polyfill-intl-idn",
-            "version": "v1.13.0",
+            "version": "v1.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-idn.git",
@@ -4364,7 +4386,7 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.13.0",
+            "version": "v1.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
@@ -4423,7 +4445,7 @@
         },
         {
             "name": "symfony/polyfill-php72",
-            "version": "v1.13.0",
+            "version": "v1.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php72.git",
@@ -4478,7 +4500,7 @@
         },
         {
             "name": "symfony/polyfill-php73",
-            "version": "v1.13.0",
+            "version": "v1.13.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php73.git",
@@ -5250,20 +5272,20 @@
         },
         {
             "name": "symfony/service-contracts",
-            "version": "v2.0.0",
+            "version": "v2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/service-contracts.git",
-                "reference": "9d99e1556417bf227a62e14856d630672bf10eaf"
+                "reference": "144c5e51266b281231e947b51223ba14acf1a749"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/9d99e1556417bf227a62e14856d630672bf10eaf",
-                "reference": "9d99e1556417bf227a62e14856d630672bf10eaf",
+                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/144c5e51266b281231e947b51223ba14acf1a749",
+                "reference": "144c5e51266b281231e947b51223ba14acf1a749",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2.9",
+                "php": "^7.2.5",
                 "psr/container": "^1.0"
             },
             "suggest": {
@@ -5304,7 +5326,7 @@
                 "interoperability",
                 "standards"
             ],
-            "time": "2019-11-09T09:18:34+00:00"
+            "time": "2019-11-18T17:27:11+00:00"
         },
         {
             "name": "symfony/stopwatch",
@@ -5499,20 +5521,20 @@
         },
         {
             "name": "symfony/translation-contracts",
-            "version": "v2.0.0",
+            "version": "v2.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/translation-contracts.git",
-                "reference": "8feb81e6bb1a42d6a3b1429c751d291eb6d05297"
+                "reference": "8cc682ac458d75557203b2f2f14b0b92e1c744ed"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/translation-contracts/zipball/8feb81e6bb1a42d6a3b1429c751d291eb6d05297",
-                "reference": "8feb81e6bb1a42d6a3b1429c751d291eb6d05297",
+                "url": "https://api.github.com/repos/symfony/translation-contracts/zipball/8cc682ac458d75557203b2f2f14b0b92e1c744ed",
+                "reference": "8cc682ac458d75557203b2f2f14b0b92e1c744ed",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.2.9"
+                "php": "^7.2.5"
             },
             "suggest": {
                 "symfony/translation-implementation": ""
@@ -5552,7 +5574,7 @@
                 "interoperability",
                 "standards"
             ],
-            "time": "2019-11-09T09:18:34+00:00"
+            "time": "2019-11-18T17:27:11+00:00"
         },
         {
             "name": "symfony/twig-bridge",
@@ -6035,38 +6057,6 @@
                 "push"
             ],
             "time": "2019-10-12T00:35:04+00:00"
-        },
-        {
-            "name": "symfony/webpack-encore-pack",
-            "version": "v1.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/webpack-encore-pack.git",
-                "reference": "8d7f51379d7ae17aea7cf501d910a11896895ac4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/symfony/webpack-encore-pack/zipball/8d7f51379d7ae17aea7cf501d910a11896895ac4",
-                "reference": "8d7f51379d7ae17aea7cf501d910a11896895ac4",
-                "shasum": ""
-            },
-            "require": {
-                "symfony/asset": "^3.3|^4.0"
-            },
-            "type": "symfony-pack",
-            "extra": {
-                "thanks": {
-                    "name": "symfony/webpack-encore",
-                    "url": "https://github.com/symfony/webpack-encore"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "A pack for Symfony Encore",
-            "abandoned": "symfony/webpack-encore-bundle",
-            "time": "2018-07-16T10:15:28+00:00"
         },
         {
             "name": "symfony/yaml",
