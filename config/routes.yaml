@@ -21,6 +21,12 @@ joblist:
 index:
     path: /
     controller:  App\Controller\IndexViewController::home
+imprint:
+    path: /imprint
+    controller:  App\Controller\IndexViewController::imprint
+privacy:
+    path: /privacy
+    controller:  App\Controller\IndexViewController::privacy
 list_jobs:
     path: /monitoring/listjobs/
     controller:  App\Controller\JobViewController::list
@@ -128,4 +134,3 @@ security_login:
     controller:  App\Controller\SecurityController::login
 security_logout:
     path:  /logout
-

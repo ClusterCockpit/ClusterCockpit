@@ -14,6 +14,7 @@
         <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light">
             <a class="navbar-brand" href="{{ path('index') }}">
                 {% block brand %}
+                    <img alt="RRZE logo" src="{{ asset('img/rrze-logo.png') }}" class="d-inline-block align-top">
                     <img alt="Brand" src="{{ asset('img/cc-logo.png') }}" class="d-inline-block align-top">
                 {% endblock %}
             </a>
@@ -121,13 +122,10 @@
 
         {% block footer %}
             <footer>
-                <div class="container text-center">
-                    <p>Copyright &copy; RRZE 2019</p>
-                    <p>
-                        <!-- <a href="https://www.rrze.fau.de/impressum/">Impressum</a> -->
-                        <!-- <a href="https://www.rrze.fau.de/privacy/">Privacy</a> -->
-                    </p>
-                </div>
+                <ul class="footer-list">
+                    <li class="footer-list-item"><a class="footer-link" href="/imprint" title="Imprint" rel="nofollow">Imprint</a></li>
+                    <li class="footer-list-item"><a class="footer-link" href="/privacy" title="Privacy Policy" rel="nofollow">Privacy Policy</a></li>
+                </ul>
             </footer>
         {% endblock %}
         {% block javascript %}

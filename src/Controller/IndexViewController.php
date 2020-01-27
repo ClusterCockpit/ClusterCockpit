@@ -36,4 +36,14 @@ class IndexViewController extends AbstractController
     {
         return $this->render('default/index.html.twig');
     }
+
+    public function imprint(Configuration $configuration)
+    {
+        return $this->render('default/imprint.html.twig');
+    }
+
+    public function privacy(Configuration $configuration)
+    {
+        return $this->render('default/privacy.html.twig');
+    }
 }
