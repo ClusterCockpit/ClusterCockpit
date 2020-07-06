@@ -24,7 +24,7 @@ class MetricList
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Metric", mappedBy="metricList", indexBy="name")
+     * @ORM\OneToMany(targetEntity="App\Entity\Metric", mappedBy="metricList", indexBy="name", orphanRemoval=true)
      * @ORM\OrderBy({"position" = "ASC"})
      */
     public $metrics;
