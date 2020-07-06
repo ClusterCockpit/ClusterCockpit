@@ -10,7 +10,7 @@
         {% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
-    <body data-id="{{ id|default(0) }}">
+    <body class="Site" data-id="{{ id|default(0) }}">
         <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light">
             <a class="navbar-brand" href="{{ path('index') }}">
                 {% block brand %}
@@ -93,35 +93,37 @@
             </div>
         </nav>
 
-        <div class="container-fluid" style="margin-top:80px;">
+        <main class="Site-content">
+            <div class="container-fluid" style="margin-top:80px;">
 
-            <div class="modal" id="helpmodal" tabindex="-1" role="dialog">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h4 class="modal-title">Help</h4>
-                        </div>
-                        <div class="modal-body">
-                            {% block helptext %}
-                            {% endblock %}
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
-                                Close
-                                <i class="fas fa-times fa-lg"></i>
-                            </button>
+                <div class="modal" id="helpmodal" tabindex="-1" role="dialog">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h4 class="modal-title">Help</h4>
+                            </div>
+                            <div class="modal-body">
+                                {% block helptext %}
+                                {% endblock %}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                                    Close
+                                    <i class="fas fa-times fa-lg"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+
+                {% block body %}
+                {% endblock %}
             </div>
-
-
-            {% block body %}
-            {% endblock %}
-        </div>
+        </main>
 
         {% block footer %}
-            <footer>
+            <footer class="Site-footer">
                 <ul class="footer-list">
                     <li class="footer-list-item"><a class="footer-link" href="/imprint" title="Imprint" rel="nofollow">Imprint</a></li>
                     <li class="footer-list-item"><a class="footer-link" href="/privacy" title="Privacy Policy" rel="nofollow">Privacy Policy</a></li>

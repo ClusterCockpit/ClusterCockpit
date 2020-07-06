@@ -61,6 +61,21 @@ p {
     }
 }
 
+.Site {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.Site-content {
+    flex: 1 0 auto;
+}
+
+.Site-footer {
+    flex: none;
+}
+
+
 .feather {
   width: 16px;
   height: 16px;
@@ -187,8 +202,6 @@ p {
 }
 
 footer {
-    position: fixed;
-    bottom: 0;
     width: 100%;
     padding: 0.1rem 1.0rem;
     background-color: #4b4a56;
@@ -211,8 +224,8 @@ footer {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .footer-list-item {
