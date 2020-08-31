@@ -31,6 +31,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Adapter\LdapManager;
+use App\Service\Configuration;
 
 
 class QueryLdap extends Command
