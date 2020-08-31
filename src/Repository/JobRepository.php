@@ -33,7 +33,7 @@ use App\Entity\User;
 use App\Entity\Cluster;
 use App\Entity\JobSearch;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 class JobRepository extends ServiceEntityRepository
 {

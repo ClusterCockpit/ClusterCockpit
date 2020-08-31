@@ -27,7 +27,7 @@ namespace App\Repository;
 
 use App\Entity\Configuration;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ManagerRegistry;
 
 class ConfigurationRepository extends ServiceEntityRepository
 {
