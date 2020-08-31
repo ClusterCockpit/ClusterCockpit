@@ -68,7 +68,7 @@ class Cluster
     public $memoryBandwidth;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\MetricList", mappedBy="cluster", indexBy="name")
+     * @ORM\OneToMany(targetEntity="App\Entity\MetricList", mappedBy="cluster", indexBy="name", orphanRemoval=true)
      */
     public $metricLists;
 
@@ -173,5 +173,3 @@ class Cluster
     }
 
 }
-
-
