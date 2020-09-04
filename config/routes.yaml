@@ -27,6 +27,9 @@ imprint:
 privacy:
     path: /privacy
     controller:  App\Controller\IndexViewController::privacy
+cluster_roof:
+    path: /roofline/
+    controller:  App\Controller\IndexViewController::roofline
 list_jobs:
     path: /monitoring/listjobs/
     controller:  App\Controller\JobViewController::list

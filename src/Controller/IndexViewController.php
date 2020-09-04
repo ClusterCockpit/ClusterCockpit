@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2020 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -35,6 +35,11 @@ class IndexViewController extends AbstractController
     public function home(Configuration $configuration)
     {
         return $this->render('default/index.html.twig');
+    }
+
+    public function roofline(Configuration $configuration)
+    {
+        return $this->render('default/roofline.html.twig');
     }
 
     public function imprint(Configuration $configuration)
