@@ -11,6 +11,7 @@
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body class="Site" data-id="{{ id|default(0) }}">
+        <header>
         <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light">
             <a class="navbar-brand" href="{{ path('index') }}">
                 {% block brand %}
@@ -92,6 +93,7 @@
                 {% endif %}
             </div>
         </nav>
+        </header>
 
         <main class="Site-content">
             <div class="container-fluid" style="margin-top:80px;">

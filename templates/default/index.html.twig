@@ -8,14 +8,14 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container" style="margin-top:80px;">
+    <div class="container">
         <div class="row">
-            <div class="col-md">
+            <div class="col">
                 <h2 class="text-center">Application Panel</h2>
-                <ul class="list-unstyled">
-                    <li><a class="btn btn-secondary btn-block"  role="button" href="{{ path('list_jobs') }}">Job Monitoring</a></li>
-                    <li><a class="btn btn-secondary btn-block"  role="button" href="{{ path('cluster_roof') }}">Cluster Roofline</a></li>
-                </ul>
+                <div class="list-group">
+                    <a class="text-center font-weight-bold bg-secondary text-white list-group-item list-group-item-action"  href="{{ path('list_jobs') }}">Job Monitoring</a></li>
+                    <a class="text-center font-weight-bold bg-secondary text-white list-group-item list-group-item-action"  href="{{ path('cluster_roof') }}">Cluster Roofline</a></li>
+                </div>
             </div>
         </div>
     </div>
