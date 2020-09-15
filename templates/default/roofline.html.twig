@@ -28,7 +28,7 @@
         systems.forEach(renderPlot);
 
         function renderPlot(system) {
-            fetch("http://131.188.16.40:8080/roofline/"+system)
+            fetch("https://131.188.16.40:8080/roofline/"+system)
                 .then(response => response.json())
                 .then(data => {
                     var trace1 = {
