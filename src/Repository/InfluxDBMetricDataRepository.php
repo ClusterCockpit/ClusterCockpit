@@ -105,9 +105,8 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
         $this->_logger->info("InfluxDB QUERY: $query");
         $result = $this->_database->query($query);
         $points = $result->getPoints();
-        $count = $points[0]['count'];
 
-        if ( $count < 4 ){
+        if ( count($points) == 0 || $points[0]['count'] < 4 ){
             $job->hasProfile = false;
             return false;
         } else {
