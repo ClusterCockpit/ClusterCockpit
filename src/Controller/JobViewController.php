@@ -302,11 +302,16 @@ class JobViewController extends AbstractController
         $d2 = new DateTime();
         $d2->add(new DateInterval('PT'.$job->duration.'S'));
         $iv = $d2->diff($d1);
+        $duration = $iv->format('%h h %i m');
+
+        if ( $iv->days ){
+            $duration = $iv->format('%a d %h h %i m');
+        }
 
         return $this->render('jobViews/viewJob-ajax.html.twig',
             array(
                 'job' => $job,
-                'duration' => $iv->format('%h h %i m'),
+                'duration' => $duration,
                 'config' => $config,
                 'tags' => $alltags,
                 'backend' => $jobCache->getBackend()
