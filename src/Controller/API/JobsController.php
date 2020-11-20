@@ -90,6 +90,7 @@ class JobsController extends AbstractFOSRestController
 
         $job->setNumNodes(count($nodes));
 
+        $job->isRunning = true;
         $job->severity = 0;
         $job->memBwAvg = 0;
         $job->memUsedAvg = 0;
@@ -113,25 +114,17 @@ class JobsController extends AbstractFOSRestController
     public function patchJobsAction(Job $id, ParamFetcher $paramFetcher)
     {
         $stop_time = $paramFetcher->get('stop_time');
-        /* $repository = $this->getDoctrine()->getRepository(\App\Entity\RunningJob::class); */
-        /* $runningJob = $repository->findOneByJobId($jobId); */
 
         if (empty($id)) {
             throw new HttpException(400, "No such running job: $id");
         }
 
-        /* transfer job to job table */
-        /* $job =  new Job; */
-        /* $job->import($runningJob); */
-        /* $job->setStopTime($stop_time); */
-        /* $em = $this->getDoctrine()->getManager(); */
-        /* $em->persist($job); */
+        $id->stopTime = $stop_time;
+        $id->duration = $stop_time - $id->startTime;
+        $id->isRunning = false;
 
-        /* cleanup running job entry */
         $em = $this->getDoctrine()->getManager();
-        $id->getNodes()->clear();
-        $em->remove($id);
-
+        $em->persist($id);
         $em->flush();
 
         $view = new View();
