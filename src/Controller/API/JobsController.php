@@ -63,7 +63,7 @@ class JobsController extends AbstractFOSRestController
         $job->setJobId($jobId);
         $job->setStartTime($startTime);
 
-        $user = $user_rep->findOneByUserId($userId);
+        $user = $user_rep->findOneByUsername($userId);
         if (empty($user)) {
             throw new HttpException(400, "No such user ID: ".$userId);
         }
@@ -91,6 +91,8 @@ class JobsController extends AbstractFOSRestController
         $job->setNumNodes(count($nodes));
 
         $job->isRunning = true;
+        $job->isCached = false;
+        $job->duration = 0;
         $job->severity = 0;
         $job->memBwAvg = 0;
         $job->memUsedAvg = 0;
