@@ -117,6 +117,11 @@ class JobListController extends AbstractFOSRestController
         $d2 = new DateTime();
         $d2->add(new DateInterval('PT'.$job->duration.'S'));
         $iv = $d2->diff($d1);
+        $duration = $iv->format('%h h %i m');
+
+        if ( $iv->days ){
+            $duration = $iv->format('%a d %h h %i m');
+        }
 
         /* add job meta data */
         $jobData = array(
@@ -126,7 +131,7 @@ class JobListController extends AbstractFOSRestController
                 "username" => $job->getUser()->getUserId(),
                 "userid" => $job->getUser()->getId(),
                 "numnodes" => $job->getNumNodes(),
-                "runtime" => $iv->format('%h h %i m'),
+                "runtime" => $duration,
                 "starttime" => $job->getStartTime(),
                 "tags" => $job->getTagsArray()
             )
