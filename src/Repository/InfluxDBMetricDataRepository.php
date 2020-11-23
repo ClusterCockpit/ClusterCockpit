@@ -94,6 +94,7 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
         $metric = $job->getCluster()->getMetricList('list')->getMetrics()->first();
 
         if ( count($nodes) < 1 ){
+            $job->hasProfile = false;
             return false;
         }
 

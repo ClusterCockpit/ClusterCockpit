@@ -66,6 +66,9 @@ class JobCache
             /* $job->stopTime = 1540353335; */
             $job->duration = $job->stopTime - $job->startTime;
         }
+        if (!$job->hasProfile){
+            $this->_metricDataRepository->hasProfile($job);
+        }
     }
 
     private function _colorBackground(&$options, $metric, $stats)
@@ -296,6 +299,9 @@ class JobCache
         $this->_initJob($job);
 
         if (!$job->getNodes()->first()){
+            return;
+        }
+        if (!$job->hasProfile){
             return;
         }
 
