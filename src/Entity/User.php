@@ -61,6 +61,11 @@ class User implements UserInterface, \Serializable
      */
     private $isActive;
 
+    /**
+     * @ORM\Column(type="string", unique=true, nullable=true)
+     */
+    private $apiToken;
+
     public function getId()
     {
         return $this->id;
@@ -209,6 +214,18 @@ class User implements UserInterface, \Serializable
     public function setIsActive(bool $isActive): self
     {
         $this->isActive = $isActive;
+
+        return $this;
+    }
+
+    public function getApiToken(): ?string
+    {
+        return $this->apiToken;
+    }
+
+    public function setApiToken(?string $apiToken): self
+    {
+        $this->apiToken = $apiToken;
 
         return $this;
     }

@@ -4,19 +4,22 @@ security:
             algorithm: bcrypt
 
     providers:
-        api_key_user_provider:
-            id: App\Security\ApiKeyUserProvider
         db_provider:
             entity:
                 class: App\Entity\User
+        db_api_provider:
+            entity:
+                class: App\Entity\User
+                property: apiToken
 
     firewalls:
         rest_api:
             pattern: ^/api
             stateless: true
-            simple_preauth:
-                authenticator: App\Security\ApiKeyAuthenticator
-            provider: api_key_user_provider
+            provider: db_api_provider
+            guard:
+              authenticators:
+                - App\Security\TokenAuthenticator
 
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -25,11 +28,15 @@ security:
         main:
             pattern: ^/
             anonymous: ~
-            logout: ~
+            logout:
+                path: app_logout
+                target: index
             provider: db_provider
             guard:
                 authenticators:
                     - App\Security\LdapAuthenticator
+                    - App\Security\LoginFormAuthenticator
+                entry_point: App\Security\LoginFormAuthenticator
 
 
     access_control:
@@ -38,4 +45,3 @@ security:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/api, roles: ROLE_API }
         - { path: ^/web, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
-

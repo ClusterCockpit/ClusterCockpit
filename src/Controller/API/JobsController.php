@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -37,9 +37,17 @@ use App\Entity\Project;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\Route;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Patch;
 
 class JobsController extends AbstractFOSRestController
 {
+    /**
+     * @Post("/jobs", name="post_jobs")
+     * @param Request $request
+     * @return View
+     */
     public function postJobsAction(Request $request)
     {
         $jobId = $request->request->get('job_id');
@@ -111,6 +119,7 @@ class JobsController extends AbstractFOSRestController
     } // "post_jobs"           [POST] api/jobs
 
     /**
+     * @Patch("/jobs/{id}", name="patch_jobs")
      * @QueryParam(name="stop_time", requirements="\d+")
      */
     public function patchJobsAction(Job $id, ParamFetcher $paramFetcher)

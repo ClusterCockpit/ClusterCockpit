@@ -1,23 +1,3 @@
-job:
-    type:     rest
-    resource: App\Controller\API\JobsController
-    prefix:  "api"
-configuration:
-    type:     rest
-    resource: App\Controller\API\ConfigurationController
-    prefix:  "web"
-tag:
-    type:     rest
-    resource: App\Controller\API\TagController
-    prefix:  "web"
-cluster:
-    type:     rest
-    resource: App\Controller\API\ClusterController
-    prefix:  "web"
-joblist:
-    type:     rest
-    resource: App\Controller\API\JobListController
-    prefix:  "web"
 index:
     path: /
     controller:  App\Controller\IndexViewController::home

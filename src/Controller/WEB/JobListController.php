@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
  *  THE SOFTWARE.
  */
 
-namespace App\Controller\API;
+namespace App\Controller\WEB;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -41,13 +41,11 @@ use App\Service\Configuration;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
-use FOS\RestBundle\Controller\Annotations\RouteResource;
+use FOS\RestBundle\Controller\Annotations\Route;
+use FOS\RestBundle\Controller\Annotations\Get;
 use \DateTime;
 use \DateInterval;
 
-/**
- * @RouteResource("Jobs", pluralize=false)
- */
 class JobListController extends AbstractFOSRestController
 {
     private $_jobCache;
@@ -199,6 +197,9 @@ class JobListController extends AbstractFOSRestController
         return $jobData;
     }
 
+    /**
+     * @Get("/web/jobs/{slug}", name="get_job")
+     */
     public function getAction($slug)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -224,6 +225,7 @@ class JobListController extends AbstractFOSRestController
     } // "get_job"             [GET] api/jobs/$slug
 
     /**
+     * @Get("/joblist", name="get_jobs")
      * @QueryParam(name="draw", requirements="\d+")
      * @QueryParam(name="start", requirements="\d+")
      * @QueryParam(name="length", requirements="\d+")
