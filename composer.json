@@ -4,7 +4,7 @@
     "require": {
         "php": ">=7.1.3",
         "ext-iconv": "*",
-        "friendsofsymfony/rest-bundle": "^2.3",
+        "friendsofsymfony/rest-bundle": "^2.8",
         "influxdb/influxdb-php": "^1.15",
         "predis/predis": "^1.1",
         "sensio/framework-extra-bundle": "^5.6",
