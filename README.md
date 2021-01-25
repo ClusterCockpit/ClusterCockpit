@@ -223,9 +223,9 @@ $ php bin/console debug:router
 
 3. Start up local web server
 
-To start the web server with integrated Symfony profiler console run:
+To start the Symfony web server (you have to install the [Symfony CLI](https://symfony.com/download) application first) with integrated Symfony profiler console run:
 ```
-$ php bin/console server:run
+$ symfony server:start --no-tls
 ```
 
 The web application can be accessed with any web browser on localhost port 8000.
