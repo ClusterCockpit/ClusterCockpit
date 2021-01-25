@@ -41,7 +41,7 @@ use App\Entity\JobTag;
 class TagController extends AbstractFOSRestController
 {
     /**
-     * @Get("/jobtags", name="get_jobtag")
+     * @Get("/jobtags", name="get_tags")
      * @QueryParam(name="jobId", requirements="\d+")
      */
     public function getTagsAction( ParamFetcher $paramFetcher)
@@ -56,7 +56,7 @@ class TagController extends AbstractFOSRestController
     } // "get_jobtag"          [GET] /api/tags/
 
     /**
-     * @Post("/tags", name="post_jobtag")
+     * @Post("/tags", name="post_tag")
      */
     public function postTagAction(Request $request)
     {
@@ -96,7 +96,7 @@ class TagController extends AbstractFOSRestController
     } // "post_jobtag"           [POST] /api/tags
 
     /**
-     * @Patch("/tags", name="patch_jobtag")
+     * @Patch("/tags", name="delete_tag")
      */
     public function deleteTagAction(Request $request)
     {

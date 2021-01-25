@@ -198,7 +198,7 @@ class JobListController extends AbstractFOSRestController
     }
 
     /**
-     * @Get("/web/jobs/{slug}", name="get_job")
+     * @Get("/jobs/{slug}", name="get_job")
      */
     public function getAction($slug)
     {

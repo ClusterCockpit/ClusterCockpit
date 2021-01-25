@@ -29,14 +29,12 @@ security:
             pattern: ^/
             anonymous: ~
             logout:
-                path: app_logout
+                path: security_logout
                 target: index
             provider: db_provider
             guard:
                 authenticators:
-                    - App\Security\LdapAuthenticator
                     - App\Security\LoginFormAuthenticator
-                entry_point: App\Security\LoginFormAuthenticator
 
 
     access_control:

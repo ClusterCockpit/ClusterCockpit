@@ -117,3 +117,4 @@ security_login:
     controller:  App\Controller\SecurityController::login
 security_logout:
     path:  /logout
+    controller:  App\Controller\SecurityController::logout
