@@ -52,8 +52,8 @@ class User implements UserInterface, \Serializable
     private $username;
 
     /**
-     * @Assert\NotBlank()
-     * @Assert\Length(max=4096)
+     * @Assert\NotBlank(groups={"userCreate"})
+     * @Assert\Length(min=10,max=4096,groups={"userCreate"})
      */
     private $plainPassword;
 
@@ -74,8 +74,8 @@ class User implements UserInterface, \Serializable
 
     /**
      * @ORM\Column(type="string", length=254, unique=true)
-     * @Assert\NotBlank()
-     * @Assert\Email()
+     * @Assert\NotBlank(groups={"userCreate"})
+     * @Assert\Email(groups={"userCreate"})
      */
     private $email;
 
@@ -117,6 +117,10 @@ class User implements UserInterface, \Serializable
     }
 
     public function removeRole($role) {
+        if (is_null($this->roles)) {
+            return;
+        }
+
         if ($this->roles->contains($role)) {
             $this->roles->removeElement($role);
         }
@@ -249,6 +253,13 @@ class User implements UserInterface, \Serializable
     public function setApiToken(?string $apiToken): self
     {
         $this->apiToken = $apiToken;
+
+        return $this;
+    }
+
+    public function removeApiToken(): self
+    {
+        $this->apiToken = null;
 
         return $this;
     }

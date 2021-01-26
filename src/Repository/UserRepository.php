@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -59,6 +59,25 @@ class UserRepository extends ServiceEntityRepository  implements UserLoaderInter
                     ->getQuery()
                     ->getResult();
     }
+
+    public function findLocalUsersWithApiKeys()
+    {
+        return $this->createQueryBuilder('u')
+                    ->where('u.password IS NOT NULL')
+                    ->andWhere('u.apiToken IS NOT NULL')
+                    ->getQuery()
+                    ->getResult();
+    }
+
+    public function findLocalUsersWithoutApiKeys()
+    {
+        return $this->createQueryBuilder('u')
+                    ->where('u.password IS NOT NULL')
+                    ->andWhere('u.apiToken IS NULL')
+                    ->getQuery()
+                    ->getResult();
+    }
+
 
     public function loadUserByUsername($username)
     {
