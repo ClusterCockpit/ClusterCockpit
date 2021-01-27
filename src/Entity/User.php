@@ -73,9 +73,7 @@ class User implements UserInterface, \Serializable
     private $roles;
 
     /**
-     * @ORM\Column(type="string", length=254, unique=true)
-     * @Assert\NotBlank(groups={"userCreate"})
-     * @Assert\Email(groups={"userCreate"})
+     * @ORM\Column(type="string", length=254, nullable=true)
      */
     private $email;
 

@@ -185,7 +185,7 @@ class ConfigViewController extends AbstractController
                          ->getRepository(\App\Entity\User::class)
                          ->findLocalUsersWithoutApiKeys();
 
-        $userList['ALL'] = 0;
+        $userList['Select user'] = 0;
 
         foreach  ( $users as $user ){
             $userList[$user->getUsername()] = $user->getId();
