@@ -53,10 +53,11 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
         $flopsAny = $metrics['flops_any'];
         $memBw = $metrics['mem_bw'];
         $nodes = implode('|', $nodes);
+        $stopTime = $job->startTime + $job->duration;
 
         $query = "SELECT {$flopsAny->name}*{$flopsAny->scale}
             FROM {$flopsAny->measurement}
-            WHERE  time >= {$job->startTime}s AND time <= {$job->stopTime}s
+            WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
             AND host =~ /$nodes/";
 
         $result = $this->_database->query($query, ['epoch' => 's']);
@@ -236,23 +237,22 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
     {
         $nodes = $job->getNodes();
         $id = $nodes->first()->getNodeId();
-        $startTime = $job->getStartTime();
-        $stopTime = $job->getStopTime();
         $metric = $metrics->first();
+        $stopTime = $job->startTime + $job->duration;
 
         $query = "SELECT COUNT({$metric->name})
             FROM {$metric->measurement}
-            WHERE  time >= {$job->startTime}s AND time <= {$job->stopTime}s
+            WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
             AND host = '$id'";
 
         $this->_logger->info("InfluxDB QUERY: $query");
         $result = $this->_database->query($query, ['epoch' => 's']);
         $count =  $result->getPoints();
 
-	if ( array_key_exists(0, $count) ) {
-		return $count[0]['count'] * count($nodes) * count($metrics);
-	} else {
-		return 0;
-	}
+        if ( array_key_exists(0, $count) ) {
+            return $count[0]['count'] * count($nodes) * count($metrics);
+        } else {
+            return 0;
+        }
     }
 }
