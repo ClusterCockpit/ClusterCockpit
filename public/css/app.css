@@ -31,6 +31,12 @@ p {
     line-height: 1.5;
 }
 
+p.search {
+    margin: 15px 0 0px;
+    font-size: 1rem;
+    line-height: 1.0;
+}
+
 @media(min-width:768px) {
     body {
         padding-top: 100px;

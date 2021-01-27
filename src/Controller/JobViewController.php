@@ -121,10 +121,16 @@ class JobViewController extends AbstractController
         $form = $this->createFormBuilder($search)
             ->add('clusterId', ChoiceType::class,array(
                 'choices'  => $this->getSystems(),
+                'label' => 'Cluster',
                 'required' => true))
-            ->add('numNodesFrom', IntegerType::class, array('required' => false))
-            ->add('numNodesTo', IntegerType::class, array('required' => false))
+                ->add('numNodesFrom', IntegerType::class, array(
+                    'label' => 'from',
+                    'required' => false))
+                ->add('numNodesTo', IntegerType::class, array(
+                    'label' => 'to',
+                    'required' => false))
             ->add('durationFrom', DateIntervalType::class, array(
+                'label' => 'from',
                 'with_hours' => true,
                 'with_minutes' => true,
                 'with_days' => false,
@@ -132,6 +138,7 @@ class JobViewController extends AbstractController
                 'with_years' => false,
             ))
             ->add('durationTo', DateIntervalType::class, array(
+                'label' => 'to',
                 'with_hours' => true,
                 'with_minutes' => true,
                 'with_days' => false,
@@ -139,10 +146,12 @@ class JobViewController extends AbstractController
                 'with_years' => false,
             ))
             ->add('dateFrom', DateTimeType::class, array(
+                'label' => 'from',
                 'input' => 'timestamp',
                 'widget' => 'single_text'
             ))
             ->add('dateTo', DateTimeType::class, array(
+                'label' => 'to',
                 'input' => 'timestamp',
                 'widget' => 'single_text'
             ))
