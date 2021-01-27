@@ -28,12 +28,22 @@
                 {{ form_start(form) }}
                 {{ form_errors(form) }}
 
-                {{ form_row(form.username) }}
-                {{ form_row(form.email) }}
-                {{ form_row(form.isActive) }}
-                {{ form_row(form.roles) }}
-                {{ form_row(form.plainPassword) }}
-                <div class="form-group row justify-content-end">
+                <div class="row mt-2">
+                    {{ form_row(form.username) }}
+                </div>
+                <div class="row mt-2">
+                    {{ form_row(form.email) }}
+                </div>
+                <div class="row mt-2">
+                    {{ form_row(form.isActive) }}
+                </div>
+                <div class="row mt-2">
+                    {{ form_row(form.roles) }}
+                </div>
+                <div class="row mt-2">
+                    {{ form_row(form.plainPassword) }}
+                </div>
+                <div class="form-group row justify-content-end mt-4">
                     <div class="col-1">
                         {{ form_widget(form.cancel, {'attr': {'class': 'btn-danger btn'}}) }}
                     </div>
@@ -46,5 +56,3 @@
         </div>
     </div>
 {% endblock %}
-
-

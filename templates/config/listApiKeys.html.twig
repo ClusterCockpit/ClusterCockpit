@@ -21,33 +21,27 @@
                     <thead class="thead-light">
                         <tr>
                             <th scope="col">Id</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Token</th>
                             <th scope="col">User</th>
-                            <th scope="col">Enabled</th>
-                            <th scope="col">Edit</th>
+                            <th scope="col">Token</th>
+                            <th scope="col">Renew</th>
                             <th scope="col">Delete</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for key in keys %}
+                        {% for user in users %}
                             <tr>
                                 <th scope="row">
-                                    {{ key.id }}
+                                    {{ user.id }}
                                 </th>
-                                <td>{{ key.name }}</td>
-                                <td>{{ key.token }}</td>
-                                <td>{{ key.user.userName }}</td>
-                                <td class="text-center">
-                                    {{ key.enabled ? 'Yes':'No' }}
-                                </td>
+                                <td>{{ user.userName }}</td>
+                                <td>{{ user.apiToken }}</td>
                                 <td class="align-middle text-center">
-                                    <a class="btn btn-success" href="{{ path('edit_api_key', {id : key.id}) }}" aria-label="Edit">
+                                    <a class="btn btn-success" href="{{ path('edit_api_key', {id : user.id}) }}" aria-label="Edit">
                                         <span class="fas fa-pen-square fa-lg" aria-hidden="true"></span>
                                     </a>
                                 </td>
                                 <td class="align-middle text-center">
-                                    <a class="btn btn-danger" href="{{ path('delete_api_key', {id : key.id}) }}" onclick="return confirm('Are you sure? This cannot be undone!')" aria-label="Delete">
+                                    <a class="btn btn-danger" href="{{ path('delete_api_key', {id : user.id}) }}" onclick="return confirm('Are you sure? This cannot be undone!')" aria-label="Delete">
                                         <span class="fas fa-times fa-lg" aria-hidden="true"></span>
                                     </a>
                                 </td>
@@ -58,4 +52,3 @@
             </div>
         </div>
 {% endblock %}
-

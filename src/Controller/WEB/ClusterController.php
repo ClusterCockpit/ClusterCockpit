@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
  *  THE SOFTWARE.
  */
 
-namespace App\Controller\API;
+namespace App\Controller\WEB;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -32,6 +32,9 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\Route;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Patch;
 use Psr\Log\LoggerInterface;
 use App\Entity\Cluster;
 use App\Entity\Metric;
@@ -87,6 +90,9 @@ class ClusterController extends AbstractFOSRestController
         }
     }
 
+    /**
+     * @Get("/clusters/{id}", name="get_cluster")
+     */
     public function getClusterAction(Cluster $id)
     {
         if (empty($id)) {
@@ -95,8 +101,11 @@ class ClusterController extends AbstractFOSRestController
 
         $view = $this->view($config);
         return $this->handleView($view);
-    } // "get_configuration"          [GET] web/clusters/$id
+    }
 
+    /**
+     * @Patch("/clusters/{id}", name="patch_cluster")
+     */
     public function patchClusterAction(
         Cluster $id,
         Request $request,
@@ -161,5 +170,5 @@ class ClusterController extends AbstractFOSRestController
         $view->setStatusCode(200);
         $view->setData("SUCCESS");
         return $this->handleView($view);
-    } // "patch_configuration"           [PATCH] web/clusters/$id
+    }
 }

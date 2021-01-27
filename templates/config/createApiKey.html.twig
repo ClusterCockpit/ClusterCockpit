@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+
+{% block navigation %}
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+    <script src="{{ asset('js/feather.min.js') }}"/></script>
+    <script>
+      feather.replace()
+
+      $("#generate").click(function(){
+          var text = "";
+          var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+          for(var i = 0; i < 40; i++) {
+              text += possible.charAt(Math.floor(Math.random() * possible.length));
+          }
+          $("#api_key_token").val(text);
+      });
+    </script>
+{% endblock %}
+
+
+{% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            {{ include("renderSidebar.html.twig") }}
+            <div class="col-10 ml-auto">
+
+                <h2>{{ title }} </h2>
+
+                {{ form_start(form) }}
+                {{ form_errors(form) }}
+                <div class="col-6">
+                    {{ form_row(form.userId) }}
+                </div>
+                <div class="col-6">
+                    {{ form_row(form.token, {'attr': {'readonly':''}}) }}
+                </div>
+                <div class="row justify-content-end mt-4">
+                    <div class="col-4">
+                        {{ form_row(form.create, {'attr': {'class': 'btn btn-success btn-lg'}}) }}
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+{% endblock %}

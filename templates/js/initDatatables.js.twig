@@ -7,7 +7,7 @@ $(document).ready( function () {
     var tablelist =  $('#jobs').DataTable(
         {
             "ajax": {
-                "url": "{{ path('cget_jobs') }}",
+                "url": "{{ path('get_jobs') }}",
                 "data": {
                     "jobQuery": {{ jobQuery|raw }}
                 }

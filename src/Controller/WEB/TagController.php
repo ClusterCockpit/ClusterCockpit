@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
  *  THE SOFTWARE.
  */
 
-namespace App\Controller\API;
+namespace App\Controller\WEB;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -32,11 +32,16 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\Route;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Patch;
 use App\Entity\JobTag;
 
 class TagController extends AbstractFOSRestController
 {
     /**
+     * @Get("/jobtags", name="get_tags")
      * @QueryParam(name="jobId", requirements="\d+")
      */
     public function getTagsAction( ParamFetcher $paramFetcher)
@@ -48,8 +53,11 @@ class TagController extends AbstractFOSRestController
 
         $view = $this->view($tags);
         return $this->handleView($view);
-    } // "get_jobtag"          [GET] /web/jobtags/$slug
+    } // "get_jobtag"          [GET] /api/tags/
 
+    /**
+     * @Post("/tags", name="post_tag")
+     */
     public function postTagAction(Request $request)
     {
         $repository = $this->getDoctrine()->getRepository(\App\Entity\JobTag::class);
@@ -87,6 +95,9 @@ class TagController extends AbstractFOSRestController
         return $this->handleView($view);
     } // "post_jobtag"           [POST] /api/tags
 
+    /**
+     * @Patch("/tags", name="delete_tag")
+     */
     public function deleteTagAction(Request $request)
     {
         $repository = $this->getDoctrine()->getRepository(\App\Entity\JobTag::class);
@@ -110,5 +121,5 @@ class TagController extends AbstractFOSRestController
         $view->setStatusCode(200);
         $view->setData("SUCCESS");
         return $this->handleView($view);
-    } // "patch_configuration"           [PATCH] api/configurations/$id
+    }
 }

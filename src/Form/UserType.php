@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -46,7 +46,8 @@ class UserType extends AbstractType
             ->add('plainPassword', RepeatedType::class, array(
                 'type' => PasswordType::class,
                 'first_options'  => array('label' => 'Password'),
-                'second_options' => array('label' => 'Repeat Password'))
+                'second_options' => array('label' => 'Repeat Password'),
+                'validation_groups' => ['userCreate']),
             )
             ->add('roles', ChoiceType::class, array(
                 'choices' => [
@@ -59,17 +60,19 @@ class UserType extends AbstractType
                 'expanded' => true,
                 )
             )
-            ->add('email', EmailType::class)
+            ->add('email', EmailType::class, array('required' => false))
             ->add('isActive', CheckboxType::class, array('required' => false))
             ->add('save', SubmitType::class, array('label' => 'Save changes'))
-            ->add('cancel', SubmitType::class, array('label' => 'Cancel'))
-        ;
+            ->add('cancel', SubmitType::class, array(
+                'label' => 'Cancel',
+                'validate' => false,));
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class' => User::class,
+            'validation_groups' => ['userCreate', 'userEdit']
         ]);
     }
 }

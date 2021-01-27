@@ -54,7 +54,9 @@ class ClusterType extends AbstractType
                 'label' => 'Nodelist (Text file)',
                 'required' => false))
             ->add('save', SubmitType::class, array('label' => 'Save changes'))
-            ->add('cancel', SubmitType::class, array('label' => 'Cancel'));
+            ->add('cancel', SubmitType::class, array(
+                'label' => 'Cancel',
+                'validate' => false,));
     }
 
     public function configureOptions(OptionsResolver $resolver)

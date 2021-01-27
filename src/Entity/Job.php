@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -67,11 +67,6 @@ class Job
      *  @ORM\Column(type="integer")
      */
     public $startTime;
-
-    /**
-     *  @ORM\Column(type="integer", nullable=true)
-     */
-    public $stopTime;
 
     /**
      *  @ORM\Column(type="integer", nullable=true)
@@ -213,16 +208,6 @@ class Job
     public function setDuration($duration)
     {
         $this->duration = $duration;
-    }
-
-    public function getStopTime()
-    {
-        return $this->stopTime;
-    }
-
-    public function setStopTime($stopTime)
-    {
-        $this->stopTime = $stopTime;
     }
 
     public function getNodeIdArray()

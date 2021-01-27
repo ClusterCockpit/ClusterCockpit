@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
  *  THE SOFTWARE.
  */
 
-namespace App\Controller\API;
+namespace App\Controller\WEB;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -32,10 +32,18 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Request\ParamFetcher;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
+use FOS\RestBundle\Controller\Annotations\Route;
+use FOS\RestBundle\Controller\Annotations\Get;
+use FOS\RestBundle\Controller\Annotations\Post;
+use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Delete;
 use App\Entity\Configuration;
 
 class ConfigurationController extends AbstractFOSRestController
 {
+    /**
+     * @Get("/configurations/{slug}", name="get_configuration")
+     */
     public function getConfigurationAction($slug)
     {
         $repository = $this->getDoctrine()->getRepository(\App\Entity\Configuration::class);
@@ -47,8 +55,11 @@ class ConfigurationController extends AbstractFOSRestController
 
         $view = $this->view($config);
         return $this->handleView($view);
-    } // "get_configuration"          [GET] web/configurations/$slug
+    }
 
+    /**
+     * @Post("/configurations/", name="post_configuration")
+     */
     public function postConfigurationAction(Request $request)
     {
         $repository = $this->getDoctrine()->getRepository(\App\Entity\Configuration::class);
@@ -78,8 +89,11 @@ class ConfigurationController extends AbstractFOSRestController
         $view->setStatusCode(200);
         $view->setData("SUCCESS");
         return $this->handleView($view);
-    } // "post_configuation"           [POST] web/configurations
+    }
 
+    /**
+     * @Patch("/configurations/{id}", name="patch_configuration")
+     */
     public function patchConfigurationAction(Configuration $id, Request $request)
     {
         $value = $request->request->get('value');
@@ -100,8 +114,11 @@ class ConfigurationController extends AbstractFOSRestController
         $view->setStatusCode(200);
         $view->setData("SUCCESS");
         return $this->handleView($view);
-    } // "patch_configuration"           [PATCH] web/configurations/$id
+    }
 
+    /**
+     * @Delete("/configurations/{id}", name="delete_configuration")
+     */
     public function deleteConfigurationAction(Configuration $id)
     {
         if (empty($id)) {
@@ -119,5 +136,5 @@ class ConfigurationController extends AbstractFOSRestController
         $view->setStatusCode(200);
         $view->setData("SUCCESS");
         return $this->handleView($view);
-    } // "patch_configuration"           [PATCH] web/configurations/$id
+    }
 }

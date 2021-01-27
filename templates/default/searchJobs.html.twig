@@ -10,21 +10,50 @@
 {{ form_start(form) }}
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-3">
+        <div class="col-6">
             {{ form_row(form.clusterId) }}
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-6">
+            <p class="search">Number of nodes:</p>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-3">
             {{ form_row(form.numNodesFrom) }}
+        </div>
+        <div class="col-3">
             {{ form_row(form.numNodesTo) }}
         </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-6">
+            <p class="search">Start time:</p>
+        </div>
+    </div>
+    <div class="row justify-content-center">
         <div class="col-3">
             {{ form_row(form.dateFrom) }}
-            {{ form_row(form.dateTo) }}
         </div>
         <div class="col-3">
+            {{ form_row(form.dateTo) }}
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-6">
+            <p class="search">Duration:</p>
+        </div>
+    </div>
+    <div class="row justify-content-center">
+        <div class="col-3">
             {{ form_row(form.durationFrom) }}
+        </div>
+        <div class="col-3">
             {{ form_row(form.durationTo) }}
         </div>
     </div>
-    <div class="row justify-content-end mt-4">
+    <div class="row  justify-content-end mt-4">
         <div class="col-4">
             {{ form_row(form.search, {'attr': {'class': 'btn btn-secondary btn-lg'}}) }}
         </div>
