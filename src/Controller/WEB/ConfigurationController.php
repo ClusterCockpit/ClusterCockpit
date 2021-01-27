@@ -36,6 +36,7 @@ use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Delete;
 use App\Entity\Configuration;
 
 class ConfigurationController extends AbstractFOSRestController
@@ -54,7 +55,7 @@ class ConfigurationController extends AbstractFOSRestController
 
         $view = $this->view($config);
         return $this->handleView($view);
-    } // "get_configuration"          [GET] web/configurations/$slug
+    }
 
     /**
      * @Post("/configurations/", name="post_configuration")
@@ -88,7 +89,7 @@ class ConfigurationController extends AbstractFOSRestController
         $view->setStatusCode(200);
         $view->setData("SUCCESS");
         return $this->handleView($view);
-    } // "post_configuation"           [POST] web/configurations
+    }
 
     /**
      * @Patch("/configurations/{id}", name="patch_configuration")
@@ -113,10 +114,10 @@ class ConfigurationController extends AbstractFOSRestController
         $view->setStatusCode(200);
         $view->setData("SUCCESS");
         return $this->handleView($view);
-    } // "patch_configuration"           [PATCH] web/configurations/$id
+    }
 
     /**
-     * @Patch("/configurations/{id}", name="patch_configuration")
+     * @Delete("/configurations/{id}", name="delete_configuration")
      */
     public function deleteConfigurationAction(Configuration $id)
     {
@@ -135,5 +136,5 @@ class ConfigurationController extends AbstractFOSRestController
         $view->setStatusCode(200);
         $view->setData("SUCCESS");
         return $this->handleView($view);
-    } // "patch_configuration"           [PATCH] web/configurations/$id
+    }
 }
