@@ -37,7 +37,7 @@ $(document).ready( function () {
                             content += '</br>';
 
                         for (let tag of data.tags) {
-                            content += '<a href="{{ path('list_jobs') }}'+tag.id+'" class="badge badge-pill badge-warning mt-1">'+tag.name+'</a></br>';
+                            content += '<a href="{{ path('list_jobs') }}'+tag.id+'" class="badge rounded-pill bg-warning mt-1">'+tag.name+'</a></br>';
                         }
 
                         return content;

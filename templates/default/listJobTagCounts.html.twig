@@ -22,7 +22,7 @@
                     </div>
                     {% for tag in tags %}
                         <a class="btn btn-lg btn-warning m-2" href="{{ path('list_jobs_tag', {id : tag.id}) }}" role="button">
-                            {{ tag.name }}<span class="badge badge-light ml-3">{{ tag.count }}</span>
+                            {{ tag.name }}<span class="badge bg-light text-dark ml-3">{{ tag.count }}</span>
                         </a>
                     {% endfor %}
                 {% endfor %}
@@ -30,4 +30,3 @@
         </div>
     </div>
 {% endblock %}
-

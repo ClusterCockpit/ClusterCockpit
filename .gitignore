@@ -1,6 +1,7 @@
 *~
 *.swp
 *.swo
+*.DS_STORE
 ###> symfony/framework-bundle ###
 /.env
 /public/bundles/
