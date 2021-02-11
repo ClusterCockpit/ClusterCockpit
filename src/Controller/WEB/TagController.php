@@ -36,12 +36,13 @@ use FOS\RestBundle\Controller\Annotations\Route;
 use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\Post;
 use FOS\RestBundle\Controller\Annotations\Patch;
+use FOS\RestBundle\Controller\Annotations\Delete;
 use App\Entity\JobTag;
 
 class TagController extends AbstractFOSRestController
 {
     /**
-     * @Get("/jobtags", name="get_tags")
+     * @Get("/tags", name="get_tags")
      * @QueryParam(name="jobId", requirements="\d+")
      */
     public function getTagsAction( ParamFetcher $paramFetcher)
@@ -53,7 +54,7 @@ class TagController extends AbstractFOSRestController
 
         $view = $this->view($tags);
         return $this->handleView($view);
-    } // "get_jobtag"          [GET] /api/tags/
+    }
 
     /**
      * @Post("/tags", name="post_tag")
@@ -93,10 +94,10 @@ class TagController extends AbstractFOSRestController
         $view->setStatusCode(200);
         $view->setData("SUCCESS");
         return $this->handleView($view);
-    } // "post_jobtag"           [POST] /api/tags
+    }
 
     /**
-     * @Patch("/tags", name="delete_tag")
+     * @Delete("/tags", name="delete_tag")
      */
     public function deleteTagAction(Request $request)
     {
