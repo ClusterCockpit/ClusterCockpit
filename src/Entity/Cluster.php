@@ -68,6 +68,11 @@ class Cluster
     public $memoryBandwidth;
 
     /**
+     *  @ORM\Column(type="json")
+     */
+    public $metricListConfig;
+
+    /**
      * @ORM\OneToMany(targetEntity="App\Entity\MetricList", mappedBy="cluster", indexBy="name", orphanRemoval=true)
      */
     public $metricLists;
