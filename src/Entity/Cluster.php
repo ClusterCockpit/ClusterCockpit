@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -69,13 +69,9 @@ class Cluster
 
     /**
      *  @ORM\Column(type="json")
+     *  @Assert\Json()
      */
     public $metricListConfig;
-
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\MetricList", mappedBy="cluster", indexBy="name", orphanRemoval=true)
-     */
-    public $metricLists;
 
     /**
      * @Assert\File(mimeTypes={ "text/plain" })
@@ -83,10 +79,6 @@ class Cluster
     private $nodeFile;
 
     private $nodes;
-
-    public function __construct() {
-        $this->metricLists = new ArrayCollection();
-    }
 
     public function getId() {
         return $this->id;
@@ -106,47 +98,27 @@ class Cluster
         $this->coresPerNode = $coresPerNode;
     }
 
-    /**
-     * @return Collection|MetricList[]
-     */
-    public function getMetricLists(): Collection
+    public function getMetricLists()
     {
-        return $this->metricLists;
+        return json_decode ( $this->metricListConfig , true );
     }
 
     public function getMetricList($name)
     {
-        if (!isset($this->metricLists[$name])) {
+        //TODO Do this in constructor
+        $tmpList = json_decode ( $this->metricListConfig , true );
+
+        if (!isset($tmpList[$name])) {
             throw new \InvalidArgumentException("No list with name $name in Cluster config.");
         }
 
-        return $this->metricLists[$name];
-    }
+        $metricList = array();
 
-    public function addMetricList(MetricList $metricList): self
-    {
-        $this->metricLists[$metricList->getName()] = $metricList;
-        $metricList->setCluster($this);
-        return $this;
-
-        /* if (!$this->metricLists->contains($metricList)) { */
-        /*     $this->metricLists[] = $metricList; */
-        /*     $metricList->setCluster($this); */
-        /* } */
-        /* return $this; */
-    }
-
-    public function removeMetricList(MetricList $metricList): self
-    {
-        if ($this->metricLists->contains($metricList)) {
-            $this->metricLists->removeElement($metricList);
-            // set the owning side to null (unless already changed)
-            if ($metricList->getCluster() === $this) {
-                $metricList->setCluster(null);
-            }
+        foreach ($tmpList[$name] as $metric){
+            $metricList[$metric['name']] = $metric;
         }
 
-        return $this;
+        return $metricList;
     }
 
     public function getNodes(): ?array

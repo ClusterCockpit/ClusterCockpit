@@ -151,7 +151,7 @@ class JobListController extends AbstractFOSRestController
                 $jobData["plots"] = array(
                     'id' => $job->getId(),
                     'plots' => $job->jobCache->getPlotsArray(
-                        $job->getCluster()->getMetricList($mode)->getMetrics()),
+                        $job->getCluster()->getMetricList($mode)),
                     'plotOptions' => '{staticPlot: true}'
                 );
 
@@ -159,7 +159,7 @@ class JobListController extends AbstractFOSRestController
 
             if ( $mode === 'view' ){
                 $jobData["plots"] = $job->jobCache->getPlotsArray(
-                    $job->getCluster()->getMetricList($mode)->getMetrics());
+                    $job->getCluster()->getMetricList($mode));
 
                 if ( $options['plot_view_showRoofline'] === 'true' ){
                     $plot = $job->jobCache->getPlot('roofline');

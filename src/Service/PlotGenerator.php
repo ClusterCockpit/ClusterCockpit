@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -218,7 +218,7 @@ class PlotGenerator
     )
     {
         $maxVal = 0.0;
-        $metricName = $metric->getName();
+        $metricName = $metric['name'];
         $xAxis;
         $lineData;
         $colorState;
@@ -259,7 +259,7 @@ class PlotGenerator
         if ( $options['mode'] === 'list' ){
             /* add reference line */
             $options['color'] = 'rgb(0,0,0)';
-            $value = $metric->normal;
+            $value = $metric['normal'];
             $x = array(0, end($x));
             $y = array($value,$value);
 
@@ -275,7 +275,7 @@ class PlotGenerator
         }
 
         $options['maxVal'] = $maxVal;
-        $options['unit'] = $metric->getUnit();
+        $options['unit'] = $metric['unit'];
         $options['xUnit'] = $xAxis['unit'];
         $options['xDtick'] = $xAxis['dtick'];
 

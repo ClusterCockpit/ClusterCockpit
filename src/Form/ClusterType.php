@@ -26,11 +26,11 @@
 namespace App\Form;
 
 use App\Entity\Cluster;
-use App\Form\MetricListType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -50,6 +50,7 @@ class ClusterType extends AbstractType
             ->add('flopRateScalar', NumberType::class)
             ->add('flopRateSimd', NumberType::class)
             ->add('memoryBandwidth', NumberType::class)
+            ->add('metricListConfig', TextareaType::class)
             ->add('nodeFile', FileType::class, array(
                 'label' => 'Nodelist (Text file)',
                 'required' => false))

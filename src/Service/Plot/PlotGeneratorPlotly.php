@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -124,17 +124,17 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
                 ));
 
         foreach ($metrics as $metric){
-            $name = $metric->name;
-            $r_avg[] = $jobData["{$name}_avg"]/$metric->peak;
+            $name = $metric['name'];
+            $r_avg[] = $jobData["{$name}_avg"]/$metric['peak'];
             $theta_avg[] = $name;
-            $r_max[] = $jobData["{$name}_max"]/$metric->peak;
+            $r_max[] = $jobData["{$name}_max"]/$metric['peak'];
             $theta_max[] = $name;
         }
 
-        $name = $metrics['mem_used']->name;
-        $r_avg[] = $jobData["{$name}_avg"]/$metrics['mem_used']->peak;
+        $name = $metrics['mem_used']['name'];
+        $r_avg[] = $jobData["{$name}_avg"]/$metrics['mem_used']['peak'];
         $theta_avg[] = $name;
-        $r_max[] = $jobData["{$name}_max"]/$metrics['mem_used']->peak;
+        $r_max[] = $jobData["{$name}_max"]/$metrics['mem_used']['peak'];
         $theta_max[] = $name;
 
         $data[] = array(
@@ -252,4 +252,3 @@ class PlotGeneratorPlotly implements PlotGeneratorInterface
         return 'plotly';
     }
 }
-

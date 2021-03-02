@@ -147,16 +147,16 @@
         <div class="col-4" id="polarplot"> </div>
     </div>
 
-    {% set metrics = job.cluster.metricLists[mode].metrics %}
+    {% set metrics = job.cluster.MetricLists[mode] %}
     {% set margin = 'mt-4' %}
 
     <div class="row">
         {% for metric in metrics %}
-            <div class="col {{ margin }} perfplot" id="{{ metric.name }}"></div>
+            <div class="col {{ margin }} perfplot" id="{{ metric['name'] }}"></div>
         {% endfor %}
     </div>
 
-    {% set metrics = job.cluster.metricLists['stat'].metrics %}
+    {% set metrics = job.cluster.MetricLists['stat'] %}
     {% set viewStatTable = config['plot_view_showStatTable'].value|default('true') %}
     {% if  viewStatTable is same as('true') %}
         <div class="row">
@@ -165,9 +165,9 @@
                     <thead>
                         <th style="font-size: 0.9rem;" scope="col">nodeId</th>
                         {% for metric in metrics%}
-                            <th style="font-size: 0.8rem;" scope="col">{{ metric.name }} avg [{{ metric.unit }}]</th>
-                            <th style="font-size: 0.8rem;" scope="col">{{ metric.name }} min [{{ metric.unit }}]</th>
-                            <th style="font-size: 0.8rem;" scope="col">{{ metric.name }} max [{{ metric.unit }}]</th>
+                            <th style="font-size: 0.8rem;" scope="col">{{ metric['name'] }} avg [{{ metric['unit'] }}]</th>
+                            <th style="font-size: 0.8rem;" scope="col">{{ metric['name'] }} min [{{ metric['unit'] }}]</th>
+                            <th style="font-size: 0.8rem;" scope="col">{{ metric['name'] }} max [{{ metric['unit'] }}]</th>
                         {% endfor %}
                         </tr>
                     </thead>
