@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -71,23 +71,23 @@ class JobCache
 
     private function _colorBackground(&$options, $metric, $stats)
     {
-        $metricName = $metric->name;
+        $metricName = $metric['name'];
 
-        if ( ! is_null($metric->alert) ){
+        if ( ! is_null($metric['alert']) ){
             if ( isset($stats["{$metricName}_avg"]) ) {
                 if ( $metricName === 'mem_used' ){
-                    if ( $stats["{$metricName}_avg"] > $metric->alert ){
+                    if ( $stats["{$metricName}_avg"] > $metric['alert'] ){
                         $options['bgColor'] = 'rgb(255,238,230)';
-                    } else if ( $stats["{$metricName}_avg"] > $metric->caution ){
+                    } else if ( $stats["{$metricName}_avg"] > $metric['caution'] ){
                         $options['bgColor'] = 'rgb(255,255,230)';
                     } else {
                         unset($options['bgColor']);
                     }
 
                 } else {
-                    if ( $stats["{$metricName}_avg"] < $metric->alert ){
+                    if ( $stats["{$metricName}_avg"] < $metric['alert'] ){
                         $options['bgColor'] = 'rgb(255,238,230)';
-                    } else if ( $stats["{$metricName}_avg"] < $metric->caution ){
+                    } else if ( $stats["{$metricName}_avg"] < $metric['caution'] ){
                         $options['bgColor'] = 'rgb(255,255,230)';
                     } else {
                         unset($options['bgColor']);
@@ -155,7 +155,7 @@ class JobCache
                 $options['plot_general_colorBackground'] == 'true'
             ) {
                 /* collect all metrics required for node table and job table sorting */
-                $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
+                $metrics = $job->getCluster()->getMetricList('stat');
                 $stats = $this->_metricDataRepository->getJobStats($job, $metrics);
             }
         }
@@ -191,7 +191,7 @@ class JobCache
 
         $options['lineWidth'] =  $options['plot_general_lineWidth'];
 
-        $metrics = $job->getCluster()->getMetricList($mode)->getMetrics();
+        $metrics = $job->getCluster()->getMetricList($mode);
         $data = $this->_metricDataRepository->getMetricData( $job, $metrics, $options);
 
         if ( $data == false ) {
@@ -221,7 +221,7 @@ class JobCache
         if ( ! $job->isRunning()) {
             if ( $this->_metricDataRepository->hasProfile($job) ) {
                 $job->jobCache = new \App\Entity\JobCache();
-                $metrics = $job->getCluster()->getMetricList('view')->getMetrics();
+                $metrics = $job->getCluster()->getMetricList('view');
                 $data = $this->_metricDataRepository->getMetricData(
                     $job, $metrics, array('sample' => 0));
                 $nodes = $job->getNodes();
@@ -303,7 +303,7 @@ class JobCache
             return;
         }
 
-        $viewMetrics = $job->getCluster()->getMetricList('view')->getMetrics();
+        $viewMetrics = $job->getCluster()->getMetricList('view');
         $pointsJob = $this->_metricDataRepository->getMetricCount($job, $viewMetrics);
         $points = (int) $options['data_cache_numpoints'];
 

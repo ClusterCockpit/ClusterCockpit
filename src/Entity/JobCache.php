@@ -25,8 +25,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Metric;
-
 class JobCache
 {
     public $nodeStat;
@@ -66,7 +64,7 @@ class JobCache
         $jsonPlots = array();
 
         foreach ($metrics as $metric){
-            $plot = $this->plots[$metric->name];
+            $plot = $this->plots[$metric['name']];
             $jsonPlots[] = array(
                 'name' => $plot->name,
                 'options' => $plot->options,
@@ -100,4 +98,3 @@ class JobCache
         return $this->plots[$name];
     }
 }
-

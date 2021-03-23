@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -40,8 +40,6 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
     {
         $this->_timer = new Stopwatch();
         $this->_logger = $logger;
-        /* $client = new \InfluxDB\Client('localhost', '8086'); */
-        /* $this->_database = $client->selectDB('ClusterCockpit'); */
         $influxdbURL = getenv('INFLUXDB_URL');
         $this->_database = \InfluxDB\Client::fromDSN($influxdbURL);
     }
@@ -55,16 +53,16 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
         $nodes = implode('|', $nodes);
         $stopTime = $job->startTime + $job->duration;
 
-        $query = "SELECT {$flopsAny->name}*{$flopsAny->scale}
-            FROM {$flopsAny->measurement}
+        $query = "SELECT {$flopsAny['name']}*{$flopsAny['scale']}
+            FROM {$flopsAny['measurement']}
             WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
             AND host =~ /$nodes/";
 
         $result = $this->_database->query($query, ['epoch' => 's']);
         $points[0] = $result->getPoints();
 
-        $query = "SELECT {$memBw->name}*{$memBw->scale}
-            FROM {$memBw->measurement}
+        $query = "SELECT {$memBw['name']}*{$memBw['scale']}
+            FROM {$memBw['measurement']}
             WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
             AND host =~ /$nodes/";
 
@@ -92,7 +90,8 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
     public function hasProfile($job)
     {
         $nodes = $job->getNodes();
-        $metric = $job->getCluster()->getMetricList('list')->getMetrics()->first();
+        $metrics = $job->getCluster()->getMetricList('list');
+        $metric = reset($metrics);
 
         if ( count($nodes) < 1 ){
             $job->hasProfile = false;
@@ -100,8 +99,8 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
         }
         $stopTime = $job->startTime + $job->duration;
 
-        $query = "SELECT COUNT({$metric->name})
-            FROM {$metric->measurement}
+        $query = "SELECT COUNT({$metric['name']})
+            FROM {$metric['measurement']}
             WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
             AND host = '{$nodes->first()->getNodeId()}'";
 
@@ -125,14 +124,14 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
         $stopTime = $job->startTime + $job->duration;
 
         foreach ( $metrics as $metric ){
-            $name = $metric->name;
-            $scale = sprintf("%f",$metric->scale);
+            $name = $metric['name'];
+            $scale = sprintf("%f",$metric['scale']);
 
             $query = "SELECT
                 MEAN($name) * $scale AS {$name}_avg
                 ,MIN($name)  * $scale AS {$name}_min
                 ,MAX($name)  * $scale AS {$name}_max
-                FROM {$metric->measurement}
+                FROM {$metric['measurement']}
                 WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
                 AND host =~ /$nodes/ GROUP BY host";
 	    $this->_logger->info("InfluxDB QUERY: $query");
@@ -146,7 +145,7 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
                 MEAN($name) * $scale AS {$name}_avg
                 ,MIN($name)  * $scale AS {$name}_min
                 ,MAX($name)  * $scale AS {$name}_max
-                FROM {$metric->measurement}
+                FROM {$metric['measurement']}
                 WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
                 AND host =~ /$nodes/";
 
@@ -198,14 +197,14 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
 
 
         foreach ( $metrics as $metric ){
-            $scale = sprintf("%f",$metric->scale);
-            if ( $sampletime < $metric->sampletime ) {
-                $sampletime = $metric->sampletime;
+            $scale = sprintf("%f",$metric['scale']);
+            if ( $sampletime < $metric['sampletime'] ) {
+                $sampletime = $metric['sampletime'];
             }
 
             $query = "SELECT
-                MEAN({$metric->name}) * $scale AS {$metric->name}
-                FROM {$metric->measurement}
+                MEAN({$metric['name']}) * $scale AS {$metric['name']}
+                FROM {$metric['measurement']}
                 WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
                 AND host =~ /$nodes/ GROUP BY time({$sampletime}s), host";
 
@@ -240,11 +239,11 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
     {
         $nodes = $job->getNodes();
         $id = $nodes->first()->getNodeId();
-        $metric = $metrics->first();
+        $metric = reset($metrics);
         $stopTime = $job->startTime + $job->duration;
 
-        $query = "SELECT COUNT({$metric->name})
-            FROM {$metric->measurement}
+        $query = "SELECT COUNT({$metric['name']})
+            FROM {$metric['measurement']}
             WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
             AND host = '$id'";
 

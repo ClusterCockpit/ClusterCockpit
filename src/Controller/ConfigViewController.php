@@ -37,7 +37,6 @@ use Psr\Log\LoggerInterface;
 use App\Entity\ApiKey;
 use App\Form\ClusterType;
 use App\Entity\Cluster;
-use App\Entity\MetricList;
 use App\Entity\Node;
 use App\Entity\Configuration;
 use App\Form\UserType;
@@ -647,16 +646,62 @@ class ConfigViewController extends AbstractController
                 $cluster = $form->getData();
                 $em = $this->getDoctrine()->getManager();
                 $file = $cluster->getNodeFile();
-                $em->persist($cluster);
-                $em->flush();
-
-                foreach ( array('list','view','stat','sort') as $listName ) {
-                    $list = new MetricList();
-                    $list->setName($listName);
-                    $cluster->addMetricList($list);
-                    $em->persist($list);
-                }
-
+                $cluster->metricListConfig = <<<JSON
+{
+    "list":
+    [
+        {
+            "name": "flops_any", "measurement": "data",
+            "unit": "GF/s", "scale": 0.001, "sampletime": 60,
+            "peak": 704, "normal": 100, "caution": 20, "alert": 2
+        },
+        {
+            "name": "mem_bw", "measurement": "data",
+            "unit": "GB/s", "scale": 0.001, "sampletime": 60,
+            "peak": 80, "normal": 30, "caution": 10, "alert": 5
+        }
+    ],
+    "view":
+    [
+        {
+            "name": "flops_any", "measurement": "data",
+            "unit": "GF/s", "scale": 0.001, "sampletime": 60,
+            "peak": 704, "normal": 100, "caution": 20, "alert": 2
+        },
+        {
+            "name": "mem_bw", "measurement": "data",
+            "unit": "GB/s", "scale": 0.001, "sampletime": 60,
+            "peak": 80, "normal": 30, "caution": 10, "alert": 5
+        }
+    ],
+    "stat":
+    [
+        {
+            "name": "flops_any", "measurement": "data",
+            "unit": "GF/s", "scale": 0.001, "sampletime": 60,
+            "peak": 704, "normal": 100, "caution": 20, "alert": 2
+        },
+        {
+            "name": "mem_bw", "measurement": "data",
+            "unit": "GB/s", "scale": 0.001, "sampletime": 60,
+            "peak": 80, "normal": 30, "caution": 10, "alert": 5
+        }
+    ],
+    "sort":
+    [
+        {
+            "name": "flops_any", "measurement": "data",
+            "unit": "GF/s", "scale": 0.001, "sampletime": 60,
+            "peak": 704, "normal": 100, "caution": 20, "alert": 2
+        },
+        {
+            "name": "mem_bw", "measurement": "data",
+            "unit": "GB/s", "scale": 0.001, "sampletime": 60,
+            "peak": 80, "normal": 30, "caution": 10, "alert": 5
+        }
+    ]
+}
+JSON;
                 $em->persist($cluster);
                 $em->flush();
 
