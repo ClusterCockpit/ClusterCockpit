@@ -29,61 +29,78 @@ use AppBundle\Entity\Node;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 /**
 *  @ORM\Entity(repositoryClass="App\Repository\JobRepository")
 *  @ORM\Table(name="job",indexes={@ORM\Index(name="search_idx", columns={"is_running","cluster_id"})})
 */
+#[ApiResource(
+   attributes: [
+        'pagination_type' => 'page'
+    ]
+)]
+#[ApiFilter(SearchFilter::class, properties: ['user' => 'partial', 'jobId' => 'start', 'tags.name' => 'exact'])]
+#[ApiFilter(RangeFilter::class, properties: ['startTime','numNodes','duration'])]
+#[ApiFilter(OrderFilter::class, properties: ['startTime','duration','numNodes'])]
+#[ApiFilter(BooleanFilter::class, properties: ['isRunning'])]
 class Job
 {
     /**
-     *  @ORM\Column(type="integer")
+     *  The jobId of this job.
+     *
+     *  @ORM\Column(type="string", unique=true)
      *  @ORM\Id
-     *  @ORM\GeneratedValue(strategy="AUTO")
-     */
-    public $id;
-
-    /**
-     *  @ORM\Column(type="string")
      */
     private $jobId;
 
     /**
+     * The userId for this job.
+     *
      *  @ORM\ManyToOne(targetEntity="User")
      */
     private $user;
 
     /**
+     * The cluster on which the job was executed.
+     *
      *  @ORM\ManyToOne(targetEntity="Cluster")
      */
     private $cluster;
 
     /**
+     * The number of nodes used by the job.
+     *
      *  @ORM\Column(type="integer")
      */
     public $numNodes;
 
     /**
+     * When the job was started.
+     *
      *  @ORM\Column(type="integer")
      */
     public $startTime;
 
     /**
-     *  @ORM\Column(type="integer", nullable=true)
+     * The duration of the job.
+     *
+     *  @ORM\Column(type="integer")
      */
     public $duration;
 
     /**
-     *  @ORM\Column(type="integer", nullable=true, options={"default":0})
-     */
-    public $severity;
-
-    /**
+     * The node list of the job.
+     *
      * @ORM\ManyToMany(targetEntity="Node", indexBy="id")
      * @ORM\JoinTable(name="jobs_nodes", joinColumns={@ORM\JoinColumn(name="job_id", referencedColumnName="id")}, inverseJoinColumns={@ORM\JoinColumn(name="node_id", referencedColumnName="id")})
      */
     private $nodes;
-
 
     public $jobCache;
 
@@ -103,51 +120,60 @@ class Job
     private $jobScript;
 
     /**
-     *  @ORM\Column(type="float", nullable=true)
+     * The maximum memory capacity used by the job.
+     *
+     *  @ORM\Column(type="float")
      */
-    public $slot_0;
+    public $memUsedMax;
 
     /**
-     *  @ORM\Column(type="float", nullable=true)
+     * The average flop rate of the job.
+     *
+     *  @ORM\Column(type="float")
      */
-    public $slot_1;
+    public $flopsAnyAvg;
 
     /**
-     *  @ORM\Column(type="float", nullable=true)
+     * The average memory bandwidth of the job.
+     *
+     *  @ORM\Column(type="float")
      */
-    public $slot_2;
+    public $memBwAvg;
 
     /**
-     *  @ORM\Column(type="float", nullable=true)
+     * The average load of the job.
+     *
+     *  @ORM\Column(type="float")
      */
-    public $slot_3;
+    public $loadAvg;
 
     /**
-     *  @ORM\Column(type="float", nullable=true)
+     * The average network bandwidth of the job.
+     *
+     *  @ORM\Column(type="float")
      */
-    public $slot_4;
+    public $netBwAvg;
+
+    /**
+     * The average file io bandwidth of the job.
+     *
+     *  @ORM\Column(type="float")
+     */
+    public $fileBwAvg;
 
     public $hasProfile;
 
     /**
+     * Tags of the job.
+     *
      * @ORM\ManyToMany(targetEntity="App\Entity\JobTag", inversedBy="jobs")
      */
-    private $tags;
+    public $tags;
 
 
     public function __construct() {
         $this->nodes = new ArrayCollection();
         $this->tags = new ArrayCollection();
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId($id)
-    {
-        $this->id = $id;
     }
 
     public function getJobId()

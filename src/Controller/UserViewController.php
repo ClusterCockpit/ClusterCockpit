@@ -129,9 +129,9 @@ class UserViewController extends AbstractController
             $control->getCluster(),
             $status);
 
-        $sortMetrics = $this->getDoctrine()
-                            ->getRepository(\App\Entity\TableSortConfig::class)
-                            ->findMetrics();
+        /* $sortMetrics = $this->getDoctrine() */
+        /*                     ->getRepository(\App\Entity\TableSortConfig::class) */
+        /*                     ->findMetrics(); */
 
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());

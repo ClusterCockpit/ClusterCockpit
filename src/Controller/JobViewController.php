@@ -173,9 +173,9 @@ class JobViewController extends AbstractController
             } else {
                 $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
                 $config = $configuration->getUserConfig($this->getUser());
-                $sortMetrics = $this->getDoctrine()
-                                    ->getRepository(\App\Entity\TableSortConfig::class)
-                                    ->findMetrics();
+                /* $sortMetrics = $this->getDoctrine() */
+                /*                     ->getRepository(\App\Entity\TableSortConfig::class) */
+                /*                     ->findMetrics(); */
 
                 $count = count($sortMetrics);
                 $end = $count+1;
