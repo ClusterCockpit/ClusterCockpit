@@ -52,10 +52,16 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 class Job
 {
     /**
+     *  @ORM\Column(type="integer")
+     *  @ORM\Id
+     *  @ORM\GeneratedValue(strategy="AUTO")
+     */
+    public $id;
+
+    /**
      *  The jobId of this job.
      *
-     *  @ORM\Column(type="string", unique=true)
-     *  @ORM\Id
+     *  @ORM\Column(type="string")
      */
     private $jobId;
 
@@ -69,9 +75,9 @@ class Job
     /**
      * The cluster on which the job was executed.
      *
-     *  @ORM\ManyToOne(targetEntity="Cluster")
+     *  @ORM\Column(type="string")
      */
-    private $cluster;
+    private $clusterId;
 
     /**
      * The number of nodes used by the job.
