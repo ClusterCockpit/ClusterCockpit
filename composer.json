@@ -16,37 +16,36 @@
         "predis/predis": "^1.1",
         "sensio/framework-extra-bundle": "^5.6",
         "symfony/apache-pack": "^1.0",
-        "symfony/asset": "4.4.*",
-        "symfony/cache": "4.4.*",
-        "symfony/console": "4.4.*",
-        "symfony/expression-language": "4.4.*",
+        "symfony/asset": "5.2.*",
+        "symfony/cache": "5.2.*",
+        "symfony/console": "5.2.*",
+        "symfony/expression-language": "5.2.*",
         "symfony/flex": "^1.10",
-        "symfony/form": "4.4.*",
-        "symfony/framework-bundle": "4.4.*",
-        "symfony/ldap": "4.4.*",
+        "symfony/form": "5.2.*",
+        "symfony/framework-bundle": "5.2.*",
+        "symfony/ldap": "5.2.*",
         "symfony/monolog-bundle": "^3.1",
-        "symfony/process": "4.4.*",
-        "symfony/property-access": "4.4.*",
-        "symfony/property-info": "4.4.*",
-        "symfony/proxy-manager-bridge": "4.4.*",
-        "symfony/security": "4.4.*",
-        "symfony/security-bundle": "4.4.*",
-        "symfony/serializer": "4.4.*",
-        "symfony/stopwatch": "4.4.*",
+        "symfony/process": "5.2.*",
+        "symfony/property-access": "5.2.*",
+        "symfony/property-info": "5.2.*",
+        "symfony/proxy-manager-bridge": "5.2.*",
+        "symfony/security-bundle": "5.2.*",
+        "symfony/serializer": "5.2.*",
+        "symfony/stopwatch": "5.2.*",
         "symfony/swiftmailer-bundle": "^3.1",
-        "symfony/twig-bundle": "4.4.*",
-        "symfony/validator": "4.4.*",
-        "symfony/web-link": "4.4.*",
-        "symfony/yaml": "4.4.*",
+        "symfony/twig-bundle": "5.2.*",
+        "symfony/validator": "5.2.*",
+        "symfony/web-link": "5.2.*",
+        "symfony/yaml": "5.2.*",
         "webonyx/graphql-php": "^14.5"
     },
     "require-dev": {
         "symfony/debug-pack": "*",
-        "symfony/dotenv": "4.4.*",
+        "symfony/dotenv": "5.2.*",
         "symfony/maker-bundle": "^1.0",
         "symfony/profiler-pack": "*",
         "symfony/test-pack": "^1.0",
-        "symfony/var-dumper": "4.4.*"
+        "symfony/var-dumper": "5.2.*"
     },
     "config": {
         "preferred-install": {
@@ -88,7 +87,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": true,
-            "require": "4.4.*"
+            "require": "5.2.*"
         }
     }
 }
