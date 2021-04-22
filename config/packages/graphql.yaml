@@ -2,9 +2,11 @@ overblog_graphql:
     definitions:
         schema:
             query: Query
+            resolver_maps:
+                - App\Resolver\RootResolverMap
         mappings:
             types:
                 -
                     type: graphql
                     dir: "%kernel.project_dir%/config/graphql/types"
-                    suffix: null
+                    suffix: ~

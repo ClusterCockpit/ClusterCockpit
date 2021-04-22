@@ -202,14 +202,14 @@ class Job
         $this->user = $user;
     }
 
-    public function getCluster()
+    public function getClusterId()
     {
-        return $this->cluster;
+        return $this->clusterId;
     }
 
-    public function setCluster($cluster)
+    public function setClusterId($clusterId)
     {
-        $this->cluster = $cluster;
+        $this->clusterId = $clusterId;
     }
 
     public function getNumNodes()
