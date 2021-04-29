@@ -39,16 +39,19 @@ class RootResolverMap extends ResolverMap
     private $jobRepo;
     private $clusterRepo;
     private $logger;
+    private $projectDir;
 
     public function __construct(
         JobRepository $jobRepo,
         ClusterRepository $clusterRepo,
         LoggerInterface $logger,
+        $projectDir
     )
     {
         $this->jobRepo = $jobRepo;
         $this->clusterRepo = $clusterRepo;
         $this->logger = $logger;
+        $this->projectDir = $projectDir;
     }
 
     private function jobEntityToArray($job)
@@ -67,6 +70,23 @@ class RootResolverMap extends ResolverMap
             'hasProfile' => true,
             'tags' => []
         ];
+    }
+
+    private function readMetircData($jobId, $clusterId)
+    {
+        $jobId = intval(explode('.', $jobId)[0]);
+        $lvl1 = intdiv($jobId, 1000);
+        $lvl2 = $jobId % 1000;
+
+        $path = sprintf('%s/job-data/%s/%d/%03d/data.json',
+            $this->projectDir, $clusterId, $lvl1, $lvl2);
+
+
+        $file = @file_get_contents($path);
+        if ($file === false)
+            return false;
+
+        return json_decode($file);
     }
 
     public function map()
@@ -111,6 +131,27 @@ class RootResolverMap extends ResolverMap
                             'metricConfig' => $cluster->getMetricLists()['list']
                         ];
                     }, $clusters);
+                },
+
+                'jobMetrics' => function($value, Argument $args) {
+                    $jobId = $args['jobId'];
+                    $clusterId = $args['clusterId'];
+                    $metrics = $args['metrics'];
+                    $data = $this->readMetircData($jobId, $clusterId);
+                    if ($data === false)
+                        return [];
+
+                    $res = [];
+                    foreach ($data as $metricName => $metricData) {
+                        if ($metrics && !in_array($metricName, $metrics))
+                            continue;
+
+                        $res[] = [
+                            'name' => $metricName,
+                            'metric' => $metricData
+                        ];
+                    }
+                    return $res;
                 }
             ],
 

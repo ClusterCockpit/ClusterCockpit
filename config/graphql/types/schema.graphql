@@ -39,11 +39,42 @@ type MetricConfig {
   alert: Int!
 }
 
+type JobMetric {
+  unit: String!
+  scope: JobMetricScope!
+  timestep: Int!
+  series: [JobMetricSeries]!
+}
+
+enum JobMetricScope {
+  node
+  cpu
+  socket
+}
+
+type JobMetricSeries {
+  node_id: String!
+  statistics: JobMetricStatistics
+  data: [Float]!
+}
+
+type JobMetricStatistics {
+  avg: Float!
+  min: Float!
+  max: Float!
+}
+
+type JobMetricWithName {
+  name: String!
+  metric: JobMetric!
+}
+
 type Query {
   clusters: [Cluster!]!
   jobById(jobId: String!): Job
   jobs(filter: JobFilterList, page: PageRequest, order: OrderByInput): JobResultList!
   jobsStatistics(filter: JobFilterList): JobsStatistics!
+  jobMetrics(jobId: String!, clusterId: String, metrics: [String]): [JobMetricWithName]!
 }
 
 type Mutation {
