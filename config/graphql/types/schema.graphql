@@ -7,11 +7,42 @@ type Job {
   startTime: Time!
   duration: Int!
   numNodes: Int!
+  hasProfile: Boolean!
+  tags: [JobTag!]!
+}
+
+type JobTag {
+  id: ID!
+  tagType: String!
+  tagName: String!
+}
+
+type Cluster {
+  clusterID: String!
+  processorType: String!
+  socketsPerNode: Int!
+  coresPerSocket: Int!
+  threadsPerCore: Int!
+  flopRateScalar: Int!
+  flopRateSimd: Int!
+  memoryBandwidth: Int!
+  metricConfig: [MetricConfig!]!
+}
+
+type MetricConfig {
+  name: String!
+  unit: String!
+  sampletime: Int!
+  peak: Int!
+  normal: Int!
+  caution: Int!
+  alert: Int!
 }
 
 type Query {
+  clusters: [Cluster!]!
   jobById(jobId: String!): Job
-  jobs(filter: JobFilterList, page: PageRequest, orderBy: OrderByInput): JobResultList!
+  jobs(filter: JobFilterList, page: PageRequest, order: OrderByInput): JobResultList!
   jobsStatistics(filter: JobFilterList): JobsStatistics!
 }
 
@@ -114,8 +145,8 @@ type JobsStatistics  {
 }
 
 input PageRequest {
-  limit: Int
-  offset: Int
+  itemsPerPage: Int!
+  page: Int!
 }
 
 scalar Time

@@ -182,95 +182,85 @@ class JobRepository extends ServiceEntityRepository
         return $stat;
     }
 
-    public function countJobs(
-        $userId,
-        $filter,
-        $jobQuery
-    )
+    private function addStringCondition($qb, $field, $i, $cond)
+    {
+        if (isset($cond['eq']))
+            $qb->andWhere("j.$field = :{$field}_$i")
+               ->setParameter("{$field}_$i", $cond['eq']);
+
+        if (isset($cond['contains']))
+            $qb->andWhere("j.$field LIKE :{$field}_c_$i")
+               ->setParameter("{$field}_c_$i", '%'.$cond['contains'].'%');
+
+        if (isset($cond['startsWith']))
+            $qb->andWhere("j.$field LIKE :{$field}_sw_$i")
+               ->setParameter("{$field}_sw_$i", $cond['startsWith'].'%');
+
+        if (isset($cond['endsWith']))
+            $qb->andWhere("j.$field LIKE :{$field}_ew_$i")
+               ->setParameter("{$field}_ew_$i", '%'.$cond['endsWith']);
+    }
+
+    private function buildJobFilter($qb, $filter, $sorting)
+    {
+        if ($filter && isset($filter['list'])) {
+            $filterList = $filter['list'];
+            foreach ($filterList as $i => $filter) {
+                if (isset($filter['jobId']))
+                    $this->addStringCondition($qb, 'jobId', $i, $filter['jobId']);
+                if (isset($filter['userId']))
+                    $this->addStringCondition($qb, 'userId', $i, $filter['userId']);
+                if (isset($filter['projectId']))
+                    $this->addStringCondition($qb, 'projectId', $i, $filter['projectId']);
+                if (isset($filter['clusterId']))
+                    $this->addStringCondition($qb, 'clusterId', $i, $filter['clusterId']);
+
+                if (isset($filter['duration']))
+                    $qb->andWhere("j.duration BETWEEN :duration_from_$i AND :duration_to_$i")
+                       ->setParameter("duration_from_$i", $filter['duration']['from'])
+                       ->setParameter("duration_to_$i", $filter['duration']['to']);
+
+                if (isset($filter['numNodes']))
+                    $qb->andWhere("j.numNodes BETWEEN :numNodes_from_$i AND :numNodes_to_$i")
+                       ->setParameter("numNodes_from_$i", $filter['numNodes']['from'])
+                       ->setParameter("numNodes_to_$i", $filter['numNodes']['to']);
+
+                if (isset($filter['startTime']))
+                    $qb->andWhere("j.startTime BETWEEN :startTime_from_$i AND :startTime_to_$i")
+                       ->setParameter("startTime_from_$i", $filter['startTime']['from'])
+                       ->setParameter("startTime_to_$i", $filter['startTime']['to']);
+
+                if (isset($filter['hasProfile']))
+                    $qb->andWhere('j.hasProfile = '.$filter['hasProfile']);
+            }
+        }
+
+        if ($sorting)
+            $qb->orderBy('j.'.$sorting['field'], $sorting['order']);
+    }
+
+    public function countJobs($filter, $sorting)
     {
         $qb = $this->createQueryBuilder('j');
-
-        $qb->select('count(j)')
-           ->where("j.duration > 300");
-
-        if ( $userId ){
-            $qb->andWhere("j.user = $userId");
-        } else {
-            if( $filter ){
-                $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
-                   ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
-            }
-        }
-
-        if (array_key_exists ( 'runningJobs', $jobQuery )) {
-            $qb->andWhere("j.isRunning = true");
-        } elseif (array_key_exists ( 'clusterId', $jobQuery )) {
-
-            $qb->andWhere($qb->expr()->between('j.numNodes',$jobQuery['numNodesFrom'],$jobQuery['numNodesTo']));
-            $qb->andWhere($qb->expr()->between( 'j.duration', $jobQuery['durationFrom'], $jobQuery['durationTo']));
-            $qb->andWhere($qb->expr()->between( 'j.startTime', $jobQuery['dateFrom'], $jobQuery['dateTo']));
-
-            if ( $jobQuery['clusterId'] != 0 ){  /* 0 means all Clusters */
-                $qb->andWhere("j.cluster = $jobQuery[clusterId]");
-            }
-
-            if ( ! $userId and  $jobQuery['userId'] != 0 ){
-                $qb->andWhere("j.user = $jobQuery[userId]");
-            }
-
-        } elseif (array_key_exists ( 'jobTag', $jobQuery )) {
-            $qb->innerJoin('j.tags', 't', 'WITH', 't.id = :tagId')
-               ->setParameter('tagId', $jobQuery['jobTag']);
-        }
+        $qb->select('count(j)');
+        $this->buildJobFilter($qb, $filter, $sorting);
 
         return $qb
             ->getQuery()
             ->getSingleScalarResult();
     }
 
-    public function findFilteredJobs(
-        $userId,
-        $offset, $limit,
-        $sorting,
-        $filter,
-        $jobQuery)
+    public function findFilteredJobs($page, $filter, $sorting)
     {
         $qb = $this->createQueryBuilder('j');
+        $qb->select('j');
+        $this->buildJobFilter($qb, $filter, $sorting);
 
-        $qb->select('j')
-           ->where("j.duration > 300")
-           ->orderBy('j.'.$sorting['col'], $sorting['order'])
-           ->setFirstResult( $offset )
-           ->setMaxResults( $limit );
-
-        if ( $userId ){
-            $qb->andWhere("j.user = $userId");
+        if ($page) {
+            $qb->setFirstResult(($page['page'] - 1) * $page['itemsPerPage']);
+            $qb->setMaxResults($page['itemsPerPage']);
         } else {
-            if( $filter ){
-                $qb->innerJoin('j.user', 'u', 'WITH', "u.username LIKE :word")
-                   ->setParameter('word', '%'.addcslashes($filter, '%_').'%');
-            }
-        }
-
-        if (array_key_exists ( 'runningJobs', $jobQuery )) {
-            $qb->andWhere("j.isRunning = true");
-        } elseif (array_key_exists ( 'clusterId', $jobQuery )) {
-
-            $qb->andWhere($qb->expr()->between('j.numNodes',$jobQuery['numNodesFrom'],$jobQuery['numNodesTo']));
-            $qb->andWhere($qb->expr()->between( 'j.duration', $jobQuery['durationFrom'], $jobQuery['durationTo']));
-            $qb->andWhere($qb->expr()->between( 'j.startTime', $jobQuery['dateFrom'], $jobQuery['dateTo']));
-
-            if ( $jobQuery['clusterId'] != 0 ) { /* 0 means all Clusters */
-                $qb->andWhere("j.cluster = $jobQuery[clusterId]");
-            }
-
-            if ( ! $userId and  $jobQuery['userId'] != 0 ){
-                $qb->andWhere("j.user = $jobQuery[userId]");
-            }
-
-        } elseif (array_key_exists ( 'jobTag', $jobQuery )) {
-            $qb->innerJoin('j.tags', 't', 'WITH', 't.id = :tagId')
-               ->setParameter('tagId', $jobQuery['jobTag']);
+            $qb->setMaxResults(50);
         }
 
         return $qb
@@ -452,10 +442,12 @@ class JobRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('j');
         $qb->select('j')
-           ->andWhere("j.id = $jobId");
+           ->andWhere("j.id = :jobId")
+           ->setParameter('jobId', $jobId);
 
         if ( $userId ){
-            $qb->andWhere("j.user = $userId");
+            $qb->andWhere("j.user = :userId")
+               ->setParameter('userId', $userId);
         }
 
         return $qb
