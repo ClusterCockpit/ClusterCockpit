@@ -33,25 +33,38 @@ use Overblog\GraphQLBundle\Resolver\ResolverMap;
 
 use App\Repository\ClusterRepository;
 use App\Repository\JobRepository;
+use App\Repository\JobTagRepository;
 
 class RootResolverMap extends ResolverMap
 {
     private $jobRepo;
+    private $jobTagRepo;
     private $clusterRepo;
     private $logger;
     private $projectDir;
 
     public function __construct(
         JobRepository $jobRepo,
+        JobTagRepository $jobTagRepo,
         ClusterRepository $clusterRepo,
         LoggerInterface $logger,
         $projectDir
     )
     {
         $this->jobRepo = $jobRepo;
+        $this->jobTagRepo = $jobTagRepo;
         $this->clusterRepo = $clusterRepo;
         $this->logger = $logger;
         $this->projectDir = $projectDir;
+    }
+
+    private function getJobDataPath($jobId, $clusterId)
+    {
+        $jobId = intval(explode('.', $jobId)[0]);
+        $lvl1 = intdiv($jobId, 1000);
+        $lvl2 = $jobId % 1000;
+        return sprintf('%s/job-data/%s/%d/%03d/data.json',
+            $this->projectDir, $clusterId, $lvl1, $lvl2);
     }
 
     private function jobEntityToArray($job)
@@ -64,29 +77,19 @@ class RootResolverMap extends ResolverMap
             'startTime' => $job->getStartTime(),
             'duration' => $job->getDuration(),
             'numNodes' => $job->getNumNodes(),
+            'tags' => array_map(function ($tag) {
+                return [
+                    'id' => $tag->getId(),
+                    'tagType' => $tag->getType(),
+                    'tagName' => $tag->getName()
+                ];
+            }, $job->tags->getValues()),
 
-            // TODO:
-            'projectId' => "TODO",
-            'hasProfile' => true,
-            'tags' => []
+            // TODO: DB-Schemas differ
+            'hasProfile' => file_exists(
+                $this->getJobDataPath($job->getJobId(), $job->getClusterId())),
+            'projectId' => null
         ];
-    }
-
-    private function readMetircData($jobId, $clusterId)
-    {
-        $jobId = intval(explode('.', $jobId)[0]);
-        $lvl1 = intdiv($jobId, 1000);
-        $lvl2 = $jobId % 1000;
-
-        $path = sprintf('%s/job-data/%s/%d/%03d/data.json',
-            $this->projectDir, $clusterId, $lvl1, $lvl2);
-
-
-        $file = @file_get_contents($path);
-        if ($file === false)
-            return false;
-
-        return json_decode($file);
     }
 
     public function map()
@@ -126,21 +129,41 @@ class RootResolverMap extends ResolverMap
                     $clusters = $this->clusterRepo->findAllConfig();
                     return array_map(function($cluster) {
                         return [
-                            // TODO: Other fields
                             'clusterID' => $cluster->id,
-                            'metricConfig' => $cluster->getMetricLists()['list']
+                            'flopRateScalar' => $cluster->flopRateScalar,
+                            'flopRateSimd' => $cluster->flopRateSimd,
+                            'memoryBandwidth' => $cluster->memoryBandwidth,
+                            'metricConfig' => $cluster->getMetricLists()['list'],
+
+                            // TODO: DB-Schemas differ
+                            'processorType' => null,
+                            'socketsPerNode' => 1,
+                            'coresPerSocket' => $cluster->coresPerNode,
+                            'threadsPerCore' => 1
                         ];
                     }, $clusters);
+                },
+
+                'tags' => function($value, Argument $args) {
+                    return array_map(function ($tag) {
+                        return [
+                            'id' => $tag->getId(),
+                            'tagType' => $tag->getType(),
+                            'tagName' => $tag->getName()
+                        ];
+                    }, $this->jobTagRepo->getAllTags());
                 },
 
                 'jobMetrics' => function($value, Argument $args) {
                     $jobId = $args['jobId'];
                     $clusterId = $args['clusterId'];
                     $metrics = $args['metrics'];
-                    $data = $this->readMetircData($jobId, $clusterId);
+                    $path = $this->getJobDataPath($jobId, $clusterId);
+                    $data = @file_get_contents($path);
                     if ($data === false)
-                        return [];
+                        throw new Error("No profile data for '$jobId' (on '$clusterId')");
 
+                    $data = json_decode($data);
                     $res = [];
                     foreach ($data as $metricName => $metricData) {
                         if ($metrics && !in_array($metricName, $metrics))

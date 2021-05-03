@@ -75,6 +75,7 @@ type Query {
   jobs(filter: JobFilterList, page: PageRequest, order: OrderByInput): JobResultList!
   jobsStatistics(filter: JobFilterList): JobsStatistics!
   jobMetrics(jobId: String!, clusterId: String, metrics: [String]): [JobMetricWithName]!
+  tags: [JobTag!]!
 }
 
 type Mutation {
@@ -112,6 +113,7 @@ input JobFilterList {
 }
 
 input JobFilter {
+  tags: [ID!]
   jobId: StringInput
   userId: StringInput
   projectId: StringInput

@@ -232,6 +232,10 @@ class JobRepository extends ServiceEntityRepository
 
                 if (isset($filter['hasProfile']))
                     $qb->andWhere('j.hasProfile = '.$filter['hasProfile']);
+
+                if (isset($filter['tags']))
+                    $qb->join('j.tags', 't')
+                       ->andWhere($qb->expr()->in('t.id', $filter['tags']));
             }
         }
 
