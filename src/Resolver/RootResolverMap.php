@@ -175,6 +175,10 @@ class RootResolverMap extends ResolverMap
                         ];
                     }
                     return $res;
+                },
+
+                'jobsStatistics' => function($value, Argument $args) {
+                    return $this->jobRepo->findFilteredStatistics($args['filter']);
                 }
             ],
 

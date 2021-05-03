@@ -272,6 +272,74 @@ class JobRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /*
+     * Filters are expected in the same format as for
+     * findFilteredJobs() and countJobs() (therefore,
+     * the GraphQL JobFilterList type).
+     */
+    public function findFilteredStatistics($filter)
+    {
+        $qb = $this->createQueryBuilder('j');
+        $qb->select([
+            'COUNT(j.id)',
+            'SUM(j.duration) / 3600',
+            'SUM(j.duration * j.numNodes) / 3600'
+        ]);
+        $this->buildJobFilter($qb, $filter, null);
+        $res = $qb->getQuery()->getSingleResult();
+        $stats = [
+            'totalJobs' => $res[1],
+            'totalWalltime' => intval($res[2]),
+            'totalCoreHours' => intval($res[3])
+        ];
+
+        $qb = $this->createQueryBuilder('j');
+        $qb->select('COUNT(j.id)')
+           ->andWhere('j.duration < 120');
+        $this->buildJobFilter($qb, $filter, null);
+        $stats['shortJobs'] = $qb->getQuery()->getSingleResult()[1];
+
+        // histWalltime
+        // TODO/FIXME: No int division in standard SQL?
+        $qb = $this->createQueryBuilder('j');
+        $qb->select([
+            '(j.duration / 3600) as value',
+            'count(j.id) as count'
+        ]);
+        $this->buildJobFilter($qb, $filter, null);
+        $qb->groupBy('value');
+        $rows = $qb->getQuery()->getResult();
+        $histo = [];
+        // The problem: value is a float, grouping is broken
+        foreach ($rows as $row) {
+            $value = intval($row['value']);
+            if (isset($histo[$value]))
+                $histo[$value] += $row['count'];
+            else
+                $histo[$value] = $row['count'];
+        }
+        $histWalltime = [];
+        foreach ($histo as $value => $count) {
+            $histWalltime[] = ['count' => $count, 'value' => $value];
+        }
+
+
+        // histNumNodes
+        $histNumNodes = [];
+        $qb = $this->createQueryBuilder('j');
+        $qb->select(['j.numNodes as value', 'count(j.id) as count']);
+        $this->buildJobFilter($qb, $filter, null);
+        $qb->groupBy('value')->orderBy('value');
+        $rows = $qb->getQuery()->getResult();
+        foreach ($rows as $row) {
+            $histNumNodes[] = $row;
+        }
+
+        $stats['histWalltime'] = $histWalltime;
+        $stats['histNumNodes'] = $histNumNodes;
+        return $stats;
+    }
+
     public function findRunningJobs()
     {
         $qb = $this->createQueryBuilder('j');
