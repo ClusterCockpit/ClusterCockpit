@@ -26,6 +26,7 @@
 namespace App\Entity;
 
 use AppBundle\Entity\Node;
+use AppBundle\Entity\Cluster;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -103,10 +104,9 @@ class Job
     /**
      * The node list of the job.
      *
-     * @ORM\ManyToMany(targetEntity="Node", indexBy="id")
-     * @ORM\JoinTable(name="jobs_nodes", joinColumns={@ORM\JoinColumn(name="job_id", referencedColumnName="id")}, inverseJoinColumns={@ORM\JoinColumn(name="node_id", referencedColumnName="id")})
+     *  @ORM\Column(type="text", nullable=true)
      */
-    private $nodes;
+    private $nodeList;
 
     public $jobCache;
 
@@ -124,6 +124,11 @@ class Job
      *  @ORM\Column(type="text", nullable=true)
      */
     private $jobScript;
+
+    /**
+     *  @ORM\Column(type="text", options={"default":"noProject"})
+     */
+    private $projectId;
 
     /**
      * The maximum memory capacity used by the job.
@@ -204,7 +209,7 @@ class Job
 
     public function getClusterId()
     {
-        return $this->clusterId;
+        return trim($this->clusterId,"'");
     }
 
     public function setClusterId($clusterId)
@@ -220,6 +225,16 @@ class Job
     public function setNumNodes($numNodes)
     {
         $this->numNodes = $numNodes;
+    }
+
+    public function getProjectId()
+    {
+        return $this->projectId;
+    }
+
+    public function setProjectId($projectId)
+    {
+        $this->projectId = $projectId;
     }
 
     public function getStartTime()
