@@ -31,12 +31,14 @@ use GraphQL\Error\Error;
 use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Resolver\ResolverMap;
 
+use App\Service\JobArchive;
 use App\Repository\ClusterRepository;
 use App\Repository\JobRepository;
 use App\Repository\JobTagRepository;
 
 class RootResolverMap extends ResolverMap
 {
+    private $jobArchive;
     private $jobRepo;
     private $jobTagRepo;
     private $clusterRepo;
@@ -47,6 +49,7 @@ class RootResolverMap extends ResolverMap
         JobRepository $jobRepo,
         JobTagRepository $jobTagRepo,
         ClusterRepository $clusterRepo,
+        JobArchive $archive,
         LoggerInterface $logger,
         $projectDir
     )
@@ -54,6 +57,7 @@ class RootResolverMap extends ResolverMap
         $this->jobRepo = $jobRepo;
         $this->jobTagRepo = $jobTagRepo;
         $this->clusterRepo = $clusterRepo;
+        $this->JobArchive = $archive;
         $this->logger = $logger;
         $this->projectDir = $projectDir;
     }
@@ -63,8 +67,10 @@ class RootResolverMap extends ResolverMap
         $jobId = intval(explode('.', $jobId)[0]);
         $lvl1 = intdiv($jobId, 1000);
         $lvl2 = $jobId % 1000;
-        return sprintf('%s/job-data/%s/%d/%03d/data.json',
+        $path = sprintf('%s/job-data/%s/%d/%03d/data.json',
             $this->projectDir, $clusterId, $lvl1, $lvl2);
+        $this->logger->info("PATH $path");
+        return $path;
     }
 
     private function jobEntityToArray($job)
@@ -88,7 +94,7 @@ class RootResolverMap extends ResolverMap
             // TODO: DB-Schemas differ
             'hasProfile' => file_exists(
                 $this->getJobDataPath($job->getJobId(), $job->getClusterId())),
-            'projectId' => null
+            'projectId' => $job->getProjectId()
         ];
     }
 
