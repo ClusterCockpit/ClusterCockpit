@@ -213,25 +213,11 @@ class JobViewController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());
-        $sortMetrics = $this->getDoctrine()
-                            ->getRepository(\App\Entity\TableSortConfig::class)
-                            ->findMetrics();
-
-        $count = count($sortMetrics);
-        $end = $count+1;
-
-        $columnDefs = array(
-            'orderable'  => "0,$end",
-            'visible'    => implode(',',range(1,$count)),
-            'searchable' => implode(',',range(1,$end))
-        );
 
         return $this->render('jobViews/listJobs.html.twig',
             array(
                 'jobQuery' => json_encode(array('runningJobs' => true)),
-                'config' => $config,
-                'sortMetrics' => $sortMetrics,
-                'columnDefs' => $columnDefs
+                'config' => $config
             ));
     }
 
