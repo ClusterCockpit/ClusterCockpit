@@ -89,124 +89,6 @@ class JobViewController extends AbstractController
         }
     }
 
-    private function getSystems(){
-
-        $clusters = $this->getDoctrine()
-                            ->getRepository(\App\Entity\Cluster::class)
-                            ->findAll();
-
-        $systems['ALL'] = 0;
-
-        foreach  ( $clusters as $cluster ){
-            $systems[$cluster->getName()] = $cluster->getId();
-        }
-
-        return $systems;
-    }
-
-    public function search(
-        Request $request,
-        SerializerInterface $serializer,
-        Configuration $configuration
-    )
-    {
-        $search = new JobSearch();
-        $search->setNumNodesFrom(1);
-        $search->setNumNodesTo(64);
-        $search->setDurationFrom(new DateInterval('PT1H'));
-        $search->setDurationTo(new DateInterval('PT24H'));
-        $search->setDateFrom(floor(time()/60)*60-2592000);
-        $search->setDateTo(floor(time()/60)*60);
-
-        $form = $this->createFormBuilder($search)
-            ->add('clusterId', ChoiceType::class,array(
-                'choices'  => $this->getSystems(),
-                'label' => 'Cluster',
-                'required' => true))
-                ->add('numNodesFrom', IntegerType::class, array(
-                    'label' => 'from',
-                    'required' => false))
-                ->add('numNodesTo', IntegerType::class, array(
-                    'label' => 'to',
-                    'required' => false))
-            ->add('durationFrom', DateIntervalType::class, array(
-                'label' => 'from',
-                'with_hours' => true,
-                'with_minutes' => true,
-                'with_days' => false,
-                'with_months' => false,
-                'with_years' => false,
-            ))
-            ->add('durationTo', DateIntervalType::class, array(
-                'label' => 'to',
-                'with_hours' => true,
-                'with_minutes' => true,
-                'with_days' => false,
-                'with_months' => false,
-                'with_years' => false,
-            ))
-            ->add('dateFrom', DateTimeType::class, array(
-                'label' => 'from',
-                'input' => 'timestamp',
-                'widget' => 'single_text'
-            ))
-            ->add('dateTo', DateTimeType::class, array(
-                'label' => 'to',
-                'input' => 'timestamp',
-                'widget' => 'single_text'
-            ))
-            ->add('search', SubmitType::class, array('label' => 'Search Jobs'))
-            ->getForm();
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $search = $form->getData();
-            $joblist = array();
-
-            $repository = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
-            $jobId = $search->getJobId();
-
-            if (isset($jobId)){
-                $job = $repository->findOneBy(['jobId' => $jobId]);
-                return $this->redirectToRoute('show_job', array('id' => $job->getId()));
-            } else {
-                $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-                $config = $configuration->getUserConfig($this->getUser());
-                /* $sortMetrics = $this->getDoctrine() */
-                /*                     ->getRepository(\App\Entity\TableSortConfig::class) */
-                /*                     ->findMetrics(); */
-
-                $count = count($sortMetrics);
-                $end = $count+1;
-
-                $columnDefs = array(
-                    'orderable'  => "0,$end",
-                    'visible'    => implode(',',range(1,$count)),
-                    'searchable' => implode(',',range(1,$end))
-                );
-
-                $durationFrom =$search->getDurationFrom()->h*3600+$search->getDurationFrom()->m*60;
-                $durationTo =$search->getDurationTo()->h*3600+$search->getDurationFrom()->m*60;
-                $search->setDurationFrom($durationFrom);
-                $search->setDurationTo($durationTo);
-                $search->setUserId(0);
-
-                return $this->render('jobViews/listJobs.html.twig',
-                    array(
-                        'jobQuery' => $serializer->serialize($search, 'json'),
-                        'config' => $config,
-                        'sortMetrics' => $sortMetrics,
-                        'columnDefs' => $columnDefs
-                    ));
-            }
-        }
-
-        return $this->render('default/searchJobs.html.twig', array(
-            'form' => $form->createView(),
-        ));
-    }
-
     public function list(
         Configuration $configuration
     )
@@ -216,7 +98,6 @@ class JobViewController extends AbstractController
 
         return $this->render('jobViews/listJobs.html.twig',
             array(
-                'jobQuery' => json_encode(array('runningJobs' => true)),
                 'config' => $config
             ));
     }

@@ -25,11 +25,11 @@
 
 namespace App\Entity;
 
-use AppBundle\Entity\Node;
 use AppBundle\Entity\Cluster;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
@@ -42,9 +42,17 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 *  @ORM\Table(name="job",indexes={@ORM\Index(name="search_idx", columns={"is_running","cluster_id"})})
 */
 #[ApiResource(
-   attributes: [
-        'pagination_type' => 'page'
-    ]
+attributes: [
+    'pagination_type' => 'page',
+    'normalization_context' => ['groups' => ['read']],
+    'denormalization_context' => ['groups' => ['write']],
+],
+    collectionOperations: [
+        'post' => [
+            'path' => '/jobs/start_job/',
+        ],
+    ],
+    itemOperations: ['get','patch'],
 )]
 #[ApiFilter(SearchFilter::class, properties: ['user' => 'partial', 'jobId' => 'start', 'tags.name' => 'exact'])]
 #[ApiFilter(RangeFilter::class, properties: ['startTime','numNodes','duration'])]
@@ -56,6 +64,7 @@ class Job
      *  @ORM\Column(type="integer")
      *  @ORM\Id
      *  @ORM\GeneratedValue(strategy="AUTO")
+     *  @Groups({"read"})
      */
     public $id;
 
@@ -63,6 +72,7 @@ class Job
      *  The jobId of this job.
      *
      *  @ORM\Column(type="string")
+     *  @Groups({"read","write"})
      */
     private $jobId;
 
@@ -77,6 +87,7 @@ class Job
      * The cluster on which the job was executed.
      *
      *  @ORM\Column(type="string")
+     *  @Groups({"read","write"})
      */
     private $clusterId;
 
@@ -84,6 +95,7 @@ class Job
      * The number of nodes used by the job.
      *
      *  @ORM\Column(type="integer")
+     *  @Groups({"read","write"})
      */
     public $numNodes;
 
@@ -91,6 +103,7 @@ class Job
      * When the job was started.
      *
      *  @ORM\Column(type="integer")
+     *  @Groups({"read","write"})
      */
     public $startTime;
 
@@ -98,6 +111,7 @@ class Job
      * The duration of the job.
      *
      *  @ORM\Column(type="integer")
+     *  @Groups({"read","write"})
      */
     public $duration;
 
@@ -105,8 +119,9 @@ class Job
      * The node list of the job.
      *
      *  @ORM\Column(type="text", nullable=true)
+     *  @Groups({"read","write"})
      */
-    private $nodeList;
+    public $nodeList;
 
     public $jobCache;
 
@@ -122,11 +137,13 @@ class Job
 
     /**
      *  @ORM\Column(type="text", nullable=true)
+     *  @Groups({"write"})
      */
     private $jobScript;
 
     /**
      *  @ORM\Column(type="text", options={"default":"noProject"})
+     *  @Groups({"write"})
      */
     private $projectId;
 
@@ -178,12 +195,12 @@ class Job
      * Tags of the job.
      *
      * @ORM\ManyToMany(targetEntity="App\Entity\JobTag", inversedBy="jobs")
+     *  @Groups({"read"})
      */
     public $tags;
 
 
     public function __construct() {
-        $this->nodes = new ArrayCollection();
         $this->tags = new ArrayCollection();
     }
 
@@ -209,7 +226,7 @@ class Job
 
     public function getClusterId()
     {
-        return trim($this->clusterId,"'");
+        return $this->clusterId;
     }
 
     public function setClusterId($clusterId)
@@ -255,56 +272,6 @@ class Job
     public function setDuration($duration)
     {
         $this->duration = $duration;
-    }
-
-    public function getNodeIdArray()
-    {
-        $arr;
-
-        foreach ( $this->nodes as $node ) {
-            $arr[] = $node->getNodeId();
-        }
-
-        return $arr;
-    }
-
-    public function getNodeNameArray()
-    {
-        $arr;
-
-        foreach ( $this->nodes as $node ) {
-            $arr[] = $node->getNodeId();
-        }
-
-        return $arr;
-    }
-
-    public function getNodes()
-    {
-        return $this->nodes;
-    }
-
-    public function addNode($node)
-    {
-        if ($this->nodes->contains($node)) {
-            return $node;
-        }
-
-        $this->nodes[] = $node;
-    }
-
-    public function removeNode($node)
-    {
-        $this->nodes->removeElement($node);
-    }
-
-    public function getNode($id)
-    {
-        if (!isset($this->nodes[$id])) {
-            throw new \InvalidArgumentException("No node with id $id in Job.");
-        }
-
-        return $this->nodes[$id];
     }
 
     public function getJobScript()
