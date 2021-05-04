@@ -509,6 +509,26 @@ class JobRepository extends ServiceEntityRepository
         return $users;
     }
 
+    public function findBatchJob($jobId, $clusterId, $startTime)
+    {
+        $this->_logger->info("Find BatchJobs: " . $jobId);
+
+        $qb = $this->createQueryBuilder('j');
+        $qb->select('j')->where("j.jobId = :jobId");
+        $qb->setParameter('jobId', $jobId);
+
+/*         if ( $clusterId ){ */
+/*             $qb->andWhere("j.clusterId = $clusterId"); */
+/*         } */
+/*         if ( $startTime ){ */
+/*             $qb->andWhere("j.startTime = $startTime"); */
+/*         } */
+
+
+        return $qb
+            ->getQuery()
+            ->getSingleResult();
+    }
 
     public function findJobById($jobId, $userId)
     {
