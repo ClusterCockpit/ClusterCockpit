@@ -25,34 +25,39 @@
 
 namespace App\Service;
 
+use Psr\Log\LoggerInterface;
 use App\Entity\Job;
 use App\Repository\InfluxDBMetricDataRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
-class JobArchive
+class JobData
 {
     private $_em;
     private $_metricDataRepository;
+    private $logger;
     private $projectDir;
 
     public function __construct(
         EntityManagerInterface $em,
         InfluxDBMetricDataRepository $metricRepo,
+        LoggerInterface $logger,
         $projectDir
     )
     {
         $this->_em = $em;
         $this->_metricDataRepository = $metricRepo;
+        $this->logger = $logger;
         $this->projectDir = $projectDir;
     }
 
-    private function getJobDataPath($jobId, $clusterId)
+    private function _getJobDataPath($jobId, $clusterId)
     {
         $jobId = intval(explode('.', $jobId)[0]);
         $lvl1 = intdiv($jobId, 1000);
         $lvl2 = $jobId % 1000;
         $path = sprintf('%s/job-data/%s/%d/%03d/data.json',
             $this->projectDir, $clusterId, $lvl1, $lvl2);
+        $this->logger->info("PATH $path");
         return $path;
     }
 
@@ -195,35 +200,50 @@ class JobArchive
         }
     }
 
-    public function hasArchive($job)
+    public function hasData($job)
     {
-        $this->_initJob($job);
-        $item = $this->_cache->getItem($job->getJobId().$mode);
-
-        if ($item->isHit()) {
-            return true;
-        } else {
-            return false;
+        if ( $job->isRunning()) {
+            $job->duration = time() - $job->startTime;
         }
+
+        $job->hasProfile = file_exists( $this->_getJobDataPath($job->getJobId(), $job->getClusterId()));
+
+        if (!$job->hasProfile){
+            $this->_metricDataRepository->hasProfile($job);
+        }
+
+        return $job->hasProfile;
     }
 
-    public function checkArchive(
-        $job,
-        $mode,
-        $options
-    )
+    public function getData($job, $metrics)
     {
-        $this->_initJob($job);
-        $item = $this->_cache->getItem($job->getJobId().$mode);
-
-        if ($item->isHit()) {
-            $job->jobCache = $item->get();
-            $job->hasProfile = true;
-            return;
+        if (! $this->hasData($job) ) {
+            return false;
         }
 
-        if ( $this->_metricDataRepository->hasProfile($job)){
-            $this->_generatePlots($job, $mode, $options, true);
+        if ( $job->isRunning()) {
+        /* Get MetricData from Database */
+                     /* $data = $this->_metricDataRepository->getMetricData( */
+                    /* $job, $metrics, array('sample' => 0)); */
+            /* if ( $this->_metricDataRepository->hasProfile($job)){ */
+            /*     $this->_generatePlots($job, $mode, $options, true); */
+            /* } */
+        } else {
+            $path = $this->_getJobDataPath($job->getJobId(), $job->getClusterId());
+            $data = @file_get_contents($path);
+
+            $data = json_decode($data);
+            $res = [];
+            foreach ($data as $metricName => $metricData) {
+                if ($metrics && !in_array($metricName, $metrics))
+                    continue;
+
+                $res[] = [
+                    'name' => $metricName,
+                    'metric' => $metricData
+                ];
+            }
         }
+        return $res;
     }
 }

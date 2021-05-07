@@ -41,7 +41,8 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
         $this->_timer = new Stopwatch();
         $this->_logger = $logger;
         $influxdbURL = getenv('INFLUXDB_URL');
-        $this->_database = \InfluxDB\Client::fromDSN($influxdbURL);
+	    $this->_logger->info("Scheme: $influxdbURL");
+        $this->_database = \InfluxDB\Client::fromDSN("influxdb://symfony:mashup@127.0.0.1:8086/ClusterCockpit");
     }
 
     public function getJobRoofline($job, $metrics)

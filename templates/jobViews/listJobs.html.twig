@@ -1,16 +1,65 @@
-    <head>
-        <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Job List</title>
-        <link href="/css/bootstrap.min.css" rel="stylesheet">
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
     <link rel='stylesheet' href='/css/uPlot.min.css'>
+    {{ parent() }}
     <link rel='stylesheet' href='/css/global.css'>
     {{ encore_entry_link_tags('app') }}
-        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
-    </head>
+{% endblock %}
 
-    <body>
+{% block javascript %}
     {{ encore_entry_script_tags('app') }}
-    </body>
-</html>
+{% endblock %}
+
+
+{% block title %}
+    Job List
+{% endblock %}
+
+{% block helptext %}
+    <h5>Basic usage</h5>
+    <p>
+        If you click anywhere on the plot area you get to the detailed single
+        job view of this particular job. In the Job ID column you can click the user
+        name to get job statistics and the all jobs of a user in the current
+        month. Jobs may have tags which can be clicked to get a job list with
+        all jobs having this tag.
+    </p>
+    <h5>Filtering</h5>
+    <p>
+        The Search input area above the job list allows to filter for a subset of users.
+        This also allows e.g. to show all users belonging to a group in case
+        the group name is a substring of the user name. It may take a short time to
+        update the job list after entering a string in the Search field as a updated
+        job list has to be fetched from the server.
+    </p>
+    <h5>Sorting</h5>
+    <p>
+        You can change the sort order of jobs by pressing the
+        sort button in the first column and selecting a column.
+        Press multiple times to switch between ascending and
+        descending sort order. Default sorting order is ascending severity.
+        Severity is a metric that indicates that a job makes not good
+        use of the hardware resources.
+    </p>
+    <h5>Plot Legend</h5>
+    <p>
+        Different lines represent nodes within a job. The color of lines only
+        helps to distinguish nodes and does not serve another purpose. Metrics are
+        always aggregated per node. The horizontal black line
+        indicates an acceptable normal performance and serves as
+        frame of reference. The y-axis is runtime from the start of the job.
+    </p>
+    <h5>Plot background</h5>
+    <p>
+        The plot background is colored according to metric thresholds. Light
+        red background indicates an inacceptable value and light yellow a worse
+        than average value. The thresholds used for every metric can be configured
+        in the metric section of the configuration view (alert value for light red and warning for light yellow).
+    </p>
+{% endblock %}
+
+{% block body %}
+    <div id="svelte-app"></div>
+{% endblock %}

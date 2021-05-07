@@ -31,14 +31,14 @@ use GraphQL\Error\Error;
 use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Resolver\ResolverMap;
 
-use App\Service\JobArchive;
+use App\Service\JobData;
 use App\Repository\ClusterRepository;
 use App\Repository\JobRepository;
 use App\Repository\JobTagRepository;
 
 class RootResolverMap extends ResolverMap
 {
-    private $jobArchive;
+    private $jobData;
     private $jobRepo;
     private $jobTagRepo;
     private $clusterRepo;
@@ -49,7 +49,7 @@ class RootResolverMap extends ResolverMap
         JobRepository $jobRepo,
         JobTagRepository $jobTagRepo,
         ClusterRepository $clusterRepo,
-        JobArchive $archive,
+        JobData $jobData,
         LoggerInterface $logger,
         $projectDir
     )
@@ -57,20 +57,9 @@ class RootResolverMap extends ResolverMap
         $this->jobRepo = $jobRepo;
         $this->jobTagRepo = $jobTagRepo;
         $this->clusterRepo = $clusterRepo;
-        $this->JobArchive = $archive;
+        $this->jobData = $jobData;
         $this->logger = $logger;
         $this->projectDir = $projectDir;
-    }
-
-    private function getJobDataPath($jobId, $clusterId)
-    {
-        $jobId = intval(explode('.', $jobId)[0]);
-        $lvl1 = intdiv($jobId, 1000);
-        $lvl2 = $jobId % 1000;
-        $path = sprintf('%s/job-data/%s/%d/%03d/data.json',
-            $this->projectDir, $clusterId, $lvl1, $lvl2);
-        $this->logger->info("PATH $path");
-        return $path;
     }
 
     private function jobEntityToArray($job)
@@ -92,8 +81,7 @@ class RootResolverMap extends ResolverMap
             }, $job->tags->getValues()),
 
             // TODO: DB-Schemas differ
-            'hasProfile' => file_exists(
-                $this->getJobDataPath($job->getJobId(), $job->getClusterId())),
+            'hasProfile' => $this->jobData->hasData($job),
             'projectId' => $job->getProjectId()
         ];
     }
@@ -135,7 +123,7 @@ class RootResolverMap extends ResolverMap
                     $clusters = $this->clusterRepo->findAllConfig();
                     return array_map(function($cluster) {
                         return [
-                            'clusterID' => $cluster->id,
+                            'clusterID' => $cluster->name,
                             'flopRateScalar' => $cluster->flopRateScalar,
                             'flopRateSimd' => $cluster->flopRateSimd,
                             'memoryBandwidth' => $cluster->memoryBandwidth,
@@ -164,23 +152,18 @@ class RootResolverMap extends ResolverMap
                     $jobId = $args['jobId'];
                     $clusterId = $args['clusterId'];
                     $metrics = $args['metrics'];
-                    $path = $this->getJobDataPath($jobId, $clusterId);
-                    $data = @file_get_contents($path);
+
+                    $job = $this->jobRepo->findBatchJob($jobId, $clusterId, null);
+
+                    if ($job === false)
+                        throw new Error("No job for '$jobId' (on '$clusterId')");
+
+                    $data = $this->jobData->getData($job, $metrics);
+
                     if ($data === false)
                         throw new Error("No profile data for '$jobId' (on '$clusterId')");
 
-                    $data = json_decode($data);
-                    $res = [];
-                    foreach ($data as $metricName => $metricData) {
-                        if ($metrics && !in_array($metricName, $metrics))
-                            continue;
-
-                        $res[] = [
-                            'name' => $metricName,
-                            'metric' => $metricData
-                        ];
-                    }
-                    return $res;
+                    return $data;
                 },
 
                 'jobsStatistics' => function($value, Argument $args) {

@@ -517,13 +517,13 @@ class JobRepository extends ServiceEntityRepository
         $qb->select('j')->where("j.jobId = :jobId");
         $qb->setParameter('jobId', $jobId);
 
-/*         if ( $clusterId ){ */
-/*             $qb->andWhere("j.clusterId = $clusterId"); */
-/*         } */
+        if ( $clusterId ){
+            $qb->andWhere("j.clusterId = :clusterId");
+            $qb->setParameter('clusterId', $clusterId);
+        }
 /*         if ( $startTime ){ */
 /*             $qb->andWhere("j.startTime = $startTime"); */
 /*         } */
-
 
         return $qb
             ->getQuery()
