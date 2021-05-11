@@ -187,22 +187,15 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
 
     public function getMetricData($job, $metrics, $options)
     {
-        $nodes = $job->getNodeNameArray();
+        $nodes = $job->getNodeArray();
         $nodes = implode('|', $nodes);
-        $sampletime = 0;
         $stopTime = $job->startTime + $job->duration;
 
         if ( $options['sample'] > 0 ){
             $sampletime = intdiv($job->duration, $options['sample']);
         }
 
-
         foreach ( $metrics as $metric ){
-            $scale = sprintf("%f",$metric['scale']);
-            if ( $sampletime < $metric['sampletime'] ) {
-                $sampletime = $metric['sampletime'];
-            }
-
             $query = "SELECT
                 MEAN({$metric['name']}) * $scale AS {$metric['name']}
                 FROM {$metric['measurement']}
@@ -223,11 +216,8 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
                 $start = $seriesdata['values'][0][0];
 
                 foreach ( $seriesdata['columns'] as $index => $metric ){
-                    if ($metric != 'time'){
-                        foreach ( $seriesdata['values'] as $row ){
-                            $data[$metric][$nodeId]['x'][] = $row[0] - $start ;
-                            $data[$metric][$nodeId]['y'][] = $row[$index];
-                        }
+                    foreach ( $seriesdata['values'] as $row ){
+                        $data[$metric][$nodeId][] = $row[$index];
                     }
                 }
             }
