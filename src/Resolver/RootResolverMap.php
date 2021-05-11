@@ -32,14 +32,16 @@ use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Resolver\ResolverMap;
 
 use App\Service\JobData;
+use App\Service\ClusterConfiguration;
 use App\Repository\ClusterRepository;
 use App\Repository\JobRepository;
 use App\Repository\JobTagRepository;
 
 class RootResolverMap extends ResolverMap
 {
-    private $jobData;
     private $jobRepo;
+    private $jobData;
+    private $clusterCfg;
     private $jobTagRepo;
     private $clusterRepo;
     private $logger;
@@ -47,19 +49,32 @@ class RootResolverMap extends ResolverMap
 
     public function __construct(
         JobRepository $jobRepo,
+        JobData $jobData,
+        ClusterConfiguration $clusterCfg,
         JobTagRepository $jobTagRepo,
         ClusterRepository $clusterRepo,
-        JobData $jobData,
         LoggerInterface $logger,
         $projectDir
     )
     {
         $this->jobRepo = $jobRepo;
+        $this->jobData = $jobData;
+        $this->ClusterCfg = $clusterCfg;
         $this->jobTagRepo = $jobTagRepo;
         $this->clusterRepo = $clusterRepo;
-        $this->jobData = $jobData;
         $this->logger = $logger;
         $this->projectDir = $projectDir;
+    }
+
+    private function getJobDataPath($jobId, $clusterId)
+    {
+        $jobId = intval(explode('.', $jobId)[0]);
+        $lvl1 = intdiv($jobId, 1000);
+        $lvl2 = $jobId % 1000;
+        $path = sprintf('%s/job-data/%s/%d/%03d/data.json',
+            $this->projectDir, $clusterId, $lvl1, $lvl2);
+        $this->logger->info("PATH $path");
+        return $path;
     }
 
     private function jobEntityToArray($job)
@@ -81,7 +96,8 @@ class RootResolverMap extends ResolverMap
             }, $job->tags->getValues()),
 
             // TODO: DB-Schemas differ
-            'hasProfile' => $this->jobData->hasData($job),
+            'hasProfile' => file_exists(
+                $this->getJobDataPath($job->getJobId(), $job->getClusterId())),
             'projectId' => $job->getProjectId()
         ];
     }
@@ -120,22 +136,25 @@ class RootResolverMap extends ResolverMap
                 },
 
                 'clusters' => function($value, Argument $args) {
-                    $clusters = $this->clusterRepo->findAllConfig();
-                    return array_map(function($cluster) {
-                        return [
-                            'clusterID' => $cluster->name,
-                            'flopRateScalar' => $cluster->flopRateScalar,
-                            'flopRateSimd' => $cluster->flopRateSimd,
-                            'memoryBandwidth' => $cluster->memoryBandwidth,
-                            'metricConfig' => $cluster->getMetricLists()['list'],
+                     return $this->clusterCfg->getConfigurations();
 
-                            // TODO: DB-Schemas differ
-                            'processorType' => null,
-                            'socketsPerNode' => 1,
-                            'coresPerSocket' => $cluster->coresPerNode,
-                            'threadsPerCore' => 1
-                        ];
-                    }, $clusters);
+                    /* $clusters = $this->clusterRepo->findAllConfig(); */
+                    /* return array_map(function($cluster) { */
+                    /*     return [ */
+                    /*         'clusterID' => $cluster->name, */
+                    /*         'flopRateScalar' => $cluster->flopRateScalar, */
+                    /*         'flopRateSimd' => $cluster->flopRateSimd, */
+                    /*         'memoryBandwidth' => $cluster->memoryBandwidth, */
+                    /*         'metricConfig' => $cluster->getMetricLists()['list'], */
+
+                    /*         // TODO: DB-Schemas differ */
+                    /*         'processorType' => null, */
+                    /*         'socketsPerNode' => 1, */
+                    /*         'coresPerSocket' => $cluster->coresPerNode, */
+                    /*         'threadsPerCore' => 1 */
+                    /*     ]; */
+                    /* }, $clusters); */
+
                 },
 
                 'tags' => function($value, Argument $args) {
@@ -159,9 +178,6 @@ class RootResolverMap extends ResolverMap
                         throw new Error("No job for '$jobId' (on '$clusterId')");
 
                     $data = $this->jobData->getData($job, $metrics);
-
-                    if ($data === false)
-                        throw new Error("No profile data for '$jobId' (on '$clusterId')");
 
                     return $data;
                 },
