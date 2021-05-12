@@ -28,6 +28,7 @@ namespace App\Resolver;
 use Psr\Log\LoggerInterface;
 
 use GraphQL\Error\Error;
+use GraphQL\Type\Definition\ResolveInfo;
 use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Resolver\ResolverMap;
 
@@ -59,7 +60,7 @@ class RootResolverMap extends ResolverMap
     {
         $this->jobRepo = $jobRepo;
         $this->jobData = $jobData;
-        $this->ClusterCfg = $clusterCfg;
+        $this->clusterCfg = $clusterCfg;
         $this->jobTagRepo = $jobTagRepo;
         $this->clusterRepo = $clusterRepo;
         $this->logger = $logger;
@@ -73,7 +74,6 @@ class RootResolverMap extends ResolverMap
         $lvl2 = $jobId % 1000;
         $path = sprintf('%s/job-data/%s/%d/%03d/data.json',
             $this->projectDir, $clusterId, $lvl1, $lvl2);
-        $this->logger->info("PATH $path");
         return $path;
     }
 
@@ -135,27 +135,23 @@ class RootResolverMap extends ResolverMap
                     ];
                 },
 
-                'clusters' => function($value, Argument $args) {
-                     return $this->clusterCfg->getConfigurations();
+                'clusters' => function($value, Argument $args, $context, ResolveInfo $info) {
+                    $clusters = $this->clusterCfg->getConfigurations();
 
-                    /* $clusters = $this->clusterRepo->findAllConfig(); */
-                    /* return array_map(function($cluster) { */
-                    /*     return [ */
-                    /*         'clusterID' => $cluster->name, */
-                    /*         'flopRateScalar' => $cluster->flopRateScalar, */
-                    /*         'flopRateSimd' => $cluster->flopRateSimd, */
-                    /*         'memoryBandwidth' => $cluster->memoryBandwidth, */
-                    /*         'metricConfig' => $cluster->getMetricLists()['list'], */
+                    // Getting the filter ranges is expensive, so only fetch them if requested.
+                    if (array_key_exists('filterRanges', $info->getFieldSelection())) {
+                        foreach ($clusters as &$cluster) {
+                            $cluster['filterRanges'] = $this->jobRepo->getFilterRanges($cluster['clusterID']);
+                        }
+                    }
 
-                    /*         // TODO: DB-Schemas differ */
-                    /*         'processorType' => null, */
-                    /*         'socketsPerNode' => 1, */
-                    /*         'coresPerSocket' => $cluster->coresPerNode, */
-                    /*         'threadsPerCore' => 1 */
-                    /*     ]; */
-                    /* }, $clusters); */
-
+                    return $clusters;
                 },
+
+                'filterRanges' => function() {
+                    return $this->jobRepo->getFilterRanges(null);
+                },
+
 
                 'tags' => function($value, Argument $args) {
                     return array_map(function ($tag) {

@@ -340,6 +340,28 @@ class JobRepository extends ServiceEntityRepository
         return $stats;
     }
 
+    public function getFilterRanges($cluster = null)
+    {
+        $qb = $this->createQueryBuilder('j');
+        $qb->select([
+            'MIN(j.duration)', 'MAX(j.duration)',
+            'MIN(j.numNodes)', 'MAX(j.numNodes)',
+            'MIN(j.startTime)', 'MAX(j.startTime)'
+        ]);
+
+        if ($cluster != null)
+            $qb->where('j.clusterId = :cluster')
+               ->setParameter('cluster', $cluster);
+
+        $res = $qb->getQuery()->getSingleResult();
+        return [
+            'duration' => [ 'from' => $res[1], 'to' => $res[2] ],
+            'numNodes' => [ 'from' => $res[3], 'to' => $res[4] ],
+            'startTime' => [ 'from' => intval($res[5]), 'to' => intval($res[6]) ]
+        ];
+    }
+
+
     public function findRunningJobs()
     {
         $qb = $this->createQueryBuilder('j');

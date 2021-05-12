@@ -27,6 +27,7 @@ type Cluster {
   flopRateSimd: Int!
   memoryBandwidth: Int!
   metricConfig: [MetricConfig!]!
+  filterRanges: FilterRanges!
 }
 
 type MetricConfig {
@@ -76,12 +77,29 @@ type Query {
   jobsStatistics(filter: JobFilterList): JobsStatistics!
   jobMetrics(jobId: String!, clusterId: String, metrics: [String]): [JobMetricWithName]!
   tags: [JobTag!]!
+  filterRanges: FilterRanges!
 }
 
 type Mutation {
   startJob(input: StartJobInput!): Job!
   stopJob(input: StopJobInput!): Job!
   addJob(input: AddJobInput!): Job!
+}
+
+type IntRangeOutput {
+  from: Int!
+  to: Int!
+}
+
+type TimeRangeOutput {
+  from: Time!
+  to: Time!
+}
+
+type FilterRanges {
+  duration: IntRangeOutput!
+  numNodes: IntRangeOutput!
+  startTime: TimeRangeOutput!
 }
 
 input StartJobInput {
