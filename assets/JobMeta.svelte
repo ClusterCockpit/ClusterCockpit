@@ -13,17 +13,19 @@
     }
 </script>
 
-<div class="fw-bold">{job["jobId"]} ({job["clusterId"]})</div>
-<div class="fst-italic">{job["userId"]}</div>
-<p>{job["numNodes"]} nodes</p>
-<div>Started at:</div>
-<p class="fw-bold">{job["startTime"]}</p>
-<div>Duration:</div>
-<p class="fw-bold">{formatDuration(job["duration"])}</p>
-<p>
-    {#each job["tags"] as tag}
-        <span class="badge rounded-pill {getColorForTag(tag)}">
-            {tag.tagType}: {tag.tagName}
-        </span>
-    {/each}
-</p>
+<div>
+    <div class="fw-bold">{job["jobId"]} ({job["clusterId"]})</div>
+    <div class="fst-italic">{job["userId"]} ({job["projectId"]})</div>
+    <p>{job["numNodes"]} nodes</p>
+    <div>Started at:</div>
+    <p class="fw-bold">{job["startTime"]}</p>
+    <div>Duration:</div>
+    <p class="fw-bold">{formatDuration(job["duration"])}</p>
+    <p>
+        {#each job["tags"] as tag}
+            <span class="badge rounded-pill {getColorForTag(tag)}">
+                {tag.tagType}: {tag.tagName}
+            </span>
+        {/each}
+    </p>
+</div>

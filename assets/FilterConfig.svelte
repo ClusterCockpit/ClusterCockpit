@@ -1,34 +1,120 @@
 <script context="module">
+    /* The values in here are only
+     * used while the GraphQL clusters
+     * query is still loading. After that,
+     * the values are replaced.
+     */
     export const defaultFilters = {
         numNodes: {
-            from: 1, to: 64
+            from: 0, to: 0
         },
         duration: {
-            from: { hours: 0, min: 10 },
-            to: { hours: 24, min: 0 }
+            from: { hours: 0, min: 0 },
+            to: { hours: 0, min: 0 }
         },
         startTime: {
-            from: { date: "2014-01-01" , time: "12:00"},
-            to: { date:  "2021-03-30", time: "23:00"}
-        }
+            from: { date: "0000-00-00" , time: "00:00"},
+            to: { date:  "0000-00-00", time: "00:00"}
+        },
+        statistics: [
+            {
+                filter: 'flopsAnyAvg',
+                metric: 'flops_any',
+                name: 'Flops Any (Avg)',
+                enabled: false,
+                from: 0, to: 0
+            },
+            {
+                filter: 'memBwAvg',
+                metric: 'mem_bw',
+                name: 'Mem. Bw. (Avg)',
+                enabled: false,
+                from: 0, to: 0
+            },
+            {
+                filter: 'loadAvg',
+                metric: 'cpu_load',
+                name: 'Load (Avg)',
+                enabled: false,
+                from: 0, to: 0
+            },
+            {
+                filter: 'memUsedMax',
+                metric: 'mem_used',
+                name: 'Mem. Used (Max)',
+                enabled: false,
+                from: 0, to: 0
+            }
+        ],
+        projectId: '',
+        cluster: null,
+        tags: {}
     };
 
-    export const defaultFilterItems = [
-        {numNodes: {from: 1, to: 64}},
-        {duration: {from: 600, to: 84600}},
-        {startTime: {from: "2014-01-01T12:00:00Z", to: "2021-03-30T23:00:00Z"}}
-    ];
+    function toRFC3339({ date, time }) {
+        return `${date}T${time}:00Z`;
+    }
+
+    function getFilterItems(filters) {
+        let filterItems = [];
+
+        filterItems.push({ numNodes: {
+            from: filters["numNodes"]["from"],
+            to:   filters["numNodes"]["to"]
+        }});
+
+        filterItems.push({ startTime: {
+            from: toRFC3339(filters["startTime"]["from"]),
+            to:   toRFC3339(filters["startTime"]["to"])
+        }});
+
+        let from = filters["duration"]["from"]["hours"] * 3600
+                + filters["duration"]["from"]["min"] * 60;
+        let to = filters["duration"]["to"]["hours"] * 3600
+                + filters["duration"]["to"]["min"] * 60;
+        filterItems.push({ duration: { from: from , to: to } });
+
+        if (filters.cluster != null)
+            filterItems.push({ clusterId: { eq: filters.cluster } });
+
+        if (filters.projectId)
+            filterItems.push({ projectId: { contains: filters.projectId } });
+
+        let tags = Object.keys(filters["tags"]);
+        if (tags.length > 0)
+            filterItems.push({ tags });
+
+        for (let stat of filters.statistics) {
+            if (!stat.enabled)
+                continue;
+
+            filterItems.push({
+                [stat.filter]: {
+                    from: stat.from,
+                    to: stat.to
+                }
+            });
+        }
+
+        return filterItems;
+    }
+
+    export const defaultFilterItems = [];
 </script>
 
 <script>
     import { getColorForTag } from './utils.js';
-    import { createEventDispatcher } from "svelte";
+    import { createEventDispatcher, getContext } from "svelte";
     import { Col, Row, FormGroup, Button, Input,
              ListGroup, ListGroupItem, Card, Spinner } from 'sveltestrap';
+    import DoubleRangeSlider from './DoubleRangeSlider.svelte';
     import { operationStore, query } from '@urql/svelte';
 
-    /* Deep clone: */
-    let filters = JSON.parse(JSON.stringify(defaultFilters));
+    function deepCopy(obj) {
+        return JSON.parse(JSON.stringify(obj));
+    }
+
+    let filters = deepCopy(defaultFilters);
 
     let tagsQuery = operationStore(`
         query {
@@ -44,13 +130,22 @@
 
     export let showFilters = false;
     export let clusters;
+    export let filterRanges; /* Global filter ranges for all clusters */
     const dispatch = createEventDispatcher();
 
     let tagFilterTerm = '';
-    let projectFilterTerm = '';
     let filteredTags = [];
-    let selectedTags = new Set();
-    let selectedCluster = null;
+    let currentRanges = {
+        numNodes: { from: 0, to: 0 },
+        statistics: [
+            { from: 0, to: 0 },
+            { from: 0, to: 0 },
+            { from: 0, to: 0 },
+            { from: 0, to: 0 }
+        ]
+    };
+    let appliedFilters = defaultFilters;
+    let metricConfig = getContext('metric-config');
 
     function fuzzyMatch(term, string) {
         return string.toLowerCase().includes(term);
@@ -71,60 +166,141 @@
 
     $: fuzzySearchTags(tagFilterTerm, $tagsQuery.data && $tagsQuery.data.tags);
 
+    function fromRFC3339(rfc3339) {
+        let parts = rfc3339.split('T');
+        return {
+            date: parts[0],
+            time: parts[1].split(':', 2).join(':')
+        };
+    }
+
+    function secondsToHours(duration) {
+        const hours = Math.floor(duration / 3600);
+        duration -= hours * 3600;
+        const min = Math.floor(duration / 60);
+        return { hours, min };
+    }
+
+    function getPeakValue(metric) {
+        if (filters.cluster)
+            return metricConfig[filters.cluster][metric].peak;
+
+        return clusters.reduce((max, c) =>
+            Math.max(max, metricConfig[c.clusterID][metric].peak), 0);
+    }
+
+    /* Gets called when a cluster is selected
+     * and once the filterRanges have been loaded (via GraphQL).
+     */
+    function updateRanges() {
+        if (!filterRanges || !clusters)
+            return;
+
+        let ranges = filters.cluster
+            ? clusters.find(c => c.clusterID == filters.cluster).filterRanges
+            : filterRanges;
+
+        currentRanges.numNodes = ranges.numNodes;
+
+        function clamp(x, { from, to }) {
+            return x < from ? from : (x < to ? x : to);
+        }
+
+        function clampTime(t, { from, to }) {
+            let min = Date.parse(from);
+            let max = Date.parse(to);
+            let x = Date.parse(toRFC3339(t));
+
+            return x < min
+                ? fromRFC3339(from)
+                : (x < max ? t : fromRFC3339(to));
+        }
+
+        function clampDuration(d, { from, to }) {
+            let x = d.hours * 3600 + d.min * 60;
+            return x < from
+                ? secondsToHours(from)
+                : (x < to ? d : secondsToHours(to));
+        }
+
+        filters.numNodes.from = clamp(filters.numNodes.from, ranges.numNodes);
+        filters.numNodes.to = clamp(filters.numNodes.to, ranges.numNodes);
+
+        filters.startTime.from = clampTime(filters.startTime.from, ranges.startTime);
+        filters.startTime.to = clampTime(filters.startTime.to, ranges.startTime);
+
+        filters.duration.from = clampDuration(filters.duration.from, ranges.duration);
+        filters.duration.to = clampDuration(filters.duration.to, ranges.duration);
+
+        for (let i in filters.statistics) {
+            let stat = filters.statistics[i];
+            let peak = getPeakValue(stat.metric);
+            stat.from = clamp(stat.from, { from: 0, to: peak });
+            stat.to = clamp(stat.to, { from: 0, to: peak });
+            currentRanges.statistics[i].to = peak;
+        }
+    }
+
+    /* Later used for 'Reset' button: */
+    function setDefaultFilters() {
+        if (!filterRanges)
+            return null;
+
+        defaultFilters.numNodes.from = filterRanges.numNodes.from;
+        defaultFilters.numNodes.to = filterRanges.numNodes.to;
+
+        defaultFilters.startTime.from = fromRFC3339(filterRanges.startTime.from);
+        defaultFilters.startTime.to = fromRFC3339(filterRanges.startTime.to);
+
+        defaultFilters.duration.from = secondsToHours(filterRanges.duration.from);
+        defaultFilters.duration.to = secondsToHours(filterRanges.duration.to);
+
+        for (let stat of defaultFilters.statistics)
+            stat.to = getPeakValue(stat.metric);
+
+        appliedFilters = defaultFilters;
+        filters = deepCopy(defaultFilters);
+    }
+
+    $: setDefaultFilters(filterRanges);
+    $: updateRanges(filterRanges, clusters);
+
+    function formatDuration({ hours, min }) {
+        hours = hours.toString().padStart(2, '0');
+        min = min.toString().padStart(2, '0');
+        return `${hours}:${min}h`
+    }
+
     function handleReset( ) {
         tagFilterTerm = '';
-        projectFilterTerm = '';
-        filters = JSON.parse(JSON.stringify(defaultFilters));
-        selectedTags.clear();
-        selectedCluster = null;
+        filters = deepCopy(defaultFilters);
+        appliedFilters = defaultFilters;
         handleApply();
     }
 
     function handleTagSelection(tag) {
-        if (selectedTags.has(tag))
-            selectedTags.delete(tag);
+        if (filters["tags"][tag.id])
+            delete filters["tags"][tag.id];
         else
-            selectedTags.add(tag);
+            filters["tags"][tag.id] = tag;
 
-        selectedTags = selectedTags;
-    }
-
-    function toTime({ date, time }) {
-        return `${date}T${time}:00Z`; /* Expected: rfc3339 */
+        filteredTags = filteredTags;
     }
 
     function handleApply( ) {
-        let filterItems = [];
-        const keys = Object.keys(filters);
-
-        keys.forEach((key, index) => {
-            switch(key) {
-                case "numNodes":
-                    filterItems.push({numNodes: {"from": filters["numNodes"]["from"], to:  filters["numNodes"]["to"]}});
-                    break;
-                case "startTime":
-                    filterItems.push({ startTime: {
-                        from: toTime(filters["startTime"]["from"]),
-                        to: toTime(filters["startTime"]["to"])
-                    } });
-                    break;
-                case "duration":
-                    var from = filters["duration"]["from"]["hours"] * 3600 + filters["duration"]["from"]["min"] * 60;
-                    var to = filters["duration"]["to"]["hours"] * 3600 + filters["duration"]["to"]["min"] * 60;
-                    filterItems.push({duration: {from: from , to: to }});
-            }
-        });
-
-        if (selectedTags.size > 0)
-            filterItems.push({ tags: Array.from(selectedTags).map(t => t.id) });
-
-        if (selectedCluster != null)
-            filterItems.push({ clusterId: { eq: selectedCluster } });
-
-        if (projectFilterTerm)
-            filterItems.push({ projectId: { contains: projectFilterTerm } });
-
+        let filterItems = getFilterItems(filters);
+        appliedFilters = deepCopy(filters);
         dispatch("update", { filterItems });
+    }
+
+    function handleNodesSlider({ detail }) {
+        filters.numNodes.from = detail[0];
+        filters.numNodes.to = detail[1];
+    }
+
+    function handleStatisticsSlider(stat, { detail }) {
+        stat.from = detail[0];
+        stat.to = detail[1];
     }
 </script>
 
@@ -142,6 +318,23 @@
     .tags-search-input {
         width: 100%;
         margin-top: 20px;
+    }
+
+    .applied-filters {
+        margin-bottom: 10px;
+    }
+
+    table th, table td {
+        border-bottom: none;
+    }
+    table thead tr th:nth-child(1) {
+        width: 9em;
+    }
+    table thead tr th:nth-child(2) {
+        width: 3em;
+    }
+    table tbody tr td:nth-child(1), table tbody tr td:nth-child(2) {
+        vertical-align: middle;
     }
 </style>
 
@@ -221,17 +414,10 @@
                     <h5>Number of nodes</h5>
                 </Col>
             </Row>
-            <p>Between</p>
             <Row>
-                <FormGroup class="col">
-                    <Input type=number bind:value={filters["numNodes"]["from"]} min=1 max=64 />
-                    <Input type=range bind:value={filters["numNodes"]["from"]} min=1 max=64 />
-                </FormGroup>
-                <p>and</p>
-                <FormGroup class="col">
-                    <Input type=number bind:value={filters["numNodes"]["to"]} min=1 max=64 />
-                    <Input type=range bind:value={filters["numNodes"]["to"]} min=1 max=64 />
-                </FormGroup>
+                <DoubleRangeSlider on:change={handleNodesSlider}
+                    min={currentRanges.numNodes.from} max={currentRanges.numNodes.to}
+                    firstSlider={filters["numNodes"]["from"]} secondSlider={filters["numNodes"]["to"]}/>
             </Row>
         </Col>
     </Row>
@@ -253,7 +439,7 @@
                     {:else}
                         <ul class="list-group tags-list">
                             {#each filteredTags as tag}
-                                <ListGroupItem class="{selectedTags.has(tag) ? 'active' : ''}">
+                                <ListGroupItem class="{filters["tags"][tag.id] ? 'active' : ''}">
                                     <span class="cc-tag badge rounded-pill {getColorForTag(tag)}" on:click={_ => handleTagSelection(tag)}>
                                         {tag.tagType}: {tag.tagName}
                                     </span>
@@ -278,13 +464,17 @@
                 <Col>
                     <ListGroup>
                         <ListGroupItem>
-                            <input type="radio" bind:group={selectedCluster} value={null}/>
+                            <input type="radio" value={null}
+                                bind:group={filters["cluster"]}
+                                on:change={updateRanges} />
                             All
                         </ListGroupItem>
-                        {#each clusters as cluster}
+                        {#each (clusters || []) as cluster}
                             <ListGroupItem>
-                                <input type="radio" bind:group={selectedCluster} value={cluster}/>
-                                {cluster}
+                                <input type="radio" value={cluster.clusterID}
+                                    bind:group={filters["cluster"]}
+                                    on:change={updateRanges} />
+                                {cluster.clusterID}
                             </ListGroupItem>
                         {/each}
                     </ListGroup>
@@ -300,9 +490,43 @@
             <Row>
                 <Col>
                     <input type="text"
-                        bind:value={projectFilterTerm}
+                        bind:value={filters.projectId}
                         placeholder="Filter"
                         style="width: 100%;">
+                </Col>
+            </Row>
+        </Col>
+        <Col xs="6">
+            <Row>
+                <Col>
+                    <h5>Job Statistics</h5>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Statistic</th>
+                                <th>Enabled</th>
+                                <th>Range</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {#each filters.statistics as stat, idx (stat)}
+                            <tr>
+                                <td>{stat.name}</td>
+                                <td><input type="checkbox" bind:checked={stat.enabled}></td>
+                                <td>
+                                    <DoubleRangeSlider on:change={(e) => handleStatisticsSlider(stat, e)}
+                                        min={currentRanges.statistics[idx].from}
+                                        max={currentRanges.statistics[idx].to}
+                                        firstSlider={stat.from} secondSlider={stat.to}/>
+                                </td>
+                            </tr>
+                            {/each}
+                        </tbody>
+                    </table>
                 </Col>
             </Row>
         </Col>
@@ -316,3 +540,67 @@
         </div>
     </div>
 {/if}
+
+<div class="applied-filters d-flex flex-row justify-content-between">
+    <div>
+        <b>Applied Filters:</b>
+    </div>
+    <div>
+        Clusters:
+        <br>
+        {appliedFilters["cluster"] == null
+            ? (clusters || []).map(c => c.clusterID).join(', ')
+            : appliedFilters["cluster"]}
+    </div>
+
+    {#if appliedFilters.projectId}
+        <div>
+            Project ID:
+            <br>
+            Contains: "{appliedFilters.projectId}"
+        </div>
+    {/if}
+
+    {#if Object.values(appliedFilters["tags"]).length > 0}
+        <div>
+            Tags:
+            {#each Object.values(appliedFilters["tags"]) as tag}
+                <br>
+                <span class="cc-tag badge rounded-pill {getColorForTag(tag)}">
+                    {tag.tagType}: {tag.tagName}
+                </span>
+            {/each}
+        </div>
+    {/if}
+
+    {#if appliedFilters.statistics.some(stat => stat.enabled)}
+        <div>
+            Job Statistics:
+            {#each appliedFilters.statistics.filter(s => s.enabled) as stat}
+                <br>
+                {stat.name}: {stat.from} - {stat.to}
+            {/each}
+        </div>
+    {/if}
+
+    <div>
+        Nodes:
+        <br>
+        {appliedFilters["numNodes"]["from"]} - {appliedFilters["numNodes"]["to"]}
+    </div>
+    <div>
+        Duration:
+        <br>
+        {formatDuration(appliedFilters["duration"]["from"])} -
+        {formatDuration(appliedFilters["duration"]["to"])}
+    </div>
+    <div>
+        Start Time:
+        <br>
+        {appliedFilters["startTime"]["from"]["date"]}
+        {appliedFilters["startTime"]["from"]["time"]}
+        -
+        {appliedFilters["startTime"]["to"]["date"]}
+        {appliedFilters["startTime"]["to"]["time"]}
+    </div>
+</div>

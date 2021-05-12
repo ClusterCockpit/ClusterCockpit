@@ -9,6 +9,9 @@ Encore
     })
     .cleanupOutputBeforeBuild()
     .enableSingleRuntimeChunk()
+    .configureBabel((config) => {
+        config.plugins.push('@babel/plugin-transform-runtime');
+    })
     .enableSourceMaps(!Encore.isProduction())
     .addEntry('app', './assets/app.js')
 ;

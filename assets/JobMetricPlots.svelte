@@ -44,12 +44,12 @@
             return obj;
         }, {});
 
-        return selectedMetrics.map((name) => ({
+        return selectedMetrics.map((name) => obj[name] ? {
             name,
-            data: obj[name]?.metric,
-            loading: obj[name]?.loading,
-            error: obj[name]?.error
-        }));
+            data: obj[name].metric,
+            loading: obj[name].loading,
+            error: obj[name].error
+        } : { name });
     }
 
     let triggerUpdate = 0;
@@ -126,17 +126,15 @@
         <Card body color="danger" class="mb-3">Error: {$jobDataQuery.error.message}</Card>
     </td>
 {:else}
-    {#each prepareData($jobDataQuery.data.jobMetrics, selectedMetrics, triggerUpdate) as metric (metric.name)}
+    {#each prepareData($jobDataQuery.data.jobMetrics, selectedMetrics, triggerUpdate) as metric (metric.data || metric)}
         <td class="cc-plot-{jobId.replace('.', '_')}-{metric.name}">
             {#if metric.data}
-                {#key metric.data}
-                    <Plot
-                        metric={metric.name}
-                        clusterId={clusterId}
-                        data={metric.data}
-                        height={height}
-                        width={width / selectedMetrics.length}/>
-                {/key}
+                <Plot
+                    metric={metric.name}
+                    clusterId={clusterId}
+                    data={metric.data}
+                    height={height}
+                    width={width}/>
             {:else if metric.error}
                 <Card body color="danger">{metric.error.message}</Card>
             {:else if metric.loading}

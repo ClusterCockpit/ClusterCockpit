@@ -13,6 +13,7 @@
         "build": "encore production"
     },
     "dependencies": {
+        "@babel/plugin-transform-runtime": "^7.13.15",
         "@urql/svelte": "^1.2.1",
         "graphql": "^15.5.0",
         "sveltestrap": "5.0.0-beta.3",

@@ -14,6 +14,7 @@
     import ColumnConfig from './ColumnConfig.svelte';
     import JobMeta from './JobMeta.svelte';
     import JobMetricPlots from './JobMetricPlots.svelte';
+    import { fetchClusters } from './utils.js';
 
     let itemsPerPage = 25;
     let page = 1;
@@ -34,8 +35,6 @@
     let metrics = [];
     let selectedMetrics = [];
 
-    let date;
-    let showStats = false;
     let columnConfigOpen = false;
     let sortConfigOpen = false;
     let showFilters = false;
@@ -43,60 +42,36 @@
     const toggleSortConfig = () => (sortConfigOpen = !sortConfigOpen);
     const toggleFilter = () => (showFilters = !showFilters);
 
-    let tableWidth;
-    let jobMetaWidth = 180; // TODO: Read actuall width/height
-    let jobMetaHeight = 200;
+    let tableWidth, plotWidth;
+    let jobMetaWidth = 200;
+    let rowHeight = 200;
+    $: {
+        const elm = document.querySelector('.cc-table-wrapper tbody td:first-child > div');
+        if (elm)
+            rowHeight = Math.max(200, elm.offsetHeight);
+
+        plotWidth = Math.floor((tableWidth - jobMetaWidth) / selectedMetrics.length - 10);
+    }
 
     /* initClient({ url: 'http://localhost:8080/query' }); // cc-jobarchive as Backend */
     initClient({ url: 'http://localhost:8000/query/' }); // ClusterCockpit as Backend
 
-    let metricUnits = null;
+    const metricUnits = {};
     const metricConfig = {};
     setContext('metric-config', metricConfig);
 
-    getClient()
-        .query(`query {
-            clusters {
-                clusterID,
-                metricConfig {
-                    name
-                    unit
-                    peak
-                    normal
-                    caution
-                    alert
-                }
-            }
-        }`)
-        .toPromise()
-        .then(res => {
-            if (res.error) {
-                console.error(res.error);
-                return;
-            }
+    let clusters = null;
+    let filterRanges = null;
+    fetchClusters(metricConfig, metricUnits).then(res => {
+        clusters = res.clusters;
+        filterRanges = res.filterRanges;
+        metrics = Object.keys(metricUnits);
 
-            metrics = [];
-            metricUnits = {};
-            for (let cluster of res.data.clusters) {
-                metricConfig[cluster.clusterID] = {};
-                for (let config of cluster.metricConfig) {
-                    metricConfig[cluster.clusterID][config.name] = config;
-
-                    if (metricUnits[config.name] != null) {
-                        /* TODO: Show proper warning? Show both units? */
-                        console.assert(metricUnits[config.name] == config.unit);
-                    } else {
-                        metricUnits[config.name] = config.unit;
-                        metrics.push(config.name);
-                    }
-                }
-            }
-
-            selectedMetrics = metrics
-                .filter(m => res.data.clusters
-                    .every(c => metricConfig[c.clusterID][m] != null))
-                .slice(0, 4);
-        });
+        selectedMetrics = metrics
+            .filter(m => clusters.every(c =>
+                metricConfig[c.clusterID][m] != null))
+            .slice(0, 4);
+    }, err => console.error(err));
 
     const jobQuery = operationStore(`
     query($filter: JobFilterList!, $sorting: OrderByInput!, $paging: PageRequest! ){
@@ -124,7 +99,10 @@
     query(jobQuery);
 
     function handleFilter( event ) {
-        filterItems = event.detail.filterItems;
+        if (event.detail && event.detail.filterItems)
+            filterItems = event.detail.filterItems;
+
+        filterItems = filterItems.filter(f => f.userId == null);
         if (userFilter)
             filterItems.push({ userId: { contains: userFilter }});
 
@@ -137,13 +115,19 @@
         $jobQuery.variables.paging = {itemsPerPage: itemsPerPage, page: page };
     }
 
-    function handleUserFilter ( event ) {
-        filterItems = filterItems.filter(f => !f.userId);
+    /* Run query when the user has
+     * stopped typing for 350ms:
+     */
+    let searchTimeoutId = null;
+    const searchDelay = 350;
+    function handleUserFilter( event ) {
+        if (searchTimeoutId !== null)
+            clearTimeout(searchTimeoutId);
 
-        if (userFilter)
-            filterItems.push({ userId: { contains: userFilter }});
-
-        $jobQuery.variables.filter = { "list": filterItems };
+        searchTimeoutId = setTimeout(() => {
+            handleFilter(event);
+            searchTimeoutId = null;
+        }, searchDelay);
     }
 
     function handleSorting( event ) {
@@ -193,6 +177,7 @@
     :global(.cc-table-wrapper > table) {
         border-collapse: separate;
         border-spacing: 0px;
+        table-layout: fixed;
     }
 
     :global(.cc-table-wrapper > table > tbody > tr > td) {
@@ -241,7 +226,8 @@
     bind:selectedMetrics={selectedMetrics} />
 
 <Filter {showFilters}
-    clusters={Object.keys(metricConfig)}
+    clusters={clusters}
+    filterRanges={filterRanges}
     on:update={handleFilter} />
 <div class="d-flex flex-row justify-content-between">
     <div>
@@ -251,7 +237,7 @@
         <div class="input-group-prepend">
             <div class="input-group-text"><Icon name="search" /></div>
         </div>
-        <input type="search" bind:value={userFilter} on:change={handleUserFilter} class="form-control"  placeholder="Filter userId">
+        <input type="search" bind:value={userFilter} on:input={handleUserFilter} class="form-control"  placeholder="Filter userId">
       </div>
     <div>
         <Button outline on:click={toggleSortConfig}><Icon name="sort-down" /></Button>
@@ -271,11 +257,12 @@
             <Table cellspacing="0px" cellpadding="0px">
                 <thead>
                     <tr>
-                        <th class="position-sticky top-0" scope="col">
+                        <th class="position-sticky top-0" scope="col" style="width: {jobMetaWidth}px">
                             Job Info
                         </th>
                         {#each selectedMetrics as metric}
-                            <th class="position-sticky top-0 text-center" scope="col">
+                            <th class="position-sticky top-0 text-center" scope="col"
+                                style="width: {plotWidth}px">
                                 {metric}
                                 {#if metricUnits[metric]}
                                     ({metricUnits[metric]})
@@ -287,15 +274,15 @@
                 <tbody>
                     {#each $jobQuery.data.jobs.items as row, i}
                         <tr>
-                            <td style="width: {jobMetaWidth}px; height: {jobMetaHeight}px;">
+                            <td style="width: {jobMetaWidth}px;">
                                 <JobMeta job={row} />
                             </td>
                             {#if row["hasProfile"]}
                                 <JobMetricPlots
                                     jobId={row["jobId"]}
                                     clusterId={row["clusterId"]}
-                                    width={tableWidth - jobMetaWidth - 50}
-                                    height={jobMetaHeight}
+                                    width={plotWidth}
+                                    height={rowHeight}
                                     selectedMetrics={selectedMetrics} />
                             {:else}
                                 <td colspan="{selectedMetrics.length}">
