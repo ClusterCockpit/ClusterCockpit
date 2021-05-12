@@ -13,7 +13,8 @@ Encore
         config.plugins.push('@babel/plugin-transform-runtime');
     })
     .enableSourceMaps(!Encore.isProduction())
-    .addEntry('app', './assets/app.js')
+    .addEntry('joblist', './assets/joblist.js')
+    .addEntry('jobview', './assets/jobview.js')
 ;
 
 let config = Encore.getWebpackConfig();
