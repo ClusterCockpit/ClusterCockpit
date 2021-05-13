@@ -93,8 +93,7 @@ class RootResolverMap extends ResolverMap
             // Root
             'Query' => [
                 'jobById' => function($value, Argument $args) {
-                    $jobId = $args['jobId'];
-                    $job = $this->jobRepo->findJobById($jobId, null);
+                    $job = $this->jobRepo->findJobById($args['jobId'], $args['clusterId']);
                     if (!$job)
                         return null;
 

@@ -6,12 +6,14 @@
              operationStore, query } from '@urql/svelte';
     import Plot from './Plot.svelte';
     import RooflinePlot from './RooflinePlot.svelte';
+    import JobMeta from './JobMeta.svelte';
 
     export let jobId;
     export let clusterId;
 
     let cluster = null;
     let metrics = [];
+    let job = null;
     const metricUnits = {};
     const metricConfig = {};
     setContext('metric-config', metricConfig);
@@ -39,6 +41,11 @@
     });
     query(jobMetricsQuery);
 
+    /*
+     * The jobById query could be replaced by
+     * values provided by the twig template
+     * when the server renders the page.
+     */
     getClient()
         .query(`query {
             clusters {
@@ -52,11 +59,27 @@
                     alert
                 }
             }
+
+            jobById(jobId: "${jobId}", clusterId: "${clusterId}") {
+                id
+                jobId
+                userId
+                projectId
+                clusterId
+                startTime
+                duration
+                numNodes
+                hasProfile
+                tags { id, tagType, tagName }
+            }
         }`)
         .toPromise()
         .then(res => {
             if (res.error)
                 console.error(res.error);
+
+            job = res.data.jobById;
+            console.log(job);
 
             cluster = res.data.clusters
                 .filter(c => c.clusterID === clusterId)[0];
@@ -86,7 +109,11 @@
 
 <Row>
     <Col>
-        JobId: {jobId}, clusterId: {clusterId}
+        {#if job != null}
+            <JobMeta job={job} />
+        {:else}
+            <Spinner secondary />
+        {/if}
     </Col>
     <Col>
         {#if $jobMetricsQuery.data}

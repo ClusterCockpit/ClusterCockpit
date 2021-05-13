@@ -487,16 +487,16 @@ class JobRepository extends ServiceEntityRepository
             ->getSingleResult();
     }
 
-    public function findJobById($jobId, $userId)
+    public function findJobById($jobId, $clusterId)
     {
         $qb = $this->createQueryBuilder('j');
         $qb->select('j')
-           ->andWhere("j.id = :jobId")
+           ->andWhere("j.jobId = :jobId")
            ->setParameter('jobId', $jobId);
 
-        if ( $userId ){
-            $qb->andWhere("j.user = :userId")
-               ->setParameter('userId', $userId);
+        if ($clusterId) {
+            $qb->andWhere("j.clusterId = :clusterId")
+               ->setParameter('clusterId', $clusterId);
         }
 
         return $qb

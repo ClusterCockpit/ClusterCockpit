@@ -72,7 +72,7 @@ type JobMetricWithName {
 
 type Query {
   clusters: [Cluster!]!
-  jobById(jobId: String!): Job
+  jobById(jobId: String!, clusterId: String!): Job
   jobs(filter: JobFilterList, page: PageRequest, order: OrderByInput): JobResultList!
   jobsStatistics(filter: JobFilterList): JobsStatistics!
   jobMetrics(jobId: String!, clusterId: String, metrics: [String]): [JobMetricWithName]!
