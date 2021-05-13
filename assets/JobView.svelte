@@ -50,6 +50,9 @@
         .query(`query {
             clusters {
                 clusterID,
+                flopRateScalar,
+                flopRateSimd,
+                memoryBandwidth,
                 metricConfig {
                     name
                     unit
@@ -122,6 +125,7 @@
                     .find(m => m.name == 'flops_any').metric}
                 memBw={$jobMetricsQuery.data.jobMetrics
                     .find(m => m.name == 'mem_bw').metric}
+                cluster={cluster}
             />
         {:else}
             <Spinner secondary />

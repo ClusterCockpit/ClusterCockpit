@@ -69,8 +69,8 @@
         return Math.abs(x) >= 1000 ? x.toExponential() : x.toString();
     }
 
-    function render(ctx, data, width, height) {
-        const [minX, maxX, minY, maxY] = [0., data.maxX, 0., data.maxY];
+    function render(ctx, data, cluster, width, height) {
+        const [minX, maxX, minY, maxY] = [0., 32, 0., cluster.flopRateSimd * 1.1];
         const w = width - paddingLeft - paddingRight;
         const h = height - paddingTop - paddingBottom;
 
@@ -140,6 +140,26 @@
             ctx.fill();
         }
 
+        // Draw roofs
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        {
+            const ycut = 0.01 * cluster.memoryBandwidth;
+            const scalarKnee = (cluster.flopRateScalar - ycut) / cluster.memoryBandwidth;
+            const simdKnee = (cluster.flopRateSimd - ycut) / cluster.memoryBandwidth;
+
+            ctx.moveTo(getCanvasX(scalarKnee), getCanvasY(cluster.flopRateScalar));
+            ctx.lineTo(width - paddingRight, getCanvasY(cluster.flopRateScalar));
+
+            ctx.moveTo(getCanvasX(simdKnee), getCanvasY(cluster.flopRateSimd));
+            ctx.lineTo(width - paddingRight, getCanvasY(cluster.flopRateSimd));
+
+            ctx.moveTo(getCanvasX(0.01), getCanvasY(ycut));
+            ctx.lineTo(getCanvasX(simdKnee), getCanvasY(cluster.flopRateSimd));
+        }
+        ctx.stroke();
+
         // The Color Scale
         ctx.fillStyle = 'black';
         ctx.fillText('Time:', 17, height - 5);
@@ -167,7 +187,7 @@
 
         /* c will contain values from 0 to 1 representing the time */
         const x = [], y = [], c = [];
-        let maxX = Number.NEGATIVE_INFINITY, maxY = Number.NEGATIVE_INFINITY;
+        let maxX = Number.NEGATIVE_INFINITY;
         for (let i = 0; i < nodes; i++) {
             const flopsData = flopsAny.series[i].data;
             const memBwData = memBw.series[i].data;
@@ -178,7 +198,6 @@
                     continue;
 
                 maxX = Math.max(maxX, intensity);
-                maxY = Math.max(maxY, f);
                 x.push(intensity);
                 y.push(f);
                 c.push(j / timesteps);
@@ -186,7 +205,7 @@
         }
 
         return {
-            x, y, c, maxX: avg(x) * 2., maxY,
+            x, y, c, maxX: avg(x) * 2.,
             xLabel: 'Intensity [FLOPS/byte]',
             yLabel: 'Performance [GFLOPS]'
         };
@@ -194,11 +213,13 @@
 </script>
 
 <script>
-    import { onMount } from 'svelte';
+    import { onMount, getContext } from 'svelte';
 
     export let flopsAny
     export let memBw;
+    export let cluster;
     let canvasElement;
+    let metricConfig = getContext('metric-config');
 
     onMount(() => {
         const ctx = canvasElement.getContext('2d');
@@ -206,7 +227,7 @@
         setTimeout(() => {
             console.time('render-roofline');
             const data = transformData(flopsAny, memBw);
-            render(ctx, data, canvasElement.width, canvasElement.height);
+            render(ctx, data, cluster, canvasElement.width, canvasElement.height);
             console.timeEnd('render-roofline');
         }, 0);
     });
