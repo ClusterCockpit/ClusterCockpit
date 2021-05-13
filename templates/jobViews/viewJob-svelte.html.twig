@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Job {{ job.jobId }}
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
+    <link rel='stylesheet' href='/css/uPlot.min.css'>
+    {{ parent() }}
+    <link rel='stylesheet' href='/css/global.css'>
+    {{ encore_entry_link_tags('jobview') }}
+{% endblock %}
+
+{% block javascript %}
+    {{ encore_entry_script_tags('jobview') }}
+{% endblock %}
+
+{% block helptext %}
+    <h5>Tag area</h5>
+    <p>
+        Below the job meta data table there are the tags set for this jobs and
+        a button Add Tag which allows opens a form to add a new tag. Known tags
+        are automatically expanded, unknown tags will be added. To remove a tag
+        move the cursor above a tag pill, a remove button will appear. If you press
+        it the tag will be removed from the job.
+    </p>
+    <h5>Roofline plot</h4>
+    <p>
+    </p>
+    <h5>Polar plot</h4>
+    <p>
+    </p>
+    <h4>Metric plots</h4>
+    <p>
+    </p>
+    <h4>Node statistic table</h4>
+    <p>
+    </p>
+{% endblock %}
+
+{% block body %}
+    <div id="svelte-app"></div>
+{% endblock %}
