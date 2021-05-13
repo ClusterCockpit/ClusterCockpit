@@ -70,18 +70,23 @@
     }
 
     function render(ctx, data, cluster, width, height) {
-        const [minX, maxX, minY, maxY] = [0., 32, 0., cluster.flopRateSimd * 1.1];
+        const [minX, maxX, minY, maxY] = [0.1, 100, 1., cluster.flopRateSimd * 1.1];
         const w = width - paddingLeft - paddingRight;
         const h = height - paddingTop - paddingBottom;
 
         // Helpers:
+        const [log10minX, log10maxX, log10minY, log10maxY] =
+            [Math.log10(minX), Math.log10(maxX), Math.log10(minY), Math.log10(maxY)];
+
         const getCanvasX = (x) => {
-            x -= minX; x /= (maxX - minX);
+            x = Math.log10(x);
+            x -= log10minX; x /= (log10maxX - log10minX);
             return Math.round((x * w) + paddingLeft);
         };
 
         const getCanvasY = (y) => {
-            y -= minY; y /= (maxY - minY);
+            y = Math.log10(y);
+            y -= log10minY; y /= (log10maxY - log10minY);
             return Math.round((h - y * h) + paddingTop);
         };
 
@@ -89,8 +94,8 @@
         ctx.strokeStyle = axesColor;
         ctx.font = `${fontSize}px sans-serif`;
         ctx.beginPath();
-        const stepsizeX = getStepSize(maxX - minX, w, 100);
-        for (let x = minX; x <= maxX; x += stepsizeX) {
+        const stepsizeX = 10;
+        for (let x = minX; x <= maxX; x *= stepsizeX) {
             let px = getCanvasX(x);
             let text = formatNumber(x);
             let textWidth = ctx.measureText(text).width;
@@ -102,9 +107,9 @@
             let textWidth = ctx.measureText(data.xLabel).width;
             ctx.fillText(data.xLabel, (width / 2) - (textWidth / 2), height - 20);
         }
-        const stepsizeY = getStepSize(maxY - minY, h, 75);
+        const stepsizeY = 10;
         ctx.textAlign = 'center';
-        for (let y = minY; y <= maxY; y += stepsizeY) {
+        for (let y = minY; y <= maxY; y *= stepsizeY) {
             let py = getCanvasY(y);
             ctx.moveTo(paddingLeft - 5, py);
             ctx.lineTo(width - paddingRight + 5, py);
@@ -173,14 +178,6 @@
         }
     }
 
-    function avg(x) {
-        let a = 0.;
-        for (let value of x)
-            a += value;
-
-        return a / x.length;
-    }
-
     function transformData(flopsAny, memBw) {
         const nodes = flopsAny.series.length;
         const timesteps = flopsAny.series[0].data.length;
@@ -205,7 +202,7 @@
         }
 
         return {
-            x, y, c, maxX: avg(x) * 2.,
+            x, y, c,
             xLabel: 'Intensity [FLOPS/byte]',
             yLabel: 'Performance [GFLOPS]'
         };
