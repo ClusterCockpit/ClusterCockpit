@@ -244,9 +244,15 @@ class Job
         $this->numNodes = $numNodes;
     }
 
+    public function getNodes($delimiter)
+    {
+        $nodes = explode(',', $this->nodeList);
+        return implode($delimiter, $nodes);
+    }
+
     public function getNodeArray()
     {
-        return split(',', $this->nodeList);
+        return explode(',', $this->nodeList);
     }
 
     public function getProjectId()

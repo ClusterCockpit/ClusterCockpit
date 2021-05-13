@@ -43,7 +43,7 @@ class JobData
     public function __construct(
         EntityManagerInterface $em,
         InfluxDBMetricDataRepository $metricRepo,
-        ClusterRepository $clusterRepo,
+        ClusterConfiguration $clusterCfg,
         LoggerInterface $logger,
         $projectDir
     )
@@ -77,7 +77,8 @@ class JobData
             $job->getClusterId()));
 
         if (!$job->hasProfile){
-            $this->_metricDataRepository->hasProfile($job);
+            $this->_metricDataRepository->hasProfile($job,
+            $this->_clusterCfg->getSingleMetric($job->getClusterId()));
         }
 
         return $job->hasProfile;

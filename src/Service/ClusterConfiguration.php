@@ -42,6 +42,14 @@ class ClusterConfiguration
                 if (file_exists("$rootdir/$entry/cluster.json")){
                     $str = file_get_contents("$rootdir/$entry/cluster.json");
                     $this->_config[$entry] = json_decode($str, true);
+
+                    $metricConfig = [];
+
+                    foreach ($this->_config[$entry]['metricConfig'] as $metric) {
+                        $cfg[$metric['name']] = $metric;
+                    }
+
+                    $this->_config[$entry]['metricConfig'] = $cfg;
                 }
             }
         }
@@ -54,15 +62,20 @@ class ClusterConfiguration
         $cfg = [];
 
         foreach ($metrics as $metric) {
-            $cfg[] = $this->_config[$clusterId]['']
-
+            $cfg[$metric] = $this->_config[$clusterId]['metricConfig'][$metric];
         }
+
+        return $cfg;
     }
 
     public function getClusterIds()
     {
         return array_keys($this->_config);
+    }
 
+    public function getSingleMetric($clusterId)
+    {
+        return reset($this->_config[$clusterId]['metricConfig']);
     }
 
     public function getClusterConfiguration($clusterId)

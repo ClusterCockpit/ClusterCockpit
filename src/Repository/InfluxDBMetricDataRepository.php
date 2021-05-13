@@ -88,11 +88,9 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
         return $roofline;
     }
 
-    public function hasProfile($job)
+    public function hasProfile($job, $metric)
     {
-        $nodes = $job->getNodes();
-        $metrics = $job->getCluster()->getMetricList('list');
-        $metric = reset($metrics);
+        $nodes = $job->getNodeArray();
 
         if ( count($nodes) < 1 ){
             $job->hasProfile = false;
@@ -100,10 +98,11 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
         }
         $stopTime = $job->startTime + $job->duration;
 
+        /* TODO add measurement */
         $query = "SELECT COUNT({$metric['name']})
             FROM {$metric['measurement']}
             WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
-            AND host = '{$nodes->first()->getNodeId()}'";
+            AND host = '{$nodes[0]}'";
 
         $this->_logger->info("InfluxDB QUERY: $query");
         $result = $this->_database->query($query);
@@ -120,8 +119,7 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
 
     public function getJobStats($job, $metrics)
     {
-        $nodes = $job->getNodeNameArray();
-        $nodes = implode('|', $nodes);
+        $nodes = $job->getNodes('|');
         $stopTime = $job->startTime + $job->duration;
 
         foreach ( $metrics as $metric ){
@@ -187,8 +185,7 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
 
     public function getMetricData($job, $metrics, $options)
     {
-        $nodes = $job->getNodeArray();
-        $nodes = implode('|', $nodes);
+        $nodes = $job->getNodes('|');
         $stopTime = $job->startTime + $job->duration;
 
         if ( $options['sample'] > 0 ){
@@ -228,8 +225,8 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
 
     public function getMetricCount($job, $metrics)
     {
-        $nodes = $job->getNodes();
-        $id = $nodes->first()->getNodeId();
+        $nodes = $job->getNodeArray();
+        $id = $nodes[0];
         $metric = reset($metrics);
         $stopTime = $job->startTime + $job->duration;
 

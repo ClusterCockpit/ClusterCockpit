@@ -34,7 +34,6 @@ use Overblog\GraphQLBundle\Resolver\ResolverMap;
 
 use App\Service\JobData;
 use App\Service\ClusterConfiguration;
-use App\Repository\ClusterRepository;
 use App\Repository\JobRepository;
 use App\Repository\JobTagRepository;
 
@@ -44,7 +43,6 @@ class RootResolverMap extends ResolverMap
     private $jobData;
     private $clusterCfg;
     private $jobTagRepo;
-    private $clusterRepo;
     private $logger;
     private $projectDir;
 
@@ -53,7 +51,6 @@ class RootResolverMap extends ResolverMap
         JobData $jobData,
         ClusterConfiguration $clusterCfg,
         JobTagRepository $jobTagRepo,
-        ClusterRepository $clusterRepo,
         LoggerInterface $logger,
         $projectDir
     )
@@ -62,19 +59,8 @@ class RootResolverMap extends ResolverMap
         $this->jobData = $jobData;
         $this->clusterCfg = $clusterCfg;
         $this->jobTagRepo = $jobTagRepo;
-        $this->clusterRepo = $clusterRepo;
         $this->logger = $logger;
         $this->projectDir = $projectDir;
-    }
-
-    private function getJobDataPath($jobId, $clusterId)
-    {
-        $jobId = intval(explode('.', $jobId)[0]);
-        $lvl1 = intdiv($jobId, 1000);
-        $lvl2 = $jobId % 1000;
-        $path = sprintf('%s/job-data/%s/%d/%03d/data.json',
-            $this->projectDir, $clusterId, $lvl1, $lvl2);
-        return $path;
     }
 
     private function jobEntityToArray($job)
@@ -96,8 +82,7 @@ class RootResolverMap extends ResolverMap
             }, $job->tags->getValues()),
 
             // TODO: DB-Schemas differ
-            'hasProfile' => file_exists(
-                $this->getJobDataPath($job->getJobId(), $job->getClusterId())),
+            'hasProfile' => $this->jobData->hasData($job),
             'projectId' => $job->getProjectId()
         ];
     }
