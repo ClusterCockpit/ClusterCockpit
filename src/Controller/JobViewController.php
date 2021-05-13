@@ -27,7 +27,6 @@ namespace App\Controller;
 
 use App\Entity\Job;
 use App\Entity\JobTag;
-use App\Entity\JobSearch;
 use App\Repository\JobRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
@@ -40,7 +39,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\SerializerInterface;
-use App\Service\JobCache;
 use App\Service\Configuration;
 use Psr\Log\LoggerInterface;
 use \DateTime;
@@ -158,7 +156,6 @@ class JobViewController extends AbstractController
     public function show(
         Job $job,
         Configuration $configuration,
-        JobCache $jobCache
     )
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -182,13 +179,12 @@ class JobViewController extends AbstractController
             $duration = $iv->format('%a d %h h %i m');
         }
 
-        return $this->render('jobViews/viewJob-ajax.html.twig',
+        return $this->render('jobViews/viewJob-svelte.html.twig',
             array(
                 'job' => $job,
                 'duration' => $duration,
                 'config' => $config,
                 'tags' => $alltags,
-                'backend' => $jobCache->getBackend()
             ));
     }
 }

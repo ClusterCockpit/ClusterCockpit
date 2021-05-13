@@ -34,7 +34,7 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Adapter\LdapManager;
-use App\Service\JobCache;
+/* use App\Service\JobCache; */
 use App\Service\PasswdFileReader;
 use App\Service\Configuration;
 use App\Entity\User;
@@ -58,7 +58,7 @@ class Cron extends Command
         LdapManager $ldap,
         EntityManagerInterface $em,
         LoggerInterface $logger,
-        JobCache $jobcache,
+        /* JobCache $jobcache, */
         StopWatch $stopwatch
     )
     {
@@ -66,41 +66,41 @@ class Cron extends Command
         $this->_ldap = $ldap;
         $this->_timer = $stopwatch;
         $this->_logger = $logger;
-        $this->_jobCache = $jobcache;
+        /* $this->_jobCache = $jobcache; */
 
         parent::__construct();
     }
 
     private function warmupCache($output)
     {
-        $repository = $this->_em->getRepository(\App\Entity\Job::class);
-        $jobs = $repository->findRunningJobs();
-        $this->_configuration = new Configuration($this->_em);
+        /* $repository = $this->_em->getRepository(\App\Entity\Job::class); */
+        /* $jobs = $repository->findRunningJobs(); */
+        /* $this->_configuration = new Configuration($this->_em); */
 
-        $options['plot_view_showPolarplot']      = $this->_configuration->getValue('plot_view_showPolarplot');
-        $options['plot_view_showRoofline']       = $this->_configuration->getValue('plot_view_showRoofline');
-        $options['plot_view_showStatTable']      = $this->_configuration->getValue('plot_view_showStatTable');
-        $options['plot_list_samples']            = $this->_configuration->getValue('plot_list_samples');
-        $options['plot_general_colorBackground'] = $this->_configuration->getValue('plot_general_colorBackground');
-        $options['plot_general_colorscheme']     = $this->_configuration->getValue('plot_general_colorscheme');
-        $options['plot_general_lineWidth']       = $this->_configuration->getValue('plot_general_lineWidth');
-        $options['data_time_digits']             = $this->_configuration->getValue('data_time_digits');
-        $options['data_cache_numpoints']         = $this->_configuration->getValue('data_cache_numpoints');
+        /* $options['plot_view_showPolarplot']      = $this->_configuration->getValue('plot_view_showPolarplot'); */
+        /* $options['plot_view_showRoofline']       = $this->_configuration->getValue('plot_view_showRoofline'); */
+        /* $options['plot_view_showStatTable']      = $this->_configuration->getValue('plot_view_showStatTable'); */
+        /* $options['plot_list_samples']            = $this->_configuration->getValue('plot_list_samples'); */
+        /* $options['plot_general_colorBackground'] = $this->_configuration->getValue('plot_general_colorBackground'); */
+        /* $options['plot_general_colorscheme']     = $this->_configuration->getValue('plot_general_colorscheme'); */
+        /* $options['plot_general_lineWidth']       = $this->_configuration->getValue('plot_general_lineWidth'); */
+        /* $options['data_time_digits']             = $this->_configuration->getValue('data_time_digits'); */
+        /* $options['data_cache_numpoints']         = $this->_configuration->getValue('data_cache_numpoints'); */
 
-        $this->_timer->start('WarmupCache');
-        foreach ( $jobs as $job ){
+        /* $this->_timer->start('WarmupCache'); */
+        /* foreach ( $jobs as $job ){ */
 
-            if ( $job->getNumNodes() > 0 && $job->duration > 400 ) {
-                $this->_jobCache->warmupCache(
-                    $job, $options);
-                $this->_em->persist($job);
-                $this->_em->flush();
-            }
-        }
-        $event = $this->_timer->stop('WarmupCache');
-        $seconds =  floor($event->getDuration()/ 1000);
-        $count = count($jobs);
-        $this->_logger->info("CRON:warmupCache $count jobs in $seconds s");
+        /*     if ( $job->getNumNodes() > 0 && $job->duration > 400 ) { */
+        /*         $this->_jobCache->warmupCache( */
+        /*             $job, $options); */
+        /*         $this->_em->persist($job); */
+        /*         $this->_em->flush(); */
+        /*     } */
+        /* } */
+        /* $event = $this->_timer->stop('WarmupCache'); */
+        /* $seconds =  floor($event->getDuration()/ 1000); */
+        /* $count = count($jobs); */
+        /* $this->_logger->info("CRON:warmupCache $count jobs in $seconds s"); */
     }
 
     private function updateCache($output, $interactive)

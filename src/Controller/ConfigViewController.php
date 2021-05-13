@@ -36,7 +36,6 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Psr\Log\LoggerInterface;
 use App\Entity\ApiKey;
 use App\Form\ClusterType;
-use App\Entity\Cluster;
 use App\Entity\Node;
 use App\Entity\Configuration;
 use App\Form\UserType;

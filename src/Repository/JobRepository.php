@@ -28,12 +28,11 @@ namespace App\Repository;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\Job;
-use App\Entity\User;
-use App\Entity\Cluster;
-use App\Entity\JobSearch;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+
+use App\Entity\Job;
+use App\Entity\User;
 
 class JobRepository extends ServiceEntityRepository
 {
@@ -41,7 +40,6 @@ class JobRepository extends ServiceEntityRepository
     private $_logger;
     private $_connection;
     private $_userRepository;
-    private $_clusters;
 
     public function __construct(
         ManagerRegistry $registry,
@@ -54,69 +52,6 @@ class JobRepository extends ServiceEntityRepository
         $this->_timing = $stopwatch;
         $this->_connection = $this->getEntityManager()->getConnection();
         $this->_userRepository = $this->getEntityManager()->getRepository(User::class);
-        $cluster_rep = $this->getEntityManager()->getRepository(Cluster::class);
-        $clusters = $cluster_rep->findAll();
-        $this->_clusters = array();
-
-        foreach ( $clusters as $cluster ){
-            $this->_clusters[$cluster->getId()] = array(
-                'name' => $cluster->getName(),
-                'coresPerNode' => $cluster->getCoresPerNode()
-            );
-        }
-    }
-
-    private function getSettings($control): array
-    {
-        $single = true;
-        $clusterId = $control->getCluster();
-        $clusters = array();
-
-        if ( $clusterId == 0 ){
-            foreach ( $this->_clusters as $id => $cluster ){
-                $clusters[] = array(
-                    'id' => $id,
-                    'coresPerNode' => $cluster['coresPerNode'],
-                    'name' => $cluster['name']
-                );
-            }
-            $single = false;
-	} else {
-	    if(isset($this->_clusters[$clusterId]))
-            {
-                $clusters[] =  array(
-                    'id' => $clusterId,
-                    'coresPerNode' => $this->_clusters[$clusterId]['coresPerNode'],
-                    'name' => $this->_clusters[$clusterId]['name']
-                );
-	    }
-        }
-
-        $month = $control->getMonth();
-        $year = $control->getYear();
-
-        if (isset($month)){
-            $datestring = sprintf("%04d%02d01",$year,$month);
-            $startTime = strtotime($datestring);
-            $days = date(' t ', $startTime );
-            $datestring = sprintf("%04d%02d%02d",$year, $month, $days);
-            $stopTime = strtotime($datestring);
-        } else {
-            $datestring = sprintf("%04d0101",$year);
-            $startTime = strtotime($datestring);
-            $datestring = sprintf("%04d1231",$year);
-            $stopTime = strtotime($datestring);
-        }
-        $settings = array(
-            'startTime' => $startTime,
-            'stopTime' => $stopTime,
-            'clusters' => $clusters,
-            'oneSystem' => $single
-        );
-
-        $this->_logger->info("Settings: ", $settings);
-
-        return  $settings;
     }
 
     private function getHisto($settings, $target, $constraint = '', $join = ''): array
