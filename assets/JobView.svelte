@@ -5,6 +5,7 @@
     import { initClient, getClient,
              operationStore, query } from '@urql/svelte';
     import Plot from './Plot.svelte';
+    import RooflinePlot from './RooflinePlot.svelte';
 
     export let jobId;
     export let clusterId;
@@ -68,9 +69,6 @@
             metrics = Object.keys(metricConfig[clusterId]);
             $jobMetricsQuery.variables.metrics = metrics;
             $jobMetricsQuery.context.pause = false;
-
-            console.log(metricConfig);
-            console.log(metrics);
         });
 
     const plotsPerRow = 3;
@@ -89,6 +87,18 @@
 <Row>
     <Col>
         JobId: {jobId}, clusterId: {clusterId}
+    </Col>
+    <Col>
+        {#if $jobMetricsQuery.data}
+            <RooflinePlot
+                flopsAny={$jobMetricsQuery.data.jobMetrics
+                    .find(m => m.name == 'flops_any').metric}
+                memBw={$jobMetricsQuery.data.jobMetrics
+                    .find(m => m.name == 'mem_bw').metric}
+            />
+        {:else}
+            <Spinner secondary />
+        {/if}
     </Col>
 </Row>
 <Row>
