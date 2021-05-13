@@ -34,12 +34,13 @@ class ClusterConfiguration
         $projectDir
     )
     {
-        $dh =  opendir("$projectDir/job-data/");
+        $rootdir = "$projectDir/var/job-archive";
+        $dh =  opendir($rootdir);
 
         while (false !== ($entry = readdir($dh))) {
             if ($entry != "." && $entry != "..") {
-                if (file_exists("$projectDir/job-data/$entry/cluster.json")){
-                    $str = file_get_contents("$projectDir/job-data/$entry/cluster.json");
+                if (file_exists("$rootdir/$entry/cluster.json")){
+                    $str = file_get_contents("$rootdir/$entry/cluster.json");
                     $this->_config[$entry] = json_decode($str, true);
                 }
             }
@@ -48,8 +49,14 @@ class ClusterConfiguration
         closedir($dh);
     }
 
-    public function getMetrics($clusterId, $metrics)
+    public function getMetricConfiguration($clusterId, $metrics)
     {
+        $cfg = [];
+
+        foreach ($metrics as $metric) {
+            $cfg[] = $this->_config[$clusterId]['']
+
+        }
     }
 
     public function getClusterIds()
@@ -58,7 +65,7 @@ class ClusterConfiguration
 
     }
 
-    public function getClusterConfig($clusterId)
+    public function getClusterConfiguration($clusterId)
     {
         return $this->_config[$clusterId];
     }

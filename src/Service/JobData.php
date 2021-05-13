@@ -26,28 +26,33 @@
 namespace App\Service;
 
 use Psr\Log\LoggerInterface;
-use App\Entity\Job;
-use App\Repository\InfluxDBMetricDataRepository;
 use Doctrine\ORM\EntityManagerInterface;
+
+use App\Entity\Job;
+use App\Service\ClusterConfiguration;
+use App\Repository\InfluxDBMetricDataRepository;
 
 class JobData
 {
     private $_em;
     private $_metricDataRepository;
+    private $_clusterCfg;
     private $logger;
     private $projectDir;
 
     public function __construct(
         EntityManagerInterface $em,
         InfluxDBMetricDataRepository $metricRepo,
+        ClusterRepository $clusterRepo,
         LoggerInterface $logger,
         $projectDir
     )
     {
         $this->_em = $em;
         $this->_metricDataRepository = $metricRepo;
+        $this->_clusterCfg = $clusterCfg;
+        $this->_rootdir = "$projectDir/var/job-archive";
         $this->logger = $logger;
-        $this->projectDir = $projectDir;
     }
 
     private function _getJobDataPath($jobId, $clusterId)
@@ -55,8 +60,8 @@ class JobData
         $jobId = intval(explode('.', $jobId)[0]);
         $lvl1 = intdiv($jobId, 1000);
         $lvl2 = $jobId % 1000;
-        $path = sprintf('%s/job-data/%s/%d/%03d/data.json',
-            $this->projectDir, $clusterId, $lvl1, $lvl2);
+        $path = sprintf('%s/%s/%d/%03d/data.json',
+            $this->_rootdir, $clusterId, $lvl1, $lvl2);
         $this->logger->info("PATH $path");
         return $path;
     }
@@ -67,7 +72,9 @@ class JobData
             $job->duration = time() - $job->startTime;
         }
 
-        $job->hasProfile = file_exists( $this->_getJobDataPath($job->getJobId(), $job->getClusterId()));
+        $job->hasProfile = file_exists(
+            $this->_getJobDataPath($job->getJobId(),
+            $job->getClusterId()));
 
         if (!$job->hasProfile){
             $this->_metricDataRepository->hasProfile($job);
@@ -83,8 +90,8 @@ class JobData
         }
 
         if ( $job->isRunning()) {
-            $metricConfig = $this->_clusterConfig->getMetrics($metrics);
-            $res = $this->_metricDataRepository->getMetricData( $job, $metricConfig);
+            $metricConfig = $this->_clusterCfg->getMetrics($job->getClusterId(), $metrics);
+            $res = $this->_metricDataRepository->getMetricData($job, $metricConfig);
         } else {
             $path = $this->_getJobDataPath($job->getJobId(), $job->getClusterId());
             $data = @file_get_contents($path);
