@@ -14,8 +14,17 @@
 </script>
 
 <div>
-    <div class="fw-bold">{job["jobId"]} ({job["clusterId"]})</div>
-    <div class="fst-italic">{job["userId"]} ({job["projectId"]})</div>
+    <div class="fw-bold">
+        <a href="/monitoring/job/{job["id"]}">
+            {job["jobId"]} ({job["clusterId"]})
+        </a>
+    </div>
+    <div class="fst-italic">
+        {job["userId"]}
+        {#if job["projectId"] && job["projectId"] != 'no project'}
+            ({job["projectId"]})
+        {/if}
+    </div>
     <p>{job["numNodes"]} nodes</p>
     <div>Started at:</div>
     <p class="fw-bold">{job["startTime"]}</p>

@@ -1,5 +1,10 @@
-import App from './App.svelte';
+import JobView from './JobView.svelte';
 
-const app = new App({
+const jobView = new JobView({
     target: document.getElementById('svelte-app'),
+    props: {
+        /* Originally set in templates/jobViews/viewJob-svelte.html.twig */
+        jobId: ccJobView.jobId,
+        clusterId: ccJobView.clusterId
+    }
 });
