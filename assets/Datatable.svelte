@@ -16,7 +16,7 @@
     import JobMetricPlots from './JobMetricPlots.svelte';
     import { fetchClusters } from './utils.js';
 
-    let itemsPerPage = 25;
+    let itemsPerPage = 10;
     let page = 1;
     let filterItems = defaultFilterItems;
     let userFilter;
@@ -81,6 +81,7 @@
        page: $paging
        ) {
            items {
+             id
              jobId
              userId
              projectId
