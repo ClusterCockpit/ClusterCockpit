@@ -7,6 +7,7 @@
     import Plot from './Plot.svelte';
     import RooflinePlot from './RooflinePlot.svelte';
     import JobMeta from './JobMeta.svelte';
+    import NodeStats from './NodeStats.svelte';
 
     export let jobId;
     export let clusterId;
@@ -82,10 +83,9 @@
                 console.error(res.error);
 
             job = res.data.jobById;
-            console.log(job);
-
             cluster = res.data.clusters
                 .filter(c => c.clusterID === clusterId)[0];
+
             console.assert(cluster != null, 'unkown cluster');
 
             metricConfig[clusterId] = {};
@@ -169,4 +169,15 @@
             <Spinner secondary />
         </Col>
     {/if}
+</Row>
+<Row>
+    <Col>
+        {#if $jobMetricsQuery.data}
+            <NodeStats
+                job={job}
+                jobMetrics={$jobMetricsQuery.data.jobMetrics}/>
+        {:else}
+            <Spinner secondary />
+        {/if}
+    </Col>
 </Row>
