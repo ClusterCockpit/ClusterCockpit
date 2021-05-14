@@ -103,7 +103,7 @@
 </script>
 
 <style>
-    h5 {
+    h6 {
         margin-bottom: 5px;
         margin-top: 20px;
         text-align: center;
@@ -147,10 +147,10 @@
         {#each $jobMetricsQuery.data.jobMetrics as metric, index}
             {#if index % plotsPerRow == 0 && index != 0}{@html '<div class="row">'}{/if}
             <Col>
-                <h5>
+                <h6>
                     {metric.name}
                     [{metricConfig[clusterId][metric.name].unit}]
-                </h5>
+                </h6>
                 <Plot
                     metric={metric.name}
                     clusterId={clusterId}

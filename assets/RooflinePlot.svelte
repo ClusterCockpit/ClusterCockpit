@@ -36,29 +36,6 @@
         return `rgb(${getGradientR(c)}, ${getGradientG(c)}, ${getGradientB(c)})`;
     }
 
-    function getStepSize(valueRange, pixelRange, minSpace) {
-        const proposition = valueRange / (pixelRange / minSpace);
-        const getStepSize = n => Math.pow(10, Math.floor(n / 3)) *
-            (n < 0 ? [1., 5., 2.][-n % 3] : [1., 2., 5.][n % 3]);
-
-        let n = 0;
-        let stepsize = getStepSize(n);
-        while (true) {
-            let smaller = getStepSize(n - 1);
-            let bigger = getStepSize(n + 1);
-
-            if (proposition < smaller) {
-                n -= 1;
-                stepsize = smaller;
-            } else if (proposition > bigger) {
-                n += 1;
-                stepsize = bigger;
-            } else {
-                return stepsize;
-            }
-        }
-    }
-
     const power = [1, 1e3, 1e6, 1e9, 1e12];
     const suffix = ['', 'k', 'm', 'g'];
     function formatNumber(x) {
@@ -69,8 +46,17 @@
         return Math.abs(x) >= 1000 ? x.toExponential() : x.toString();
     }
 
+    function axisStepFactor(i) {
+        if (i % 3 == 0)
+            return 2;
+        else if (i % 3 == 1)
+            return 2.5;
+        else
+            return 2;
+    }
+
     function render(ctx, data, cluster, width, height) {
-        const [minX, maxX, minY, maxY] = [0.1, 100, 1., cluster.flopRateSimd * 1.1];
+        const [minX, maxX, minY, maxY] = [0.01, data.maxX, 1., cluster.flopRateSimd];
         const w = width - paddingLeft - paddingRight;
         const h = height - paddingTop - paddingBottom;
 
@@ -78,12 +64,12 @@
         const [log10minX, log10maxX, log10minY, log10maxY] =
             [Math.log10(minX), Math.log10(maxX), Math.log10(minY), Math.log10(maxY)];
 
+        /* Value -> Pixel-Coordinate */
         const getCanvasX = (x) => {
             x = Math.log10(x);
             x -= log10minX; x /= (log10maxX - log10minX);
             return Math.round((x * w) + paddingLeft);
         };
-
         const getCanvasY = (y) => {
             y = Math.log10(y);
             y -= log10minY; y /= (log10maxY - log10minY);
@@ -94,22 +80,23 @@
         ctx.strokeStyle = axesColor;
         ctx.font = `${fontSize}px sans-serif`;
         ctx.beginPath();
-        const stepsizeX = 10;
-        for (let x = minX; x <= maxX; x *= stepsizeX) {
+        for (let x = minX, i = 0; x <= maxX; i++) {
             let px = getCanvasX(x);
             let text = formatNumber(x);
             let textWidth = ctx.measureText(text).width;
             ctx.fillText(text, px - (textWidth / 2), height - paddingBottom + fontSize + 5);
             ctx.moveTo(px, paddingTop - 5);
             ctx.lineTo(px, height - paddingBottom + 5);
+
+            x *= axisStepFactor(i);
         }
         if (data.xLabel) {
             let textWidth = ctx.measureText(data.xLabel).width;
             ctx.fillText(data.xLabel, (width / 2) - (textWidth / 2), height - 20);
         }
-        const stepsizeY = 10;
+
         ctx.textAlign = 'center';
-        for (let y = minY; y <= maxY; y *= stepsizeY) {
+        for (let y = minY, i = 0; y <= maxY; i++) {
             let py = getCanvasY(y);
             ctx.moveTo(paddingLeft - 5, py);
             ctx.lineTo(width - paddingRight + 5, py);
@@ -119,6 +106,8 @@
             ctx.rotate(-Math.PI / 2);
             ctx.fillText(formatNumber(y), 0, 0);
             ctx.restore();
+
+            y *= axisStepFactor(i);
         }
         if (data.yLabel) {
             ctx.save();
@@ -153,15 +142,23 @@
             const ycut = 0.01 * cluster.memoryBandwidth;
             const scalarKnee = (cluster.flopRateScalar - ycut) / cluster.memoryBandwidth;
             const simdKnee = (cluster.flopRateSimd - ycut) / cluster.memoryBandwidth;
+            const scalarKneeX = getCanvasX(scalarKnee);
+            const simdKneeX = getCanvasX(simdKnee);
+            const flopRateScalarY = getCanvasY(cluster.flopRateScalar);
+            const flopRateSimdY = getCanvasY(cluster.flopRateSimd);
 
-            ctx.moveTo(getCanvasX(scalarKnee), getCanvasY(cluster.flopRateScalar));
-            ctx.lineTo(width - paddingRight, getCanvasY(cluster.flopRateScalar));
+            if (scalarKneeX < width - paddingRight) {
+                ctx.moveTo(scalarKneeX, flopRateScalarY);
+                ctx.lineTo(width - paddingRight, flopRateScalarY);
+            }
 
-            ctx.moveTo(getCanvasX(simdKnee), getCanvasY(cluster.flopRateSimd));
-            ctx.lineTo(width - paddingRight, getCanvasY(cluster.flopRateSimd));
+            if (simdKneeX < width - paddingRight) {
+                ctx.moveTo(simdKneeX, flopRateSimdY);
+                ctx.lineTo(width - paddingRight, flopRateSimdY);
+            }
 
             ctx.moveTo(getCanvasX(0.01), getCanvasY(ycut));
-            ctx.lineTo(getCanvasX(simdKnee), getCanvasY(cluster.flopRateSimd));
+            ctx.lineTo(getCanvasX(simdKnee), flopRateSimdY);
         }
         ctx.stroke();
 
@@ -202,7 +199,7 @@
         }
 
         return {
-            x, y, c,
+            x, y, c, maxX,
             xLabel: 'Intensity [FLOPS/byte]',
             yLabel: 'Performance [GFLOPS]'
         };
