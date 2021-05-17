@@ -171,11 +171,28 @@ class JobRepository extends ServiceEntityRepository
                 if (isset($filter['tags']))
                     $qb->join('j.tags', 't')
                        ->andWhere($qb->expr()->in('t.id', $filter['tags']));
+
+                if (isset($filter['flopsAnyAvg']))
+                    $qb->andWhere('j.flopsAnyAvg BETWEEN '
+                        .$filter['flopsAnyAvg']['from'].' AND '.$filter['flopsAnyAvg']['to']);
+
+                if (isset($filter['memBwAvg']))
+                    $qb->andWhere('j.memBwAvg BETWEEN '
+                        .$filter['memBwAvg']['from'].' AND '.$filter['memBwAvg']['to']);
+
+                if (isset($filter['loadAvg']))
+                    $qb->andWhere('j.loadAvg BETWEEN '
+                        .$filter['loadAvg']['from'].' AND '.$filter['loadAvg']['to']);
+
+                if (isset($filter['memUsedMax']))
+                    $qb->andWhere('j.memUsedMax BETWEEN '
+                        .$filter['memUsedMax']['from'].' AND '.$filter['memUsedMax']['to']);
             }
         }
 
         if ($sorting)
-            $qb->orderBy('j.'.$sorting['field'], $sorting['order']);
+            $qb->andWhere('j.'.$sorting['field'].' IS NOT NULL')
+               ->orderBy('j.'.$sorting['field'], $sorting['order']);
     }
 
     public function countJobs($filter, $sorting)

@@ -140,6 +140,10 @@ input JobFilter {
   numNodes: IntRange
   startTime: TimeRange
   hasProfile: Boolean
+  flopsAnyAvg: FloatRange
+  memBwAvg: FloatRange
+  loadAvg: FloatRange
+  memUsedMax: FloatRange
 }
 
 input OrderByInput {
