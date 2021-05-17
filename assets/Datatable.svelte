@@ -53,8 +53,7 @@
         plotWidth = Math.floor((tableWidth - jobMetaWidth) / selectedMetrics.length - 10);
     }
 
-    /* initClient({ url: 'http://localhost:8080/query' }); // cc-jobarchive as Backend */
-    initClient({ url: 'http://localhost:8000/query/' }); // ClusterCockpit as Backend
+    initClient({ url: `${window.location.origin}/query` });
 
     const metricUnits = {};
     const metricConfig = {};
