@@ -25,34 +25,25 @@
 
 namespace App\Service;
 
-use Psr\Log\LoggerInterface;
-use Doctrine\ORM\EntityManagerInterface;
-
 use App\Entity\Job;
 use App\Service\ClusterConfiguration;
 use App\Repository\InfluxDBMetricDataRepository;
 
 class JobData
 {
-    private $_em;
     private $_metricDataRepository;
     private $_clusterCfg;
-    private $logger;
     private $projectDir;
 
     public function __construct(
-        EntityManagerInterface $em,
         InfluxDBMetricDataRepository $metricRepo,
         ClusterConfiguration $clusterCfg,
-        LoggerInterface $logger,
         $projectDir
     )
     {
-        $this->_em = $em;
         $this->_metricDataRepository = $metricRepo;
         $this->_clusterCfg = $clusterCfg;
         $this->_rootdir = "$projectDir/var/job-archive";
-        $this->logger = $logger;
     }
 
     private function _getJobDataPath($jobId, $clusterId)
@@ -62,7 +53,6 @@ class JobData
         $lvl2 = $jobId % 1000;
         $path = sprintf('%s/%s/%d/%03d/data.json',
             $this->_rootdir, $clusterId, $lvl1, $lvl2);
-        $this->logger->info("PATH $path");
         return $path;
     }
 
@@ -91,8 +81,36 @@ class JobData
         }
 
         if ( $job->isRunning()) {
-            $metricConfig = $this->_clusterCfg->getMetrics($job->getClusterId(), $metrics);
-            $res = $this->_metricDataRepository->getMetricData($job, $metricConfig);
+            $metricConfig = $this->_clusterCfg->getMetricConfiguration($job->getClusterId(), $metrics);
+            $stats = $this->_metricDataRepository->getJobStats($job, $metricConfig);
+            $data = $this->_metricDataRepository->getMetricData($job, $metricConfig);
+            res [];
+
+            foreach ( $metrics as $metricName => $metric) {
+
+                $series = [];
+                foreach ( $data[$metricName] as $nodeId => $nodedata) {
+                    $series[] = [
+                        'node_id' => $nodeId,
+                        'statistics' => [
+                            'avg' => $stats['nodeStats'][$nodeId][$metricName.'_avg'],
+                            'min' => $stats['nodeStats'][$nodeId][$metricName.'_min'],
+                            'max' => $stats['nodeStats'][$nodeId][$metricName.'_max']
+                        ],
+                        'data' => $data[$metricName][$nodeId]
+                    ];
+                }
+
+                $res[] = [
+                    'name' => $metricName,
+                    'metric' => [
+                        'unit' => $metric['unit'],
+                        'scope' => $metric['scope'],
+                        'timestep' => $metric['sampletime'],
+                        'series' => $series
+                    ]
+                ];
+            }
         } else {
             $path = $this->_getJobDataPath($job->getJobId(), $job->getClusterId());
             $data = @file_get_contents($path);
