@@ -13,20 +13,17 @@ cluster_roof:
 list_jobs:
     path: /monitoring/listjobs/
     controller:  App\Controller\JobViewController::list
+systems:
+    path: /monitoring/listsystems/
+    controller:  App\Controller\JobViewController::list
 list_jobs_tag:
     path: /monitoring/listjobs/{id}
     controller:  App\Controller\JobViewController::listTag
 job_tag_types:
     path: /monitoring/tagtypes/
     controller:  App\Controller\JobViewController::listTagTypes
-search_jobs:
-    path: /monitoring/job/search
-    controller:  App\Controller\JobViewController::search
 show_job:
     path: /monitoring/job/{id}
-    controller:  App\Controller\JobViewController::show
-show_job_base:
-    path: /monitoring/job/
     controller:  App\Controller\JobViewController::show
 search_id:
     path: /monitoring/searchId
@@ -37,15 +34,6 @@ user_stat:
 show_user:
     path: /monitoring/user/{id}
     controller:  App\Controller\UserViewController::show
-show_user_base:
-    path: /monitoring/user/
-    controller:  App\Controller\UserViewController::show
-show_group:
-    path: /monitoring/group/show/{id}
-    controller:  App\Controller\UserViewController::showGroup
-edit_group:
-    path: /monitoring/group/edit/{id}
-    controller:  App\Controller\UserViewController::editGroup
 config_user:
     path: /config
     controller:  App\Controller\ConfigViewController::config
@@ -100,18 +88,6 @@ delete_user_account:
 create_user_account:
     path: /admin/create_userAccount/
     controller:  App\Controller\ConfigViewController::createUserAccount
-list_clusters:
-    path: /admin/clusters/
-    controller:  App\Controller\ConfigViewController::listClusters
-edit_cluster:
-    path: /admin/clusters/{id}
-    controller:  App\Controller\ConfigViewController::editCluster
-delete_cluster:
-    path: /admin/delete_cluster/{id}
-    controller:  App\Controller\ConfigViewController::deleteCluster
-create_cluster:
-    path: /admin/create_cluster/
-    controller:  App\Controller\ConfigViewController::createCluster
 security_login:
     path: /login
     controller:  App\Controller\SecurityController::login
