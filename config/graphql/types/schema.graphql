@@ -72,7 +72,7 @@ type JobMetricWithName {
 
 type Query {
   clusters: [Cluster!]!
-  jobById(jobId: String!, clusterId: String!): Job
+  jobById(id: ID!): Job
   jobs(filter: JobFilterList, page: PageRequest, order: OrderByInput): JobResultList!
   jobsStatistics(filter: JobFilterList): JobsStatistics!
   jobMetrics(jobId: String!, clusterId: String, metrics: [String]): [JobMetricWithName]!
@@ -81,9 +81,14 @@ type Query {
 }
 
 type Mutation {
-  startJob(input: StartJobInput!): Job!
-  stopJob(input: StopJobInput!): Job!
-  addJob(input: AddJobInput!): Job!
+  # startJob(input: StartJobInput!): Job!
+  # stopJob(input: StopJobInput!): Job!
+  # addJob(input: AddJobInput!): Job!
+
+  createTag(type: String!, name: String!): JobTag!
+  deleteTag(id: ID!): ID!
+  addTagsToJob(job: ID!, tagIds: [ID!]!): [JobTag!]!
+  removeTagsFromJob(job: ID!, tagIds: [ID!]!): [JobTag!]!
 }
 
 type IntRangeOutput {
@@ -102,29 +107,28 @@ type FilterRanges {
   startTime: TimeRangeOutput!
 }
 
-input StartJobInput {
-  jobId: String!
-  userId: String!
-  projectId: String!
-  clusterId: String!
-  startTime: Time!
-  numNodes: Int!
-}
-
-input StopJobInput {
-  stopTime: Time!
-}
-
-input AddJobInput {
-  jobId: String!
-  userId: String!
-  projectId: String!
-  clusterId: String!
-  startTime: Time!
-  duration: Int!
-  numNodes: Int!
-}
-
+# input StartJobInput {
+#   jobId: String!
+#   userId: String!
+#   projectId: String!
+#   clusterId: String!
+#   startTime: Time!
+#   numNodes: Int!
+# }
+#
+# input StopJobInput {
+#   stopTime: Time!
+# }
+#
+# input AddJobInput {
+#   jobId: String!
+#   userId: String!
+#   projectId: String!
+#   clusterId: String!
+#   startTime: Time!
+#   duration: Int!
+#   numNodes: Int!
+# }
 
 input JobFilterList {
   list: [JobFilter]

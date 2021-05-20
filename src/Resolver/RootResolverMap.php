@@ -73,18 +73,21 @@ class RootResolverMap extends ResolverMap
             'startTime' => $job->getStartTime(),
             'duration' => $job->getDuration(),
             'numNodes' => $job->getNumNodes(),
-            'tags' => array_map(function ($tag) {
-                return [
-                    'id' => $tag->getId(),
-                    'tagType' => $tag->getType(),
-                    'tagName' => $tag->getName()
-                ];
-            }, $job->tags->getValues()),
-
-            // TODO: DB-Schemas differ
+            'tags' => $this->getTagsArray($job->tags->getValues()),
             'hasProfile' => $this->jobData->hasData($job),
             'projectId' => $job->getProjectId()
         ];
+    }
+
+    private function getTagsArray($tags)
+    {
+        return array_map(function ($tag) {
+            return [
+                'id' => $tag->getId(),
+                'tagType' => $tag->getType(),
+                'tagName' => $tag->getName()
+            ];
+        }, $tags);
     }
 
     public function map()
@@ -93,7 +96,7 @@ class RootResolverMap extends ResolverMap
             // Root
             'Query' => [
                 'jobById' => function($value, Argument $args) {
-                    $job = $this->jobRepo->findJobById($args['jobId'], $args['clusterId']);
+                    $job = $this->jobRepo->findJobById($args['id']);
                     if (!$job)
                         return null;
 
@@ -138,13 +141,7 @@ class RootResolverMap extends ResolverMap
 
 
                 'tags' => function($value, Argument $args) {
-                    return array_map(function ($tag) {
-                        return [
-                            'id' => $tag->getId(),
-                            'tagType' => $tag->getType(),
-                            'tagName' => $tag->getName()
-                        ];
-                    }, $this->jobTagRepo->getAllTags());
+                    return $this->getTagsArray($this->jobTagRepo->getAllTags());
                 },
 
                 'jobMetrics' => function($value, Argument $args) {
@@ -164,6 +161,51 @@ class RootResolverMap extends ResolverMap
 
                 'jobsStatistics' => function($value, Argument $args) {
                     return $this->jobRepo->findFilteredStatistics($args['filter']);
+                }
+            ],
+
+            'Mutation' => [
+                'createTag' => function($value, Argument $args) {
+                    $tagType = $args['type'];
+                    $tagName = $args['name'];
+                    $tag = $this->jobTagRepo->createTag($tagType, $tagName);
+                    return [
+                        'id' => $tag->getId(), 'tagType' => $tag->getType(), 'tagName' => $tag->getName()
+                    ];
+                },
+
+                'deleteTag' => function($value, Argument $args) {
+                    $tagId = $args['id'];
+                    $this->jobTagRepo->deleteTag($tagId);
+                    return $tagId;
+                },
+
+                'addTagsToJob' => function($value, Argument $args) {
+                    $tagIds = $args['tagIds'];
+                    $job = $this->jobRepo->findJobById($args['job']);
+
+                    $tags = $this->jobTagRepo->findTagsByIds($tagIds);
+                    foreach ($tags as $tag) {
+                        $job->addTag($tag);
+                    }
+
+                    $this->jobRepo->persistJob($job);
+                    return $this->getTagsArray($job->tags->getValues());
+                },
+
+                'removeTagsFromJob' => function($value, Argument $args) {
+                    $tagIds = $args['tagIds'];
+                    $job = $this->jobRepo->findJobById($args['job']);
+
+                    $tags = $job->getTags()->toArray();
+                    foreach ($tags as $tag) {
+                        if (in_array(strval($tag->getId()), $tagIds)) {
+                            $job->removeTag($tag);
+                        }
+                    }
+
+                    $this->jobRepo->persistJob($job);
+                    return $this->getTagsArray($job->tags->getValues());
                 }
             ],
 

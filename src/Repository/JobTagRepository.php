@@ -47,4 +47,43 @@ class JobTagRepository extends ServiceEntityRepository
                     ->getQuery()
                     ->getResult();
     }
+
+    public function createTag($tagType, $tagName)
+    {
+        $tag = new JobTag();
+        $tag->setType($tagType);
+        $tag->setName($tagName);
+        $entityManager = $this->getEntityManager();
+        $entityManager->persist($tag);
+        $entityManager->flush();
+        return $tag;
+    }
+
+    public function findTagById($tagId)
+    {
+        $qb = $this->createQueryBuilder('t');
+        return $qb->select('t')
+                  ->andWhere("t.id = :id")
+                  ->setParameter('id', $tagId)
+                  ->getQuery()
+                  ->getSingleResult();
+    }
+
+    public function findTagsByIds($tagIds)
+    {
+        $qb = $this->createQueryBuilder('t');
+        return $qb->select('t')
+                  ->andWhere("t.id IN (:ids)")
+                  ->setParameter('ids', $tagIds)
+                  ->getQuery()
+                  ->getResult();
+    }
+
+    public function deleteTag($tagId)
+    {
+        $entityManager = $this->getEntityManager();
+        $tag = $this->findTagById($tagId);
+        $entityManager->remove($tag);
+        $entityManager->flush();
+    }
 }
