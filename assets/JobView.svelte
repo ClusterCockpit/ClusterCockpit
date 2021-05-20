@@ -116,9 +116,12 @@
             }
             rows.push(row);
         }
-        console.log(rows);
         return rows;
     }
+
+    let screenWidth = 0;
+    let rooflinePlotWidth, rooflinePlotHeight = 300;
+    $: rooflinePlotWidth = screenWidth / 3;
 
 </script>
 
@@ -148,6 +151,11 @@
 {:else}
     <Row>
         <Col>
+            <div bind:clientWidth={screenWidth} style="width: 100%"><!-- Only for getting the row width --></div>
+        </Col>
+    </Row>
+    <Row>
+        <Col>
             <JobMeta job={job} />
             <TagControl bind:job={job} allTags={allTags} />
         </Col>
@@ -155,7 +163,7 @@
             <RooflinePlot
                 flopsAny={jobMetrics.find(m => m.name == 'flops_any').metric}
                 memBw={jobMetrics.find(m => m.name == 'mem_bw').metric}
-                cluster={cluster} />
+                cluster={cluster} width={rooflinePlotWidth} height={rooflinePlotHeight} />
         </Col>
     </Row>
     <br/>
