@@ -9,6 +9,7 @@
     import JobMeta from './JobMeta.svelte';
     import NodeStats from './NodeStats.svelte';
     import TagControl from './TagControl.svelte';
+    import PolarPlot from './PolarPlot.svelte';
 
     export let jobInfos;
     const { clusterId, jobId } = jobInfos;
@@ -123,8 +124,6 @@
     let rooflinePlotWidth, rooflinePlotHeight = 300;
     $: metricPlotWidth = (screenWidth - 50) / plotsPerRow;
     $: rooflinePlotWidth = screenWidth / 3;
-
-    $: console.log('metricPlotWidth:', metricPlotWidth, `(full width: ${screenWidth})`);
 </script>
 
 <style>
@@ -133,9 +132,15 @@
         width: 100%;
         font-weight: bold;
         text-align: center;
+        padding-bottom: 5px;
     }
 </style>
 
+<Row>
+    <Col>
+        <div bind:clientWidth={screenWidth} style="width: 100%"><!-- Only for getting the row width --></div>
+    </Col>
+</Row>
 {#if fetching}
     <Row>
         <Col>
@@ -153,13 +158,13 @@
 {:else}
     <Row>
         <Col>
-            <div bind:clientWidth={screenWidth} style="width: 100%"><!-- Only for getting the row width --></div>
-        </Col>
-    </Row>
-    <Row>
-        <Col>
             <JobMeta job={job} />
             <TagControl bind:job={job} allTags={allTags} />
+        </Col>
+        <Col>
+            <PolarPlot
+                cluster={cluster} jobMetrics={jobMetrics}
+                width={rooflinePlotWidth} height={rooflinePlotHeight} />
         </Col>
         <Col>
             <RooflinePlot
