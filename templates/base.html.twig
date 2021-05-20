@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -8,7 +9,7 @@
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css">
             <link href="{{ asset('css/global.css') }}" rel="stylesheet" type="text/css" />
         {% endblock %}
-        <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
+        <link rel='icon' type='image/png' href="{{ asset('favicon.png') }}" />
     </head>
     <body class="Site" data-id="{{ id|default(0) }}">
         <header>
@@ -108,7 +109,7 @@
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
                                     Close
-                                    <i class="fas fa-times fa-lg"></i>
+                                    <i class="bi-x-lg"></i>
                                 </button>
                             </div>
                         </div>

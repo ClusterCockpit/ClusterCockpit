@@ -1,122 +1,48 @@
 {% extends 'base.html.twig' %}
-{% set renderTemplate = "plot/renderPerformancePlots_#{backend}.html.twig" %}
 
 {% block title %}
     Job {{ job.jobId }}
 {% endblock %}
 
 {% block stylesheets %}
+    <link rel='stylesheet' href='/css/uPlot.min.css'>
     {{ parent() }}
-    <link href="{{ asset('css/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+    {{ encore_entry_link_tags('jobview') }}
 {% endblock %}
 
 {% block javascript %}
-    <script src="{{ asset('js/jquery.min.js') }}"/></script>
-{{ parent() }}
-<script src="{{ asset('js/datatables.min.js') }}"/></script>
     <script>
-        $(document).ready( function () {
-            var tablelist =  $('#stat').DataTable(
-                {
-                    "columnDefs": [
-                        { "visible": false, "targets": [10,11,12,13,14,15] }
-                    ],
-                    paging: false,
-                    bFilter: false
-                }
-            );
-
-            tablelist
-                .draw();
-        } );
+        const ccJobView = {
+            jobId: "{{ job.jobId }}",
+            clusterId: "{{ job.clusterId }}"
+        };
     </script>
+    {{ encore_entry_script_tags('jobview') }}
 {% endblock %}
 
+{% block helptext %}
+    <h5>Tag area</h5>
+    <p>
+        Below the job meta data table there are the tags set for this jobs and
+        a button Add Tag which allows opens a form to add a new tag. Known tags
+        are automatically expanded, unknown tags will be added. To remove a tag
+        move the cursor above a tag pill, a remove button will appear. If you press
+        it the tag will be removed from the job.
+    </p>
+    <h5>Roofline plot</h4>
+    <p>
+    </p>
+    <h5>Polar plot</h4>
+    <p>
+    </p>
+    <h4>Metric plots</h4>
+    <p>
+    </p>
+    <h4>Node statistic table</h4>
+    <p>
+    </p>
+{% endblock %}
 
 {% block body %}
-        <script src="{{ asset('js/jquery.min.js') }}"/></script>
-    {% if backend == 'plotly' %}
-    <script src="{{ asset('js/plotly.min.js') }}"/></script>
-    {% elseif backend == 'chartjs' %}
-    <script src="{{ asset('js/Chart.min.js') }}"/></script>
-    {% elseif backend == 'flot' %}
-    <script src="{{ asset('js/jquery.flot.js') }}"/></script>
-    {% endif %}
-
-    <div class="row justify-content-center">
-        <div class="col-3 ">
-            <table class="table table-sm table-striped">
-                <tbody>
-                    <tr>
-                        <th scope="col"> Job id </th>
-                        <td scope="col"> {{ job.jobId }} </td>
-                    </tr>
-                    <tr>
-                        <th scope="col"> User name </th>
-                        <td scope="col"> {{ job.user.name }} </td>
-                    </tr>
-                    <tr>
-                        <th scope="col"> User id </th>
-                        <td scope="col">
-                            <a href="{{ path('show_user',{ 'id':job.user.id }) }}">
-                                {{ job.user.userId }}
-                            </a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th scope="col"> Number of nodes </th>
-                        <td scope="col"> {{ job.numNodes }} </td>
-                    </tr>
-                    <tr>
-                        <th scope="col"> Job start </th>
-                        <td scope="col">{{ job.startTime|date('d.m.y - H:i') }}</td>
-                    </tr>
-                    <tr>
-                        <th scope="col"> Walltime </th>
-                        <td scope="col">{{ "%5.2f hours"|format(job.duration / 3600) }}</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div class="col-4" id="roofline"> </div>
-        <div class="col-4" id="polarplot"> </div>
-    </div>
-
-    {% set mode = 'view' %}
-    {{ include(renderTemplate) }}
-
-    {% set metrics = job.cluster.metricLists['stat'].metrics %}
-    {% set nodeStat = job.jobCache.nodeStat %}
-
-    {% set viewStatTable = config['plot_view_showStatTable'].value|default('true') %}
-    {% if  viewStatTable is same as('true') %}
-        <div class="row">
-            <div class="col-10 offset-1 mt-5">
-                <table class="table table-striped" id="stat">
-                    <thead>
-                        <tr>
-                            <th scope="col">Node</th>
-                            {% for metric in metrics%}
-                                <th scope="col">{{ metric.name }}_min</th>
-                                <th scope="col">{{ metric.name }}_max</th>
-                                <th scope="col">{{ metric.name }}_avg</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody class="text-center">
-                        {% for node in nodeStat %}
-                            <tr>
-                                <td> {{ node.nodeName }} </td>
-                                {% for metric in metrics%}
-                                    <td> {{ node.metrics[metric.name].min }} </td>
-                                    <td> {{ node.metrics[metric.name].max }} </td>
-                                    <td> {{ node.metrics[metric.name].avg }} </td>
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    {% endif %}
+    <div id="svelte-app"></div>
 {% endblock %}

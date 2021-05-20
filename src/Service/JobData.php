@@ -84,7 +84,7 @@ class JobData
             $metricConfig = $this->_clusterCfg->getMetricConfiguration($job->getClusterId(), $metrics);
             $stats = $this->_metricDataRepository->getJobStats($job, $metricConfig);
             $data = $this->_metricDataRepository->getMetricData($job, $metricConfig);
-            res [];
+            $res = [];
 
             foreach ( $metrics as $metricName => $metric) {
 
