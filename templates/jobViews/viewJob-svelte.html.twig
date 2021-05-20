@@ -12,7 +12,8 @@
 
 {% block javascript %}
     <script>
-        const ccJobView = {
+        const jobInfos = {
+            id: "{{ job.id }}",
             jobId: "{{ job.jobId }}",
             clusterId: "{{ job.clusterId }}"
         };

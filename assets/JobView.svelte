@@ -8,18 +8,20 @@
     import RooflinePlot from './RooflinePlot.svelte';
     import JobMeta from './JobMeta.svelte';
     import NodeStats from './NodeStats.svelte';
+    import TagControl from './TagControl.svelte';
 
-    export let jobId;
-    export let clusterId;
+    export let jobInfos;
 
+    const { jobId, clusterId } = jobInfos;
     let cluster = null;
     let metrics = [];
     let job = null;
+    let allTags = null;
     const metricUnits = {};
     const metricConfig = {};
     setContext('metric-config', metricConfig);
 
-    initClient({ url: `${window.location.origin}/query/` });
+    initClient({ url: `${window.location.origin}/query` });
 
     const jobMetricsQuery = operationStore(`
         query($jobId: String!, $clusterId: String, $metrics: [String]!) {
@@ -64,7 +66,7 @@
                 }
             }
 
-            jobById(jobId: "${jobId}", clusterId: "${clusterId}") {
+            jobById(id: "${jobInfos.id}") {
                 id
                 jobId
                 userId
@@ -76,12 +78,15 @@
                 hasProfile
                 tags { id, tagType, tagName }
             }
+
+            tags { id, tagType, tagName }
         }`)
         .toPromise()
         .then(res => {
             if (res.error)
                 console.error(res.error);
 
+            allTags = res.data.tags;
             job = res.data.jobById;
             cluster = res.data.clusters
                 .filter(c => c.clusterID === clusterId)[0];
@@ -114,6 +119,7 @@
     <Col>
         {#if job != null}
             <JobMeta job={job} />
+            <TagControl bind:job={job} allTags={allTags} />
         {:else}
             <Spinner secondary />
         {/if}

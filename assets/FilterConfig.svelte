@@ -51,8 +51,8 @@
         tags: {}
     };
 
-    function toRFC3339({ date, time }) {
-        return `${date}T${time}:00Z`;
+    function toRFC3339({ date, time }, secs = '00') {
+        return `${date}T${time}:${secs}Z`;
     }
 
     function getFilterItems(filters) {
@@ -65,7 +65,7 @@
 
         filterItems.push({ startTime: {
             from: toRFC3339(filters["startTime"]["from"]),
-            to:   toRFC3339(filters["startTime"]["to"])
+            to:   toRFC3339(filters["startTime"]["to"], '59')
         }});
 
         let from = filters["duration"]["from"]["hours"] * 3600
@@ -103,7 +103,7 @@
 </script>
 
 <script>
-    import { getColorForTag } from './utils.js';
+    import { getColorForTag, fuzzySearchTags } from './utils.js';
     import { createEventDispatcher, getContext } from "svelte";
     import { Col, Row, FormGroup, Button, Input,
              ListGroup, ListGroupItem, Card, Spinner } from 'sveltestrap';
@@ -147,24 +147,7 @@
     let appliedFilters = defaultFilters;
     let metricConfig = getContext('metric-config');
 
-    function fuzzyMatch(term, string) {
-        return string.toLowerCase().includes(term);
-    }
-
-    function fuzzySearchTags(term, tags) {
-        if (!tags)
-            return;
-
-        let results = [];
-        for (let tag of tags) {
-            if (fuzzyMatch(term, tag.tagType) ||
-                fuzzyMatch(term, tag.tagName))
-                results.push(tag);
-        }
-        filteredTags = results;
-    }
-
-    $: fuzzySearchTags(tagFilterTerm, $tagsQuery.data && $tagsQuery.data.tags);
+    $: filteredTags = fuzzySearchTags(tagFilterTerm, $tagsQuery.data && $tagsQuery.data.tags);
 
     function fromRFC3339(rfc3339) {
         let parts = rfc3339.split('T');

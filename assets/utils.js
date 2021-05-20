@@ -11,6 +11,29 @@ export function getColorForTag(tag) {
     return 'bg-info';
 }
 
+function fuzzyMatch(term, string) {
+    return string.toLowerCase().includes(term);
+}
+
+export function fuzzySearchTags(term, tags) {
+    if (!tags)
+        return [];
+
+    let results = [];
+    for (let tag of tags) {
+        if (fuzzyMatch(term, tag.tagType) ||
+            fuzzyMatch(term, tag.tagName))
+            results.push(tag);
+    }
+
+    return results.sort((a, b) => {
+        if (a.tagType < b.tagType) return -1;
+        if (a.tagType > b.tagType) return 1;
+        if (a.tagName < b.tagName) return -1;
+        if (a.tagName > b.tagName) return 1;
+        return 0;
+    });
+}
 
 /*
  * Fetch a list of all clusters and build:
