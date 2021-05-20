@@ -4,7 +4,6 @@ const jobView = new JobView({
     target: document.getElementById('svelte-app'),
     props: {
         /* Originally set in templates/jobViews/viewJob-svelte.html.twig */
-        jobId: ccJobView.jobId,
-        clusterId: ccJobView.clusterId
+        jobInfos: jobInfos
     }
 });

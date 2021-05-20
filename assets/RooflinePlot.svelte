@@ -1,5 +1,5 @@
 <div class="cc-plot">
-    <canvas bind:this={canvasElement} width="600" height="400"></canvas>
+    <canvas bind:this={canvasElement} width="{width}" height="{height}"></canvas>
 </div>
 
 <script context="module">
@@ -207,22 +207,47 @@
 </script>
 
 <script>
-    import { onMount, getContext } from 'svelte';
+    import { onMount } from 'svelte';
 
     export let flopsAny
     export let memBw;
     export let cluster;
+    export let width;
+    export let height;
+
+    let ctx;
     let canvasElement;
-    let metricConfig = getContext('metric-config');
+    let mounted = false;
+    const data = transformData(flopsAny, memBw);
 
     onMount(() => {
-        const ctx = canvasElement.getContext('2d');
+        canvasElement.width = width;
+        canvasElement.height = height;
+        ctx = canvasElement.getContext('2d');
+        mounted = true;
 
-        setTimeout(() => {
-            console.time('render-roofline');
-            const data = transformData(flopsAny, memBw);
-            render(ctx, data, cluster, canvasElement.width, canvasElement.height);
-            console.timeEnd('render-roofline');
-        }, 0);
+        render(ctx, data, cluster, width, height);
     });
+
+    let timeoutId = null;
+    function sizeChanged() {
+        if (!mounted)
+            return;
+
+        if (timeoutId != null)
+            clearTimeout(timeoutId);
+
+        timeoutId = setTimeout(() => {
+            timeoutId = null;
+
+            canvasElement.width = width;
+            canvasElement.height = height;
+            ctx = canvasElement.getContext('2d');
+            render(ctx, data, cluster, width, height);
+        }, 250);
+    }
+
+    $: sizeChanged(width, height);
+
+
 </script>

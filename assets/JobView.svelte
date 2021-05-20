@@ -8,45 +8,24 @@
     import RooflinePlot from './RooflinePlot.svelte';
     import JobMeta from './JobMeta.svelte';
     import NodeStats from './NodeStats.svelte';
+    import TagControl from './TagControl.svelte';
+    import PolarPlot from './PolarPlot.svelte';
 
-    export let jobId;
-    export let clusterId;
+    export let jobInfos;
+    const { clusterId, jobId } = jobInfos;
 
+    let fetching = true;
     let cluster = null;
-    let metrics = [];
+    let metrics = null;
     let job = null;
-    const metricUnits = {};
+    let allTags = null;
+    let jobMetrics = null;
+    let queryError = null;
     const metricConfig = {};
     setContext('metric-config', metricConfig);
 
-    initClient({ url: `${window.location.origin}/query/` });
+    initClient({ url: `${window.location.origin}/query` });
 
-    const jobMetricsQuery = operationStore(`
-        query($jobId: String!, $clusterId: String, $metrics: [String]!) {
-            jobMetrics(jobId: $jobId, clusterId: $clusterId, metrics: $metrics) {
-                name,
-                metric {
-                    unit, scope, timestep,
-                    series {
-                        node_id
-                        statistics { avg, min, max }
-                        data
-                    }
-                }
-            }
-        }
-    `, {
-        jobId, clusterId, metrics
-    }, {
-        pause: true
-    });
-    query(jobMetricsQuery);
-
-    /*
-     * The jobById query could be replaced by
-     * values provided by the twig template
-     * when the server renders the page.
-     */
     getClient()
         .query(`query {
             clusters {
@@ -64,7 +43,7 @@
                 }
             }
 
-            jobById(jobId: "${jobId}", clusterId: "${clusterId}") {
+            jobById(id: "${jobInfos.id}") {
                 id
                 jobId
                 userId
@@ -76,12 +55,31 @@
                 hasProfile
                 tags { id, tagType, tagName }
             }
+
+            jobMetrics(jobId: "${jobInfos.jobId}", clusterId: "${jobInfos.clusterId}") {
+                name,
+                metric {
+                    unit, scope, timestep,
+                    series {
+                        node_id
+                        statistics { avg, min, max }
+                        data
+                    }
+                }
+            }
+
+            tags { id, tagType, tagName }
         }`)
         .toPromise()
         .then(res => {
-            if (res.error)
+            if (res.error) {
                 console.error(res.error);
+                queryError = res.error;
+                fetching = false;
+                return;
+            }
 
+            allTags = res.data.tags;
             job = res.data.jobById;
             cluster = res.data.clusters
                 .filter(c => c.clusterID === clusterId)[0];
@@ -93,91 +91,127 @@
                 metricConfig[clusterId][config.name] = config;
 
             metrics = Object.keys(metricConfig[clusterId]);
-            $jobMetricsQuery.variables.metrics = metrics;
-            $jobMetricsQuery.context.pause = false;
+            jobMetrics = res.data.jobMetrics.filter(m => metrics.includes(m.name));
+            fetching = false;
+        })
+        .catch(err => {
+            console.error(err);
+            queryError = err;
+            fetching = false;
         });
 
     const plotsPerRow = 3;
-    let plotWidth = (document.body.offsetWidth - 100) / plotsPerRow;
 
+    function tilePlots() {
+        let rows = [], i = 0;
+        for (let n = 0; n < metrics.length; n += plotsPerRow) {
+            let row = [];
+            for (let m = 0; m < plotsPerRow; m++, i++) {
+                if (i < metrics.length) {
+                    let metric = jobMetrics.find(m => m.name == metrics[i]);
+                    row.push(metric || { name: metrics[i] });
+                } else {
+                    row.push('filler');
+                }
+            }
+            rows.push(row);
+        }
+        return rows;
+    }
+
+    let screenWidth = 0;
+    let metricPlotWidth;
+    let rooflinePlotWidth, rooflinePlotHeight = 300;
+    $: metricPlotWidth = (screenWidth - 50) / plotsPerRow;
+    $: rooflinePlotWidth = screenWidth / 3;
 </script>
 
 <style>
-    h6 {
-        margin-bottom: 5px;
-        margin-top: 20px;
+    .plot-title {
+        display: inline-block;
+        width: 100%;
+        font-weight: bold;
         text-align: center;
+        padding-bottom: 5px;
     }
 </style>
 
 <Row>
     <Col>
-        {#if job != null}
-            <JobMeta job={job} />
-        {:else}
-            <Spinner secondary />
-        {/if}
-    </Col>
-    <Col>
-        {#if $jobMetricsQuery.data}
-            <RooflinePlot
-                flopsAny={$jobMetricsQuery.data.jobMetrics
-                    .find(m => m.name == 'flops_any').metric}
-                memBw={$jobMetricsQuery.data.jobMetrics
-                    .find(m => m.name == 'mem_bw').metric}
-                cluster={cluster}
-            />
-        {:else}
-            <Spinner secondary />
-        {/if}
+        <div bind:clientWidth={screenWidth} style="width: 100%"><!-- Only for getting the row width --></div>
     </Col>
 </Row>
-<Row>
-    {#if $jobMetricsQuery.fetching}
+{#if fetching}
+    <Row>
         <Col>
             <Spinner secondary />
         </Col>
-    {:else if $jobMetricsQuery.error}
+    </Row>
+{:else if queryError != null}
+    <Row>
         <Col>
             <Card body color="danger" class="mb-3">
-                Error: {$jobMetricsQuery.error.message}
+                GraphQL Query Failed: {queryError.message}
             </Card>
         </Col>
-    {:else if $jobMetricsQuery.data}
-        {#each $jobMetricsQuery.data.jobMetrics as metric, index}
-            {#if index % plotsPerRow == 0 && index != 0}{@html '<div class="row">'}{/if}
-            <Col>
-                <h6>
-                    {metric.name}
-                    [{metricConfig[clusterId][metric.name].unit}]
-                </h6>
-                <Plot
-                    metric={metric.name}
-                    clusterId={clusterId}
-                    data={metric.metric}
-                    height={200}
-                    width={plotWidth}/>
-            </Col>
-            {#if index % plotsPerRow == 0 && index != 0}{@html '</div>'}{/if}
-        {:else}
+    </Row>
+{:else}
+    <Row>
+        <Col>
+            <JobMeta job={job} />
+            <TagControl bind:job={job} allTags={allTags} />
+        </Col>
+        <Col>
+            <PolarPlot
+                cluster={cluster} jobMetrics={jobMetrics}
+                width={rooflinePlotWidth} height={rooflinePlotHeight} />
+        </Col>
+        <Col>
+            <RooflinePlot
+                flopsAny={jobMetrics.find(m => m.name == 'flops_any').metric}
+                memBw={jobMetrics.find(m => m.name == 'mem_bw').metric}
+                cluster={cluster} width={rooflinePlotWidth} height={rooflinePlotHeight} />
+        </Col>
+    </Row>
+    <br/>
+    {#each tilePlots(jobMetrics) as row}
+        <Row>
+            {#each row as metric (metric)}
+                <Col>
+                {#if metric == 'filler'}
+                    <!-- Filling Space -->
+                {:else if !metric.metric}
+                    <span class="plot-title">
+                        {metric.name} [{metricConfig[clusterId][metric.name].unit}]
+                    </span>
+                    <br>
+                    <Card body color="warning">No Profiling Data</Card>
+                {:else}
+                    <span class="plot-title">
+                        {metric.name} [{metricConfig[clusterId][metric.name].unit}]
+                    </span>
+                    <Plot
+                        metric={metric.name}
+                        clusterId={clusterId}
+                        data={metric.metric}
+                        height={200}
+                        width={metricPlotWidth} />
+                {/if}
+                </Col>
+            {/each}
+        </Row>
+        <br/>
+    {:else}
+        <Row>
             <Col>
                 <Card body color="warning">No Data</Card>
             </Col>
-        {/each}
-    {:else}
+        </Row>
+    {/each}
+    <br/>
+    <Row>
         <Col>
-            <Spinner secondary />
+            <NodeStats job={job} jobMetrics={jobMetrics} />
         </Col>
-    {/if}
-</Row>
-<Row>
-    <Col>
-        {#if $jobMetricsQuery.data}
-            <NodeStats
-                job={job}
-                jobMetrics={$jobMetricsQuery.data.jobMetrics}/>
-        {:else}
-            <Spinner secondary />
-        {/if}
-    </Col>
-</Row>
+    </Row>
+{/if}
