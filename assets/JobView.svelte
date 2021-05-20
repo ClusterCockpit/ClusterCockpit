@@ -100,7 +100,6 @@
         });
 
     const plotsPerRow = 3;
-    let plotWidth = (document.body.offsetWidth - 100) / plotsPerRow;
 
     function tilePlots() {
         let rows = [], i = 0;
@@ -120,9 +119,12 @@
     }
 
     let screenWidth = 0;
+    let metricPlotWidth;
     let rooflinePlotWidth, rooflinePlotHeight = 300;
+    $: metricPlotWidth = (screenWidth - 50) / plotsPerRow;
     $: rooflinePlotWidth = screenWidth / 3;
 
+    $: console.log('metricPlotWidth:', metricPlotWidth, `(full width: ${screenWidth})`);
 </script>
 
 <style>
@@ -177,6 +179,7 @@
                     <span class="plot-title">
                         {metric.name} [{metricConfig[clusterId][metric.name].unit}]
                     </span>
+                    <br>
                     <Card body color="warning">No Profiling Data</Card>
                 {:else}
                     <span class="plot-title">
@@ -187,7 +190,7 @@
                         clusterId={clusterId}
                         data={metric.metric}
                         height={200}
-                        width={plotWidth} />
+                        width={metricPlotWidth} />
                 {/if}
                 </Col>
             {/each}

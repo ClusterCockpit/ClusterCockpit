@@ -243,7 +243,6 @@
             canvasElement.width = width;
             canvasElement.height = height;
             ctx = canvasElement.getContext('2d');
-            console.log('rerender!', width, height);
             render(ctx, data, cluster, width, height);
         }, 250);
     }
