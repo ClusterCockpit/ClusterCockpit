@@ -1,5 +1,7 @@
-import App from './App.svelte';
+import Datatable from './Datatable.svelte';
 
-const app = new App({
-    target: document.getElementById('svelte-app'),
+const datatable = new Datatable({
+	target: document.getElementById('svelte-app')
 });
+
+export default datatable;

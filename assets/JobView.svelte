@@ -24,7 +24,11 @@
     const metricConfig = {};
     setContext('metric-config', metricConfig);
 
-    initClient({ url: `${window.location.origin}/query` });
+    initClient({
+        url: typeof GRAPHQL_BACKEND !== 'undefined'
+            ? GRAPHQL_BACKEND
+            : `${window.location.origin}/query`
+    });
 
     getClient()
         .query(`query {

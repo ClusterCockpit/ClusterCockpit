@@ -130,6 +130,7 @@
 
     export let showFilters = false;
     export let clusters;
+    export let sorting;
     export let filterRanges; /* Global filter ranges for all clusters */
     const dispatch = createEventDispatcher();
 
@@ -556,7 +557,7 @@
         </div>
     {/if}
 
-    {#if appliedFilters.statistics.some(stat => stat.enabled)}
+    {#if appliedFilters.statistics.some(s => s.enabled)}
         <div>
             Job Statistics:
             {#each appliedFilters.statistics.filter(s => s.enabled) as stat}
@@ -585,5 +586,15 @@
         -
         {appliedFilters["startTime"]["to"]["date"]}
         {appliedFilters["startTime"]["to"]["time"]}
+    </div>
+    <div>
+        Sorting:
+        <br>
+        {sorting.field}
+        {#if sorting.order == 'ASC'}
+            (<i class="bi bi-sort-up"></i>)
+        {:else if sorting.order == 'DESC'}
+            (<i class="bi bi-sort-down"></i>)
+        {/if}
     </div>
 </div>

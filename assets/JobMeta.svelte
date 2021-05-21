@@ -11,13 +11,16 @@
         const seconds = duration;
         return `${hours}:${('0' + minutes).slice(-2)}:${('0' + seconds).slice(-2)}`;
     }
+
+    const getUrl = typeof JOBVIEW_URL !== 'undefined'
+        ? JOBVIEW_URL
+        : job => `/monitoring/job/${job.id}`;
 </script>
 
 <div>
     <div class="fw-bold">
-        <a href="/monitoring/job/{job["id"]}">
-            {job["jobId"]} ({job["clusterId"]})
-        </a>
+        <a href="{getUrl(job)}" target="_blank">{job["jobId"]}</a>
+        ({job["clusterId"]})
     </div>
     <div class="fst-italic">
         {job["userId"]}

@@ -16,7 +16,7 @@
     import JobMetricPlots from './JobMetricPlots.svelte';
     import { fetchClusters } from './utils.js';
 
-    let itemsPerPage = 10;
+    let itemsPerPage = 25;
     let page = 1;
     let filterItems = defaultFilterItems;
     let userFilter;
@@ -53,7 +53,11 @@
         plotWidth = Math.floor((tableWidth - jobMetaWidth) / selectedMetrics.length - 10);
     }
 
-    initClient({ url: `${window.location.origin}/query` });
+    initClient({
+        url: typeof GRAPHQL_BACKEND !== 'undefined'
+            ? GRAPHQL_BACKEND
+            : `${window.location.origin}/query`
+    });
 
     const metricUnits = {};
     const metricConfig = {};
@@ -74,11 +78,7 @@
 
     const jobQuery = operationStore(`
     query($filter: JobFilterList!, $sorting: OrderByInput!, $paging: PageRequest! ){
-       jobs(
-       filter: $filter
-       order: $sorting
-       page: $paging
-       ) {
+       jobs(filter: $filter, order: $sorting, page: $paging) {
            items {
              id
              jobId
@@ -93,8 +93,8 @@
            }
            count
          }
-     }
-     `, {filter: { list: defaultFilterItems }, sorting, paging});
+    }
+    `, {filter: { list: defaultFilterItems }, sorting, paging});
 
     query(jobQuery);
 
@@ -105,6 +105,8 @@
         filterItems = filterItems.filter(f => f.userId == null);
         if (userFilter)
             filterItems.push({ userId: { contains: userFilter }});
+
+        console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
 
         $jobQuery.variables.filter = { "list": filterItems };
     }
@@ -146,10 +148,11 @@
                     }
                 }
 
-                $jobQuery.variables.sorting = {
+                sorting = {
                     field: sortedColumns[key].field,
                     order: sortedColumns[key].order[sortedColumns[key].current]
                 };
+                $jobQuery.variables.sorting = sorting;
             } else {
                 sortedColumns[key].current = 2;
             }
@@ -227,6 +230,7 @@
 
 <Filter {showFilters}
     clusters={clusters}
+    sorting={sorting}
     filterRanges={filterRanges}
     on:update={handleFilter} />
 <div class="d-flex flex-row justify-content-between">
@@ -265,7 +269,7 @@
                                 style="width: {plotWidth}px">
                                 {metric}
                                 {#if metricUnits[metric]}
-                                    ({metricUnits[metric]})
+                                    [{metricUnits[metric]}]
                                 {/if}
                             </th>
                         {/each}
