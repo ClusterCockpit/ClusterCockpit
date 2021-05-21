@@ -155,6 +155,8 @@ class RootResolverMap extends ResolverMap
                         throw new Error("No job for '$jobId' (on '$clusterId')");
 
                     $data = $this->jobData->getData($job, $metrics);
+                    if ($data === false)
+                        throw new Error("No profiling data for this job");
 
                     return $data;
                 },
