@@ -10,6 +10,7 @@
         "doctrine/doctrine-bundle": "^2.2",
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.8",
+        "influxdata/influxdb-client-php": "^1.12",
         "influxdb/influxdb-php": "^1.15",
         "nelmio/cors-bundle": "^2.1",
         "overblog/graphql-bundle": "^0.13.5",
