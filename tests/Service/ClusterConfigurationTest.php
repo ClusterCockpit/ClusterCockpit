@@ -50,49 +50,42 @@ class ClusterConfigurationTest extends KernelTestCase
         $cfg = $config->getClusterIds();
         $this->assertCount(2, $cfg);
     }
+
     public function testGetCluster()
     {
         $config = new ClusterConfiguration('/Users/jan/dev/web/ClusterCockpit');
-        $cfg = $config->getClusterConfig('emmy');
+        $cfg = $config->getClusterConfiguration('emmy');
         /* var_dump($cfg); */
-        $this->assertTrue($cfg['cores_per_socket'] === 10);
+        $this->assertTrue($cfg['coresPerSocket'] === 10);
     }
+
     public function testMetricConfig()
     {
         $config = new ClusterConfiguration('/Users/jan/dev/web/ClusterCockpit');
-        $cfg = $config->getClusterConfig('emmy');
-        $this->assertTrue($cfg['metric_config'][2]['name'] === 'flops_any');
+        $cfg = $config->getClusterConfiguration('emmy');
+        $this->assertTrue($cfg['metricConfig']['flops_any']['name'] === 'flops_any');
     }
+
+    public function testMetricConfigException()
+    {
+        $this->expectExceptionMessage('No such cluster marta');
+        $config = new ClusterConfiguration('/Users/jan/dev/web/ClusterCockpit');
+        $cfg = $config->getClusterConfiguration('marta');
+    }
+
+
     public function testGetConfigurations()
     {
         $config = new ClusterConfiguration('/Users/jan/dev/web/ClusterCockpit');
         $cfg = $config->getConfigurations();
-        var_dump($cfg);
-        $this->assertTrue($cfg['metric_config'][2]['name'] === 'flops_any');
+        $this->assertTrue($cfg['woody']['metricConfig']['flops_any']['name'] === 'flops_any');
     }
-    public function testCompareConfiguration()
+
+    public function testSingleMetric()
     {
-        $clusters = $this->entityManager
-                         ->getRepository(Cluster::class)
-                         ->findAllConfig();
-        $cfg = array_map(function($cluster) {
-            return [
-                'clusterID' => $cluster->name,
-                'flopRateScalar' => $cluster->flopRateScalar,
-                'flopRateSimd' => $cluster->flopRateSimd,
-                'memoryBandwidth' => $cluster->memoryBandwidth,
-                'metricConfig' => $cluster->getMetricLists()['list'],
-
-                // TODO: DB-Schemas differ
-                'processorType' => null,
-                'socketsPerNode' => 1,
-                'coresPerSocket' => $cluster->coresPerNode,
-                'threadsPerCore' => 1
-            ];
-        }, $clusters);
-
-        var_dump($cfg);
-        $this->assertTrue($cfg['metric_config'][2]['name'] === 'flops_any');
+        $config = new ClusterConfiguration('/Users/jan/dev/web/ClusterCockpit');
+        $cfg = $config->getSingleMetric('emmy');
+        $this->assertCount(8, $cfg);
     }
 
 }

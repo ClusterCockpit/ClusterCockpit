@@ -75,12 +75,20 @@ class ClusterConfiguration
 
     public function getSingleMetric($clusterId)
     {
-        return reset($this->_config[$clusterId]['metricConfig']);
+        if ( array_key_exists($clusterId, $this->_config) ) {
+            return reset($this->_config[$clusterId]['metricConfig']);
+        } else {
+            throw new \Exception("No such cluster $clusterId");
+        }
     }
 
     public function getClusterConfiguration($clusterId)
     {
-        return $this->_config[$clusterId];
+        if ( array_key_exists($clusterId, $this->_config) ) {
+            return $this->_config[$clusterId];
+        } else {
+            throw new \Exception("No such cluster $clusterId");
+        }
     }
 
     public function getConfigurations()
