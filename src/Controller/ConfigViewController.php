@@ -57,14 +57,14 @@ class ConfigViewController extends AbstractController
                 'items' => array(
                     array(
                         'label' => 'Users',
-                        'icon' => 'users',
+                        'icon' => 'bi-people-fill',
                         'link' => 'list_user_accounts',
                         'addlink' => 'create_user_account',
                         'active' => false
                     ),
                     array(
                         'label' => 'ApiKeys',
-                        'icon' => 'lock',
+                        'icon' => 'bi-key-fill',
                         'link' => 'list_api_keys',
                         'addlink' => 'create_api_key',
                         'active' => false
@@ -76,56 +76,44 @@ class ConfigViewController extends AbstractController
                 'items' => array(
                     array(
                         'label' => 'Plot defaults',
-                        'icon' => 'bar-chart-2',
+                        'icon' => 'bi-bar-chart-fill',
                         'link' => 'default_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'Plot user',
-                        'icon' => 'bar-chart-2',
+                        'icon' => 'bi-bar-chart-fill',
                         'link' => 'user_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'Colormap',
-                        'icon' => 'edit',
+                        'icon' => 'bi-palette-fill',
                         'link' => 'color_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'Cache',
-                        'icon' => 'copy',
+                        'icon' => 'bi-archive-fill',
                         'link' => 'cache_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'Ldap',
-                        'icon' => 'database',
+                        'icon' => 'bi-person-fill',
                         'link' => 'ldap_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'General',
-                        'icon' => 'settings',
+                        'icon' => 'bi-gear-fill',
                         'link' => 'general_options',
                         'addlink' => false,
-                        'active' => false
-                    ),
-                )
-            ),
-            array(
-                'label' => 'System config',
-                'items' => array(
-                    array(
-                        'label' => 'Clusters',
-                        'icon' => 'server',
-                        'link' => 'list_clusters',
-                        'addlink' => 'create_cluster',
                         'active' => false
                     ),
                 )

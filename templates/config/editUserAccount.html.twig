@@ -7,13 +7,6 @@
 {% block navigation %}
 {% endblock %}
 
-{% block javascript %}
-    {{ parent() }}
-    <script src="{{ asset('js/feather.min.js') }}"/></script>
-    <script>
-        feather.replace()
-    </script>
-{% endblock %}
 
 {% form_theme form 'bootstrap_4_horizontal_layout.html.twig' %}
 
