@@ -25,7 +25,7 @@
 
 namespace App\Repository\Service;
 
-use App\Repository\InfluxDBMetricDataRepository;
+use App\Repository\PrometheusMetricDataRepository;
 use App\Entity\Job;
 use App\Service\ClusterConfiguration;
 
@@ -35,7 +35,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 /* 579945 */
 /* '523286' */
 
-class InfluxDBMetricDataRepositoryTest extends KernelTestCase
+class PrometheusMetricDataRepositoryTest extends KernelTestCase
 {
     private $entityManager;
     private $clusterConfiguration;
@@ -58,7 +58,7 @@ class InfluxDBMetricDataRepositoryTest extends KernelTestCase
                     /* ->find('523286'); */
                     ->find('579945');
 
-        $metricData = new InfluxDBMetricDataRepository();
+        $metricData = new PrometheusMetricDataRepository();
         $returnValue = $metricData->hasProfile($job,
             $this->clusterConfiguration->getSingleMetric($job->getClusterId()));
 
@@ -75,7 +75,7 @@ class InfluxDBMetricDataRepositoryTest extends KernelTestCase
         $metrics =
             $this->clusterConfiguration->getMetricConfiguration($job->getClusterId(), ['flops_any','mem_bw']);
 
-        $metricData = new InfluxDBMetricDataRepository();
+        $metricData = new PrometheusMetricDataRepository();
         $returnValue = $metricData->getJobStats($job, $metrics);
         /* var_dump($returnValue); */
         $this->assertCount(23, $returnValue['nodeStats']);
@@ -91,7 +91,7 @@ class InfluxDBMetricDataRepositoryTest extends KernelTestCase
         $metrics =
             $this->clusterConfiguration->getMetricConfiguration($job->getClusterId(), ['flops_any','mem_bw','rapl_power','clock']);
 
-        $metricData = new InfluxDBMetricDataRepository();
+        $metricData = new PrometheusMetricDataRepository();
         $returnValue = $metricData->getMetricData($job, $metrics);
         var_dump($returnValue);
         $this->assertCount(5, $returnValue);
