@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ namespace App\Repository\Service;
 
 use App\Repository\InfluxDBMetricDataRepository;
 use App\Entity\Job;
+use App\Service\ClusterConfiguration;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -37,29 +38,17 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 class InfluxDBMetricDataRepositoryTest extends KernelTestCase
 {
     private $entityManager;
+    private $clusterConfiguration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $kernel = self::bootKernel();
 
         $this->entityManager = $kernel->getContainer()
              ->get('doctrine')
              ->getManager();
-    }
 
-    public function testGetJobRoofline()
-    {
-        $job = $this->entityManager
-                    ->getRepository(Job::class)
-                    /* ->find('523286'); */
-                    ->find('579945');
-        $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
-
-        $metricData = new InfluxDBMetricDataRepository();
-        $returnValue = $metricData->getJobRoofline($job, $metrics);
-        /* var_dump($returnValue); */
-
-        $this->assertCount(14300, $returnValue);
+        $this->clusterConfiguration = new ClusterConfiguration('/Users/jan/dev/web/ClusterCockpit');
     }
 
     public function testHasProfile()
@@ -70,7 +59,8 @@ class InfluxDBMetricDataRepositoryTest extends KernelTestCase
                     ->find('579945');
 
         $metricData = new InfluxDBMetricDataRepository();
-        $returnValue = $metricData->hasProfile($job);
+        $returnValue = $metricData->hasProfile($job,
+            $this->clusterConfiguration->getSingleMetric($job->getClusterId()));
 
         $this->assertTrue($returnValue);
     }
@@ -80,13 +70,15 @@ class InfluxDBMetricDataRepositoryTest extends KernelTestCase
         $job = $this->entityManager
                     ->getRepository(Job::class)
                     /* ->find('523286'); */
-                    ->find('579945');
-        $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
+                    /* ->find('579945'); */
+                    ->find('1249812');
+        $metrics =
+            $this->clusterConfiguration->getMetricConfiguration($job->getClusterId(), ['flops_any','mem_bw']);
 
         $metricData = new InfluxDBMetricDataRepository();
         $returnValue = $metricData->getJobStats($job, $metrics);
-        /* var_dump($returnValue); */
-        $this->assertCount(16, $returnValue);
+        var_dump($returnValue);
+        $this->assertCount(23, $returnValue['nodeStats']);
     }
 
     public function testGetMetricData()
@@ -95,30 +87,16 @@ class InfluxDBMetricDataRepositoryTest extends KernelTestCase
                     ->getRepository(Job::class)
                     /* ->find('523286'); */
                     ->find('579945');
-        $metrics = $job->getCluster()->getMetricList('list')->getMetrics();
+        $metrics =
+            $this->clusterConfiguration->getMetricConfiguration($job->getClusterId(), ['flops_any','mem_bw','rapl_power','clock']);
 
         $metricData = new InfluxDBMetricDataRepository();
         $returnValue = $metricData->getMetricData($job, $metrics);
         /* var_dump($returnValue); */
-        $this->assertCount(17, $returnValue);
+        $this->assertCount(5, $returnValue);
     }
 
-    public function testGetMetricCount()
-    {
-        $job = $this->entityManager
-                    ->getRepository(Job::class)
-                    /* ->find('523286'); */
-                    ->find('579945');
-        $metrics = $job->getCluster()->getMetricList('list')->getMetrics();
-
-        $metricData = new InfluxDBMetricDataRepository();
-        $returnValue = $metricData->getMetricCount($job, $metrics);
-        /* var_dump($returnValue); */
-        $this->assertEquals(1400, $returnValue);
-    }
-
-
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
