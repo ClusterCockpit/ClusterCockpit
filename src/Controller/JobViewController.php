@@ -47,18 +47,6 @@ use \DateInterval;
 
 class JobViewController extends AbstractController
 {
-    private $_colorMaps;
-    private $_projectDir;
-
-    public function __construct(
-        ColorMap $colorMaps,
-        $projectDir
-    )
-    {
-        $this->_colorMaps = $colorMaps;
-        $this->_projectDir = $projectDir;
-    }
-
     public function searchId(Request $request, AuthorizationCheckerInterface $authChecker)
     {
         $searchId = $request->query->get('searchId');
@@ -100,16 +88,20 @@ class JobViewController extends AbstractController
         }
     }
 
-    public function list( Configuration $configuration )
+    public function list(
+        Configuration $configuration,
+        ColorMap $colorMaps,
+        $projectDir
+    )
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());
-        $this->_colorMaps->setColormap($config['plot_general_colorscheme']->value, $this->_projectDir);
+        $colorMaps->setColormap($config['plot_general_colorscheme']->value, $projectDir);
 
         return $this->render('jobViews/listJobs.html.twig',
             array(
                 'config' => $config,
-                'colormap' => $this->_colorMaps->getColorMap()
+                'colormap' => $colorMaps->getColorMap()
             ));
     }
 
@@ -169,11 +161,13 @@ class JobViewController extends AbstractController
     public function show(
         Job $job,
         Configuration $configuration,
+        ColorMap $colorMaps,
+        $projectDir
     )
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());
-        $this->_colorMaps->setColormap($config['plot_general_colorscheme']->value, $this->_projectDir);
+        $colorMaps->setColormap($config['plot_general_colorscheme']->value, $projectDir);
 
         if ( $job->isRunning ) {
             $job->duration = time() - $job->startTime;
@@ -183,7 +177,7 @@ class JobViewController extends AbstractController
             array(
                 'job' => $job,
                 'config' => $config,
-                'colormap' => $this->_colorMaps->getColorMap()
+                'colormap' => $colorMaps->getColorMap()
             ));
     }
 }

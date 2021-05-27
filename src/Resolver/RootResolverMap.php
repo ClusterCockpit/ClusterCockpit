@@ -26,6 +26,7 @@
 namespace App\Resolver;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Security;
 
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
@@ -33,6 +34,7 @@ use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Resolver\ResolverMap;
 
 use App\Service\JobData;
+use App\Service\Configuration;
 use App\Service\ClusterConfiguration;
 use App\Repository\JobRepository;
 use App\Repository\JobTagRepository;
@@ -44,6 +46,8 @@ class RootResolverMap extends ResolverMap
     private $clusterCfg;
     private $jobTagRepo;
     private $logger;
+    private $configuration;
+    private $security;
     private $projectDir;
 
     public function __construct(
@@ -52,6 +56,8 @@ class RootResolverMap extends ResolverMap
         ClusterConfiguration $clusterCfg,
         JobTagRepository $jobTagRepo,
         LoggerInterface $logger,
+        Configuration $configuration,
+        Security $security,
         $projectDir
     )
     {
@@ -60,6 +66,8 @@ class RootResolverMap extends ResolverMap
         $this->clusterCfg = $clusterCfg;
         $this->jobTagRepo = $jobTagRepo;
         $this->logger = $logger;
+        $this->configuration = $configuration;
+        $this->security = $security;
         $this->projectDir = $projectDir;
     }
 
@@ -220,6 +228,19 @@ class RootResolverMap extends ResolverMap
 
                     $this->jobRepo->persistJob($job);
                     return $this->getTagsArray($job->tags->getValues());
+                },
+
+                'updateConfiguration' => function($value, Argument $args) {
+                    $user = $this->security->getUser();
+                    if ($user == null)
+                        throw new Error('Cannot change configuration without beeing logged in');
+
+                    $username = $user->getUsername();
+                    $ok = $this->configuration->setValue($username, $args['name'], $args['value']);
+                    if ($ok === false)
+                        throw new Error('Invalid configuration');
+
+                    return null;
                 }
             ],
 

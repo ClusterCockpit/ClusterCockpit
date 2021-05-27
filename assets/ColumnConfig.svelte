@@ -2,6 +2,7 @@
     import  { Modal, ModalBody, ModalHeader,
               ModalFooter, Button, ListGroup } from 'sveltestrap';
     import { getContext } from 'svelte';
+    import { mutation } from '@urql/svelte';
 
     export let metrics;
     export let selectedMetrics;
@@ -11,6 +12,12 @@
     let newMetricsOrder;
     let unorderedSelectedMetrics;
     let columnHovering;
+
+    const updateConfiguration = mutation({
+        query: `mutation($name: String!, $value: String!) {
+            updateConfiguration(name: $name, value: $value)
+        }`
+    });
 
     function selectedMetricsChanged() {
         newMetricsOrder = [...metrics];
@@ -41,6 +48,15 @@
         selectedMetrics = metrics.filter(m =>
             unorderedSelectedMetrics.includes(m));
         isOpen = false;
+
+        updateConfiguration({
+                name: 'plot_list_selectedMetrics',
+                value: selectedMetrics.join(',')
+            })
+            .then(res => {
+                if (res.error)
+                    console.error(res.error);
+            });
     }
 
     $: selectedMetricsChanged(selectedMetrics, metrics);

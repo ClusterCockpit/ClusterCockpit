@@ -67,6 +67,28 @@ class Configuration
         return $this->_config;
     }
 
+    /*
+     * The caller must make sure that only 'admin' changes
+     * values with a scope of 'default'
+     */
+    public function setValue($scope, $key, $value)
+    {
+        if ( $this->_isInit == 0 ) {
+            $this->_initConfig();
+        }
+
+        if ( !array_key_exists ( $key , $this->_config) ) {
+            return false;
+        }
+
+        $configEntry = clone $this->_config[$key];
+        $configEntry->setValue($value);
+        $configEntry->setScope($scope);
+        $this->_em->persist($configEntry);
+        $this->_em->flush();
+        return true;
+    }
+
     public function getValue($key)
     {
         if ( $this->_isInit == 0 ) {
