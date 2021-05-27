@@ -68,8 +68,7 @@ class Configuration
     }
 
     /*
-     * The caller must make sure that only 'admin' changes
-     * values with a scope of 'default'
+     * Will NOT work with 'default' as scope!
      */
     public function setValue($scope, $key, $value)
     {
@@ -81,7 +80,11 @@ class Configuration
             return false;
         }
 
-        $configEntry = clone $this->_config[$key];
+        $configEntry = $this->_repository->findAllScope(array($scope))[$key];
+        if ( $configEntry->getScope() == 'default' ) {
+            $configEntry = clone $configEntry;
+        }
+
         $configEntry->setValue($value);
         $configEntry->setScope($scope);
         $this->_em->persist($configEntry);
