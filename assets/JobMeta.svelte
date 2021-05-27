@@ -14,7 +14,7 @@
 
     const getUrl = typeof JOBVIEW_URL !== 'undefined'
         ? JOBVIEW_URL
-        : job => `/monitoring/job/${job.id}`;
+        : job => `/monitoring/jobs/${job.id}`;
 </script>
 
 <div>

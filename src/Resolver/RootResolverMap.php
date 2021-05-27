@@ -75,7 +75,14 @@ class RootResolverMap extends ResolverMap
             'numNodes' => $job->getNumNodes(),
             'tags' => $this->getTagsArray($job->tags->getValues()),
             'hasProfile' => $this->jobData->hasData($job),
-            'projectId' => $job->getProjectId()
+            'projectId' => $job->getProjectId(),
+
+            'loadAvg' => $job->loadAvg,
+            'memUsedMax' => $job->memUsedMax,
+            'flopsAnyAvg' => $job->flopsAnyAvg,
+            'memBwAvg' => $job->memBwAvg,
+            'netBwAvg' => $job->netBwAvg,
+            'fileBwAvg' => $job->fileBwAvg,
         ];
     }
 
@@ -148,9 +155,12 @@ class RootResolverMap extends ResolverMap
                     $jobId = $args['jobId'];
                     $clusterId = $args['clusterId'];
                     $metrics = $args['metrics'];
+                    if ($metrics == null) {
+                        $clusters = $this->clusterCfg->getClusterConfiguration($clusterId);
+                        $metrics = array_map(function ($metric) { return $metric['name']; }, $clusters['metricConfig']);
+                    }
 
                     $job = $this->jobRepo->findBatchJob($jobId, $clusterId, null);
-
                     if ($job === false) {
                         throw new Error("No job for '$jobId' (on '$clusterId')");
                     }

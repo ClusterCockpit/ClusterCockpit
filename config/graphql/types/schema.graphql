@@ -9,6 +9,13 @@ type Job {
   numNodes: Int!
   hasProfile: Boolean!
   tags: [JobTag!]!
+
+  loadAvg: Float
+  memUsedMax: Float
+  flopsAnyAvg: Float
+  memBwAvg: Float
+  netBwAvg: Float
+  fileBwAvg: Float
 }
 
 type JobTag {
