@@ -21,6 +21,11 @@
     let allTags = null;
     let jobMetrics = null;
     let queryError = null;
+
+    const config = typeof uiConfig == 'undefined'
+        ? { plot_view_showRoofline: true, plot_view_showPolarplot: true, plot_view_showStatTable: true, plot_view_plotsPerRow: 3 }
+        : uiConfig;
+
     const metricConfig = {};
     setContext('metric-config', metricConfig);
 
@@ -104,13 +109,11 @@
             fetching = false;
         });
 
-    const plotsPerRow = 3;
-
     function tilePlots() {
         let rows = [], i = 0;
-        for (let n = 0; n < metrics.length; n += plotsPerRow) {
+        for (let n = 0; n < metrics.length; n += config.plot_view_plotsPerRow) {
             let row = [];
-            for (let m = 0; m < plotsPerRow; m++, i++) {
+            for (let m = 0; m < config.plot_view_plotsPerRow; m++, i++) {
                 if (i < metrics.length) {
                     let metric = jobMetrics.find(m => m.name == metrics[i]);
                     row.push(metric || { name: metrics[i] });
@@ -126,7 +129,7 @@
     let screenWidth = 0;
     let metricPlotWidth;
     let rooflinePlotWidth, rooflinePlotHeight = 300;
-    $: metricPlotWidth = (screenWidth - 50) / plotsPerRow;
+    $: metricPlotWidth = (screenWidth - 50 * config.plot_view_plotsPerRow) / config.plot_view_plotsPerRow;
     $: rooflinePlotWidth = screenWidth / 3;
 </script>
 
@@ -166,16 +169,20 @@
             <TagControl bind:job={job} allTags={allTags} />
         </Col>
         <Col>
-            <PolarPlot
-                metrics={[ 'flops_any',  'mem_bw', 'mem_used', 'ib_bw', 'lustre_bw' ]}
-                cluster={cluster} jobMetrics={jobMetrics}
-                width={rooflinePlotWidth} height={rooflinePlotHeight} />
+            {#if config.plot_view_showPolarplot}
+                <PolarPlot
+                    metrics={[ 'flops_any',  'mem_bw', 'mem_used', 'ib_bw', 'lustre_bw' ]}
+                    cluster={cluster} jobMetrics={jobMetrics}
+                    width={rooflinePlotWidth} height={rooflinePlotHeight} />
+            {/if}
         </Col>
         <Col>
-            <RooflinePlot
-                flopsAny={jobMetrics.find(m => m.name == 'flops_any').metric}
-                memBw={jobMetrics.find(m => m.name == 'mem_bw').metric}
-                cluster={cluster} width={rooflinePlotWidth} height={rooflinePlotHeight} />
+            {#if config.plot_view_showRoofline}
+                <RooflinePlot
+                    flopsAny={jobMetrics.find(m => m.name == 'flops_any').metric}
+                    memBw={jobMetrics.find(m => m.name == 'mem_bw').metric}
+                    cluster={cluster} width={rooflinePlotWidth} height={rooflinePlotHeight} />
+            {/if}
         </Col>
     </Row>
     <br/>
@@ -213,10 +220,12 @@
             </Col>
         </Row>
     {/each}
-    <br/>
-    <Row>
-        <Col>
-            <NodeStats job={job} jobMetrics={jobMetrics} />
-        </Col>
-    </Row>
+    {#if config.plot_view_showStatTable}
+        <br/>
+        <Row>
+            <Col>
+                <NodeStats job={job} jobMetrics={jobMetrics} />
+            </Col>
+        </Row>
+    {/if}
 {/if}
