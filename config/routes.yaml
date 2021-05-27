@@ -11,28 +11,28 @@ cluster_roof:
     path: /roofline/
     controller:  App\Controller\IndexViewController::roofline
 list_jobs:
-    path: /monitoring/listjobs/
+    path: /monitoring/jobs/
     controller:  App\Controller\JobViewController::list
 systems:
-    path: /monitoring/listsystems/
+    path: /monitoring/systems/
     controller:  App\Controller\JobViewController::list
 list_jobs_tag:
-    path: /monitoring/listjobs/{id}
+    path: /monitoring/tags/{id}
     controller:  App\Controller\JobViewController::listTag
 job_tag_types:
-    path: /monitoring/tagtypes/
+    path: /monitoring/tags/
     controller:  App\Controller\JobViewController::listTagTypes
 show_job:
-    path: /monitoring/job/{id}
+    path: /monitoring/jobs/{id}
     controller:  App\Controller\JobViewController::show
 search_id:
-    path: /monitoring/searchId
+    path: /monitoring/search/
     controller:  App\Controller\JobViewController::searchId
 user_stat:
-    path: /monitoring/user/statistics/
-    controller:  App\Controller\StatisticsViewController::users
+    path: /monitoring/users/
+    controller:  App\Controller\UserViewController::list
 show_user:
-    path: /monitoring/user/{id}
+    path: /monitoring/users/{id}
     controller:  App\Controller\UserViewController::show
 config_user:
     path: /config

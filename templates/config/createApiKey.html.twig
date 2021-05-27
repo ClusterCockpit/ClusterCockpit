@@ -9,10 +9,7 @@
 
 {% block javascript %}
     {{ parent() }}
-    <script src="{{ asset('js/feather.min.js') }}"/></script>
     <script>
-      feather.replace()
-
       $("#generate").click(function(){
           var text = "";
           var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

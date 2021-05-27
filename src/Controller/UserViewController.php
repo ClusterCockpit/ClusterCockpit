@@ -32,11 +32,6 @@ use App\Entity\UpdateGroupRequest;
 use App\Entity\StatisticsControl;
 use App\Repository\UserRepository;
 use App\Service\Configuration;
-use App\Service\JobCache;
-use App\Service\PlotGenerator;
-use App\Service\GroupFacade;
-use App\Form\UnixGroupType;
-use App\Form\StatisticsControlType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,11 +41,12 @@ class UserViewController extends AbstractController
 {
     public function list(Request $request)
     {
-        $repository = $this->getDoctrine()->getRepository(\App\Entity\User::class);
-        $users = $repository->findAll();
+        $users = $control['repository']->statUsers($control['control']);
 
         return $this->render('users/listUsers.html.twig',
             array(
+                'form' => $control['form']->createView(),
+                'control' => $control['control'],
                 'users' => $users,
             ));
     }
