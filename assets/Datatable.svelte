@@ -33,7 +33,9 @@
     };
 
     let metrics = [];
-    let selectedMetrics = [];
+    let selectedMetrics = typeof uiConfig === 'undefined'
+        ? []
+        : uiConfig.plot_list_selectedMetrics;
 
     let columnConfigOpen = false;
     let sortConfigOpen = false;
@@ -70,10 +72,12 @@
         filterRanges = res.filterRanges;
         metrics = Object.keys(metricUnits);
 
-        selectedMetrics = metrics
-            .filter(m => clusters.every(c =>
-                metricConfig[c.clusterID][m] != null))
-            .slice(0, 4);
+        if (typeof uiConfig === 'undefined') {
+            selectedMetrics = metrics
+                .filter(m => clusters.every(c =>
+                    metricConfig[c.clusterID][m] != null))
+                .slice(0, 4);
+        }
     }, err => console.error(err));
 
     const jobQuery = operationStore(`

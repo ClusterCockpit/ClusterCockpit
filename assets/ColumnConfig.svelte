@@ -43,7 +43,7 @@
         isOpen = false;
     }
 
-    $: selectedMetricsChanged(selectedMetrics);
+    $: selectedMetricsChanged(selectedMetrics, metrics);
 </script>
 
 <style>
