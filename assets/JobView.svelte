@@ -167,6 +167,7 @@
         </Col>
         <Col>
             <PolarPlot
+                metrics={[ 'flops_any',  'mem_bw', 'mem_used', 'ib_bw', 'lustre_bw' ]}
                 cluster={cluster} jobMetrics={jobMetrics}
                 width={rooflinePlotWidth} height={rooflinePlotHeight} />
         </Col>

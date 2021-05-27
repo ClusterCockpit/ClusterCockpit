@@ -5,6 +5,7 @@
 <script>
     import { onMount, getContext } from 'svelte';
 
+    export let metrics;
     export let width;
     export let height;
     export let cluster;
@@ -16,15 +17,19 @@
     let ctx;
     let canvasElement;
 
-    // Add a metric here to show it in the plot:
-    const labels = [ 'flops_any',  'mem_bw', 'mem_used' ];
+    const labels = metrics.filter(name => {
+        if (!jobMetrics.find(m => m.name == name)) {
+            console.warn(`PolarPlot: No metric data for '${name}'`);
+            return false;
+        }
+        return true;
+    });
 
     const getValuesForStat = (getStat) => labels.map(name => {
         const peak = metricConfig[name].peak;
         const metric = jobMetrics.find(m => m.name == name);
-        console.assert(peak != null && metric != null, 'please use existing metrics as labels');
-
-        return getStat(metric.metric) / peak;
+        const value = getStat(metric.metric) / peak;
+        return value <= 1. ? value : 1.;
     });
 
     function getMax(metric) {
@@ -59,7 +64,7 @@
     function render() {
         const centerX = width / 2;
         const centerY = height / 2 - 15;
-        const radius = (Math.min(width, height) / 2) - 30;
+        const radius = (Math.min(width, height) / 2) - 40;
 
         // Draw circles
         ctx.lineWidth = 1;
@@ -86,7 +91,7 @@
             const angle = 2 * Math.PI * ((i + 1) / labels.length);
             const dx = Math.cos(angle) * radius;
             const dy = Math.sin(angle) * radius;
-            ctx.fillText(labels[i], centerX + dx * 1.15, centerY + dy * 1.15);
+            ctx.fillText(labels[i], centerX + dx * 1.1, centerY + dy * 1.1);
 
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);
