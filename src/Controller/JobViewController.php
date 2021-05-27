@@ -28,6 +28,7 @@ namespace App\Controller;
 use App\Entity\Job;
 use App\Entity\JobTag;
 use App\Repository\JobRepository;
+use App\Service\ColorMap;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -46,6 +47,18 @@ use \DateInterval;
 
 class JobViewController extends AbstractController
 {
+    private $_colorMaps;
+    private $_projectDir;
+
+    public function __construct(
+        ColorMap $colorMaps,
+        $projectDir
+    )
+    {
+        $this->_colorMaps = $colorMaps;
+        $this->_projectDir = $projectDir;
+    }
+
     public function searchId(Request $request, AuthorizationCheckerInterface $authChecker)
     {
         $searchId = $request->query->get('searchId');
@@ -91,10 +104,12 @@ class JobViewController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());
+        $this->_colorMaps->setColormap($config['plot_general_colorscheme']->value, $this->_projectDir);
 
         return $this->render('jobViews/listJobs.html.twig',
             array(
-                'config' => $config
+                'config' => $config,
+                'colormap' => $this->_colorMaps->getColorMap()
             ));
     }
 
@@ -158,6 +173,7 @@ class JobViewController extends AbstractController
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());
+        $this->_colorMaps->setColormap($config['plot_general_colorscheme']->value, $this->_projectDir);
 
         if ( $job->isRunning ) {
             $job->duration = time() - $job->startTime;
@@ -166,7 +182,8 @@ class JobViewController extends AbstractController
         return $this->render('jobViews/viewJob.html.twig',
             array(
                 'job' => $job,
-                'config' => $config
+                'config' => $config,
+                'colormap' => $this->_colorMaps->getColorMap()
             ));
     }
 }
