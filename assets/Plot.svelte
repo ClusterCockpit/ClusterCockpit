@@ -16,11 +16,9 @@
     const peakLineColor = '#000000';
     const lineWidth = (config.plot_general_lineWidth || 1) / window.devicePixelRatio;
     const lineColors = config.plot_general_colorscheme || [ '#00bfff', '#0000ff', '#ff00ff', '#ff0000', '#ff8000', '#ffff00', '#80ff00' ];
-    const backgroundColors = config.plot_general_colorBackground === true ? {
-        normal:  'rgba(255, 255, 255, 1.0)',
-        caution: 'rgba(255, 128,   0, 0.3)',
-        alert:   'rgba(255,   0,   0, 0.3)'
-    } : null;
+    const backgroundColors = config.plot_general_colorBackground === true
+        ? { normal:  'rgba(255, 255, 255, 1.0)', caution: 'rgba(255, 128, 0, 0.3)', alert: 'rgba(255, 0, 0, 0.3)' }
+        : null;
 
     function getTotalAvg(data) {
         let avg = 0;
@@ -49,6 +47,13 @@
             return backgroundColors.caution;
 
         return backgroundColors.normal;
+    }
+
+    function getLineColor(i, n) {
+        if (n >= lineColors.length)
+            return lineColors[i % lineColors.length];
+        else
+            return lineColors[Math.floor((i / n) * lineColors.length)];
     }
 
     function formatTime(val) {
@@ -103,7 +108,7 @@
         plotSeries.push({
             scale: 'y',
             width: lineWidth,
-            stroke: lineColors[i % lineColors.length]
+            stroke: getLineColor(i, data.series.length)
         });
     }
 
