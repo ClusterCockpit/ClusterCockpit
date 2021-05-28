@@ -136,5 +136,32 @@ class PrometheusMetricDataRepository implements MetricDataRepository
 
     public function getMetricData($job, $metrics)
     {
-    }
+
+      $nodearray = $job->getNodeArray();
+      $startTime = gmdate("Y-m-d\TH:i:s",$job->startTime);
+      $stopTime = gmdate("Y-m-d\TH:i:s",$job->startTime + $job->duration);
+
+      foreach ($metrics as $key => $metric){
+        $metricname = $metric['name'];
+
+        $curl->get("http://localhost:7281/api/v1/query_range?query=$metricname{instance=~'mistral03.dkrz.de:9100|mistral02.dkrz.de:9100'}&start=$startTime.781Z&end=$stopTime.781Z&step=10");
+        $points = array_column($curl->response->data->result,'values');
+
+        foreach ($nodearray as $key2 => $nodename){
+
+          if ($key == 0){
+              $timearray[$nodename]=array_column($points[$key2],0);}
+            $metricarray[$nodename]=array_column($points[$key2],1);
+          }
+
+        if ($key == 0){
+          $data = array();
+          $data['time'] = $timearray;
+          $data[$metricname] = $metricarray;}
+
+        $data[$metricname] = $metricarray;
+        }
+
+      return $data;    
+    
 }
