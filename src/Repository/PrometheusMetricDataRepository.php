@@ -27,6 +27,7 @@ namespace App\Repository;
 
 use Symfony\Component\Stopwatch\Stopwatch;
 use Psr\Log\LoggerInterface;
+use Curl\Curl;
 
 class PrometheusMetricDataRepository implements MetricDataRepository
 {
@@ -36,18 +37,101 @@ class PrometheusMetricDataRepository implements MetricDataRepository
 
     public function __construct(
         /* LoggerInterface $logger */
+        $prometheusdbURL = getenv('PROMETHEUSDB_URL');
+        $curl = new Curl();
+        $curl->setBasicAuthentication('anwendung01', '--Passwort--');
+
     )
     {
         $this->_timer = new Stopwatch();
         /* $this->_logger = $logger; */
     }
 
+    //TODO: 	Curl Exceptions!
+    //		Rethink Variable names!
+    //		Logger!
+    //		Password Prometheus?
+
+
     public function hasProfile($job, $metric)
     {
+
+       //TODO: 	Test for each metric?
+       // 	Likwid Plugin: Result for every CPU or Sum?
+       // 	$nodes = $job->getNodes('|'); + Nodes in Curl
+        	
+        $startTime = gmdate("Y-m-d\TH:i:s",$job->startTime);
+	$stopTime = gmdate("Y-m-d\TH:i:s",$job->startTime + $job->duration);
+    
+        $nodes = $job->getNodeArray();
+        if ( count($nodes) < 1 ){
+            $job->hasProfile = false;
+            return false;
+
+        foreach ($metrics as $key => $metric){
+        $metricname = $metric['name'];}
+
+        $curl->get("http://localhost:7281/api/v1/query_range?query=$metricname{instance=~'mistral03.dkrz.de:9100|mistral02.dkrz.de:9100'}&start=$startTime.781Z&end=$stopTime.781Z&step=10");
+        $points = array_column($curl->response->data->result,'values');
+
+        if ( count($points) < 4 ){
+            $job->hasProfile = false;
+            return false;
+        } else {
+            $job->hasProfile = true;
+            return true;
+        }
     }
 
     public function getJobStats($job, $metrics)
     {
+
+        //TODO: $nodes = $job->getNodes('|'); + Nodes in Curl
+
+        $nodearray = $job->getNodeArray();
+        $stopTime = gmdate("Y-m-d\TH:i:s",$job->startTime + $job->duration);
+
+
+        foreach ($nodearray as $nodename){
+            $result=array($nodename => array());}
+
+        foreach ($metrics as $key => $metric){
+        $metricname = $metric['name'];
+
+          $curl->get("http://localhost:7281/api/v1/query?query=min_over_time($metricname{instance=~'mistral01.dkrz.de:9100|mistral02.dkrz.de:9100|mistral03.dkrz.de:9100'}[5m])&time=$stopTime.781Z");
+          $dmin = array_column(array_column($curl->response->data->result,'value'),1);
+          $curl->get("http://localhost:7281/api/v1/query?query=max_over_time($metricname{instance=~'mistral01.dkrz.de:9100|mistral02.dkrz.de:9100|mistral03.dkrz.de:9100'}[5m])&time=$stopTime.781Z");
+          $dmax = array_column(array_column($curl->response->data->result,'value'),1);
+          $curl->get("http://localhost:7281/api/v1/query?query=avg_over_time($metricname{instance=~'mistral01.dkrz.de:9100|mistral02.dkrz.de:9100|mistral03.dkrz.de:9100'}[5m])&time=$stopTime.781Z");
+          $davg = array_column(array_column($curl->response->data->result,'value'),1);
+
+          $minval=round(min($dmin),2);
+          $maxval=round(max($dmax),2);
+          $avgval=round(array_sum($davg)/count($davg),2);
+
+          foreach ($nodearray as $key2 => $nodename){
+            $array=array();
+            if ($key == 0){
+                $array['nodeId'] = $nodename;}
+            $array[$metricname."_avg"] = round($davg[$key2],2);
+            $array[$metricname."_min"] = round($dmin[$key2],2);
+            $array[$metricname."_max"] = round($dmax[$key2],2);
+            if ($key == 0){
+                $result[$nodename]=$array;}
+            else {
+                $result[$nodename] = array_merge($result[$nodename],$array);}
+            }
+   
+        $Result[$metricname."_avg"] = $avgval;
+        $Result[$metricname."_min"] = $minval;
+        $Result[$metricname."_max"] = $maxval;
+        }
+
+      $nodestats['nodestats'] = $result;
+      $stats = array_merge($Result, $nodestats);
+
+      return $stats;
+
     }
 
     public function getMetricData($job, $metrics)
