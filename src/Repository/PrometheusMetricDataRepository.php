@@ -74,7 +74,7 @@ class PrometheusMetricDataRepository implements MetricDataRepository
         $curl->get("http://localhost:7281/api/v1/query_range?query=$metricname{instance=~'mistral03.dkrz.de:9100|mistral02.dkrz.de:9100'}&start=$startTime.781Z&end=$stopTime.781Z&step=10");
         $points = array_column($curl->response->data->result,'values');
 
-        if ( count($points) < 4 ){
+        if ( count($points) == 0 || $points[0]['count'] < 4 ){
             $job->hasProfile = false;
             return false;
         } else {
