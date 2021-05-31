@@ -36,10 +36,11 @@ class PrometheusMetricDataRepository implements MetricDataRepository
     /* private $_logger; */
 
     public function __construct(
-        /* LoggerInterface $logger */
-        $prometheusdbURL = getenv('PROMETHEUSDB_URL');
+	/* LoggerInterface $logger */
+	//URL = http://localhost:7281/api/v1
+        $promURL = getenv('PROMETHEUSDB_URL');
         $curl = new Curl();
-        $curl->setBasicAuthentication('anwendung01', '--Passwort--');
+        $curl->setBasicAuthentication(getenv('PROMETHEUS_USR'), getenv('PROMETHEUS_PWD'));
 
     )
     {
@@ -71,7 +72,9 @@ class PrometheusMetricDataRepository implements MetricDataRepository
         foreach ($metrics as $key => $metric){
         $metricname = $metric['name'];}
 
-        $curl->get("http://localhost:7281/api/v1/query_range?query=$metricname{instance=~'mistral03.dkrz.de:9100|mistral02.dkrz.de:9100'}&start=$startTime.781Z&end=$stopTime.781Z&step=10");
+	    $curl->get("$promURL/query_range?query=$metricname".
+		    "{instance=~'mistral03.dkrz.de:9100|mistral02.dkrz.de:9100'}".
+		    "&start=$startTime.781Z&end=$stopTime.781Z&step=10");
         $points = array_column($curl->response->data->result,'values');
 
         if ( count($points) == 0 || $points[0]['count'] < 4 ){
@@ -96,13 +99,19 @@ class PrometheusMetricDataRepository implements MetricDataRepository
             $result=array($nodename => array());}
 
         foreach ($metrics as $key => $metric){
-        $metricname = $metric['name'];
+          $metricname = $metric['name'];
 
-          $curl->get("http://localhost:7281/api/v1/query?query=min_over_time($metricname{instance=~'mistral01.dkrz.de:9100|mistral02.dkrz.de:9100|mistral03.dkrz.de:9100'}[5m])&time=$stopTime.781Z");
+          $curl->get("$promURL/query?query=min_over_time($metricname".
+		  "{instance=~'mistral01.dkrz.de:9100|mistral02.dkrz.de:9100|mistral03.dkrz.de:9100'}".
+		  "[5m])&time=$stopTime.781Z");
           $dmin = array_column(array_column($curl->response->data->result,'value'),1);
-          $curl->get("http://localhost:7281/api/v1/query?query=max_over_time($metricname{instance=~'mistral01.dkrz.de:9100|mistral02.dkrz.de:9100|mistral03.dkrz.de:9100'}[5m])&time=$stopTime.781Z");
+	  $curl->get("$promURL/query?query=max_over_time($metricname".
+		  "{instance=~'mistral01.dkrz.de:9100|mistral02.dkrz.de:9100|mistral03.dkrz.de:9100'}".
+		  "[5m])&time=$stopTime.781Z");
           $dmax = array_column(array_column($curl->response->data->result,'value'),1);
-          $curl->get("http://localhost:7281/api/v1/query?query=avg_over_time($metricname{instance=~'mistral01.dkrz.de:9100|mistral02.dkrz.de:9100|mistral03.dkrz.de:9100'}[5m])&time=$stopTime.781Z");
+	  $curl->get("$promURL/query?query=avg_over_time($metricname".
+		  "{instance=~'mistral01.dkrz.de:9100|mistral02.dkrz.de:9100|mistral03.dkrz.de:9100'}".
+		  "[5m])&time=$stopTime.781Z");
           $davg = array_column(array_column($curl->response->data->result,'value'),1);
 
           $minval=round(min($dmin),2);
@@ -144,7 +153,9 @@ class PrometheusMetricDataRepository implements MetricDataRepository
       foreach ($metrics as $key => $metric){
         $metricname = $metric['name'];
 
-        $curl->get("http://localhost:7281/api/v1/query_range?query=$metricname{instance=~'mistral03.dkrz.de:9100|mistral02.dkrz.de:9100'}&start=$startTime.781Z&end=$stopTime.781Z&step=10");
+	$curl->get("$promURL/query_range?query=$metricname".
+		"{instance=~'mistral03.dkrz.de:9100|mistral02.dkrz.de:9100'}".
+		"&start=$startTime.781Z&end=$stopTime.781Z&step=10");
         $points = array_column($curl->response->data->result,'values');
 
         foreach ($nodearray as $key2 => $nodename){
