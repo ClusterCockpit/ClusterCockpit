@@ -20,7 +20,9 @@
     });
 
     function selectedMetricsChanged() {
-        newMetricsOrder = [...metrics];
+        // The selectedMetrics shall be in order and at the start.
+        newMetricsOrder = metrics.filter(m => !selectedMetrics.includes(m));
+        newMetricsOrder.unshift(...selectedMetrics);
         unorderedSelectedMetrics = [...selectedMetrics];
     }
 
