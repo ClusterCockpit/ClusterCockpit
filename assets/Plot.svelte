@@ -7,16 +7,17 @@
     }
 </style>
 
-<script context="module">
+<script>
+    import { onMount, onDestroy, getContext } from "svelte";
+    import uPlot from "uplot";
 
-    // uiConfig will be set in templates/jobViews/*.html.twig:
-    const config = typeof uiConfig === 'undefined' ? {} : uiConfig;
+    const clusterCockpitConfig = getContext('cc-config');
 
     const resizeSleepTime = 250;
     const peakLineColor = '#000000';
-    const lineWidth = (config.plot_general_lineWidth || 1) / window.devicePixelRatio;
-    const lineColors = config.plot_general_colorscheme || [ '#00bfff', '#0000ff', '#ff00ff', '#ff0000', '#ff8000', '#ffff00', '#80ff00' ];
-    const backgroundColors = config.plot_general_colorBackground === true
+    const lineWidth = clusterCockpitConfig.plot_general_lineWidth / window.devicePixelRatio;
+    const lineColors = clusterCockpitConfig.plot_general_colorscheme;
+    const backgroundColors = clusterCockpitConfig.plot_general_colorBackground === true
         ? { normal:  'rgba(255, 255, 255, 1.0)', caution: 'rgba(255, 128, 0, 0.3)', alert: 'rgba(255, 0, 0, 0.3)' }
         : null;
 
@@ -74,11 +75,6 @@
 
         return incrs;
     }
-</script>
-
-<script>
-    import { onMount, onDestroy, getContext } from "svelte";
-    import uPlot from "uplot";
 
     export let metric;
     export let clusterId;

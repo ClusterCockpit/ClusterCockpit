@@ -8,13 +8,15 @@
         Spinner,
         ListGroup, ListGroupItem,
         Modal, ModalBody, ModalHeader, ModalFooter, Input } from 'sveltestrap';
-    import { setContext } from 'svelte';
+    import { setContext, getContext } from 'svelte';
     import Pagination from './Pagination.svelte';
     import Filter, { defaultFilterItems } from './FilterConfig.svelte';
     import ColumnConfig from './ColumnConfig.svelte';
     import JobMeta from './JobMeta.svelte';
     import JobMetricPlots from './JobMetricPlots.svelte';
     import { fetchClusters } from './utils.js';
+
+    const clusterCockpitConfig = getContext('cc-config');
 
     let itemsPerPage = 25;
     let page = 1;
@@ -33,9 +35,7 @@
     };
 
     let metrics = [];
-    let selectedMetrics = typeof uiConfig === 'undefined'
-        ? []
-        : uiConfig.plot_list_selectedMetrics;
+    let selectedMetrics = clusterCockpitConfig.plot_list_selectedMetrics.split(',').map(s => s.trim());
 
     let columnConfigOpen = false;
     let sortConfigOpen = false;
@@ -72,12 +72,10 @@
         filterRanges = res.filterRanges;
         metrics = Object.keys(metricUnits);
 
-        if (typeof uiConfig === 'undefined') {
-            selectedMetrics = metrics
-                .filter(m => clusters.every(c =>
-                    metricConfig[c.clusterID][m] != null))
-                .slice(0, 4);
-        }
+        // selectedMetrics = metrics
+        //     .filter(m => clusters.every(c =>
+        //         metricConfig[c.clusterID][m] != null))
+        //     .slice(0, 4);
     }, err => console.error(err));
 
     const jobQuery = operationStore(`

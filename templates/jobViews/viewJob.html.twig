@@ -18,7 +18,7 @@
             clusterId: "{{ job.clusterId }}"
         };
 
-        const uiConfig = {
+        const clusterCockpitConfigPromise = Promise.resolve({
             plot_general_colorscheme: {{ colormap | json_encode | raw }},
             plot_general_lineWidth: {{ config.plot_general_lineWidth.value }},
             plot_general_colorBackground: {{ config.plot_general_colorBackground.value }},
@@ -26,7 +26,7 @@
             plot_view_showPolarplot: {{ config.plot_view_showPolarplot.value }},
             plot_view_showStatTable: {{ config.plot_view_showStatTable.value }},
             plot_view_plotsPerRow: {{ config.plot_view_plotsPerRow.value }}
-        };
+        });
     </script>
     {{ encore_entry_script_tags('jobview') }}
 {% endblock %}

@@ -1,5 +1,5 @@
 <script>
-    import { setContext } from 'svelte';
+    import { setContext, getContext } from 'svelte';
     import { Col, Row, Card, Spinner } from 'sveltestrap';
     import { fetchClusters } from './utils.js';
     import { initClient, getClient,
@@ -22,9 +22,7 @@
     let jobMetrics = null;
     let queryError = null;
 
-    const config = typeof uiConfig == 'undefined'
-        ? { plot_view_showRoofline: true, plot_view_showPolarplot: true, plot_view_showStatTable: true, plot_view_plotsPerRow: 3 }
-        : uiConfig;
+    const clusterCockpitConfig = getContext('cc-config');
 
     const metricConfig = {};
     setContext('metric-config', metricConfig);
@@ -109,11 +107,12 @@
             fetching = false;
         });
 
+    const plotsPerRow = clusterCockpitConfig.plot_view_plotsPerRow;
     function tilePlots() {
         let rows = [], i = 0;
-        for (let n = 0; n < metrics.length; n += config.plot_view_plotsPerRow) {
+        for (let n = 0; n < metrics.length; n += plotsPerRow) {
             let row = [];
-            for (let m = 0; m < config.plot_view_plotsPerRow; m++, i++) {
+            for (let m = 0; m < plotsPerRow; m++, i++) {
                 if (i < metrics.length) {
                     let metric = jobMetrics.find(m => m.name == metrics[i]);
                     row.push(metric || { name: metrics[i] });
@@ -129,7 +128,7 @@
     let screenWidth = 0;
     let metricPlotWidth;
     let rooflinePlotWidth, rooflinePlotHeight = 300;
-    $: metricPlotWidth = (screenWidth - 50 * config.plot_view_plotsPerRow) / config.plot_view_plotsPerRow;
+    $: metricPlotWidth = (screenWidth - 50 * plotsPerRow) / plotsPerRow;
     $: rooflinePlotWidth = screenWidth / 3;
 </script>
 
@@ -169,7 +168,7 @@
             <TagControl bind:job={job} allTags={allTags} />
         </Col>
         <Col>
-            {#if config.plot_view_showPolarplot}
+            {#if clusterCockpitConfig.plot_view_showPolarplot}
                 <PolarPlot
                     metrics={[ 'flops_any',  'mem_bw', 'mem_used', 'ib_bw', 'lustre_bw' ]}
                     cluster={cluster} jobMetrics={jobMetrics}
@@ -177,7 +176,7 @@
             {/if}
         </Col>
         <Col>
-            {#if config.plot_view_showRoofline}
+            {#if clusterCockpitConfig.plot_view_showRoofline}
                 <RooflinePlot
                     flopsAny={jobMetrics.find(m => m.name == 'flops_any').metric}
                     memBw={jobMetrics.find(m => m.name == 'mem_bw').metric}
@@ -188,7 +187,7 @@
     <br/>
     {#each tilePlots(jobMetrics) as row}
         <Row>
-            {#each row as metric (metric)}
+            {#each row as metric}
                 <Col>
                 {#if metric == 'filler'}
                     <!-- Filling Space -->
@@ -220,7 +219,7 @@
             </Col>
         </Row>
     {/each}
-    {#if config.plot_view_showStatTable}
+    {#if clusterCockpitConfig.plot_view_showStatTable}
         <br/>
         <Row>
             <Col>
