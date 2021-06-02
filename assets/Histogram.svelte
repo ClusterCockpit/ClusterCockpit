@@ -9,16 +9,16 @@
     export let width;
     export let height;
 
-    const paddingLeft = 20,
-        paddingRight = 40,
-        paddingTop = 0,
+    const paddingLeft = 25,
+        paddingRight = 20,
+        paddingTop = 15,
         paddingBottom = 20;
 
     let ctx;
     let canvasElement;
 
     const [ maxCount, maxValue ] = data.reduce(([maxCount, maxValue], point) =>
-        [Math.max(maxCount, point.count), Math.max(maxValue, point.value)], [0, 0]);
+        [ Math.max(maxCount, point.count), Math.max(maxValue, point.value) ], [0, 0]);
 
     function getStepSize(valueRange, pixelRange, minSpace) {
         const proposition = valueRange / (pixelRange / minSpace);
@@ -28,13 +28,8 @@
         let n = 0;
         let stepsize = getStepSize(n);
         while (true) {
-            let smaller = getStepSize(n - 1);
             let bigger = getStepSize(n + 1);
-
-            if (proposition < smaller) {
-                n -= 1;
-                stepsize = smaller;
-            } else if (proposition > bigger) {
+            if (proposition > bigger) {
                 n += 1;
                 stepsize = bigger;
             } else {
@@ -46,19 +41,18 @@
     function render() {
         const h = height - paddingTop - paddingBottom;
         const w = width - paddingLeft - paddingRight;
-        const barWidth = Math.round(w / data.length);
+        const barWidth = Math.round(w / (maxValue + 1));
 
-        console.log(barWidth, h, w, height, width)
-
-        const getCanvasX = (value) => Math.floor((value / maxValue) * w + paddingLeft + (barWidth / 2.));
+        // const getCanvasX = (value) => Math.floor((value / maxValue) * (w - barWidth) + paddingLeft + (barWidth / 2.));
+        const getCanvasX = (value) => Math.floor((value / maxValue) * (w - barWidth) + paddingLeft + (barWidth / 2.));
         const getCanvasY = (count) => Math.floor((h - (count / maxCount) * h) + paddingTop);
 
         ctx.fillStyle = '#0066cc';
         for (let p of data) {
             ctx.fillRect(
-                getCanvasX(p.value) - (barWidth / 2.) + 2,
+                getCanvasX(p.value) - (barWidth / 2.),
                 getCanvasY(p.count),
-                barWidth - 4,
+                barWidth,
                 Math.floor((p.count / maxCount) * h));
         }
 
@@ -72,15 +66,15 @@
         ctx.fillStyle = 'black';
         ctx.textAlign = 'center';
         const stepsizeX = getStepSize(maxValue, w, 100);
-        for (let x = 0; x < maxValue; x += stepsizeX) {
+        for (let x = 0; x <= maxValue; x += stepsizeX) {
             ctx.fillText(`${x}`, getCanvasX(x), height - paddingBottom + 15);
         }
 
-        ctx.strokeStyle = `#bbb`;
+        ctx.strokeStyle = `#bbbbbb`;
         ctx.textAlign = 'right';
         ctx.beginPath();
         const stepsizeY = getStepSize(maxCount, h, 100);
-        for (let y = stepsizeY; y < maxCount; y += stepsizeY) {
+        for (let y = stepsizeY; y <= maxCount; y += stepsizeY) {
             const py = getCanvasY(y);
             ctx.fillText(`${y}`, paddingLeft - 5, py);
             ctx.moveTo(paddingLeft, py);
@@ -89,10 +83,32 @@
         ctx.stroke();
     }
 
+    let mounted = false;
     onMount(() => {
+        mounted = true;
         canvasElement.width = width;
         canvasElement.height = height;
         ctx = canvasElement.getContext('2d');
         render();
     });
+
+    let timeoutId = null;
+    function sizeChanged() {
+        if (!mounted)
+            return;
+
+        if (timeoutId != null)
+            clearTimeout(timeoutId);
+
+        timeoutId = setTimeout(() => {
+            timeoutId = null;
+
+            canvasElement.width = width;
+            canvasElement.height = height;
+            ctx = canvasElement.getContext('2d');
+            render();
+        }, 250);
+    }
+
+    $: sizeChanged(width, height);
 </script>
