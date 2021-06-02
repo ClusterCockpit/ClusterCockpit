@@ -18,6 +18,8 @@
 
     const clusterCockpitConfig = getContext('cc-config');
 
+    export let restrictToUser = null;
+
     let itemsPerPage = 25;
     let page = 1;
     let filterItems = defaultFilterItems;
@@ -55,11 +57,16 @@
         plotWidth = Math.floor((tableWidth - jobMetaWidth) / selectedMetrics.length - 10);
     }
 
-    initClient({
-        url: typeof GRAPHQL_BACKEND !== 'undefined'
-            ? GRAPHQL_BACKEND
-            : `${window.location.origin}/query`
-    });
+    if (!getClient()) {
+        initClient({
+            url: typeof GRAPHQL_BACKEND !== 'undefined'
+                ? GRAPHQL_BACKEND
+                : `${window.location.origin}/query`
+        });
+    }
+
+    if (restrictToUser)
+        defaultFilterItems.push({ userId: { eq: restrictToUser } });
 
     const metricUnits = {};
     const metricConfig = {};
@@ -107,6 +114,9 @@
         filterItems = filterItems.filter(f => f.userId == null);
         if (userFilter)
             filterItems.push({ userId: { contains: userFilter }});
+
+        if (restrictToUser)
+            filterItems.push({ userId: { eq: restrictToUser } });
 
         console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
 
@@ -240,11 +250,18 @@
         <Button outline color=success  on:click={toggleFilter}><Icon name="filter" /></Button>
     </div>
     <div class="input-group w-75 mb-2 mr-sm-2">
+    {#if !restrictToUser}
         <div class="input-group-prepend">
             <div class="input-group-text"><Icon name="search" /></div>
         </div>
-        <input type="search" bind:value={userFilter} on:input={handleUserFilter} class="form-control"  placeholder="Filter userId">
-      </div>
+        <input type="search" bind:value={userFilter} on:input={handleUserFilter} class="form-control"  placeholder="Filter userId" />
+    {:else}
+        <div class="input-group-prepend">
+            <div class="input-group-text"><Icon name="person" /></div>
+        </div>
+        <input type="search" value={restrictToUser} class="form-control" disabled />
+    {/if}
+    </div>
     <div>
         <Button outline on:click={toggleSortConfig}><Icon name="sort-down" /></Button>
         <Button outline on:click={toggleColumnConfig}><Icon name="gear" /></Button>
