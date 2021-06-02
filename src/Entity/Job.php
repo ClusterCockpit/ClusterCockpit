@@ -78,9 +78,10 @@ class Job
     /**
      * The userId for this job.
      *
-     *  @ORM\ManyToOne(targetEntity="User")
+     *  @ORM\Column(type="string")
+     *  @Groups({"read","write"})
      */
-    private $user;
+    private $userId;
 
     /**
      * The cluster on which the job was executed.
@@ -213,14 +214,14 @@ class Job
         $this->jobId = $jobId;
     }
 
-    public function getUser()
+    public function getUserId()
     {
-        return $this->user;
+        return $this->userId;
     }
 
-    public function setUser($user)
+    public function setUserId($userId)
     {
-        $this->user = $user;
+        $this->userId = $userId;
     }
 
     public function getClusterId()

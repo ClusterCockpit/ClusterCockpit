@@ -76,7 +76,7 @@ class RootResolverMap extends ResolverMap
         return [
             'id' => $job->id,
             'jobId' => $job->getJobId(),
-            'userId' => $job->getUser()->getUsername(),
+            'userId' => $job->getUserId(),
             'clusterId' => $job->getClusterId(),
             'startTime' => $job->getStartTime(),
             'duration' => $job->getDuration(),

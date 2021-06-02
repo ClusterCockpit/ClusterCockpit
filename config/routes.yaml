@@ -17,13 +17,13 @@ systems:
     path: /monitoring/systems/
     controller:  App\Controller\JobViewController::list
 list_jobs_tag:
-    path: /monitoring/tags/{id}
+    path: /monitoring/tag/{id}
     controller:  App\Controller\JobViewController::listTag
 job_tag_types:
     path: /monitoring/tags/
     controller:  App\Controller\JobViewController::listTagTypes
 show_job:
-    path: /monitoring/jobs/{id}
+    path: /monitoring/job/{id}
     controller:  App\Controller\JobViewController::show
 search_id:
     path: /monitoring/search/
@@ -32,7 +32,7 @@ user_stat:
     path: /monitoring/users/
     controller:  App\Controller\UserViewController::list
 show_user:
-    path: /monitoring/users/{id}
+    path: /monitoring/user/{id}
     controller:  App\Controller\UserViewController::show
 config_user:
     path: /config
