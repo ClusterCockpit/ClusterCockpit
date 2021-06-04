@@ -74,8 +74,9 @@
     $: updateStatsFilter(selectedCluster, selectedMonth, selectedYear);
     query(statsQuery);
 
+    let filterRanges = null;
     function onFilterRanges(event) {
-        const filterRanges = event.detail;
+        filterRanges = event.detail;
 
         const firstJob = new Date(filterRanges.startTime.from);
         const lastJob = new Date(filterRanges.startTime.to);
@@ -101,19 +102,21 @@
         <div bind:clientWidth={screenWidth} style="width: 100%"><!-- Only for getting the row width --></div>
     </Col>
 </Row>
-{#if $statsQuery.fetching}
-    <div class="d-flex justify-content-center">
-        <Spinner secondary />
-    </div>
-{:else if $statsQuery.error}
-    <Card body color="danger" class="mb-3"><h2>Error: {$statsQuery.error.message}</h2></Card>
-{:else}
-    <Row>
+<Row>
+    {#if filterRanges == null}
         <Col>
-            <h5>
-                Show Statistics for:
-            </h5>
+            <div class="d-flex justify-content-center">
+                <Spinner secondary />
+            </div>
+        </Col>
+    {:else}
+        <Col>
             <Table>
+                <thead>
+                    <tr>
+                        <th colspan="2">Statistics shown for:</th>
+                    </tr>
+                </thead>
                 <tbody>
                     <tr>
                         <th scope="row">Select Cluster</th>
@@ -157,6 +160,18 @@
                 </tbody>
             </Table>
         </Col>
+    {/if}
+    {#if $statsQuery.fetching}
+        <Col xs="9">
+            <div class="d-flex justify-content-center">
+                <Spinner secondary />
+            </div>
+        </Col>
+    {:else if $statsQuery.error}
+        <Col xs="9">
+            <Card body color="danger" class="mb-3"><h2>Error: {$statsQuery.error.message}</h2></Card>
+        </Col>
+    {:else}
         <Col>
             <Table>
                 <tbody>
@@ -197,8 +212,8 @@
             <Histogram width={histogramWidth} height={200}
                 data={$statsQuery.data.jobsStatistics.histNumNodes} />
         </Col>
-    </Row>
-{/if}
+    {/if}
+</Row>
 <Row>
     <Col>
         <hr/>
