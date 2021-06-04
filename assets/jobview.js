@@ -14,8 +14,8 @@ import JobView from './JobView.svelte';
         props: {
             jobInfos: jobInfos
         },
-        context: [
+        context: new Map([
             ['cc-config', await clusterCockpitConfigPromise]
-        ]
+        ])
     });
 })();

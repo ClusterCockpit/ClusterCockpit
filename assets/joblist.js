@@ -6,8 +6,8 @@ import Datatable from './Datatable.svelte';
      */
     new Datatable({
         target: document.getElementById('svelte-app'),
-        context: [
+        context: new Map([
             ['cc-config', await clusterCockpitConfigPromise]
-        ]
+        ])
     });
 })();

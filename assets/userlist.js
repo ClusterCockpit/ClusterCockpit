@@ -6,8 +6,8 @@ import UserView from './UserView.svelte';
         props: {
             userId: "mpt2006h" /* FIXME: Replace Me! */
         },
-        context: [
+        context: new Map([
             ['cc-config', await clusterCockpitConfigPromise]
-        ]
+        ])
     });
 })();

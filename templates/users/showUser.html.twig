@@ -11,6 +11,15 @@
 {% endblock %}
 
 {% block javascript %}
+    <script type="text/javascript">
+        const userId = "{{ userId }}";
+        const clusterCockpitConfigPromise = Promise.resolve({
+            plot_general_colorscheme: {{ colormap | json_encode | raw }},
+            plot_general_lineWidth: {{ config.plot_general_lineWidth.value }},
+            plot_general_colorBackground: {{ config.plot_general_colorBackground.value }},
+            plot_list_selectedMetrics: "{{ config.plot_list_selectedMetrics.value }}"
+        });
+    </script>
     {{ encore_entry_script_tags('userview') }}
 {% endblock %}
 
