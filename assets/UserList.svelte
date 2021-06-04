@@ -47,7 +47,11 @@
         <tbody>
             {#each $usersQuery.data.userStats as user (user.userId)}
                 <tr>
-                    <td>{user.userId}</td>
+                    <td>
+                        <a href="/monitoring/user/{user.id}" target="_blank">
+                            {user.userId}
+                        </a>
+                    </td>
                     <td>{user.totalJobs}</td>
                     <td>{user.totalWalltime.toFixed(2)}</td>
                     <td>{user.totalCoreHours.toFixed(2)}</td>

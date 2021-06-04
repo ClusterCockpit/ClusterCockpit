@@ -418,11 +418,23 @@ class JobRepository extends ServiceEntityRepository
             }
         }
 
+        // TODO/FIXME: Change Table Layout?
+        $sql = "
+        SELECT DISTINCT job.user_id, user.id FROM job
+        JOIN user ON user.username = job.user_id
+        ";
+        $rows = $this->_connection->fetchAll($sql);
+        $mapping = array();
+        foreach ($rows as $row) {
+            $mapping[$row['user_id']] = $row['id'];
+        }
+
         foreach ( $users as $id => &$user ){
             /* TODO Remove workaround */
             if ( is_null($id) ){
                 $id = 1;
             }
+            $user['id'] = $mapping[$id];
             $user['userId'] = $id;
             $user['totalWalltime'] = 0;
             $user['totalJobs'] = 0;
@@ -435,6 +447,10 @@ class JobRepository extends ServiceEntityRepository
                     $user['totalJobs'] += $user[ $cluster['clusterID'] ]['totalJobs'];
                 }
             }
+        }
+
+        foreach ( $users as $id => &$user ){
+
         }
 
         return $users;
