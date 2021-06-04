@@ -8,7 +8,7 @@
         Spinner,
         ListGroup, ListGroupItem,
         Modal, ModalBody, ModalHeader, ModalFooter, Input } from 'sveltestrap';
-    import { setContext, getContext } from 'svelte';
+    import { setContext, getContext, createEventDispatcher } from 'svelte';
     import Pagination from './Pagination.svelte';
     import Filter, { defaultFilterItems } from './FilterConfig.svelte';
     import ColumnConfig from './ColumnConfig.svelte';
@@ -16,11 +16,12 @@
     import JobMetricPlots from './JobMetricPlots.svelte';
     import { fetchClusters } from './utils.js';
 
+    const dispatch = createEventDispatcher();
     const clusterCockpitConfig = getContext('cc-config');
 
     export let restrictToUser = null;
 
-    let itemsPerPage = 25;
+    let itemsPerPage = 10;
     let page = 1;
     let filterItems = defaultFilterItems;
     let userFilter;
@@ -78,6 +79,9 @@
         clusters = res.clusters;
         filterRanges = res.filterRanges;
         metrics = Object.keys(metricUnits);
+
+        dispatch('clusters', clusters);
+        dispatch('filter-ranges', filterRanges);
 
         // selectedMetrics = metrics
         //     .filter(m => clusters.every(c =>
