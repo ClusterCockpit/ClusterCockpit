@@ -42,14 +42,7 @@ class UserViewController extends AbstractController
 {
     public function list(Request $request)
     {
-        $users = $control['repository']->statUsers($control['control']);
-
-        return $this->render('users/listUsers.html.twig',
-            array(
-                'form' => $control['form']->createView(),
-                'control' => $control['control'],
-                'users' => $users,
-            ));
+        return $this->render('users/listUsers.html.twig', array());
     }
 
     public function show(

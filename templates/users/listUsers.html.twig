@@ -10,6 +10,9 @@
 {% endblock %}
 
 {% block javascript %}
+    <script type="text/javascript">
+        const clusterCockpitConfigPromise = Promise.resolve({});
+    </script>
     {{ encore_entry_script_tags('userlist') }}
 {% endblock %}
 
