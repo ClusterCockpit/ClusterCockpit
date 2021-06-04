@@ -54,6 +54,7 @@ class JobRepository extends ServiceEntityRepository
         $this->_userRepository = $this->getEntityManager()->getRepository(User::class);
     }
 
+    /*
     private function getHisto($settings, $target, $constraint = '', $join = ''): array
     {
         $startTime = $settings['startTime'];
@@ -116,6 +117,7 @@ class JobRepository extends ServiceEntityRepository
 
         return $stat;
     }
+    */
 
     private function addStringCondition($qb, $field, $i, $cond)
     {
@@ -313,7 +315,7 @@ class JobRepository extends ServiceEntityRepository
         ];
     }
 
-
+    /*
     public function findRunningJobs()
     {
         $qb = $this->createQueryBuilder('j');
@@ -384,99 +386,54 @@ class JobRepository extends ServiceEntityRepository
         }
         return $stat;
     }
+    */
 
-    public function statUsers($control)
+    public function statUsers($startTime, $stopTime, $clusterId, $clusters)
     {
-        $settings = $this->getSettings($control);
-        $startTime = $settings['startTime'];
-        $stopTime = $settings['stopTime'];
         $users = array();
-        $lookup;
+        $lookup = array();
 
-        if ( $settings['oneSystem'] && isset($settings['clusters'][0])){
-            $cluster = $settings['clusters'][0];
+        foreach ( $clusters as $cluster ){
+            if ($clusterId != null && $cluster['clusterID'] != $clusterId)
+                continue;
 
             $sql = "
             SELECT user_id as userId,
-                   ROUND(SUM(duration)/3600,2) as totalWalltime,
-                   COUNT(*) as jobCount,
-                   ROUND(SUM(duration*num_nodes*".$cluster['coresPerNode'].")/3600,2) as totalCoreHours
+                   SUM(duration)/3600 as totalWalltime,
+                   COUNT(*) as totalJobs,
+                   SUM(duration*num_nodes*".$cluster['socketsPerNode']."*".$cluster['coresPerSocket'].")/3600 as coreHours
             FROM job
             WHERE duration>0
-            AND job.cluster_id=".$cluster['id']."
-            AND job.start_time BETWEEN $startTime AND $stopTime
+            AND job.cluster_id='".$cluster['clusterID']."'
+            ".($startTime != null && $stopTime != null ? "AND job.start_time BETWEEN $startTime AND $stopTime" : "")."
             GROUP BY 1
             ";
 
-            $users = $this->_connection->fetchAll($sql);
+            $tmpUsers = $this->_connection->fetchAll($sql);
 
-            $sql = "
-            SELECT user_id as userId,
-                   COUNT(*) as count
-            FROM job
-            WHERE duration<120
-            AND job.cluster_id=".$cluster['id']."
-            AND job.start_time BETWEEN $startTime AND $stopTime
-            GROUP BY 1
-            ";
-
-            $shortJobs = $this->_connection->fetchAll($sql);
-
-            foreach ( $shortJobs as $id => &$user ){
-                $index = $user['userId'];
-                $lookup[$index] = $user['count'];
-            }
-
-        } else {
-            foreach ( $settings['clusters'] as $cluster ){
-                $sql = "
-                SELECT user_id as userId,
-                       SUM(duration)/3600 as totalWalltime,
-                       COUNT(*) as totalJobs,
-                       SUM(duration*num_nodes*".$cluster['coresPerNode'].")/3600 as coreHours
-                FROM job
-                WHERE duration>0
-                AND job.cluster_id=".$cluster['id']."
-                AND job.start_time BETWEEN $startTime AND $stopTime
-                GROUP BY 1
-                ";
-
-                $tmpUsers = $this->_connection->fetchAll($sql);
-
-                foreach ( $tmpUsers as $user ){
-                    $users[ $user['userId'] ][ $cluster['id'] ]['totalWalltime'] = $user['totalWalltime'];
-                    $users[ $user['userId'] ][ $cluster['id'] ]['totalJobs']     = $user['totalJobs'];
-                    $users[ $user['userId'] ][ $cluster['id'] ]['coreHours']     = $user['coreHours'];
-                }
-            }
-
-            foreach ( $users as $id => &$user ){
-                /* TODO Remove workaround */
-                if ( is_null($id) ){
-                    $id = 1;
-                }
-                $user['userId'] = $id;
-                $user['totalWalltime'] = 0;
-                $user['totalJobs'] = 0;
-                $user['coreHours'] = 0;
-
-                foreach ( $settings['clusters'] as $cluster ){
-                    $user['totalWalltime'] += $user[ $cluster['id'] ]['totalWalltime'];
-                    $user['totalJobs'] += $user[ $cluster['id'] ]['totalJobs'];
-                    $user['coreHours'] += $user[ $cluster['id'] ]['coreHours'];
-                }
+            foreach ( $tmpUsers as $user ){
+                $users[ $user['userId'] ][ $cluster['clusterID'] ]['totalWalltime'] = $user['totalWalltime'];
+                $users[ $user['userId'] ][ $cluster['clusterID'] ]['totalJobs']     = $user['totalJobs'];
+                $users[ $user['userId'] ][ $cluster['clusterID'] ]['coreHours']     = $user['coreHours'];
             }
         }
 
         foreach ( $users as $id => &$user ){
-            $userObject = $this->_userRepository->find($user['userId']);
-            $user['userName'] = $userObject->getUserId();
-            $this->_logger->info("SHORT: ", $user);
-            $index = $user['userId'];
-            if ( isset($lookup[$index]) ){
-                $user['shortJobs'] = $lookup[$index];
-            } else {
-                $user['shortJobs'] = 0;
+            /* TODO Remove workaround */
+            if ( is_null($id) ){
+                $id = 1;
+            }
+            $user['userId'] = $id;
+            $user['totalWalltime'] = 0;
+            $user['totalJobs'] = 0;
+            $user['totalCoreHours'] = 0;
+
+            foreach ( $clusters as $cluster ){
+                if (isset($user[ $cluster['clusterID'] ])) {
+                    $user['totalWalltime'] += $user[ $cluster['clusterID'] ]['totalWalltime'];
+                    $user['totalCoreHours'] += $user[ $cluster['clusterID'] ]['coreHours'];
+                    $user['totalJobs'] += $user[ $cluster['clusterID'] ]['totalJobs'];
+                }
             }
         }
 

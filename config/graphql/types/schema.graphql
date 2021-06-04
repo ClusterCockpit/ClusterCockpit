@@ -85,6 +85,7 @@ type Query {
   jobMetrics(jobId: String!, clusterId: String, metrics: [String]): [JobMetricWithName]!
   tags: [JobTag!]!
   filterRanges: FilterRanges!
+  userStats(startTime: Time, stopTime: Time, clusterId: String): [UserStats!]!
 }
 
 type Mutation {
@@ -183,6 +184,14 @@ type JobsStatistics  {
   totalCoreHours: Int!
   histWalltime: [HistoPoint]!
   histNumNodes: [HistoPoint]!
+}
+
+type UserStats {
+    id: ID!,
+    userId: String!
+    totalJobs: Int!
+    totalWalltime: Float!
+    totalCoreHours: Float!
 }
 
 input PageRequest {

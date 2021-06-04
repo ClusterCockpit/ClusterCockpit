@@ -183,6 +183,13 @@ class RootResolverMap extends ResolverMap
 
                 'jobsStatistics' => function($value, Argument $args) {
                     return $this->jobRepo->findFilteredStatistics($args['filter']);
+                },
+
+                'userStats' => function($value, Argument $args) {
+                    $users = $this->jobRepo->statUsers(
+                        $args['startTime'], $args['stopTime'], $args['clusterId'],
+                        $this->clusterCfg->getConfigurations());
+                    return $users;
                 }
             ],
 
