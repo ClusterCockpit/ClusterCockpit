@@ -15,6 +15,8 @@ Encore
     .enableSourceMaps(!Encore.isProduction())
     .addEntry('joblist', './assets/joblist.js')
     .addEntry('jobview', './assets/jobview.js')
+    .addEntry('userlist', './assets/userlist.js')
+    .addEntry('userview', './assets/userview.js')
 ;
 
 let config = Encore.getWebpackConfig();

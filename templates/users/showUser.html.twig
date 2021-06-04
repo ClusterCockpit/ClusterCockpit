@@ -1,10 +1,9 @@
-{% set renderTemplate = "plot/renderHistograms_#{backend}.html.twig" %}
-
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    <link href="{{ asset('css/datatables.min.css') }}" rel="stylesheet" type="text/css" />
+    <link rel='stylesheet' href='/css/uPlot.min.css'>
     {{ parent() }}
+    {{ encore_entry_link_tags('userview') }}
 {% endblock %}
 
 {% block title %}
@@ -12,36 +11,10 @@
 {% endblock %}
 
 {% block javascript %}
-    {{ parent() }}
-    <script src="{{ asset('js/datatables.min.js') }}"/></script>
-    <script>
-        {{ include('js/initDatatables.js.twig') }}
-    </script>
+    {{ encore_entry_script_tags('userview') }}
 {% endblock %}
 
 
 {% block body %}
-    {% if status.hasJobs %}
-    <script src="{{ asset('js/plotly-basic.min.js') }}"/></script>
-        {{ include('renderStatForm.html.twig') }}
-        {% set id = user.userId %}
-        {% set name = user.name %}
-        {% set contact = user.email %}
-        {% set showJobCloud = false %}
-        {{ include('renderStatTable.html.twig') }}
-        {{ include(renderTemplate) }}
-
-        {% if status.hasPerf %}
-            {% set message="No data... " %}
-            {{ include('util/printInfo.html.twig') }}
-            {{ include('renderJobListAjax.html.twig') }}
-        {% else %}
-            {% set message = "No performance data available!" %}
-            {{ include('util/printWarning.html.twig') }}
-        {% endif %}
-    {% else %}
-        {{ include('renderStatForm.html.twig') }}
-        {% set message = "No jobs available!" %}
-        {{ include('util/printInfo.html.twig') }}
-    {% endif %}
+    <div id="svelte-app"></div>
 {% endblock %}
