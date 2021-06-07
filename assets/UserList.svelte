@@ -1,6 +1,6 @@
 <script>
-    import { initClient, operationStore, query } from '@urql/svelte';
-    import { Col, Row, Table, Card, Spinner } from 'sveltestrap';
+    import { initClient, operationStore, query, getClient } from '@urql/svelte';
+    import { Table, Card, Spinner, Icon, Button, Row, Col } from 'sveltestrap';
 
     initClient({
         url: typeof GRAPHQL_BACKEND !== 'undefined'
@@ -11,6 +11,34 @@
     let startTime = null;
     let stopTime = null;
     let clusterId = null;
+
+    let rawStartTime, rawStopTime;
+
+    let sorting = { field: 'totalJobs', direction: 'down' };
+
+    function changeSorting(event, field) {
+        let target = event.target;
+        while (target.tagName != 'BUTTON')
+            target = target.parentElement;
+
+        let direction = target.children[0].className.includes('up') ? 'down' : 'up';
+        target.children[0].className = `bi-sort-numeric-${direction}`;
+
+        sorting = { field, direction };
+    }
+
+    function sortUsers(users, sorting) {
+        let cmp = sorting.field == 'userId'
+            ? (sorting.direction == 'up'
+                ? (a, b) => a.userId < b.userId
+                : (a, b) => a.userId > b.userId)
+            : (sorting.direction == 'up'
+                ? (a, b) => a[sorting.field] - b[sorting.field]
+                : (a, b) => b[sorting.field] - a[sorting.field]);
+
+        users.sort(cmp);
+        return users;
+    }
 
     const usersQuery = operationStore(`
     query($startTime: Time, $stopTime: Time, $clusterId: String) {
@@ -24,28 +52,118 @@
     }
     `, { startTime, stopTime, clusterId });
 
+    $: $usersQuery.variables.clusterId = clusterId;
+
     query(usersQuery);
+
+    let clusters = [];
+    getClient()
+        .query(`query {
+            clusters { clusterID }
+        }`)
+        .toPromise()
+        .then((res) => {
+            if (res.error) {
+                console.error(res.error);
+                return;
+            }
+
+            clusters = res.data.clusters.map(c => c.clusterID);
+        });
+
+
+    function dateSelected() {
+        if (!rawStartTime && !rawStopTime)
+            return;
+
+        startTime = new Date(rawStartTime || 0);
+        stopTime = new Date(rawStopTime || Date.now());
+
+        const padNum = (n, len = 2) => n.toString().padStart(len, '0');
+        startTime = `${startTime.getFullYear()}-${padNum(startTime.getMonth() + 1)}-01T00:00:00+00:00`;
+        stopTime = `${stopTime.getFullYear()}-${padNum(stopTime.getMonth() + 1)}-${padNum(stopTime.getDate() + 1)}T23:59:59+00:00`;
+
+        $usersQuery.variables.startTime = startTime;
+        $usersQuery.variables.stopTime = stopTime;
+    }
+
+    $: dateSelected(rawStartTime, rawStopTime);
+    $: console.log('user stats filters:', $usersQuery.variables);
 
 </script>
 
-{#if $usersQuery.fetching}
-    <div class="d-flex justify-content-center">
-        <Spinner secondary />
-    </div>
-{:else if $usersQuery.error}
-    <Card body color="danger" class="mb-3"><h2>Error: {$usersQuery.error.message}</h2></Card>
-{:else}
-    <Table>
-        <thead>
+<style>
+    th[scope="col"] > :global(button) {
+        float: right;
+    }
+</style>
+
+<Row>
+    <Col>
+        Cluster:
+        <select bind:value={clusterId}>
+            <option value={null}>Any</option>
+            {#each clusters as cluster}
+                <option value={cluster}>{cluster}</option>
+            {/each}
+        </select>
+    </Col>
+    <Col>
+        Time:
+        From
+        <input type="date" bind:value={rawStartTime} />
+        to
+        <input type="date" bind:value={rawStopTime} />
+    </Col>
+</Row>
+<Table>
+    <thead>
+        <tr>
+            <th scope="col">
+                Username
+                <Button color="{sorting.field == 'userId' ? 'primary' : 'light'}"
+                    size="sm" on:click={e => changeSorting(e, 'userId')}>
+                    <Icon name="sort-numeric-down" />
+                </Button>
+            </th>
+            <th scope="col">
+                Total Jobs
+                <Button color="{sorting.field == 'totalJobs' ? 'primary' : 'light'}"
+                    size="sm" on:click={e => changeSorting(e, 'totalJobs')}>
+                    <Icon name="sort-numeric-down" />
+                </Button>
+            </th>
+            <th scope="col">
+                Total Walltime
+                <Button color="{sorting.field == 'totalWalltime' ? 'primary' : 'light'}"
+                    size="sm" on:click={e => changeSorting(e, 'totalWalltime')}>
+                    <Icon name="sort-numeric-down" />
+                </Button>
+            </th>
+            <th scope="col">
+                Total Core Hours
+                <Button color="{sorting.field == 'totalCoreHours' ? 'primary' : 'light'}"
+                    size="sm" on:click={e => changeSorting(e, 'totalCoreHours')}>
+                    <Icon name="sort-numeric-down" />
+                </Button>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {#if $usersQuery.fetching}
             <tr>
-                <th scope="col">Username</th>
-                <th scope="col">Total Jobs</th>
-                <th scope="col">Total Walltime</th>
-                <th scope="col">Total Core Hours</th>
+                <td colspan="4" style="text-align: center;">
+                    <Spinner secondary />
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            {#each $usersQuery.data.userStats as user (user.userId)}
+        {:else if $usersQuery.error}
+            <tr>
+                <td colspan="4">
+                    <Card body color="danger" class="mb-3">Error: {$usersQuery.error.message}</Card>
+                </td>
+            </tr>
+        {:else}
+            {#each sortUsers($usersQuery.data.userStats, sorting) as user (user.userId)}
                 <tr>
                     <td>
                         <a href="/monitoring/user/{user.id}" target="_blank">
@@ -57,6 +175,6 @@
                     <td>{user.totalCoreHours.toFixed(2)}</td>
                 </tr>
             {/each}
-        </tbody>
-    </Table>
-{/if}
+        {/if}
+    </tbody>
+</Table>
