@@ -44,8 +44,8 @@
         const barWidth = Math.round(w / (maxValue + 1));
 
         // const getCanvasX = (value) => Math.floor((value / maxValue) * (w - barWidth) + paddingLeft + (barWidth / 2.));
-        const getCanvasX = (value) => Math.floor((value / maxValue) * (w - barWidth) + paddingLeft + (barWidth / 2.));
-        const getCanvasY = (count) => Math.floor((h - (count / maxCount) * h) + paddingTop);
+        const getCanvasX = (value) => (value / maxValue) * (w - barWidth) + paddingLeft + (barWidth / 2.);
+        const getCanvasY = (count) => (h - (count / maxCount) * h) + paddingTop;
 
         ctx.fillStyle = '#0066cc';
         for (let p of data) {
@@ -53,7 +53,7 @@
                 getCanvasX(p.value) - (barWidth / 2.),
                 getCanvasY(p.count),
                 barWidth,
-                Math.floor((p.count / maxCount) * h));
+                (p.count / maxCount) * h);
         }
 
         ctx.beginPath();
@@ -73,7 +73,7 @@
         ctx.strokeStyle = `#bbbbbb`;
         ctx.textAlign = 'right';
         ctx.beginPath();
-        const stepsizeY = getStepSize(maxCount, h, 100);
+        const stepsizeY = getStepSize(maxCount, h, 50);
         for (let y = stepsizeY; y <= maxCount; y += stepsizeY) {
             const py = getCanvasY(y);
             ctx.fillText(`${y}`, paddingLeft - 5, py);

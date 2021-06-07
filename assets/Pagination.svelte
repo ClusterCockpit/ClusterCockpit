@@ -2,7 +2,7 @@
     <div class="cc-pagination-left">
         <label for="cc-pagination-select">{ itemText } per page:</label>
         <div class="cc-pagination-select-wrapper">
-            <select  on:change|preventDefault={reset} bind:value={itemsPerPage} id="cc-pagination-select" class="cc-pagination-select">
+            <select on:blur|preventDefault={reset} bind:value={itemsPerPage} id="cc-pagination-select" class="cc-pagination-select">
                 {#each pageSizes as size}
                     <option value="{size}">{size}</option>
                 {/each}
@@ -207,11 +207,6 @@
         bottom: -1px;
         border: 1px solid blue;
         border-radius: inherit;
-    }
-
-    .cc-select-icon {
-        pointer-events: none;
-        position: absolute;
     }
 
     .cc-pagination-right {
