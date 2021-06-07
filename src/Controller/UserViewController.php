@@ -57,10 +57,7 @@ class UserViewController extends AbstractController
 
         return $this->render('users/showUser.html.twig',
             array(
-                /* Maybe confusing, but in the frontend and the GraphQL-API
-                 * the `userId` is the username.
-                 */
-                'userId' => $user->getUsername(),
+                'user' => $user,
                 'config' => $config,
                 'colormap' => $colorMaps->getColorMap()
             ));

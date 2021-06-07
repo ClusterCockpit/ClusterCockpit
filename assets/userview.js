@@ -4,7 +4,7 @@ import UserView from './UserView.svelte';
     new UserView({
         target: document.getElementById('svelte-app'),
         props: {
-            userId: userId
+            userInfos: userInfos
         },
         context: new Map([
             ['cc-config', await clusterCockpitConfigPromise]

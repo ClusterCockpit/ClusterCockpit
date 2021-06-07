@@ -7,12 +7,12 @@
     import Datatable from './Datatable.svelte';
     import Filter from './FilterConfig.svelte';
 
-    export let userId;
+    export let userInfos;
 
     let showFilters = false;
     let sorting = { field: "startTime", order: "DESC" };
     let datatable;
-    let filterItems = [{ userId: { eq: userId } }];
+    let filterItems = [{ userId: { eq: userInfos.userId } }];
 
     initClient({
         url: typeof GRAPHQL_BACKEND !== 'undefined'
@@ -31,7 +31,7 @@
            histNumNodes { count, value }
        }
     }
-    `, { filter: { list: [ { userId: { 'eq': userId } } ] } });
+    `, { filter: { list: [ { userId: { eq: userInfos.userId } } ] } });
 
     query(statsQuery);
 
@@ -41,7 +41,7 @@
 
     function filtersChanged(event) {
         filterItems = event.detail.filterItems;
-        filterItems.push({ userId: { eq: userId }});
+        filterItems.push({ userId: { eq: userInfos.userId }});
 
         $statsQuery.variables.filter = { list: filterItems };
         datatable.applyFilters(filterItems);
@@ -64,6 +64,11 @@
     h5 {
         text-align: center;
     }
+
+    input[disabled] {
+        background-color: white;
+        color: #999999;
+    }
 </style>
 
 <Row>
@@ -79,11 +84,32 @@
             </div>
             <div class="input-group w-100 mb-2 mr-sm-2" style="margin-left: 10px;">
                 <div class="input-group-prepend">
+                    <div class="input-group-text"><Icon name="person-circle"/></div>
+                </div>
+                <input type="search" value={userInfos.userId} class="form-control" disabled />
+            </div>
+            {#if userInfos.name}
+            <div class="input-group w-100 mb-2 mr-sm-2" style="margin-left: 10px;">
+                <div class="input-group-prepend">
                     <div class="input-group-text"><Icon name="person"/></div>
                 </div>
-                <input type="search" value={userId} class="form-control" disabled />
+                <input type="search" value={userInfos.name} class="form-control" disabled />
             </div>
+            {/if}
+            {#if userInfos.email}
+            <div class="input-group w-100 mb-2 mr-sm-2" style="margin-left: 10px;">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">@</div>
+                </div>
+                <input type="search" value={userInfos.email} class="form-control" disabled />
+            </div>
+            {/if}
         </div>
+    </Col>
+</Row>
+<Row>
+    <Col>
+        <hr/>
     </Col>
 </Row>
 <Row>
@@ -110,10 +136,6 @@
         <Col>
             <Table>
                 <tbody>
-                    <tr>
-                        <th scope="row">User ID</th>
-                        <td>{userId}</td>
-                    </tr>
                     <tr>
                         <th scope="row">Total Jobs</th>
                         <td>{$statsQuery.data.jobsStatistics.totalJobs}</td>
