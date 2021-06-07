@@ -1,32 +1,24 @@
 <script>
-    import { initClient, operationStore, query, getClient } from '@urql/svelte';
-    import { Col, Row, FormGroup,
-        Label,
-        Table, Icon, Badge,
-        Button,
-        Card, CardBody,
-        Spinner,
-        ListGroup, ListGroupItem,
-        Modal, ModalBody, ModalHeader, ModalFooter, Input } from 'sveltestrap';
-    import { setContext, getContext, createEventDispatcher } from 'svelte';
+    import { operationStore, query } from '@urql/svelte';
+    import { Col, Row, Table, Icon,
+        Button, Card, Spinner, ListGroup, ListGroupItem,
+        Modal, ModalBody, ModalHeader, ModalFooter } from 'sveltestrap';
     import Pagination from './Pagination.svelte';
-    import Filter, { defaultFilterItems } from './FilterConfig.svelte';
     import ColumnConfig from './ColumnConfig.svelte';
     import JobMeta from './JobMeta.svelte';
     import JobMetricPlots from './JobMetricPlots.svelte';
-    import { fetchClusters } from './utils.js';
+    import { getContext } from 'svelte';
 
-    const dispatch = createEventDispatcher();
+    export let metricUnits;
+    export let sorting;
+    export let initialFilterItems;
+
     const clusterCockpitConfig = getContext('cc-config');
-
-    export let restrictToUser = null;
 
     let itemsPerPage = 10;
     let page = 1;
-    let filterItems = defaultFilterItems;
-    let userFilter;
-    let sorting = { field: "startTime", order: "DESC" };
     let paging = { itemsPerPage: itemsPerPage, page: page };
+    let selectedMetrics = clusterCockpitConfig.plot_list_selectedMetrics.split(',').map(s => s.trim());
     let sortedColumns = {
         startTime:   {type: "numeric", direction: ["down","up"], order: ["DESC","ASC"], field: "startTime",   current: 0},
         duration:    {type: "numeric", direction: ["down","up"], order: ["DESC","ASC"], field: "duration",    current: 2},
@@ -37,15 +29,10 @@
         netBwAvg:    {type: "numeric", direction: ["down","up"], order: ["DESC","ASC"], field: "netBwAvg",    current: 2},
     };
 
-    let metrics = [];
-    let selectedMetrics = clusterCockpitConfig.plot_list_selectedMetrics.split(',').map(s => s.trim());
-
     let columnConfigOpen = false;
     let sortConfigOpen = false;
-    let showFilters = false;
     const toggleColumnConfig = () => (columnConfigOpen = !columnConfigOpen);
     const toggleSortConfig = () => (sortConfigOpen = !sortConfigOpen);
-    const toggleFilter = () => (showFilters = !showFilters);
 
     let tableWidth, plotWidth;
     let jobMetaWidth = 200;
@@ -57,37 +44,6 @@
 
         plotWidth = Math.floor((tableWidth - jobMetaWidth) / selectedMetrics.length - 10);
     }
-
-    if (!getClient()) {
-        initClient({
-            url: typeof GRAPHQL_BACKEND !== 'undefined'
-                ? GRAPHQL_BACKEND
-                : `${window.location.origin}/query`
-        });
-    }
-
-    if (restrictToUser)
-        defaultFilterItems.push({ userId: { eq: restrictToUser } });
-
-    const metricUnits = {};
-    const metricConfig = {};
-    setContext('metric-config', metricConfig);
-
-    let clusters = null;
-    let filterRanges = null;
-    fetchClusters(metricConfig, metricUnits).then(res => {
-        clusters = res.clusters;
-        filterRanges = res.filterRanges;
-        metrics = Object.keys(metricUnits);
-
-        dispatch('clusters', clusters);
-        dispatch('filter-ranges', filterRanges);
-
-        // selectedMetrics = metrics
-        //     .filter(m => clusters.every(c =>
-        //         metricConfig[c.clusterID][m] != null))
-        //     .slice(0, 4);
-    }, err => console.error(err));
 
     const jobQuery = operationStore(`
     query($filter: JobFilterList!, $sorting: OrderByInput!, $paging: PageRequest! ){
@@ -107,25 +63,9 @@
            count
          }
     }
-    `, {filter: { list: defaultFilterItems }, sorting, paging});
+    `, {filter: { list: initialFilterItems }, sorting, paging});
 
     query(jobQuery);
-
-    function handleFilter( event ) {
-        if (event.detail && event.detail.filterItems)
-            filterItems = event.detail.filterItems;
-
-        filterItems = filterItems.filter(f => f.userId == null);
-        if (userFilter)
-            filterItems.push({ userId: { contains: userFilter }});
-
-        if (restrictToUser)
-            filterItems.push({ userId: { eq: restrictToUser } });
-
-        console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
-
-        $jobQuery.variables.filter = { "list": filterItems };
-    }
 
     function handlePaging( event ) {
         itemsPerPage = event.detail.itemsPerPage;
@@ -133,19 +73,9 @@
         $jobQuery.variables.paging = {itemsPerPage: itemsPerPage, page: page };
     }
 
-    /* Run query when the user has
-     * stopped typing for 350ms:
-     */
-    let searchTimeoutId = null;
-    const searchDelay = 350;
-    function handleUserFilter( event ) {
-        if (searchTimeoutId !== null)
-            clearTimeout(searchTimeoutId);
-
-        searchTimeoutId = setTimeout(() => {
-            handleFilter(event);
-            searchTimeoutId = null;
-        }, searchDelay);
+    export function applyFilters(filterItems) {
+        console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
+        $jobQuery.variables.filter = { "list": filterItems };
     }
 
     function handleSorting( event ) {
@@ -193,13 +123,17 @@
         overflow: initial;
     }
 
-    :global(.cc-table-wrapper > table) {
+    .cc-table-wrapper > :global(table) {
         border-collapse: separate;
         border-spacing: 0px;
         table-layout: fixed;
     }
 
-    :global(.cc-table-wrapper > table > tbody > tr > td) {
+    .cc-table-wrapper :global(button) {
+        margin-bottom: 0px;
+    }
+
+    .cc-table-wrapper > :global(table > tbody > tr > td) {
         margin: 0px;
         padding-left: 5px;
         padding-right: 0px;
@@ -241,36 +175,8 @@
 
 <ColumnConfig
     bind:isOpen={columnConfigOpen}
-    bind:metrics={metrics}
+    metrics={Object.keys(metricUnits)}
     bind:selectedMetrics={selectedMetrics} />
-
-<Filter {showFilters}
-    clusters={clusters}
-    sorting={sorting}
-    filterRanges={filterRanges}
-    on:update={handleFilter} />
-<div class="d-flex flex-row justify-content-between">
-    <div>
-        <Button outline color=success  on:click={toggleFilter}><Icon name="filter" /></Button>
-    </div>
-    <div class="input-group w-75 mb-2 mr-sm-2">
-    {#if !restrictToUser}
-        <div class="input-group-prepend">
-            <div class="input-group-text"><Icon name="search" /></div>
-        </div>
-        <input type="search" bind:value={userFilter} on:input={handleUserFilter} class="form-control"  placeholder="Filter userId" />
-    {:else}
-        <div class="input-group-prepend">
-            <div class="input-group-text"><Icon name="person" /></div>
-        </div>
-        <input type="search" value={restrictToUser} class="form-control" disabled />
-    {/if}
-    </div>
-    <div>
-        <Button outline on:click={toggleSortConfig}><Icon name="sort-down" /></Button>
-        <Button outline on:click={toggleColumnConfig}><Icon name="gear" /></Button>
-    </div>
-</div>
 
 {#if $jobQuery.fetching}
     <div class="d-flex justify-content-center">
@@ -285,7 +191,11 @@
                 <thead>
                     <tr>
                         <th class="position-sticky top-0" scope="col" style="width: {jobMetaWidth}px">
-                            Job Info
+                            <span style="position: absolute; bottom: .5rem;">Job Info</span>
+                            <span style="float: right;">
+                                <Button outline on:click={toggleSortConfig}><Icon name="sort-down" /></Button>
+                                <Button outline on:click={toggleColumnConfig}><Icon name="gear" /></Button>
+                            </span>
                         </th>
                         {#each selectedMetrics as metric}
                             <th class="position-sticky top-0 text-center" scope="col"
