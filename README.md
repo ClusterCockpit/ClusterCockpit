@@ -16,22 +16,26 @@ Introduction
 --------------------------------------------------------------------------------
 
 This is a web frontend for job specific performance monitoring. It is based on
-the [Symfony 4](https://symfony.com) PHP Framework. The application uses
-[Bootstrap 4](http://getbootstrap.com) for layout and styling,
-[DataTables](https://datatables.net) for interactive Ajax tables and
-[plotly.js](https://plot.ly/javascript/) for graph generation.
+the [Symfony 5](https://symfony.com) PHP Framework. The application uses
+[Bootstrap 5](http://getbootstrap.com) for layout and styling,
+[API Platform](https://api-platform.com/) for REST APIs,
+[OverblogGraphQLBundle](https://github.com/overblog/GraphQLBundle) for GraphQL APIs,  and
+[Svelte](https://svelte.dev/) for the frontend UI.
 
 --------------------------------------------------------------------------------
 Dependencies
 --------------------------------------------------------------------------------
 
 To install and use ClusterCockpit you need the following dependencies:
-- PHP 7.2 or newer
+- PHP 8.0 or newer
 - MySQL or MariaDB
 - [Composer](https://getcomposer.org) - PHP package manager
-- Optional: Apache web server for production use
+- [Yarn](https://yarnpkg.com/) - Node package manager
+- [Symfony CLI](https://symfony.com/download) - Symfony command line tool
+- Optional: Apache or Nginx web server for production use
 - Optional: [InfluxDB](https://docs.influxdata.com/influxdb/v1.7/introduction/getting-started/) time series database
-- Optional: [Redis](https://redis.io/) caching backend
+
+We are currently working hard to provide a Docker setup including all required components for development.
 
 --------------------------------------------------------------------------------
 Configure PHP
@@ -70,7 +74,7 @@ Wiki if you want to install ClusterCockpit in a production environment.
 
 1. Clone repository
 
-You may use 
+You may use
 ```
 $ git clone git@github.com:ClusterCockpit/ClusterCockpit.git ClusterCockpit
 ```
@@ -82,7 +86,7 @@ $ git clone https://github.com/ClusterCockpit/ClusterCockpit.git ClusterCockpit
 
 2. Install required PHP version
 
-You need at least PHP 7.2 or higher. Please refer to
+You need at least PHP 8.0 or higher. Please refer to
 Google for how to install PHP on your operating system.
 
 3. Setup database backends
@@ -96,7 +100,7 @@ Create symfony database user and ClusterCockpit database:
 $ mysql -u root  -p
 $mysql> CREATE USER 'username'@'localhost' IDENTIFIED BY 'mypass';
 $mysql> CREATE DATABASE ClusterCockpit CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-$mysql> GRANT ALL PRIVILEGES ON ClusterCockpit.* TO 'username'@'localhost'; 
+$mysql> GRANT ALL PRIVILEGES ON ClusterCockpit.* TO 'username'@'localhost';
 $mysql> quit
 ```
 
@@ -113,7 +117,7 @@ refer to documentation on the web.
    cache-snapshot-memory-size = "1g"
 
 [http]
-   auth-enabled = true 
+   auth-enabled = true
    reporting-disabled = true
    log-enabled = false
 
@@ -163,7 +167,6 @@ heavy load. To enable redis as caching backend uncomment the following lines in
 ```
 cache:
     app: cache.adapter.redis
-  
 ```
 
 4. Configure Symfony access to MySQL and InfluxDB:
@@ -175,7 +178,7 @@ the .env.dist file to .env and adopt it to your needs.
 
 To configure database backend credentials open the .env file in your project
 root and add the following lines (enter above username and password for the
-placeholders): 
+placeholders):
 
 ```
 DATABASE_URL=mysql://<username>:<password>@127.0.0.1:3306/ClusterCockpit
@@ -221,11 +224,20 @@ You can get a list of all configured routes (URLs) with:
 $ php bin/console debug:router
 ```
 
-3. Start up local web server
+3. Install and build frontend assets:
+```
+$ yarn install
+```
+Build assets once:
+```
+$ yarn encore dev
+```
+
+4. Start up local web server
 
 To start the web server with integrated Symfony profiler console run:
 ```
-$ php bin/console server:run
+$ symfony server:start --no-tls
 ```
 
 The web application can be accessed with any web browser on localhost port 8000.
@@ -239,5 +251,3 @@ JobMonitoring button and login with the credentials of your admin user.
 
 Please refer to the [Wiki pages](https://github.com/ClusterCockpit/ClusterCockpit/wiki) how to setup a
 cluster and other required data sources.
-
-
