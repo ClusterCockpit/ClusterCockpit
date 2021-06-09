@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('userlist') }}
+{% endblock %}
+
+{% block title %}
+    User Statistics
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        const clusterCockpitConfigPromise = Promise.resolve({});
+    </script>
+    {{ encore_entry_script_tags('userlist') }}
+{% endblock %}
+
+{% block body %}
+    <div id="svelte-app"></div>
+{% endblock %}

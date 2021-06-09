@@ -221,16 +221,6 @@ class User implements UserInterface, \Serializable
         $this->email = $email;
     }
 
-    public function getPhone()
-    {
-        return $this->phone;
-    }
-
-    public function setPhone($phone)
-    {
-        $this->phone = $phone;
-    }
-
     public function getIsActive(): ?bool
     {
         return $this->isActive;

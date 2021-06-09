@@ -4,14 +4,6 @@
     Config Panel
 {% endblock %}
 
-{% block javascript %}
-    {{ parent() }}
-    <script src="{{ asset('js/feather.min.js') }}"/></script>
-    <script>
-      feather.replace()
-    </script>
-{% endblock %}
-
 {% block body %}
     <div class="container" style="margin-top:80px;">
         <div class="row">
@@ -24,4 +16,3 @@
         </div>
     </div>
 {% endblock %}
-

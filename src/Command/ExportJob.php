@@ -37,7 +37,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use \DateInterval;
 
 use App\Repository\JobRepository;
-use App\Service\JobCache;
+/* use App\Service\JobCache; */
 use App\Service\ColorMap;
 use App\Service\Configuration;
 use App\Entity\JobSearch;
@@ -50,17 +50,17 @@ class ExportJob extends Command
     private $_em;
     private $_filesystem;
     private $_root;
-    private $_jobcache;
+    /* private $_jobcache; */
 
     public function __construct(
         EntityManagerInterface $em,
-        JobCache $jobCache,
+        /* JobCache $jobCache, */
         $projectDir,
         FileSystem $filesystem
     )
     {
         $this->_em = $em;
-        $this->_jobcache = $jobCache;
+        /* $this->_jobcache = $jobCache; */
         $this->_filesystem = $filesystem;
         $this->_root = $projectDir.'/var/export';
 
@@ -106,7 +106,7 @@ class ExportJob extends Command
             ->setRows($rows);
         $table->render();
 
-        $this->_jobcache->getArchive($job);
+        /* $this->_jobcache->getArchive($job); */
 
         if ( $job->hasProfile ) {
             $jobID = $job->getJobId();
@@ -213,4 +213,3 @@ class ExportJob extends Command
         }
     }
 }
-

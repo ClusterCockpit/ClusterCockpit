@@ -1,0 +1,163 @@
+html, body {
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+
+body {
+	padding-top: 80px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	color: #333;
+	margin: 0;
+	box-sizing: border-box;
+}
+
+.container {
+	max-width: 100vw;
+}
+
+.navbar-brand img {
+    height: 30px;
+}
+
+.Site {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.Site-content {
+    flex: 1 0 auto;
+}
+
+.Site-footer {
+    flex: none;
+}
+
+input, button, select, textarea {
+	font-family: inherit;
+	font-size: inherit;
+	-webkit-padding: 0.4em 0;
+	padding: 0.4em;
+	margin: 0 0 0.5em 0;
+	box-sizing: border-box;
+	border: 1px solid #ccc;
+	border-radius: 2px;
+}
+
+a {
+	color: rgb(0,100,200);
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:visited {
+	color: rgb(0,80,160);
+}
+
+label {
+	display: block;
+}
+
+input:disabled {
+	color: #ccc;
+}
+
+button {
+	outline: none;
+}
+
+.legal p {
+    font-size: 1rem;
+    line-height: 1.46rem;
+    margin: 0 0 10px;
+    color: #444;
+    font-family: Roboto,sans-serif;
+}
+
+.legal h1, h2, h3 {
+    margin: 10px 0 20px;
+    line-height: 2.08rem;
+    color: #444;
+    font-family: Roboto,sans-serif;
+}
+
+.legal h1 {
+    font-size: 2.5rem;
+}
+
+.legal h2 {
+    font-size: 2.2rem;
+    margin: 30px 0 20px;
+}
+
+.legal h3 {
+    font-size: 1.6rem;
+}
+
+.legal address {
+    margin: 0;
+    padding: 0 0 11px;
+    font-size: 1rem;
+    line-height: 1.46rem;
+    color: #444;
+    font-family: Roboto,sans-serif;
+    font-style: normal;
+}
+
+.legal a {
+    color: #036;
+    text-decoration: none;
+}
+
+.legal ul {
+    list-style: none;
+    padding: 0;
+    background: none;
+    margin: 0 0;
+}
+
+.legal li {
+    list-style: none;
+￼    margin: 0;
+￼    padding: 0;
+￼    min-height: 20px;
+    color: #444;
+    font-family: Roboto,sans-serif;
+    font-style: normal;
+}
+
+footer {
+    width: 100%;
+    padding: 0.1rem 1.0rem;
+    background-color: #4b4a56;
+    color: #dedee3;
+    line-height: 1.5;
+}
+
+.footer-link {
+    color: #dedee3;
+}
+
+.footer-link:hover {
+    color: inherit;
+}
+
+.footer-list {
+    list-style-type: none;
+    padding-left: 0;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.footer-list-item {
+    margin: 0rem 0.8rem;
+    white-space: nowrap;
+}

@@ -36,7 +36,6 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Psr\Log\LoggerInterface;
 use App\Entity\ApiKey;
 use App\Form\ClusterType;
-use App\Entity\Cluster;
 use App\Entity\Node;
 use App\Entity\Configuration;
 use App\Form\UserType;
@@ -58,14 +57,14 @@ class ConfigViewController extends AbstractController
                 'items' => array(
                     array(
                         'label' => 'Users',
-                        'icon' => 'users',
+                        'icon' => 'bi-people-fill',
                         'link' => 'list_user_accounts',
                         'addlink' => 'create_user_account',
                         'active' => false
                     ),
                     array(
                         'label' => 'ApiKeys',
-                        'icon' => 'lock',
+                        'icon' => 'bi-key-fill',
                         'link' => 'list_api_keys',
                         'addlink' => 'create_api_key',
                         'active' => false
@@ -77,56 +76,44 @@ class ConfigViewController extends AbstractController
                 'items' => array(
                     array(
                         'label' => 'Plot defaults',
-                        'icon' => 'bar-chart-2',
+                        'icon' => 'bi-bar-chart-fill',
                         'link' => 'default_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'Plot user',
-                        'icon' => 'bar-chart-2',
+                        'icon' => 'bi-bar-chart-fill',
                         'link' => 'user_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'Colormap',
-                        'icon' => 'edit',
+                        'icon' => 'bi-palette-fill',
                         'link' => 'color_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'Cache',
-                        'icon' => 'copy',
+                        'icon' => 'bi-archive-fill',
                         'link' => 'cache_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'Ldap',
-                        'icon' => 'database',
+                        'icon' => 'bi-person-fill',
                         'link' => 'ldap_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
                         'label' => 'General',
-                        'icon' => 'settings',
+                        'icon' => 'bi-gear-fill',
                         'link' => 'general_options',
                         'addlink' => false,
-                        'active' => false
-                    ),
-                )
-            ),
-            array(
-                'label' => 'System config',
-                'items' => array(
-                    array(
-                        'label' => 'Clusters',
-                        'icon' => 'server',
-                        'link' => 'list_clusters',
-                        'addlink' => 'create_cluster',
                         'active' => false
                     ),
                 )
@@ -531,231 +518,6 @@ class ConfigViewController extends AbstractController
                 'title' => "Create user account",
                 'sidebar' => $this->_sidebar(
                     array('menu'=>0,'item'=>0)
-                )
-            ));
-    }
-
-
-    /* ####################### */
-    /*       Clusters          */
-    /* ####################### */
-
-    public function listClusters(Request $request)
-    {
-        $repository = $this->getDoctrine()->getRepository(\App\Entity\Cluster::class);
-        $clusters = $repository->findAllConfig();
-
-        return $this->render('config/listClusters.html.twig',
-            array(
-                'clusters' => $clusters,
-                'sidebar' => $this->_sidebar(
-                    array('menu'=>2,'item'=>0)
-                )
-            ));
-    }
-
-    public function deleteCluster(Cluster $cluster, Request $request)
-    {
-        $em = $this->getDoctrine()->getManager();
-        $em->remove($cluster);
-        $em->flush();
-
-        return $this->redirectToRoute('list_clusters');
-    }
-
-    public function editCluster(Cluster $cluster, Request $request)
-    {
-        $repository = $this->getDoctrine()->getRepository(\App\Entity\Cluster::class);
-        $form = $this->createForm(ClusterType::class, $cluster);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            if ( $form->get('save')->isClicked() )  {
-                $cluster = $form->getData();
-                $em = $this->getDoctrine()->getManager();
-                $file = $cluster->getNodeFile();
-
-                if (! is_null($file)){
-
-                    $fileName = $this->generateUniqueFileName().'.'.$file->guessExtension();
-                    $filePath = $this->getParameter('upload_directory');
-
-                    try {
-                        $file->move(
-                            $filePath,
-                            $fileName
-                        );
-                    } catch (FileException $e) {
-                        // ... handle exception if something happens during file upload
-                    }
-
-                    $fileReader = new NodeFileReader();
-                    $nodes = $fileReader->parse($filePath.'/'.$fileName);
-                    $currentNodes = $cluster->getNodes();
-                    $nodeLookup = array();
-
-                    if ( count($currentNodes) > 0 ){
-                        foreach ( $currentNodes as  $node ) {
-                            $nodeLookup[$node->nodeId] = 1;
-                        }
-                    }
-
-                    foreach ( $nodes as  $node ) {
-                        if ( array_key_exists($node['nodeId'], $nodeLookup) ) {
-                            /* TODO: Sync new data */
-
-                        } else {
-                            $newNode = new Node();
-                            $newNode->nodeId = $node['nodeId'];
-                            $newNode->cluster = $cluster->getId();
-                            $newNode->status = 'active';
-                            $em->persist($newNode);
-                        }
-                    }
-                }
-
-                $em->persist($cluster);
-                $em->flush();
-            }
-
-            return $this->redirectToRoute('list_clusters');
-        }
-
-        return $this->render('config/editCluster.html.twig',
-            array(
-                'form' => $form->createView(),
-                'id' => $cluster->getId(),
-                'cluster' => $repository->addNodes($cluster),
-                'title' => "Edit Cluster ".$cluster->getName(),
-                'sidebar' => $this->_sidebar(
-                    array('menu'=>2,'item'=>0)
-                    )
-            ));
-    }
-
-    public function createCluster(Request $request, NodeFileReader $fileReader)
-    {
-        $cluster = new Cluster();
-        $form = $this->createForm(ClusterType::class, $cluster);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-
-            if ( $form->get('save')->isClicked() )  {
-                $cluster = $form->getData();
-                $em = $this->getDoctrine()->getManager();
-                $file = $cluster->getNodeFile();
-                $cluster->metricListConfig = <<<JSON
-{
-    "list":
-    [
-        {
-            "name": "flops_any", "measurement": "data",
-            "unit": "GF/s", "scale": 0.001, "sampletime": 60,
-            "peak": 704, "normal": 100, "caution": 20, "alert": 2
-        },
-        {
-            "name": "mem_bw", "measurement": "data",
-            "unit": "GB/s", "scale": 0.001, "sampletime": 60,
-            "peak": 80, "normal": 30, "caution": 10, "alert": 5
-        }
-    ],
-    "view":
-    [
-        {
-            "name": "flops_any", "measurement": "data",
-            "unit": "GF/s", "scale": 0.001, "sampletime": 60,
-            "peak": 704, "normal": 100, "caution": 20, "alert": 2
-        },
-        {
-            "name": "mem_bw", "measurement": "data",
-            "unit": "GB/s", "scale": 0.001, "sampletime": 60,
-            "peak": 80, "normal": 30, "caution": 10, "alert": 5
-        }
-    ],
-    "stat":
-    [
-        {
-            "name": "flops_any", "measurement": "data",
-            "unit": "GF/s", "scale": 0.001, "sampletime": 60,
-            "peak": 704, "normal": 100, "caution": 20, "alert": 2
-        },
-        {
-            "name": "mem_bw", "measurement": "data",
-            "unit": "GB/s", "scale": 0.001, "sampletime": 60,
-            "peak": 80, "normal": 30, "caution": 10, "alert": 5
-        }
-    ],
-    "sort":
-    [
-        {
-            "name": "flops_any", "measurement": "data",
-            "unit": "GF/s", "scale": 0.001, "sampletime": 60,
-            "peak": 704, "normal": 100, "caution": 20, "alert": 2
-        },
-        {
-            "name": "mem_bw", "measurement": "data",
-            "unit": "GB/s", "scale": 0.001, "sampletime": 60,
-            "peak": 80, "normal": 30, "caution": 10, "alert": 5
-        }
-    ]
-}
-JSON;
-                $em->persist($cluster);
-                $em->flush();
-
-                if (! is_null($file)){
-
-                    $fileName = $this->generateUniqueFileName().'.'.$file->guessExtension();
-                    $filePath = $this->getParameter('upload_directory');
-
-                    try {
-                        $file->move(
-                            $filePath,
-                            $fileName
-                        );
-                    } catch (FileException $e) {
-                        // ... handle exception if something happens during file upload
-                    }
-
-                    $fileReader = new NodeFileReader();
-                    $nodes = $fileReader->parse($filePath.'/'.$fileName);
-                    $currentNodes = $cluster->getNodes();
-                    $nodeLookup = array();
-
-                    if ( count($currentNodes) > 0 ){
-                        foreach ( $currentNodes as  $node ) {
-                            $nodeLookup[$node->nodeId] = 1;
-                        }
-                    }
-
-                    foreach ( $nodes as  $node ) {
-                        if ( array_key_exists($node['nodeId'], $nodeLookup) ) {
-                            /* TODO: Sync new data */
-
-                        } else {
-                            $newNode = new Node();
-                            $newNode->nodeId = $node['nodeId'];
-                            $newNode->cluster = $cluster->getId();
-                            $newNode->status = 'active';
-                            $em->persist($newNode);
-                        }
-                    }
-                    $em->flush();
-                }
-            }
-
-            return $this->redirectToRoute('list_clusters');
-        }
-
-        return $this->render('config/editCluster.html.twig',
-            array(
-                'form' => $form->createView(),
-                'cluster' => $cluster,
-                'title' => "Create Cluster",
-                'sidebar' => $this->_sidebar(
-                    array('menu'=>2,'item'=>0)
                 )
             ));
     }

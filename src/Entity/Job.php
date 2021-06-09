@@ -25,65 +25,103 @@
 
 namespace App\Entity;
 
-use AppBundle\Entity\Node;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 /**
 *  @ORM\Entity(repositoryClass="App\Repository\JobRepository")
 *  @ORM\Table(name="job",indexes={@ORM\Index(name="search_idx", columns={"is_running","cluster_id"})})
 */
+#[ApiResource(
+attributes: [
+    'pagination_type' => 'page',
+    'normalization_context' => ['groups' => ['read']],
+    'denormalization_context' => ['groups' => ['write']],
+],
+    collectionOperations: [
+        'post' => [
+            'path' => '/jobs/start_job/',
+        ],
+    ],
+    itemOperations: ['get','patch'],
+)]
+#[ApiFilter(SearchFilter::class, properties: ['user' => 'partial', 'jobId' => 'start', 'tags.name' => 'exact'])]
+#[ApiFilter(RangeFilter::class, properties: ['startTime','numNodes','duration'])]
+#[ApiFilter(OrderFilter::class, properties: ['startTime','duration','numNodes'])]
+#[ApiFilter(BooleanFilter::class, properties: ['isRunning'])]
 class Job
 {
     /**
      *  @ORM\Column(type="integer")
      *  @ORM\Id
      *  @ORM\GeneratedValue(strategy="AUTO")
+     *  @Groups({"read"})
      */
     public $id;
 
     /**
+     *  The jobId of this job.
+     *
      *  @ORM\Column(type="string")
+     *  @Groups({"read","write"})
      */
     private $jobId;
 
     /**
-     *  @ORM\ManyToOne(targetEntity="User")
+     * The userId for this job.
+     *
+     *  @ORM\Column(type="string")
+     *  @Groups({"read","write"})
      */
-    private $user;
+    private $userId;
 
     /**
-     *  @ORM\ManyToOne(targetEntity="Cluster")
+     * The cluster on which the job was executed.
+     *
+     *  @ORM\Column(type="string")
+     *  @Groups({"read","write"})
      */
-    private $cluster;
+    private $clusterId;
 
     /**
+     * The number of nodes used by the job.
+     *
      *  @ORM\Column(type="integer")
+     *  @Groups({"read","write"})
      */
     public $numNodes;
 
     /**
+     * When the job was started.
+     *
      *  @ORM\Column(type="integer")
+     *  @Groups({"read","write"})
      */
     public $startTime;
 
     /**
-     *  @ORM\Column(type="integer", nullable=true)
+     * The duration of the job.
+     *
+     *  @ORM\Column(type="integer")
+     *  @Groups({"read","write"})
      */
     public $duration;
 
     /**
-     *  @ORM\Column(type="integer", nullable=true, options={"default":0})
+     * The node list of the job.
+     *
+     *  @ORM\Column(type="text", nullable=true)
+     *  @Groups({"read","write"})
      */
-    public $severity;
-
-    /**
-     * @ORM\ManyToMany(targetEntity="Node", indexBy="id")
-     * @ORM\JoinTable(name="jobs_nodes", joinColumns={@ORM\JoinColumn(name="job_id", referencedColumnName="id")}, inverseJoinColumns={@ORM\JoinColumn(name="node_id", referencedColumnName="id")})
-     */
-    private $nodes;
-
+    public $nodeList;
 
     public $jobCache;
 
@@ -99,55 +137,71 @@ class Job
 
     /**
      *  @ORM\Column(type="text", nullable=true)
+     *  @Groups({"write"})
      */
     private $jobScript;
 
     /**
-     *  @ORM\Column(type="float", nullable=true)
+     *  @ORM\Column(type="text", options={"default":"noProject"})
+     *  @Groups({"write"})
      */
-    public $slot_0;
+    private $projectId;
 
     /**
-     *  @ORM\Column(type="float", nullable=true)
+     * The maximum memory capacity used by the job.
+     *
+     *  @ORM\Column(type="float")
      */
-    public $slot_1;
+    public $memUsedMax;
 
     /**
-     *  @ORM\Column(type="float", nullable=true)
+     * The average flop rate of the job.
+     *
+     *  @ORM\Column(type="float")
      */
-    public $slot_2;
+    public $flopsAnyAvg;
 
     /**
-     *  @ORM\Column(type="float", nullable=true)
+     * The average memory bandwidth of the job.
+     *
+     *  @ORM\Column(type="float")
      */
-    public $slot_3;
+    public $memBwAvg;
 
     /**
-     *  @ORM\Column(type="float", nullable=true)
+     * The average load of the job.
+     *
+     *  @ORM\Column(type="float")
      */
-    public $slot_4;
+    public $loadAvg;
+
+    /**
+     * The average network bandwidth of the job.
+     *
+     *  @ORM\Column(type="float")
+     */
+    public $netBwAvg;
+
+    /**
+     * The average file io bandwidth of the job.
+     *
+     *  @ORM\Column(type="float")
+     */
+    public $fileBwAvg;
 
     public $hasProfile;
 
     /**
+     * Tags of the job.
+     *
      * @ORM\ManyToMany(targetEntity="App\Entity\JobTag", inversedBy="jobs")
+     *  @Groups({"read"})
      */
-    private $tags;
+    public $tags;
 
 
     public function __construct() {
-        $this->nodes = new ArrayCollection();
         $this->tags = new ArrayCollection();
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function setId($id)
-    {
-        $this->id = $id;
     }
 
     public function getJobId()
@@ -160,24 +214,24 @@ class Job
         $this->jobId = $jobId;
     }
 
-    public function getUser()
+    public function getUserId()
     {
-        return $this->user;
+        return $this->userId;
     }
 
-    public function setUser($user)
+    public function setUserId($userId)
     {
-        $this->user = $user;
+        $this->userId = $userId;
     }
 
-    public function getCluster()
+    public function getClusterId()
     {
-        return $this->cluster;
+        return $this->clusterId;
     }
 
-    public function setCluster($cluster)
+    public function setClusterId($clusterId)
     {
-        $this->cluster = $cluster;
+        $this->clusterId = $clusterId;
     }
 
     public function getNumNodes()
@@ -188,6 +242,27 @@ class Job
     public function setNumNodes($numNodes)
     {
         $this->numNodes = $numNodes;
+    }
+
+    public function getNodes($delimiter)
+    {
+        $nodes = explode(',', $this->nodeList);
+        return implode($delimiter, $nodes);
+    }
+
+    public function getNodeArray()
+    {
+        return explode(',', $this->nodeList);
+    }
+
+    public function getProjectId()
+    {
+        return $this->projectId;
+    }
+
+    public function setProjectId($projectId)
+    {
+        $this->projectId = $projectId;
     }
 
     public function getStartTime()
@@ -208,56 +283,6 @@ class Job
     public function setDuration($duration)
     {
         $this->duration = $duration;
-    }
-
-    public function getNodeIdArray()
-    {
-        $arr;
-
-        foreach ( $this->nodes as $node ) {
-            $arr[] = $node->getNodeId();
-        }
-
-        return $arr;
-    }
-
-    public function getNodeNameArray()
-    {
-        $arr;
-
-        foreach ( $this->nodes as $node ) {
-            $arr[] = $node->getNodeId();
-        }
-
-        return $arr;
-    }
-
-    public function getNodes()
-    {
-        return $this->nodes;
-    }
-
-    public function addNode($node)
-    {
-        if ($this->nodes->contains($node)) {
-            return $node;
-        }
-
-        $this->nodes[] = $node;
-    }
-
-    public function removeNode($node)
-    {
-        $this->nodes->removeElement($node);
-    }
-
-    public function getNode($id)
-    {
-        if (!isset($this->nodes[$id])) {
-            throw new \InvalidArgumentException("No node with id $id in Job.");
-        }
-
-        return $this->nodes[$id];
     }
 
     public function getJobScript()

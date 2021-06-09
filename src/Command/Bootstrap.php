@@ -69,7 +69,8 @@ class Bootstrap extends Command
         array('ldap_search_dn',               '',       'default', 'Search DN',                           '',           ''),
         array('ldap_user_filter',             '',       'default', 'User query filter',                   '',           ''),
         array('general_user_scramble',        'false',  'default', 'Anonymize user names',                '',           ''),
-        array('general_user_emailbase',            '@mail.de',  'default', 'Email base adress used in user imports',                '',           ''),
+        array('general_user_emailbase', '@mail.de',  'default', 'Email base adress used in user imports', '',           ''),
+        array('plot_list_selectedMetrics', 'cpu_load,flops_any,mem_bw', 'default', 'Metrics to show in job list', '', ''),
     );
 
 

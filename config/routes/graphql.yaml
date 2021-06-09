@@ -1,0 +1,4 @@
+overblog_graphql_endpoint:
+    resource: "@OverblogGraphQLBundle/Resources/config/routing/graphql.yml"
+    prefix: query
+    trailing_slash_on_root: false

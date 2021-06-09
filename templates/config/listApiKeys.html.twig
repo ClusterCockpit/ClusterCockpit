@@ -4,14 +4,6 @@
     Config Panel
 {% endblock %}
 
-{% block javascript %}
-    {{ parent() }}
-    <script src="{{ asset('js/feather.min.js') }}"/></script>
-    <script>
-        feather.replace()
-    </script>
-{% endblock %}
-
 {% block body %}
     <div class="row">
         {{ include("renderSidebar.html.twig") }}
@@ -37,12 +29,12 @@
                                 <td>{{ user.apiToken }}</td>
                                 <td class="align-middle text-center">
                                     <a class="btn btn-success" href="{{ path('edit_api_key', {id : user.id}) }}" aria-label="Edit">
-                                        <span class="fas fa-pen-square fa-lg" aria-hidden="true"></span>
+                                        <i class="bi-pencil-fill"></i>
                                     </a>
                                 </td>
                                 <td class="align-middle text-center">
                                     <a class="btn btn-danger" href="{{ path('delete_api_key', {id : user.id}) }}" onclick="return confirm('Are you sure? This cannot be undone!')" aria-label="Delete">
-                                        <span class="fas fa-times fa-lg" aria-hidden="true"></span>
+                                        <i class="bi-x-circle"></i>
                                     </a>
                                 </td>
                             </tr>

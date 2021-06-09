@@ -67,6 +67,31 @@ class Configuration
         return $this->_config;
     }
 
+    /*
+     * Will NOT work with 'default' as scope!
+     */
+    public function setValue($scope, $key, $value)
+    {
+        if ( $this->_isInit == 0 ) {
+            $this->_initConfig();
+        }
+
+        if ( !array_key_exists ( $key , $this->_config) ) {
+            return false;
+        }
+
+        $configEntry = $this->_repository->findAllScope(array($scope))[$key];
+        if ( $configEntry->getScope() == 'default' ) {
+            $configEntry = clone $configEntry;
+        }
+
+        $configEntry->setValue($value);
+        $configEntry->setScope($scope);
+        $this->_em->persist($configEntry);
+        $this->_em->flush();
+        return true;
+    }
+
     public function getValue($key)
     {
         if ( $this->_isInit == 0 ) {

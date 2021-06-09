@@ -32,66 +32,22 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
 {
     private $_timing;
     private $_database;
-    private $_logger;
+    /* private $_logger; */
 
     public function __construct(
-        LoggerInterface $logger
+        /* LoggerInterface $logger */
     )
     {
         $this->_timer = new Stopwatch();
-        $this->_logger = $logger;
+        /* $this->_logger = $logger; */
         $influxdbURL = getenv('INFLUXDB_URL');
-        $this->_database = \InfluxDB\Client::fromDSN($influxdbURL);
+	    /* $this->_logger->info("Scheme: $influxdbURL"); */
+        $this->_database = \InfluxDB\Client::fromDSN("influxdb://symfony:mashup@127.0.0.1:8086/ClusterCockpit");
     }
 
-    public function getJobRoofline($job, $metrics)
+    public function hasProfile($job, $metric)
     {
-        $nodes = $job->getNodeNameArray();
-
-        $flopsAny = $metrics['flops_any'];
-        $memBw = $metrics['mem_bw'];
-        $nodes = implode('|', $nodes);
-        $stopTime = $job->startTime + $job->duration;
-
-        $query = "SELECT {$flopsAny['name']}*{$flopsAny['scale']}
-            FROM {$flopsAny['measurement']}
-            WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
-            AND host =~ /$nodes/";
-
-        $result = $this->_database->query($query, ['epoch' => 's']);
-        $points[0] = $result->getPoints();
-
-        $query = "SELECT {$memBw['name']}*{$memBw['scale']}
-            FROM {$memBw['measurement']}
-            WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
-            AND host =~ /$nodes/";
-
-        $this->_timer->start('InfluxDB');
-        $result = $this->_database->query($query, ['epoch' => 's']);
-        $points[1] = $result->getPoints();
-        $this->_timer->stop( 'InfluxDB');
-
-        foreach ( $points[0] as $index => $point ){
-            $memBw = $points[1][$index]['mem_bw'];
-
-            if ( $memBw != 0 ){
-                $intensity = $point['flops_any']/$memBw;
-
-                $roofline[] = array(
-                    'x' => round($intensity,2),
-                    'y' => round($point['flops_any'],2)
-                );
-            }
-        }
-
-        return $roofline;
-    }
-
-    public function hasProfile($job)
-    {
-        $nodes = $job->getNodes();
-        $metrics = $job->getCluster()->getMetricList('list');
-        $metric = reset($metrics);
+        $nodes = $job->getNodeArray();
 
         if ( count($nodes) < 1 ){
             $job->hasProfile = false;
@@ -99,12 +55,13 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
         }
         $stopTime = $job->startTime + $job->duration;
 
+        /* TODO add measurement */
         $query = "SELECT COUNT({$metric['name']})
             FROM {$metric['measurement']}
             WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
-            AND host = '{$nodes->first()->getNodeId()}'";
+            AND host = '{$nodes[0]}'";
 
-        $this->_logger->info("InfluxDB QUERY: $query");
+        /* $this->_logger->info("InfluxDB QUERY: $query"); */
         $result = $this->_database->query($query);
         $points = $result->getPoints();
 
@@ -119,22 +76,20 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
 
     public function getJobStats($job, $metrics)
     {
-        $nodes = $job->getNodeNameArray();
-        $nodes = implode('|', $nodes);
+        $nodes = $job->getNodes('|');
         $stopTime = $job->startTime + $job->duration;
 
-        foreach ( $metrics as $metric ){
+        foreach ( $metrics as $metric ) {
             $name = $metric['name'];
-            $scale = sprintf("%f",$metric['scale']);
 
             $query = "SELECT
-                MEAN($name) * $scale AS {$name}_avg
-                ,MIN($name)  * $scale AS {$name}_min
-                ,MAX($name)  * $scale AS {$name}_max
+                MEAN($name)  AS {$name}_avg
+                ,MIN($name)  AS {$name}_min
+                ,MAX($name)  AS {$name}_max
                 FROM {$metric['measurement']}
                 WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
                 AND host =~ /$nodes/ GROUP BY host";
-	    $this->_logger->info("InfluxDB QUERY: $query");
+	    /* $this->_logger->info("InfluxDB QUERY: $query"); */
 
             $this->_timer->start( 'InfluxDB');
             $result = $this->_database->query($query);
@@ -142,14 +97,14 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
             $this->_timer->stop( 'InfluxDB');
 
             $query = "SELECT
-                MEAN($name) * $scale AS {$name}_avg
-                ,MIN($name)  * $scale AS {$name}_min
-                ,MAX($name)  * $scale AS {$name}_max
+                MEAN($name)  AS {$name}_avg
+                ,MIN($name)  AS {$name}_min
+                ,MAX($name)  AS {$name}_max
                 FROM {$metric['measurement']}
                 WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
                 AND host =~ /$nodes/";
 
-	    $this->_logger->info("InfluxDB JobStat QUERY: $query");
+	    /* $this->_logger->info("InfluxDB JobStat QUERY: $query"); */
             $this->_timer->start( 'InfluxDB');
             $result = $this->_database->query($query);
             $points = $result->getPoints();
@@ -175,38 +130,26 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
             }
         }
 
-        foreach ($nodeData as $node) {
-            $nodeStat[] = $node;
-        }
+/*         foreach ($nodeData as $node) { */
+/*             $nodeStat[] = $node; */
+/*         } */
 
-        $stats['nodeStats'] = $nodeStat;
+        $stats['nodeStats'] = $nodeData;
 
         return $stats;
     }
 
-    public function getMetricData($job, $metrics, $options)
+    public function getMetricData($job, $metrics)
     {
-        $nodes = $job->getNodeNameArray();
-        $nodes = implode('|', $nodes);
-        $sampletime = 0;
+        $nodes = $job->getNodes('|');
         $stopTime = $job->startTime + $job->duration;
 
-        if ( $options['sample'] > 0 ){
-            $sampletime = intdiv($job->duration, $options['sample']);
-        }
-
-
-        foreach ( $metrics as $metric ){
-            $scale = sprintf("%f",$metric['scale']);
-            if ( $sampletime < $metric['sampletime'] ) {
-                $sampletime = $metric['sampletime'];
-            }
-
+        foreach ( $metrics as $metric ) {
             $query = "SELECT
-                MEAN({$metric['name']}) * $scale AS {$metric['name']}
+                MEAN({$metric['name']})  AS {$metric['name']}
                 FROM {$metric['measurement']}
                 WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
-                AND host =~ /$nodes/ GROUP BY time({$sampletime}s), host";
+                AND host =~ /$nodes/ GROUP BY time({$metric['sampletime']}s), host";
 
             $this->_timer->start( 'InfluxDB');
             $result = $this->_database->query($query, ['epoch' => 's']);
@@ -222,39 +165,13 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
                 $start = $seriesdata['values'][0][0];
 
                 foreach ( $seriesdata['columns'] as $index => $metric ){
-                    if ($metric != 'time'){
-                        foreach ( $seriesdata['values'] as $row ){
-                            $data[$metric][$nodeId]['x'][] = $row[0] - $start ;
-                            $data[$metric][$nodeId]['y'][] = $row[$index];
-                        }
+                    foreach ( $seriesdata['values'] as $row ){
+                        $data[$metric][$nodeId][] = $row[$index];
                     }
                 }
             }
         }
 
         return $data;
-    }
-
-    public function getMetricCount($job, $metrics)
-    {
-        $nodes = $job->getNodes();
-        $id = $nodes->first()->getNodeId();
-        $metric = reset($metrics);
-        $stopTime = $job->startTime + $job->duration;
-
-        $query = "SELECT COUNT({$metric['name']})
-            FROM {$metric['measurement']}
-            WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
-            AND host = '$id'";
-
-        $this->_logger->info("InfluxDB QUERY: $query");
-        $result = $this->_database->query($query, ['epoch' => 's']);
-        $count =  $result->getPoints();
-
-        if ( array_key_exists(0, $count) ) {
-            return $count[0]['count'] * count($nodes) * count($metrics);
-        } else {
-            return 0;
-        }
     }
 }

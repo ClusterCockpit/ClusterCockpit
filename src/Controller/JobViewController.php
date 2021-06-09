@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,8 @@ namespace App\Controller;
 
 use App\Entity\Job;
 use App\Entity\JobTag;
-use App\Entity\JobSearch;
 use App\Repository\JobRepository;
+use App\Service\ColorMap;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -40,7 +40,6 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Serializer\SerializerInterface;
-use App\Service\JobCache;
 use App\Service\Configuration;
 use Psr\Log\LoggerInterface;
 use \DateTime;
@@ -89,149 +88,20 @@ class JobViewController extends AbstractController
         }
     }
 
-    private function getSystems(){
-
-        $clusters = $this->getDoctrine()
-                            ->getRepository(\App\Entity\Cluster::class)
-                            ->findAll();
-
-        $systems['ALL'] = 0;
-
-        foreach  ( $clusters as $cluster ){
-            $systems[$cluster->getName()] = $cluster->getId();
-        }
-
-        return $systems;
-    }
-
-    public function search(
-        Request $request,
-        SerializerInterface $serializer,
-        Configuration $configuration
-    )
-    {
-        $search = new JobSearch();
-        $search->setNumNodesFrom(1);
-        $search->setNumNodesTo(64);
-        $search->setDurationFrom(new DateInterval('PT1H'));
-        $search->setDurationTo(new DateInterval('PT24H'));
-        $search->setDateFrom(floor(time()/60)*60-2592000);
-        $search->setDateTo(floor(time()/60)*60);
-
-        $form = $this->createFormBuilder($search)
-            ->add('clusterId', ChoiceType::class,array(
-                'choices'  => $this->getSystems(),
-                'label' => 'Cluster',
-                'required' => true))
-                ->add('numNodesFrom', IntegerType::class, array(
-                    'label' => 'from',
-                    'required' => false))
-                ->add('numNodesTo', IntegerType::class, array(
-                    'label' => 'to',
-                    'required' => false))
-            ->add('durationFrom', DateIntervalType::class, array(
-                'label' => 'from',
-                'with_hours' => true,
-                'with_minutes' => true,
-                'with_days' => false,
-                'with_months' => false,
-                'with_years' => false,
-            ))
-            ->add('durationTo', DateIntervalType::class, array(
-                'label' => 'to',
-                'with_hours' => true,
-                'with_minutes' => true,
-                'with_days' => false,
-                'with_months' => false,
-                'with_years' => false,
-            ))
-            ->add('dateFrom', DateTimeType::class, array(
-                'label' => 'from',
-                'input' => 'timestamp',
-                'widget' => 'single_text'
-            ))
-            ->add('dateTo', DateTimeType::class, array(
-                'label' => 'to',
-                'input' => 'timestamp',
-                'widget' => 'single_text'
-            ))
-            ->add('search', SubmitType::class, array('label' => 'Search Jobs'))
-            ->getForm();
-
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $search = $form->getData();
-            $joblist = array();
-
-            $repository = $this->getDoctrine()->getRepository(\App\Entity\Job::class);
-            $jobId = $search->getJobId();
-
-            if (isset($jobId)){
-                $job = $repository->findOneBy(['jobId' => $jobId]);
-                return $this->redirectToRoute('show_job', array('id' => $job->getId()));
-            } else {
-                $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-                $config = $configuration->getUserConfig($this->getUser());
-                $sortMetrics = $this->getDoctrine()
-                                    ->getRepository(\App\Entity\TableSortConfig::class)
-                                    ->findMetrics();
-
-                $count = count($sortMetrics);
-                $end = $count+1;
-
-                $columnDefs = array(
-                    'orderable'  => "0,$end",
-                    'visible'    => implode(',',range(1,$count)),
-                    'searchable' => implode(',',range(1,$end))
-                );
-
-                $durationFrom =$search->getDurationFrom()->h*3600+$search->getDurationFrom()->m*60;
-                $durationTo =$search->getDurationTo()->h*3600+$search->getDurationFrom()->m*60;
-                $search->setDurationFrom($durationFrom);
-                $search->setDurationTo($durationTo);
-                $search->setUserId(0);
-
-                return $this->render('jobViews/listJobs.html.twig',
-                    array(
-                        'jobQuery' => $serializer->serialize($search, 'json'),
-                        'config' => $config,
-                        'sortMetrics' => $sortMetrics,
-                        'columnDefs' => $columnDefs
-                    ));
-            }
-        }
-
-        return $this->render('default/searchJobs.html.twig', array(
-            'form' => $form->createView(),
-        ));
-    }
-
     public function list(
-        Configuration $configuration
+        Configuration $configuration,
+        ColorMap $colorMaps,
+        $projectDir
     )
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());
-        $sortMetrics = $this->getDoctrine()
-                            ->getRepository(\App\Entity\TableSortConfig::class)
-                            ->findMetrics();
-
-        $count = count($sortMetrics);
-        $end = $count+1;
-
-        $columnDefs = array(
-            'orderable'  => "0,$end",
-            'visible'    => implode(',',range(1,$count)),
-            'searchable' => implode(',',range(1,$end))
-        );
+        $colorMaps->setColormap($config['plot_general_colorscheme']->value, $projectDir);
 
         return $this->render('jobViews/listJobs.html.twig',
             array(
-                'jobQuery' => json_encode(array('runningJobs' => true)),
                 'config' => $config,
-                'sortMetrics' => $sortMetrics,
-                'columnDefs' => $columnDefs
+                'colormap' => $colorMaps->getColorMap()
             ));
     }
 
@@ -291,37 +161,23 @@ class JobViewController extends AbstractController
     public function show(
         Job $job,
         Configuration $configuration,
-        JobCache $jobCache
+        ColorMap $colorMaps,
+        $projectDir
     )
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());
+        $colorMaps->setColormap($config['plot_general_colorscheme']->value, $projectDir);
 
         if ( $job->isRunning ) {
             $job->duration = time() - $job->startTime;
         }
 
-        $alltags = $this->getDoctrine()
-                            ->getRepository(\App\Entity\JobTag::class)
-                            ->findAll();
-
-        $d1 = new DateTime();
-        $d2 = new DateTime();
-        $d2->add(new DateInterval('PT'.$job->duration.'S'));
-        $iv = $d2->diff($d1);
-        $duration = $iv->format('%h h %i m');
-
-        if ( $iv->days ){
-            $duration = $iv->format('%a d %h h %i m');
-        }
-
-        return $this->render('jobViews/viewJob-ajax.html.twig',
+        return $this->render('jobViews/viewJob.html.twig',
             array(
                 'job' => $job,
-                'duration' => $duration,
                 'config' => $config,
-                'tags' => $alltags,
-                'backend' => $jobCache->getBackend()
+                'colormap' => $colorMaps->getColorMap()
             ));
     }
 }

@@ -7,11 +7,8 @@
 {% block javascript %}
     <script src="{{ asset('js/popper.min.js') }}"/></script>
     {{ parent() }}
-    <script src="{{ asset('js/feather.min.js') }}"/></script>
     <script>
       {{ include('js/app-config.js.twig') }}
-
-      feather.replace()
     </script>
 {% endblock %}
 
@@ -30,4 +27,3 @@
             </div>
         </div>
 {% endblock %}
-

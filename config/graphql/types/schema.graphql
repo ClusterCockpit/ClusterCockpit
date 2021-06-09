@@ -1,0 +1,202 @@
+type Job {
+  id: ID!
+  jobId: String!
+  userId: String!
+  projectId: String!
+  clusterId: String!
+  startTime: Time!
+  duration: Int!
+  numNodes: Int!
+  hasProfile: Boolean!
+  tags: [JobTag!]!
+
+  loadAvg: Float
+  memUsedMax: Float
+  flopsAnyAvg: Float
+  memBwAvg: Float
+  netBwAvg: Float
+  fileBwAvg: Float
+}
+
+type JobTag {
+  id: ID!
+  tagType: String!
+  tagName: String!
+}
+
+type Cluster {
+  clusterID: String!
+  processorType: String!
+  socketsPerNode: Int!
+  coresPerSocket: Int!
+  threadsPerCore: Int!
+  flopRateScalar: Int!
+  flopRateSimd: Int!
+  memoryBandwidth: Int!
+  metricConfig: [MetricConfig!]!
+  filterRanges: FilterRanges!
+}
+
+type MetricConfig {
+  name: String!
+  unit: String!
+  sampletime: Int!
+  peak: Int!
+  normal: Int!
+  caution: Int!
+  alert: Int!
+}
+
+type JobMetric {
+  unit: String!
+  scope: JobMetricScope!
+  timestep: Int!
+  series: [JobMetricSeries]!
+}
+
+enum JobMetricScope {
+  node
+  cpu
+  socket
+}
+
+type JobMetricSeries {
+  node_id: String!
+  statistics: JobMetricStatistics
+  data: [Float]!
+}
+
+type JobMetricStatistics {
+  avg: Float!
+  min: Float!
+  max: Float!
+}
+
+type JobMetricWithName {
+  name: String!
+  metric: JobMetric!
+}
+
+type Query {
+  clusters: [Cluster!]!
+  jobById(id: ID!): Job
+  jobs(filter: JobFilterList, page: PageRequest, order: OrderByInput): JobResultList!
+  jobsStatistics(filter: JobFilterList): JobsStatistics!
+  jobMetrics(jobId: String!, clusterId: String, metrics: [String]): [JobMetricWithName]!
+  tags: [JobTag!]!
+  filterRanges: FilterRanges!
+  userStats(startTime: Time, stopTime: Time, clusterId: String): [UserStats!]!
+}
+
+type Mutation {
+  createTag(type: String!, name: String!): JobTag!
+  deleteTag(id: ID!): ID!
+  addTagsToJob(job: ID!, tagIds: [ID!]!): [JobTag!]!
+  removeTagsFromJob(job: ID!, tagIds: [ID!]!): [JobTag!]!
+
+  updateConfiguration(name: String!, value: String!): String
+}
+
+type IntRangeOutput {
+  from: Int!
+  to: Int!
+}
+
+type TimeRangeOutput {
+  from: Time!
+  to: Time!
+}
+
+type FilterRanges {
+  duration: IntRangeOutput!
+  numNodes: IntRangeOutput!
+  startTime: TimeRangeOutput!
+}
+
+input JobFilterList {
+  list: [JobFilter]
+}
+
+input JobFilter {
+  tags: [ID!]
+  jobId: StringInput
+  userId: StringInput
+  projectId: StringInput
+  clusterId: StringInput
+  duration: IntRange
+  numNodes: IntRange
+  startTime: TimeRange
+  hasProfile: Boolean
+  flopsAnyAvg: FloatRange
+  memBwAvg: FloatRange
+  loadAvg: FloatRange
+  memUsedMax: FloatRange
+}
+
+input OrderByInput {
+  field: String!
+  order: SortDirectionEnum = ASC
+}
+
+enum SortDirectionEnum {
+  DESC
+  ASC
+}
+
+input StringInput {
+  eq: String
+  contains: String
+  startsWith: String
+  endsWith: String
+}
+
+input IntRange {
+  from: Int!
+  to: Int!
+}
+
+input FloatRange {
+  from: Float!
+  to: Float!
+}
+
+input TimeRange {
+  from: Time!
+  to: Time!
+}
+
+type JobResultList {
+  items: [Job]!
+  offset: Int
+  limit: Int
+  count: Int
+}
+
+type HistoPoint {
+  count: Int!
+  value: Int!
+}
+
+type JobsStatistics  {
+  totalJobs: Int!
+  shortJobs: Int!
+  totalWalltime: Int!
+  totalCoreHours: Int!
+  histWalltime: [HistoPoint]!
+  histNumNodes: [HistoPoint]!
+}
+
+type UserStats {
+    id: ID!,
+    userId: String!
+    totalJobs: Int!
+    totalWalltime: Float!
+    totalCoreHours: Float!
+}
+
+input PageRequest {
+  itemsPerPage: Int!
+  page: Int!
+}
+
+scalar Time

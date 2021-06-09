@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -44,7 +44,7 @@ class JobTag
     /**
      * @ORM\Column(type="string", length=255)
      */
-    private $name;
+    public $name;
 
     /**
      * @ORM\Column(type="string", length=255)
@@ -54,8 +54,7 @@ class JobTag
     /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Job", mappedBy="tags")
      */
-    private $jobs;
-
+    public $jobs;
 
     public function __construct()
     {

@@ -26,10 +26,11 @@
 namespace App\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
-use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Bridge\Doctrine\Security\User\UserLoaderInterface;
+
+use App\Entity\User;
 
 class UserRepository extends ServiceEntityRepository  implements UserLoaderInterface
 {
