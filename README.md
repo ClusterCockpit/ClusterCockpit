@@ -35,7 +35,7 @@ To install and use ClusterCockpit you need the following dependencies:
 - Optional: Apache or Nginx web server for production use
 - Optional: [InfluxDB](https://docs.influxdata.com/influxdb/v1.7/introduction/getting-started/) time series database
 
-We are currently working hard to provide a Docker setup including all required components for development.
+We provide a [Docker compose setup](https://github.com/ClusterCockpit/cc-docker) for easy demo and development of ClusterCockpit.
 
 --------------------------------------------------------------------------------
 Configure PHP
