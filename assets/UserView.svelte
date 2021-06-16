@@ -13,6 +13,7 @@
     let sorting = { field: "startTime", order: "DESC" };
     let datatable;
     let filterItems = [{ userId: { eq: userInfos.userId } }];
+    let matchedJobs;
 
     initClient({
         url: typeof GRAPHQL_BACKEND !== 'undefined'
@@ -118,6 +119,7 @@
             clusters={clusters}
             sorting={sorting}
             filterRanges={filterRanges}
+            matchedJobs={matchedJobs}
             on:update={filtersChanged} />
     </Col>
 </Row>
@@ -185,6 +187,7 @@
         <Datatable
             bind:this={datatable}
             bind:sorting={sorting}
+            bind:matchedJobs={matchedJobs}
             initialFilterItems={filterItems}
             metricUnits={metricUnits} />
     </Col>

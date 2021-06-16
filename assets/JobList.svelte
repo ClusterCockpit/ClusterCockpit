@@ -17,6 +17,7 @@
     let sorting = { field: "startTime", order: "DESC" };
     let datatable;
     let filterItems = [];
+    let matchedJobs;
 
     const metricUnits = {};
     const metricConfig = {};
@@ -62,6 +63,7 @@
     clusters={clusters}
     sorting={sorting}
     filterRanges={filterRanges}
+    matchedJobs={matchedJobs}
     on:update={filtersChanged} />
 
 <div class="d-flex flex-row justify-content-between">
@@ -79,5 +81,6 @@
 <Datatable
     bind:this={datatable}
     bind:sorting={sorting}
+    bind:matchedJobs={matchedJobs}
     initialFilterItems={filterItems}
     metricUnits={metricUnits} />

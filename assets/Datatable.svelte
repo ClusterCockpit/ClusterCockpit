@@ -9,9 +9,10 @@
     import JobMetricPlots from './JobMetricPlots.svelte';
     import { getContext } from 'svelte';
 
-    export let metricUnits;
-    export let sorting;
-    export let initialFilterItems;
+    export let metricUnits; /* Metric units to show in table header. */
+    export let sorting; /* Used as output variable if changed and initial sorting. */
+    export let initialFilterItems; /* Can be empty, or for example used to restrict initially fetched jobs to single user. */
+    export let matchedJobs; /* Used as output variable (So that it can be passed to the FilterConfig) */
 
     const clusterCockpitConfig = getContext('cc-config');
 
@@ -66,6 +67,7 @@
     `, {filter: { list: initialFilterItems }, sorting, paging});
 
     query(jobQuery);
+    $: matchedJobs = $jobQuery.data != null ? $jobQuery.data.jobs.count : 0;
 
     function handlePaging( event ) {
         itemsPerPage = event.detail.itemsPerPage;

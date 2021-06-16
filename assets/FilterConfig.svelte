@@ -110,6 +110,12 @@
     import DoubleRangeSlider from './DoubleRangeSlider.svelte';
     import { operationStore, query } from '@urql/svelte';
 
+    export let showFilters; /* Hide/Show the filters */
+    export let clusters; /* Array of all clusters as returned by the GraphQL-Query (including filterRanges!) */
+    export let sorting; /* So that it can be presented in the applied filters section */
+    export let matchedJobs; /* So that it can be presented in the applied filters section */
+    export let filterRanges; /* Global filter ranges for all clusters */
+
     function deepCopy(obj) {
         return JSON.parse(JSON.stringify(obj));
     }
@@ -128,10 +134,6 @@
 
     query(tagsQuery);
 
-    export let showFilters = false;
-    export let clusters;
-    export let sorting;
-    export let filterRanges; /* Global filter ranges for all clusters */
     const dispatch = createEventDispatcher();
 
     let tagFilterTerm = '';
@@ -348,8 +350,6 @@
                     <Input type="time" name="date"  bind:value={filters["startTime"]["to"]["time"]}  placeholder="datetime placeholder" />
                 </FormGroup>
             </Row>
-        </Col>
-        <Col>
             <Row>
                 <Col>
                     <h5>Duration</h5>
@@ -391,8 +391,6 @@
                     </div>
                 </Col>
             </Row>
-        </Col>
-        <Col>
             <Row>
                 <Col>
                     <h5>Number of nodes</h5>
@@ -404,11 +402,49 @@
                     firstSlider={filters["numNodes"]["from"]} secondSlider={filters["numNodes"]["to"]}/>
             </Row>
         </Col>
-    </Row>
-    <Row>
-        <Col>
+        <Col xs="2">
             <Row>
                 <Col>
+                    <h5>Clusters</h5>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <ListGroup>
+                        <ListGroupItem>
+                            <input type="radio" value={null}
+                                bind:group={filters["cluster"]}
+                                on:change={updateRanges} />
+                            All
+                        </ListGroupItem>
+                        {#each (clusters || []) as cluster}
+                            <ListGroupItem>
+                                <input type="radio" value={cluster.clusterID}
+                                    bind:group={filters["cluster"]}
+                                    on:change={updateRanges} />
+                                {cluster.clusterID}
+                            </ListGroupItem>
+                        {/each}
+                    </ListGroup>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <br/>
+                    <h5>Project ID</h5>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <input type="text"
+                        bind:value={filters.projectId}
+                        placeholder="Filter"
+                        style="width: 100%;">
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <br/>
                     <h5>Tags</h5>
                 </Col>
             </Row>
@@ -439,48 +475,6 @@
             </Row>
         </Col>
         <Col>
-            <Row>
-                <Col>
-                    <h5>Clusters</h5>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <ListGroup>
-                        <ListGroupItem>
-                            <input type="radio" value={null}
-                                bind:group={filters["cluster"]}
-                                on:change={updateRanges} />
-                            All
-                        </ListGroupItem>
-                        {#each (clusters || []) as cluster}
-                            <ListGroupItem>
-                                <input type="radio" value={cluster.clusterID}
-                                    bind:group={filters["cluster"]}
-                                    on:change={updateRanges} />
-                                {cluster.clusterID}
-                            </ListGroupItem>
-                        {/each}
-                    </ListGroup>
-                </Col>
-            </Row>
-        </Col>
-        <Col>
-            <Row>
-                <Col>
-                    <h5>Project ID</h5>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <input type="text"
-                        bind:value={filters.projectId}
-                        placeholder="Filter"
-                        style="width: 100%;">
-                </Col>
-            </Row>
-        </Col>
-        <Col xs="6">
             <Row>
                 <Col>
                     <h5>Job Statistics</h5>
@@ -587,6 +581,13 @@
         {appliedFilters["startTime"]["to"]["date"]}
         {appliedFilters["startTime"]["to"]["time"]}
     </div>
+    {#if matchedJobs != null}
+        <div>
+            Matched Jobs:
+            <br>
+            {matchedJobs}
+        </div>
+    {/if}
     <div>
         Sorting:
         <br>
