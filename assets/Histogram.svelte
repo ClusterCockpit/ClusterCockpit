@@ -1,17 +1,30 @@
-<div class="cc-plot">
+<div class="cc-plot"
+    on:mousemove={mousemove}
+    on:mouseleave={() => (infoText = '')}>
+    <span style="left: {paddingLeft + 5}px;">{infoText}</span>
     <canvas bind:this={canvasElement} width="{width}" height="{height}"></canvas>
 </div>
 
+<style>
+    .cc-plot {
+        position: relative;
+    }
+    .cc-plot > span {
+        position: absolute;
+        top: 0px;
+    }
+</style>
+
 <script>
-    import { onMount, onDestroy } from "svelte";
+    import { onMount } from "svelte";
 
     export let data;
     export let width;
     export let height;
 
-    const paddingLeft = 25,
+    const paddingLeft = 35,
         paddingRight = 20,
-        paddingTop = 15,
+        paddingTop = 20,
         paddingBottom = 20;
 
     let ctx;
@@ -38,12 +51,31 @@
         }
     }
 
+    let infoText = '';
+    function mousemove(event) {
+        let rect = event.target.getBoundingClientRect();
+        let x = event.clientX - rect.left;
+        if (x < paddingLeft || x > width - paddingRight) {
+            infoText = '';
+            return;
+        }
+
+        const w = width - paddingLeft - paddingRight;
+        const barWidth = Math.round(w / (maxValue + 1));
+        x = Math.floor((x - paddingLeft) / (w - barWidth) * maxValue);
+        let point = data.find(point => point.value == x);
+
+        if (point)
+            infoText = `count: ${point.count} (value: ${x})`;
+        else
+            infoText = '';
+    }
+
     function render() {
         const h = height - paddingTop - paddingBottom;
         const w = width - paddingLeft - paddingRight;
         const barWidth = Math.round(w / (maxValue + 1));
 
-        // const getCanvasX = (value) => Math.floor((value / maxValue) * (w - barWidth) + paddingLeft + (barWidth / 2.));
         const getCanvasX = (value) => (value / maxValue) * (w - barWidth) + paddingLeft + (barWidth / 2.);
         const getCanvasY = (count) => (h - (count / maxCount) * h) + paddingTop;
 
