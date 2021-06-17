@@ -106,7 +106,7 @@
     import { getColorForTag, fuzzySearchTags } from './utils.js';
     import { createEventDispatcher, getContext } from "svelte";
     import { Col, Row, FormGroup, Button, Input,
-             ListGroup, ListGroupItem, Card, Spinner } from 'sveltestrap';
+             ListGroup, ListGroupItem, Card, Alert, Spinner, Icon } from 'sveltestrap';
     import DoubleRangeSlider from './DoubleRangeSlider.svelte';
     import { operationStore, query } from '@urql/svelte';
 
@@ -561,33 +561,30 @@
         </div>
     {/if}
 
-    <div>
-        Nodes:
-        <br>
-        {appliedFilters["numNodes"]["from"]} - {appliedFilters["numNodes"]["to"]}
-    </div>
-    <div>
-        Duration:
-        <br>
+    <div class="d-flex flex-row">
+    {#if matchedJobs != null}
+        <Alert class="p-2 me-2" success>
+            Matched Jobs: {matchedJobs}
+        </Alert>
+    {/if}
+
+    <Card class="p-2 me-2" body>
+        <Icon name="hdd-stack"/> {appliedFilters["numNodes"]["from"]} - {appliedFilters["numNodes"]["to"]}
+    </Card>
+    <Card class="p-2 me-2" body>
+        <Icon name="stopwatch"/>
         {formatDuration(appliedFilters["duration"]["from"])} -
         {formatDuration(appliedFilters["duration"]["to"])}
-    </div>
-    <div>
-        Start Time:
-        <br>
+    </Card>
+    <Card class="p-2 me-2" body>
+        <Icon name="calendar-range"/>
         {appliedFilters["startTime"]["from"]["date"]}
         {appliedFilters["startTime"]["from"]["time"]}
         -
         {appliedFilters["startTime"]["to"]["date"]}
         {appliedFilters["startTime"]["to"]["time"]}
+    </Card>
     </div>
-    {#if matchedJobs != null}
-        <div>
-            Matched Jobs:
-            <br>
-            {matchedJobs}
-        </div>
-    {/if}
     <div>
         Sorting:
         <br>
