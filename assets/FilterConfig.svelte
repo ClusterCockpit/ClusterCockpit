@@ -1,6 +1,6 @@
 <script context="module">
     /* The values in here are only
-     * used while the GraphQL clusters
+    * used while the GraphQL clusters
      * query is still loading. After that,
      * the values are replaced.
      */
@@ -106,7 +106,7 @@
     import { getColorForTag, fuzzySearchTags } from './utils.js';
     import { createEventDispatcher, getContext } from "svelte";
     import { Col, Row, FormGroup, Button, Input,
-             ListGroup, ListGroupItem, Card, Alert, Spinner, Icon } from 'sveltestrap';
+        ListGroup, ListGroupItem, Card, Alert, Spinner, Icon } from 'sveltestrap';
     import DoubleRangeSlider from './DoubleRangeSlider.svelte';
     import { operationStore, query } from '@urql/svelte';
 
@@ -306,10 +306,6 @@
         margin-top: 20px;
     }
 
-    .applied-filters {
-        margin-bottom: 10px;
-    }
-
     table th, table td {
         border-bottom: none;
     }
@@ -335,7 +331,7 @@
             <p>From</p>
             <Row>
                 <FormGroup class="col">
-                <Input type="date" name="date"  bind:value={filters["startTime"]["from"]["date"]}  placeholder="datetime placeholder" />
+                    <Input type="date" name="date"  bind:value={filters["startTime"]["from"]["date"]}  placeholder="datetime placeholder" />
                 </FormGroup>
                 <FormGroup class="col">
                     <Input type="time" name="date"  bind:value={filters["startTime"]["from"]["time"]}  placeholder="datetime placeholder" />
@@ -344,7 +340,7 @@
             <p>To</p>
             <Row>
                 <FormGroup class="col">
-                <Input type="date" name="date"  bind:value={filters["startTime"]["to"]["date"]}  placeholder="datetime placeholder" />
+                    <Input type="date" name="date"  bind:value={filters["startTime"]["to"]["date"]}  placeholder="datetime placeholder" />
                 </FormGroup>
                 <FormGroup class="col">
                     <Input type="time" name="date"  bind:value={filters["startTime"]["to"]["time"]}  placeholder="datetime placeholder" />
@@ -398,8 +394,8 @@
             </Row>
             <Row>
                 <DoubleRangeSlider on:change={handleNodesSlider}
-                    min={currentRanges.numNodes.from} max={currentRanges.numNodes.to}
-                    firstSlider={filters["numNodes"]["from"]} secondSlider={filters["numNodes"]["to"]}/>
+                                   min={currentRanges.numNodes.from} max={currentRanges.numNodes.to}
+                                   firstSlider={filters["numNodes"]["from"]} secondSlider={filters["numNodes"]["to"]}/>
             </Row>
         </Col>
         <Col xs="2">
@@ -413,15 +409,15 @@
                     <ListGroup>
                         <ListGroupItem>
                             <input type="radio" value={null}
-                                bind:group={filters["cluster"]}
-                                on:change={updateRanges} />
+                                   bind:group={filters["cluster"]}
+                                   on:change={updateRanges} />
                             All
                         </ListGroupItem>
                         {#each (clusters || []) as cluster}
                             <ListGroupItem>
                                 <input type="radio" value={cluster.clusterID}
-                                    bind:group={filters["cluster"]}
-                                    on:change={updateRanges} />
+                                       bind:group={filters["cluster"]}
+                                       on:change={updateRanges} />
                                 {cluster.clusterID}
                             </ListGroupItem>
                         {/each}
@@ -437,9 +433,9 @@
             <Row>
                 <Col>
                     <input type="text"
-                        bind:value={filters.projectId}
-                        placeholder="Filter"
-                        style="width: 100%;">
+                           bind:value={filters.projectId}
+                           placeholder="Filter"
+                           style="width: 100%;">
                 </Col>
             </Row>
             <Row>
@@ -468,8 +464,8 @@
                         </ul>
                         <input
                             class="tags-search-input" type="text"
-                            placeholder="Search Tags (Click to Select)"
-                            bind:value={tagFilterTerm}>
+                                                      placeholder="Search Tags (Click to Select)"
+                                                      bind:value={tagFilterTerm}>
                     {/if}
                 </Col>
             </Row>
@@ -492,16 +488,16 @@
                         </thead>
                         <tbody>
                             {#each filters.statistics as stat, idx (stat)}
-                            <tr>
-                                <td>{stat.name}</td>
-                                <td><input type="checkbox" bind:checked={stat.enabled}></td>
-                                <td>
-                                    <DoubleRangeSlider on:change={(e) => handleStatisticsSlider(stat, e)}
-                                        min={currentRanges.statistics[idx].from}
-                                        max={currentRanges.statistics[idx].to}
-                                        firstSlider={stat.from} secondSlider={stat.to}/>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>{stat.name}</td>
+                                    <td><input type="checkbox" bind:checked={stat.enabled}></td>
+                                    <td>
+                                        <DoubleRangeSlider on:change={(e) => handleStatisticsSlider(stat, e)}
+                                                           min={currentRanges.statistics[idx].from}
+                                                           max={currentRanges.statistics[idx].to}
+                                                           firstSlider={stat.from} secondSlider={stat.to}/>
+                                    </td>
+                                </tr>
                             {/each}
                         </tbody>
                     </table>
@@ -519,80 +515,75 @@
     </div>
 {/if}
 
-<div class="applied-filters d-flex flex-row justify-content-between">
-    <div>
-        <b>Applied Filters:</b>
-    </div>
-    <div>
-        Clusters:
-        <br>
-        {appliedFilters["cluster"] == null
-            ? (clusters || []).map(c => c.clusterID).join(', ')
-            : appliedFilters["cluster"]}
-    </div>
-
-    {#if appliedFilters.projectId}
-        <div>
-            Project ID:
-            <br>
-            Contains: "{appliedFilters.projectId}"
-        </div>
-    {/if}
-
-    {#if Object.values(appliedFilters["tags"]).length > 0}
-        <div>
-            Tags:
-            {#each Object.values(appliedFilters["tags"]) as tag}
-                <br>
-                <span class="cc-tag badge rounded-pill {getColorForTag(tag)}">
-                    {tag.tagType}: {tag.tagName}
-                </span>
-            {/each}
-        </div>
-    {/if}
-
-    {#if appliedFilters.statistics.some(s => s.enabled)}
-        <div>
-            Job Statistics:
-            {#each appliedFilters.statistics.filter(s => s.enabled) as stat}
-                <br>
-                {stat.name}: {stat.from} - {stat.to}
-            {/each}
-        </div>
-    {/if}
-
-    <div class="d-flex flex-row">
+<div class="d-flex flex-row mb-2">
     {#if matchedJobs != null}
-        <Alert class="p-2 me-2" success>
-            Matched Jobs: {matchedJobs}
+        <Alert class="p-2 me-2" >
+            Matching {matchedJobs} Jobs
         </Alert>
     {/if}
 
-    <Card class="p-2 me-2" body>
-        <Icon name="hdd-stack"/> {appliedFilters["numNodes"]["from"]} - {appliedFilters["numNodes"]["to"]}
-    </Card>
-    <Card class="p-2 me-2" body>
-        <Icon name="stopwatch"/>
+    <Alert class="alert-light border d-flex flex-row p-2 me-2" >
+        <Icon name="cpu"/>
+        <div class="ps-2">
+            {appliedFilters["cluster"] == null
+            ? (clusters || []).map(c => c.clusterID).join(', ')
+            : appliedFilters["cluster"]}
+        </div>
+    </Alert>
+    <Alert class="alert-light border d-flex flex-row p-2 me-2" >
+        <Icon name="hdd-stack"/>
+        <div class="ps-2">
+            {appliedFilters["numNodes"]["from"]} - {appliedFilters["numNodes"]["to"]}
+        </div>
+    </Alert>
+    <Alert class="alert-light border d-flex flex-row p-2 me-2" >
+    <Icon name="stopwatch"/>
+    <div class="ps-2">
         {formatDuration(appliedFilters["duration"]["from"])} -
         {formatDuration(appliedFilters["duration"]["to"])}
-    </Card>
-    <Card class="p-2 me-2" body>
-        <Icon name="calendar-range"/>
+    </div>
+    </Alert>
+    <Alert class="alert-light border d-flex flex-row p-2 me-2" >
+    <Icon name="calendar-range"/>
+    <div class="ps-2">
         {appliedFilters["startTime"]["from"]["date"]}
         {appliedFilters["startTime"]["from"]["time"]}
         -
         {appliedFilters["startTime"]["to"]["date"]}
         {appliedFilters["startTime"]["to"]["time"]}
-    </Card>
     </div>
-    <div>
-        Sorting:
-        <br>
-        {sorting.field}
-        {#if sorting.order == 'ASC'}
-            (<i class="bi bi-sort-up"></i>)
-        {:else if sorting.order == 'DESC'}
-            (<i class="bi bi-sort-down"></i>)
-        {/if}
-    </div>
+    </Alert>
+
+    {#if appliedFilters.projectId}
+        <Alert class="alert-light border d-flex flex-row p-2 me-2">
+        <Icon name="people"/>
+        <div class="ps-2">
+            Project ID contains: "{appliedFilters.projectId}"
+        </div>
+        </Alert>
+    {/if}
+
+    {#if Object.values(appliedFilters["tags"]).length > 0}
+        <Alert class="alert-light border d-flex flex-row p-2 me-2">
+            <Icon name="tag"/>
+            <div class="ps-2">
+                {#each Object.values(appliedFilters["tags"]) as tag}
+                    <span class="cc-tag badge rounded-pill {getColorForTag(tag)}">
+                        {tag.tagType}: {tag.tagName}
+                    </span>
+                {/each}
+            </div>
+        </Alert>
+    {/if}
+
+    {#if appliedFilters.statistics.some(s => s.enabled)}
+        <Alert class="alert-light border d-flex flex-row p-2 me-2">
+            <Icon name="bar-chart-line"/>
+            <div class="ps-2">
+                {#each appliedFilters.statistics.filter(s => s.enabled) as stat}
+                    {stat.name}: {stat.from} - {stat.to}
+                {/each}
+            </div>
+        </Alert>
+    {/if}
 </div>
