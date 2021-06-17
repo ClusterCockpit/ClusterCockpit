@@ -217,7 +217,7 @@ class JobRepository extends ServiceEntityRepository
         if ($page) {
             $qb->setFirstResult(($page['page'] - 1) * $page['itemsPerPage']);
             $qb->setMaxResults($page['itemsPerPage']);
-        } else {
+        } else if ($page === null) {
             $qb->setMaxResults(50);
         }
 
