@@ -3,10 +3,12 @@
     import { initClient, operationStore, query } from '@urql/svelte';
     import { Spinner, Row, Col, Card } from 'sveltestrap';
     import Histogram from './Histogram.svelte';
+    import ScatterPlot from './ScatterPlot.svelte';
     import { fetchClusters } from './utils.js';
 
     const selectedCluster = 'emmy'; // TODO: Make select/configurable
     const metricsInHistograms = ['flops_any', 'mem_bw', 'mem_used']; // TODO: Make select/configurable
+    const scatterPlotPairs = [ ['flops_any', 'mem_bw'], ['mem_bw', 'mem_used'] ]; // TODO: Make select/configurable
 
     const clusterCockpitConfig = getContext('cc-config');
 
@@ -29,10 +31,13 @@
 
     query(statsQuery);
 
+    const metricUnits = {};
     const metricConfig = {};
+    setContext('metric-config', metricConfig);
+
     let clusters = null;
     let filterRanges = null;
-    fetchClusters(metricConfig)
+    fetchClusters(metricConfig, metricUnits)
         .then(res => {
             clusters = res.clusters;
             filterRanges = res.filterRanges;
@@ -66,6 +71,12 @@
             name: metric
         };
     }
+
+    function buildScatterData(stats, metric) {
+        let idx = $statsQuery.variables.metrics.indexOf(metric);
+        console.assert(idx != -1, "Woops?");
+        return stats[idx].map(s => s.avg);
+    }
 </script>
 
 <h1>Hello World!</h1>
@@ -82,6 +93,17 @@
                 <h2>{metric.name}</h2>
                 <Histogram width={400} height={200}
                     data={metric.bins} label={metric.label} />
+            </Col>
+        {/each}
+    </Row>
+    <Row>
+        {#each scatterPlotPairs as metricPair}
+            <Col>
+                <ScatterPlot width={400} height={200}
+                   X={buildScatterData($statsQuery.data.jobMetricStatistics, metricPair[0])}
+                   Y={buildScatterData($statsQuery.data.jobMetricStatistics, metricPair[1])}
+                   yLabel={`${metricPair[0]} [${metricUnits[metricPair[0]]}]`}
+                   xLabel={`${metricPair[1]} [${metricUnits[metricPair[1]]}]`} />
             </Col>
         {/each}
     </Row>
