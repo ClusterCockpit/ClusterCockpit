@@ -108,6 +108,7 @@
     import { Col, Row, FormGroup, Button, Input,
              ListGroup, ListGroupItem, Card, Alert, Spinner, Icon } from 'sveltestrap';
     import DoubleRangeSlider from './DoubleRangeSlider.svelte';
+    import Tag from './Tag.svelte';
     import { operationStore, query } from '@urql/svelte';
 
     export let showFilters; /* Hide/Show the filters */
@@ -115,6 +116,7 @@
     export let sorting; /* So that it can be presented in the applied filters section */
     export let matchedJobs; /* So that it can be presented in the applied filters section */
     export let filterRanges; /* Global filter ranges for all clusters */
+    export let initialFilterTagId = null; /* If set, jobs are filtered by this tag from the start */
 
     function deepCopy(obj) {
         return JSON.parse(JSON.stringify(obj));
@@ -133,6 +135,15 @@
     `);
 
     query(tagsQuery);
+
+    $: {
+        if (initialFilterTagId != null && $tagsQuery.data) {
+            let tag = $tagsQuery.data.tags.find(tag => tag.id == initialFilterTagId);
+            console.assert(tag, "Don't just put random IDs in the URL!");
+            appliedFilters.tags[tag.id] = tag;
+            filters.tags[tag.id] = tag;
+        }
+    }
 
     const dispatch = createEventDispatcher();
 
@@ -544,9 +555,7 @@
             Tags:
             {#each Object.values(appliedFilters["tags"]) as tag}
                 <br>
-                <span class="cc-tag badge rounded-pill {getColorForTag(tag)}">
-                    {tag.tagType}: {tag.tagName}
-                </span>
+                <Tag tag={tag}/>
             {/each}
         </div>
     {/if}
@@ -561,7 +570,6 @@
         </div>
     {/if}
 
-    <div class="d-flex flex-row">
     {#if matchedJobs != null}
         <Alert class="p-2 me-2" success>
             Matched Jobs: {matchedJobs}
@@ -584,7 +592,7 @@
         {appliedFilters["startTime"]["to"]["date"]}
         {appliedFilters["startTime"]["to"]["time"]}
     </Card>
-    </div>
+
     <div>
         Sorting:
         <br>

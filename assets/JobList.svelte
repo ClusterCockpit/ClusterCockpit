@@ -57,6 +57,12 @@
         datatable.applyFilters(filterItems);
     }
 
+    let initialFilterTagId = null;
+    if (window.location.hash.startsWith('#tag=')) {
+        initialFilterTagId = window.location.hash.substring(5);
+        filterItems.push({ tags: [ initialFilterTagId ] });
+    }
+
 </script>
 
 <Filter {showFilters}
@@ -64,6 +70,7 @@
     sorting={sorting}
     filterRanges={filterRanges}
     matchedJobs={matchedJobs}
+    initialFilterTagId={initialFilterTagId}
     on:update={filtersChanged} />
 
 <div class="d-flex flex-row justify-content-between">

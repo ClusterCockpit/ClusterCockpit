@@ -3,7 +3,8 @@
     import { Icon, Button, ListGroup, ListGroupItem, Spinner,
              Modal, ModalBody, ModalHeader, ModalFooter, Alert,
              Input, InputGroup, InputGroupText, } from 'sveltestrap';
-    import { getColorForTag, fuzzySearchTags } from './utils.js';
+    import { fuzzySearchTags } from './utils.js';
+    import Tag from './Tag.svelte';
 
     export let job;
     export let allTags;
@@ -119,9 +120,7 @@
         <ListGroup>
             {#each allTagsFiltered as tag}
                 <ListGroupItem>
-                    <span class="badge rounded-pill {getColorForTag(tag)}">
-                        {tag.tagType}: {tag.tagName}
-                    </span>
+                    <Tag tag={tag}/>
 
                     <span style="float: right;">
                         <Button outline color="danger"
@@ -164,9 +163,7 @@
         <ListGroup>
             {#each allTagsFiltered as tag}
                 <ListGroupItem>
-                    <span class="badge rounded-pill {getColorForTag(tag)}">
-                        {tag.tagType}: {tag.tagName}
-                    </span>
+                    <Tag tag={tag}/>
 
                     <span style="float: right;">
                         {#if pendingChange === tag.id}
