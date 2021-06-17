@@ -25,17 +25,25 @@
 
 namespace App\Service;
 
+use App\Service\JobData;
 use App\Entity\Job;
+use App\Service\ClusterConfiguration;
 
 class JobStats
 {
     private $_rootdir;
+    private $_clusterCfg;
+    private $_jobData;
 
     public function __construct(
-        $projectDir
+        $projectDir,
+        ClusterConfiguration $clusterCfg,
+        JobData $jobData
     )
     {
         $this->_rootdir = "$projectDir/var/job-archive";
+        $this->_clusterCfg = $clusterCfg;
+        $this->_jobData = $jobData;
     }
 
     private function _getJobMetaPath($jobId, $clusterId)
@@ -48,7 +56,7 @@ class JobStats
         return $path;
     }
 
-    public function getStatsForMetrics($jobs, $metrics)
+    public function getAverages($jobs, $metrics)
     {
         $res = [];
 
@@ -61,7 +69,7 @@ class JobStats
             if (file_exists($filepath)) {
                 $data = json_decode(file_get_contents($filepath), true);
                 foreach ($metrics as $idx => $metric) {
-                    $res[$idx][] = $data['statistics'][$metric];
+                    $res[$idx][] = $data['statistics'][$metric]['avg'];
                 }
             } else {
                 foreach ($metrics as $idx => $metric) {
@@ -71,5 +79,61 @@ class JobStats
         }
 
         return $res;
+    }
+
+    public function rooflineHeatmap($jobs, $rows, $cols)
+    {
+        $tiles = [];
+        for ($i = 0; $i < $rows; $i++) {
+            $tiles[$i] = [];
+            for ($j = 0; $j < $cols; $j++) {
+                $tiles[$i][$j] = 0;
+            }
+        }
+
+        // All jobs should be from the same cluster!
+        $cluster = $this->_clusterCfg->getClusterConfiguration($jobs[0]->getClusterId());
+        $minX = log10(0.01);
+        $minY = log10(1.);
+        $maxX = log10(1000.);
+        $maxY = log10($cluster['flopRateSimd']);
+
+        foreach ($jobs as $job) {
+            $data = $this->_jobData->getData($job, ['flops_any', 'mem_bw']);
+            if ($data === false)
+                continue;
+
+            $flopsAny = null;
+            $memBw = null;
+            foreach ($data as $entry) {
+                if ($entry['name'] == 'flops_any')
+                    $flopsAny = $entry['metric'];
+                if ($entry['name'] == 'mem_bw')
+                    $memBw = $entry['metric'];
+            }
+
+            for ($n = 0; $n < $job->getNumNodes(); $n++) {
+                $flopsAnyData = $flopsAny->series[$n]->data;
+                $memBwData = $memBw->series[$n]->data;
+                $count = count($flopsAnyData);
+                for ($i = 0; $i < $count; $i++) {
+                    $f = $flopsAnyData[$i];
+                    $m = $memBwData[$i];
+                    if ($m <= 0 || $f == null || $m == null)
+                        continue;
+
+                    $x = log10($f / $m);
+                    $y = log10($f);
+                    if ($x < $minX || $x > $maxX  || $y < $minY || $y > $maxY)
+                        continue;
+
+                    $x = floor((($x - $minX) / ($maxX - $minX)) * ($cols - 1));
+                    $y = floor((($y - $minY) / ($maxY - $minY)) * ($rows - 1));
+                    $tiles[$y][$x] += 1;
+                }
+            }
+        }
+
+        return $tiles;
     }
 }

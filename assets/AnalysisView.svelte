@@ -7,8 +7,19 @@
     import { fetchClusters } from './utils.js';
 
     const selectedCluster = 'emmy'; // TODO: Make select/configurable
-    const metricsInHistograms = ['flops_any', 'mem_bw', 'mem_used']; // TODO: Make select/configurable
-    const scatterPlotPairs = [ ['flops_any', 'mem_bw'], ['mem_bw', 'mem_used'] ]; // TODO: Make select/configurable
+    const metricsInHistograms = ['flops_any', 'cpu_load', 'mem_bw', 'mem_used', 'clock']; // TODO: Make select/configurable
+    const scatterPlotPairs = [
+        ['flops_any', 'cpu_load'],
+        ['flops_any', 'mem_bw'],
+        ['flops_any', 'mem_used'],
+        ['flops_any', 'clock'],
+        ['cpu_load', 'mem_bw'],
+        ['cpu_load', 'mem_used'],
+        ['cpu_load', 'clock'],
+        ['mem_bw', 'mem_used'],
+        ['mem_bw', 'clock'],
+        ['mem_used', 'clock']
+    ]; // TODO: Make select/configurable
 
     const clusterCockpitConfig = getContext('cc-config');
 
@@ -20,9 +31,7 @@
 
     const statsQuery = operationStore(`
     query($filter: JobFilterList!, $metrics: [String!]!) {
-        jobMetricStatistics(filter: $filter, metrics: $metrics) {
-           avg
-       }
+        jobMetricAverages(filter: $filter, metrics: $metrics)
     }
     `, {
         filter: { list: [] },
@@ -50,11 +59,13 @@
 
     function buildHistogramData(stats, metric, numBins = 25) {
         let min = Number.MAX_VALUE, max = -min;
-        stats = stats.map(s => {
-            min = Math.min(min, s.avg);
-            max = Math.max(max, s.avg);
-            return s.avg;
-        });
+        for (let s of stats) {
+            min = Math.min(min, s);
+            max = Math.max(max, s);
+        }
+
+        min = Math.floor(min);
+        max = Math.ceil(max);
 
         const bins = new Array(numBins).fill(0);
         for (let value of stats) {
@@ -75,7 +86,7 @@
     function buildScatterData(stats, metric) {
         let idx = $statsQuery.variables.metrics.indexOf(metric);
         console.assert(idx != -1, "Woops?");
-        return stats[idx].map(s => s.avg);
+        return stats[idx];
     }
 </script>
 
@@ -88,10 +99,10 @@
 {:else}
     <Row>
         {#each metricsInHistograms.map((metric, idx) =>
-            buildHistogramData($statsQuery.data.jobMetricStatistics[idx], metric)) as metric}
+            buildHistogramData($statsQuery.data.jobMetricAverages[idx], metric)) as metric}
             <Col>
                 <h2>{metric.name}</h2>
-                <Histogram width={400} height={200}
+                <Histogram width={550} height={300}
                     data={metric.bins} label={metric.label} />
             </Col>
         {/each}
@@ -99,11 +110,11 @@
     <Row>
         {#each scatterPlotPairs as metricPair}
             <Col>
-                <ScatterPlot width={400} height={200}
-                   X={buildScatterData($statsQuery.data.jobMetricStatistics, metricPair[0])}
-                   Y={buildScatterData($statsQuery.data.jobMetricStatistics, metricPair[1])}
-                   yLabel={`${metricPair[0]} [${metricUnits[metricPair[0]]}]`}
-                   xLabel={`${metricPair[1]} [${metricUnits[metricPair[1]]}]`} />
+                <ScatterPlot width={550} height={300}
+                   X={buildScatterData($statsQuery.data.jobMetricAverages, metricPair[0])}
+                   Y={buildScatterData($statsQuery.data.jobMetricAverages, metricPair[1])}
+                   xLabel={`${metricPair[0]} [${metricUnits[metricPair[0]]}]`}
+                   yLabel={`${metricPair[1]} [${metricUnits[metricPair[1]]}]`} />
             </Col>
         {/each}
     </Row>
