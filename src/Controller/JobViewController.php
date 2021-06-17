@@ -105,6 +105,40 @@ class JobViewController extends AbstractController
             ));
     }
 
+    public function systems(
+        Configuration $configuration,
+        ColorMap $colorMaps,
+        $projectDir
+    )
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $config = $configuration->getUserConfig($this->getUser());
+        $colorMaps->setColormap($config['plot_general_colorscheme']->value, $projectDir);
+
+        return $this->render('jobViews/listJobs.html.twig',
+            array(
+                'config' => $config,
+                'colormap' => $colorMaps->getColorMap()
+            ));
+    }
+
+    public function analysis(
+        Configuration $configuration,
+        ColorMap $colorMaps,
+        $projectDir
+    )
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $config = $configuration->getUserConfig($this->getUser());
+        $colorMaps->setColormap($config['plot_general_colorscheme']->value, $projectDir);
+
+        return $this->render('jobViews/analysis.html.twig',
+            array(
+                'config' => $config,
+                'colormap' => $colorMaps->getColorMap()
+            ));
+    }
+
     public function listTagTypes()
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');

@@ -15,7 +15,10 @@ list_jobs:
     controller:  App\Controller\JobViewController::list
 systems:
     path: /monitoring/systems/
-    controller:  App\Controller\JobViewController::list
+    controller:  App\Controller\JobViewController::systems
+analysis:
+    path: /monitoring/analysis/
+    controller:  App\Controller\JobViewController::analysis
 list_jobs_tag:
     path: /monitoring/tag/{id}
     controller:  App\Controller\JobViewController::listTag
