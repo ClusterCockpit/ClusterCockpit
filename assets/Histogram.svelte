@@ -21,6 +21,7 @@
     export let data;
     export let width;
     export let height;
+    export let label = (value) => value.toString();
 
     const paddingLeft = 35,
         paddingRight = 20,
@@ -99,7 +100,7 @@
         ctx.textAlign = 'center';
         const stepsizeX = getStepSize(maxValue, w, 100);
         for (let x = 0; x <= maxValue; x += stepsizeX) {
-            ctx.fillText(`${x}`, getCanvasX(x), height - paddingBottom + 15);
+            ctx.fillText(label(x), getCanvasX(x), height - paddingBottom + 15);
         }
 
         ctx.strokeStyle = `#bbbbbb`;

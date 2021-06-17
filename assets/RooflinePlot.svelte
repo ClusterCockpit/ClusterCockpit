@@ -5,7 +5,6 @@
 <script context="module">
     const axesColor = '#aaaaaa';
     const fontSize = 12;
-    const colors = '#cc9900';
     const paddingLeft = 40,
         paddingRight = 10,
         paddingTop = 10,
@@ -181,7 +180,6 @@
 
         /* c will contain values from 0 to 1 representing the time */
         const x = [], y = [], c = [];
-        let maxX = Number.NEGATIVE_INFINITY;
         for (let i = 0; i < nodes; i++) {
             const flopsData = flopsAny.series[i].data;
             const memBwData = memBw.series[i].data;
@@ -191,7 +189,6 @@
                 if (Number.isNaN(intensity) || !Number.isFinite(intensity))
                     continue;
 
-                maxX = Math.max(maxX, intensity);
                 x.push(intensity);
                 y.push(f);
                 c.push(j / timesteps);
@@ -199,7 +196,8 @@
         }
 
         return {
-            x, y, c, maxX,
+            x, y, c,
+            maxX: 1000,
             xLabel: 'Intensity [FLOPS/byte]',
             yLabel: 'Performance [GFLOPS]'
         };
