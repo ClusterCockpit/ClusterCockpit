@@ -67,7 +67,7 @@
         let point = data.find(point => point.value == x);
 
         if (point)
-            infoText = `count: ${point.count} (value: ${x})`;
+            infoText = `count: ${point.count} (value: ${label(x)})`;
         else
             infoText = '';
     }
