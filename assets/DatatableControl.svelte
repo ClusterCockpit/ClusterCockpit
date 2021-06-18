@@ -5,9 +5,10 @@
         Modal, ModalBody, ModalHeader, ModalFooter } from 'sveltestrap';
     import ColumnConfig from './ColumnConfig.svelte';
 
-    export let showFilters=false;
-    export let columnConfigOpen = false;
-    export let sortConfigOpen = false;
+    export let filterConfigOpen=false;
+    let columnConfigOpen = false;
+    let sortConfigOpen = false;
+    export let clusters;
     export let sorting = '';
     export let metricUnits;
     let userFilter = '';
@@ -15,6 +16,7 @@
     const clusterCockpitConfig = getContext('cc-config');
     export let selectedMetrics = clusterCockpitConfig.plot_list_selectedMetrics.split(',').map(s => s.trim());
 
+    const toggleFilterConfig = () => (filterConfigOpen = !filterConfigOpen);
     const toggleColumnConfig = () => (columnConfigOpen = !columnConfigOpen);
     const toggleSortConfig = () => (sortConfigOpen = !sortConfigOpen);
     /* Run query when the user has
@@ -117,10 +119,16 @@
     metrics={Object.keys(metricUnits)}
     bind:selectedMetrics={selectedMetrics} />
 
+<Filter
+    showFilters={filterConfigOpen}
+    {clusters}
+    {filterRanges}
+    {initialFilterTagId}
+    on:update={filtersChanged} />
 
 <div class="d-flex flex-row">
     <div class="me-2">
-        <Button outline color=success on:click={() => (showFilters = !showFilters)}><Icon name="filter" /></Button>
+        <Button outline color=success on:click={toggleFilterConfig}><Icon name="filter" /></Button>
     </div>
     <div class="input-group w-25 me-2" >
         <div class="input-group-prepend">

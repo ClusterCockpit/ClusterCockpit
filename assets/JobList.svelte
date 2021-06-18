@@ -61,28 +61,22 @@
     }
 </script>
 
-<Filter
-    {showFilters}
-    {clusters}
-    {filterRanges}
-    {initialFilterTagId}
-    on:update={filtersChanged} />
-
 <TableInfo
     {appliedFilters}
     {clusters}
     {matchedJobs}/>
 
 <TableControl
-    {showFilters}
+    bind:filterConfigOpen={showFilters}
+    {clusters}
     {metricUnits}
-    {sorting}
+    bin:sorting={sorting}
     bind:selectedMetrics={selectedMetrics}
     on:update={filtersChanged} />
 
 <Datatable
     bind:this={datatable}
-    bind:sorting={sorting}
+    {sorting}
     bind:matchedJobs={matchedJobs}
     initialFilterItems={filterItems}
     {selectedMetrics}
