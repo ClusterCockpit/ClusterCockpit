@@ -1,8 +1,6 @@
 <script>
     import { operationStore, query } from '@urql/svelte';
-    import { Col, Row, Table, Icon,
-        Button, Card, Spinner, ListGroup, ListGroupItem,
-        Modal, ModalBody, ModalHeader, ModalFooter } from 'sveltestrap';
+    import { Row, Table, Card, Spinner } from 'sveltestrap';
     import Pagination from './Pagination.svelte';
     import JobMeta from './JobMeta.svelte';
     import JobMetricPlots from './JobMetricPlots.svelte';
@@ -51,7 +49,7 @@
 
     query(jobQuery);
     $: matchedJobs = $jobQuery.data != null ? $jobQuery.data.jobs.count : 0;
-    $jobQuery.variables.sorting = sorting;
+    $: $jobQuery.variables.sorting = sorting;
 
     function handlePaging( event ) {
         itemsPerPage = event.detail.itemsPerPage;

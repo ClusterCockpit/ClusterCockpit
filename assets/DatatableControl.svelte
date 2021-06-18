@@ -1,24 +1,32 @@
 <script>
     import { createEventDispatcher, getContext } from "svelte";
-    import { Col, Row, Table, Icon,
-        Button, Card, Spinner, ListGroup, ListGroupItem,
+    import { Icon, Button, ListGroup, ListGroupItem,
         Modal, ModalBody, ModalHeader, ModalFooter } from 'sveltestrap';
     import ColumnConfig from './ColumnConfig.svelte';
+    import Filter from './FilterConfig.svelte';
 
-    export let filterConfigOpen=false;
+    const clusterCockpitConfig = getContext('cc-config');
+
+    export let clusters;
+    export let sorting;
+    export let metricUnits;
+    export let filterRanges;
+    export let appliedFilters;
+    export let initialFilterTagId = null;
+    export let limitedToUser = false;
+    export let selectedMetrics = clusterCockpitConfig.plot_list_selectedMetrics.split(',').map(s => s.trim());
+
+    let filterConfigOpen = false;
     let columnConfigOpen = false;
     let sortConfigOpen = false;
-    export let clusters;
-    export let sorting = '';
-    export let metricUnits;
+
     let userFilter = '';
     const dispatch = createEventDispatcher();
-    const clusterCockpitConfig = getContext('cc-config');
-    export let selectedMetrics = clusterCockpitConfig.plot_list_selectedMetrics.split(',').map(s => s.trim());
 
     const toggleFilterConfig = () => (filterConfigOpen = !filterConfigOpen);
     const toggleColumnConfig = () => (columnConfigOpen = !columnConfigOpen);
     const toggleSortConfig = () => (sortConfigOpen = !sortConfigOpen);
+
     /* Run query when the user has
      * stopped typing for 350ms:
      */
@@ -121,21 +129,24 @@
 
 <Filter
     showFilters={filterConfigOpen}
+    bind:appliedFilters
     {clusters}
     {filterRanges}
     {initialFilterTagId}
-    on:update={filtersChanged} />
+    on:update />
 
 <div class="d-flex flex-row">
     <div class="me-2">
         <Button outline color=success on:click={toggleFilterConfig}><Icon name="filter" /></Button>
     </div>
-    <div class="input-group w-25 me-2" >
-        <div class="input-group-prepend">
-            <div class="input-group-text"><Icon name="search" /></div>
+    {#if !limitedToUser}
+        <div class="input-group w-25 me-2" >
+            <div class="input-group-prepend">
+                <div class="input-group-text"><Icon name="search" /></div>
+            </div>
+            <input type="search" bind:value={userFilter} on:input={handleUserFilter} class="form-control"  placeholder="Filter userId" />
         </div>
-        <input type="search" bind:value={userFilter} on:input={handleUserFilter} class="form-control"  placeholder="Filter userId" />
-    </div>
+    {/if}
     <div class="me-2">
         <Button outline color=primary on:click={toggleColumnConfig}><Icon name="gear" /></Button>
     </div>

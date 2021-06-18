@@ -1,65 +1,13 @@
-<script context="module">
-    /* The values in here are only
-    * used while the GraphQL clusters
-     * query is still loading. After that,
-     * the values are replaced.
-     */
-    export const defaultFilters = {
-        numNodes: {
-            from: 0, to: 0
-        },
-        duration: {
-            from: { hours: 0, min: 0 },
-            to: { hours: 0, min: 0 }
-        },
-        startTime: {
-            from: { date: "0000-00-00" , time: "00:00"},
-            to: { date:  "0000-00-00", time: "00:00"}
-        },
-        statistics: [
-            {
-                filter: 'flopsAnyAvg',
-                metric: 'flops_any',
-                name: 'Flops Any (Avg)',
-                enabled: false,
-                from: 0, to: 0
-            },
-            {
-                filter: 'memBwAvg',
-                metric: 'mem_bw',
-                name: 'Mem. Bw. (Avg)',
-                enabled: false,
-                from: 0, to: 0
-            },
-            {
-                filter: 'loadAvg',
-                metric: 'cpu_load',
-                name: 'Load (Avg)',
-                enabled: false,
-                from: 0, to: 0
-            },
-            {
-                filter: 'memUsedMax',
-                metric: 'mem_used',
-                name: 'Mem. Used (Max)',
-                enabled: false,
-                from: 0, to: 0
-            }
-        ],
-        projectId: '',
-        cluster: null,
-        tags: {}
-    };
-</script>
-
 <script>
     import { Alert } from 'sveltestrap';
     import InfoBox  from './InfoBox.svelte';
-    import { getColorForTag } from './utils.js';
+    import Tag from './Tag.svelte';
+    import { defaultFilters } from './FilterConfig.svelte';
 
     export let appliedFilters = defaultFilters;
     export let matchedJobs;
     export let clusters;
+    export let userInfos = null;
 
     function formatDuration({ hours, min }) {
         hours = hours.toString().padStart(2, '0');
@@ -73,6 +21,22 @@
         <Alert class="p-2 me-2" >
             Matching {matchedJobs} Jobs
         </Alert>
+    {/if}
+
+    {#if userInfos != null}
+        <InfoBox icon="person-circle">
+            {userInfos.userId}
+        </InfoBox>
+        {#if userInfos.name}
+            <InfoBox icon="person-lines-fill">
+                {userInfos.name}
+            </InfoBox>
+        {/if}
+        {#if userInfos.emal}
+            <InfoBox icon="envelope">
+                {userInfos.email}
+            </InfoBox>
+        {/if}
     {/if}
 
     <InfoBox icon="cpu">
@@ -107,9 +71,7 @@
     {#if Object.values(appliedFilters["tags"]).length > 0}
         <InfoBox icon="tag">
             {#each Object.values(appliedFilters["tags"]) as tag}
-                <span class="cc-tag badge rounded-pill {getColorForTag(tag)}">
-                    {tag.tagType}: {tag.tagName}
-                </span>
+                <Tag {tag}/>
             {/each}
         </InfoBox>
     {/if}

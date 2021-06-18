@@ -2,8 +2,6 @@
     import { initClient } from '@urql/svelte';
     import { setContext } from 'svelte';
     import Datatable from './Datatable.svelte';
-    import { Icon, Button } from 'sveltestrap';
-    import Filter from './FilterConfig.svelte';
     import TableControl from './DatatableControl.svelte';
     import TableInfo from './DatatableInfo.svelte';
     import { fetchClusters } from './utils.js';
@@ -14,14 +12,10 @@
         : `${window.location.origin}/query`
     });
 
-    let showFilters = false;
-    let userFilter = '';
     let sorting = { field: "startTime", order: "DESC" };
     let datatable;
     let filterItems = [];
     let matchedJobs;
-    let columnConfigOpen = false;
-    let sortConfigOpen = false;
     let appliedFilters;
     let selectedMetrics;
 
@@ -47,9 +41,6 @@
         if (event.detail && event.detail.filterItems) {
             filterItems = event.detail.filterItems;
         }
-        if (event.detail && event.detail.appliedFilters) {
-            appliedFilters = event.detail.appliedFilters;
-        }
 
         filterItems = filterItems.filter(f => f.userId == null);
 
@@ -67,17 +58,19 @@
     {matchedJobs}/>
 
 <TableControl
-    bind:filterConfigOpen={showFilters}
     {clusters}
     {metricUnits}
-    bin:sorting={sorting}
-    bind:selectedMetrics={selectedMetrics}
+    {filterRanges}
+    {initialFilterTagId}
+    bind:appliedFilters
+    bind:sorting
+    bind:selectedMetrics
     on:update={filtersChanged} />
 
 <Datatable
     bind:this={datatable}
-    {sorting}
-    bind:matchedJobs={matchedJobs}
+    bind:matchedJobs
     initialFilterItems={filterItems}
     {selectedMetrics}
-    {metricUnits} />
+    {metricUnits}
+    {sorting} />

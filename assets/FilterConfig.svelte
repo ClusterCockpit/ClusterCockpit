@@ -108,13 +108,13 @@
     import { Col, Row, FormGroup, Button, Input,
         ListGroup, ListGroupItem, Card, Alert, Spinner, Icon } from 'sveltestrap';
     import DoubleRangeSlider from './DoubleRangeSlider.svelte';
-    import Tag from './Tag.svelte';
     import { operationStore, query } from '@urql/svelte';
 
     export let showFilters; /* Hide/Show the filters */
     export let clusters; /* Array of all clusters as returned by the GraphQL-Query (including filterRanges!) */
     export let filterRanges; /* Global filter ranges for all clusters */
     export let initialFilterTagId = null; /* If set, jobs are filtered by this tag from the start */
+    export let appliedFilters = defaultFilters;
 
     function deepCopy(obj) {
         return JSON.parse(JSON.stringify(obj));
@@ -156,7 +156,6 @@
             { from: 0, to: 0 }
         ]
     };
-    export let appliedFilters = defaultFilters;
     let metricConfig = getContext('metric-config');
 
     $: filteredTags = fuzzySearchTags(tagFilterTerm, $tagsQuery.data && $tagsQuery.data.tags);
@@ -279,7 +278,7 @@
     function handleApply( ) {
         let filterItems = getFilterItems(filters);
         appliedFilters = deepCopy(filters);
-        dispatch("update", { filterItems: filterItems, appliedFilters: appliedFilters });
+        dispatch("update", { filterItems: filterItems });
     }
 
     function handleNodesSlider({ detail }) {
