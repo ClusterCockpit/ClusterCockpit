@@ -196,7 +196,8 @@ class RootResolverMap extends ResolverMap
 
                 'rooflineHeatmap' => function($value, Argument $args) {
                     $jobs = $this->jobRepo->findFilteredJobs(false, $args['filter'], null);
-                    return $this->jobStats->rooflineHeatmap($jobs, $args['rows'], $args['cols']);
+                    return $this->jobStats->rooflineHeatmap($jobs, $args['rows'], $args['cols'],
+                        $args['minX'], $args['minY'], $args['maxX'], $args['maxY']);
                 },
 
                 'userStats' => function($value, Argument $args) {

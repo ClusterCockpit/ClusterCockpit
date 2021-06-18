@@ -27,22 +27,18 @@ namespace App\Service;
 
 use App\Service\JobData;
 use App\Entity\Job;
-use App\Service\ClusterConfiguration;
 
 class JobStats
 {
     private $_rootdir;
-    private $_clusterCfg;
     private $_jobData;
 
     public function __construct(
         $projectDir,
-        ClusterConfiguration $clusterCfg,
         JobData $jobData
     )
     {
         $this->_rootdir = "$projectDir/var/job-archive";
-        $this->_clusterCfg = $clusterCfg;
         $this->_jobData = $jobData;
     }
 
@@ -81,7 +77,7 @@ class JobStats
         return $res;
     }
 
-    public function rooflineHeatmap($jobs, $rows, $cols)
+    public function rooflineHeatmap($jobs, $rows, $cols, $minX, $minY, $maxX, $maxY)
     {
         $tiles = [];
         for ($i = 0; $i < $rows; $i++) {
@@ -92,11 +88,10 @@ class JobStats
         }
 
         // All jobs should be from the same cluster!
-        $cluster = $this->_clusterCfg->getClusterConfiguration($jobs[0]->getClusterId());
-        $minX = log10(0.01);
-        $minY = log10(1.);
-        $maxX = log10(1000.);
-        $maxY = log10($cluster['flopRateSimd']);
+        $minX = log10($minX);
+        $minY = log10($minY);
+        $maxX = log10($maxX);
+        $maxY = log10($maxY);
 
         foreach ($jobs as $job) {
             $data = $this->_jobData->getData($job, ['flops_any', 'mem_bw']);
