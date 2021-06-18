@@ -4,7 +4,6 @@
         Button, Card, Spinner, ListGroup, ListGroupItem,
         Modal, ModalBody, ModalHeader, ModalFooter } from 'sveltestrap';
     import Pagination from './Pagination.svelte';
-    import ColumnConfig from './ColumnConfig.svelte';
     import JobMeta from './JobMeta.svelte';
     import JobMetricPlots from './JobMetricPlots.svelte';
     import { getContext } from 'svelte';
@@ -13,28 +12,12 @@
     export let sorting; /* Used as output variable if changed and initial sorting. */
     export let initialFilterItems; /* Can be empty, or for example used to restrict initially fetched jobs to single user. */
     export let matchedJobs; /* Used as output variable (So that it can be passed to the FilterConfig) */
-
     const clusterCockpitConfig = getContext('cc-config');
+    export let selectedMetrics = clusterCockpitConfig.plot_list_selectedMetrics.split(',').map(s => s.trim());
 
     let itemsPerPage = 10;
     let page = 1;
     let paging = { itemsPerPage: itemsPerPage, page: page };
-    let selectedMetrics = clusterCockpitConfig.plot_list_selectedMetrics.split(',').map(s => s.trim());
-    let sortedColumns = {
-        startTime:   {type: "numeric", direction: ["down","up"], order: ["DESC","ASC"], field: "startTime",   current: 0},
-        duration:    {type: "numeric", direction: ["down","up"], order: ["DESC","ASC"], field: "duration",    current: 2},
-        numNodes:    {type: "numeric", direction: ["down","up"], order: ["DESC","ASC"], field: "numNodes",    current: 2},
-        memUsedMax:  {type: "numeric", direction: ["down","up"], order: ["DESC","ASC"], field: "memUsedMax",  current: 2},
-        flopsAnyAvg: {type: "numeric", direction: ["down","up"], order: ["DESC","ASC"], field: "flopsAnyAvg", current: 2},
-        memBwAvg:    {type: "numeric", direction: ["down","up"], order: ["DESC","ASC"], field: "memBwAvg",    current: 2},
-        netBwAvg:    {type: "numeric", direction: ["down","up"], order: ["DESC","ASC"], field: "netBwAvg",    current: 2},
-    };
-
-    let columnConfigOpen = false;
-    let sortConfigOpen = false;
-    const toggleColumnConfig = () => (columnConfigOpen = !columnConfigOpen);
-    const toggleSortConfig = () => (sortConfigOpen = !sortConfigOpen);
-
     let tableWidth, plotWidth;
     let jobMetaWidth = 200;
     let rowHeight = 200;
@@ -68,6 +51,7 @@
 
     query(jobQuery);
     $: matchedJobs = $jobQuery.data != null ? $jobQuery.data.jobs.count : 0;
+    $jobQuery.variables.sorting = sorting;
 
     function handlePaging( event ) {
         itemsPerPage = event.detail.itemsPerPage;
@@ -79,48 +63,9 @@
         console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
         $jobQuery.variables.filter = { "list": filterItems };
     }
-
-    function handleSorting( event ) {
-        let nextActiveCol = event.currentTarget.id;
-        const keys = Object.keys(sortedColumns);
-
-        keys.forEach((key) => {
-            if ( key === nextActiveCol ) {
-                if (sortedColumns[key].current == 2) {
-                    sortedColumns[key].current = 0;
-                } else {
-                    if (sortedColumns[key].current == 0) {
-                        sortedColumns[key].current = 1;
-                    } else {
-                        sortedColumns[key].current = 0;
-                    }
-                }
-
-                sorting = {
-                    field: sortedColumns[key].field,
-                    order: sortedColumns[key].order[sortedColumns[key].current]
-                };
-                $jobQuery.variables.sorting = sorting;
-            } else {
-                sortedColumns[key].current = 2;
-            }
-        });
-    }
 </script>
 
 <style>
-    .sort {
-        border: none;
-        margin: 0;
-        padding: 0;
-        background: 0 0;
-        transition: all 70ms;
-    }
-
-    .active {
-        background-color: #bbb;
-    }
-
     .cc-table-wrapper {
         overflow: initial;
     }
@@ -148,38 +93,6 @@
     }
 </style>
 
-<Modal isOpen={sortConfigOpen} toggle={toggleSortConfig}>
-    <ModalHeader>
-        Sort rows
-    </ModalHeader>
-    <ModalBody>
-        <ListGroup>
-            {#each Object.keys(sortedColumns) as col}
-                <ListGroupItem>
-                    {#if sortedColumns[col].current == 2}
-                        <button type="button" class="sort" id="{col}" on:click={handleSorting}>
-                             <Icon name="sort-{sortedColumns[col].type}-{sortedColumns[col].direction[0]}"/>
-                        </button>
-                    {:else}
-                        <button type="button" class="sort active" id="{col}" on:click={handleSorting}>
-                            <Icon name="sort-{sortedColumns[col].type}-{sortedColumns[col].direction[sortedColumns[col].current]}"/>
-                        </button>
-                    {/if}
-                    {sortedColumns[col].field}
-                </ListGroupItem>
-            {/each}
-        </ListGroup>
-    </ModalBody>
-    <ModalFooter>
-        <Button color="primary" on:click={toggleSortConfig}>Close</Button>
-    </ModalFooter>
-</Modal>
-
-<ColumnConfig
-    bind:isOpen={columnConfigOpen}
-    metrics={Object.keys(metricUnits)}
-    bind:selectedMetrics={selectedMetrics} />
-
 {#if $jobQuery.fetching}
     <div class="d-flex justify-content-center">
         <Spinner secondary />
@@ -193,15 +106,11 @@
                 <thead>
                     <tr>
                         <th class="position-sticky top-0" scope="col" style="width: {jobMetaWidth}px">
-                            <span style="position: absolute; bottom: .5rem;">Job Info</span>
-                            <span style="float: right;">
-                                <Button outline on:click={toggleSortConfig}><Icon name="sort-down" /></Button>
-                                <Button outline on:click={toggleColumnConfig}><Icon name="gear" /></Button>
-                            </span>
+                            Job Info
                         </th>
                         {#each selectedMetrics as metric}
                             <th class="position-sticky top-0 text-center" scope="col"
-                                style="width: {plotWidth}px">
+                                                                          style="width: {plotWidth}px">
                                 {metric}
                                 {#if metricUnits[metric]}
                                     [{metricUnits[metric]}]

@@ -113,8 +113,6 @@
 
     export let showFilters; /* Hide/Show the filters */
     export let clusters; /* Array of all clusters as returned by the GraphQL-Query (including filterRanges!) */
-    export let sorting; /* So that it can be presented in the applied filters section */
-    export let matchedJobs; /* So that it can be presented in the applied filters section */
     export let filterRanges; /* Global filter ranges for all clusters */
     export let initialFilterTagId = null; /* If set, jobs are filtered by this tag from the start */
 
@@ -158,7 +156,7 @@
             { from: 0, to: 0 }
         ]
     };
-    let appliedFilters = defaultFilters;
+    export let appliedFilters = defaultFilters;
     let metricConfig = getContext('metric-config');
 
     $: filteredTags = fuzzySearchTags(tagFilterTerm, $tagsQuery.data && $tagsQuery.data.tags);
@@ -262,12 +260,6 @@
     $: setDefaultFilters(filterRanges);
     $: updateRanges(filterRanges, clusters);
 
-    function formatDuration({ hours, min }) {
-        hours = hours.toString().padStart(2, '0');
-        min = min.toString().padStart(2, '0');
-        return `${hours}:${min}h`
-    }
-
     function handleReset( ) {
         tagFilterTerm = '';
         filters = deepCopy(defaultFilters);
@@ -287,7 +279,7 @@
     function handleApply( ) {
         let filterItems = getFilterItems(filters);
         appliedFilters = deepCopy(filters);
-        dispatch("update", { filterItems });
+        dispatch("update", { filterItems: filterItems, appliedFilters: appliedFilters });
     }
 
     function handleNodesSlider({ detail }) {
@@ -525,76 +517,3 @@
         </div>
     </div>
 {/if}
-
-<div class="d-flex flex-row mb-2">
-    {#if matchedJobs != null}
-        <Alert class="p-2 me-2" >
-            Matching {matchedJobs} Jobs
-        </Alert>
-    {/if}
-
-    <Alert class="alert-light border d-flex flex-row p-2 me-2" >
-        <Icon name="cpu"/>
-        <div class="ps-2">
-            {appliedFilters["cluster"] == null
-            ? (clusters || []).map(c => c.clusterID).join(', ')
-            : appliedFilters["cluster"]}
-        </div>
-    </Alert>
-    <Alert class="alert-light border d-flex flex-row p-2 me-2" >
-        <Icon name="hdd-stack"/>
-        <div class="ps-2">
-            {appliedFilters["numNodes"]["from"]} - {appliedFilters["numNodes"]["to"]}
-        </div>
-    </Alert>
-    <Alert class="alert-light border d-flex flex-row p-2 me-2" >
-    <Icon name="stopwatch"/>
-    <div class="ps-2">
-        {formatDuration(appliedFilters["duration"]["from"])} -
-        {formatDuration(appliedFilters["duration"]["to"])}
-    </div>
-    </Alert>
-    <Alert class="alert-light border d-flex flex-row p-2 me-2" >
-    <Icon name="calendar-range"/>
-    <div class="ps-2">
-        {appliedFilters["startTime"]["from"]["date"]}
-        {appliedFilters["startTime"]["from"]["time"]}
-        -
-        {appliedFilters["startTime"]["to"]["date"]}
-        {appliedFilters["startTime"]["to"]["time"]}
-    </div>
-    </Alert>
-
-    {#if appliedFilters.projectId}
-        <Alert class="alert-light border d-flex flex-row p-2 me-2">
-        <Icon name="people"/>
-        <div class="ps-2">
-            Project ID contains: "{appliedFilters.projectId}"
-        </div>
-        </Alert>
-    {/if}
-
-    {#if Object.values(appliedFilters["tags"]).length > 0}
-        <Alert class="alert-light border d-flex flex-row p-2 me-2">
-            <Icon name="tag"/>
-            <div class="ps-2">
-                {#each Object.values(appliedFilters["tags"]) as tag}
-                    <span class="cc-tag badge rounded-pill {getColorForTag(tag)}">
-                        {tag.tagType}: {tag.tagName}
-                    </span>
-                {/each}
-            </div>
-        </Alert>
-    {/if}
-
-    {#if appliedFilters.statistics.some(s => s.enabled)}
-        <Alert class="alert-light border d-flex flex-row p-2 me-2">
-            <Icon name="bar-chart-line"/>
-            <div class="ps-2">
-                {#each appliedFilters.statistics.filter(s => s.enabled) as stat}
-                    {stat.name}: {stat.from} - {stat.to}
-                {/each}
-            </div>
-        </Alert>
-    {/if}
-</div>
