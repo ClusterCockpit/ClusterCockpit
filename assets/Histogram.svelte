@@ -98,7 +98,7 @@
 
         ctx.fillStyle = 'black';
         ctx.textAlign = 'center';
-        const stepsizeX = getStepSize(maxValue, w, 100);
+        const stepsizeX = getStepSize(maxValue, w, 150);
         for (let x = 0; x <= maxValue; x += stepsizeX) {
             ctx.fillText(label(x), getCanvasX(x), height - paddingBottom + 15);
         }

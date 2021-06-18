@@ -4,6 +4,7 @@
     import { Spinner, Row, Col, Card } from 'sveltestrap';
     import Histogram from './Histogram.svelte';
     import ScatterPlot from './ScatterPlot.svelte';
+    import RooflinePlot from './RooflinePlot.svelte';
     import { fetchClusters } from './utils.js';
 
     const selectedCluster = 'emmy'; // TODO: Make select/configurable
@@ -30,9 +31,9 @@
     });
 
     const statsQuery = operationStore(`
-    query($filter: JobFilterList!, $metrics: [String!]!) {
-        jobMetricAverages(filter: $filter, metrics: $metrics)
-    }
+        query($filter: JobFilterList!, $metrics: [String!]!) {
+            jobMetricAverages(filter: $filter, metrics: $metrics)
+        }
     `, {
         filter: { list: [] },
         metrics: []
@@ -40,20 +41,48 @@
 
     query(statsQuery);
 
+    const rooflineHeatmapQuery = operationStore(`
+        query($filter: JobFilterList!, $rows: Int!, $cols: Int!,
+                $minX: Float!, $minY: Float!, $maxX: Float!, $maxY: Float!) {
+            rooflineHeatmap(filter: $filter, rows: $rows, cols: $cols,
+                    minX: $minX, minY: $minY, maxX: $maxX, maxY: $maxY)
+        }
+    `, {
+        filter: { list: [] },
+        rows: 50, cols: 100,
+        minX: 0, minY: 0, maxX: 0, maxY: 0
+    }, { pause: true });
+
+    query(rooflineHeatmapQuery);
+
     const metricUnits = {};
     const metricConfig = {};
     setContext('metric-config', metricConfig);
 
+    let cluster;
     let clusters = null;
     let filterRanges = null;
     fetchClusters(metricConfig, metricUnits)
         .then(res => {
             clusters = res.clusters;
             filterRanges = res.filterRanges;
+            cluster = clusters.find(c => c.clusterID === selectedCluster);
 
-            $statsQuery.variables.filter = { list: [ { clusterId: { eq: selectedCluster } } ] };
+            let filterItems = [
+                { clusterId: { eq: selectedCluster } },
+                { startTime: { from: "2020-08-01T00:20:00Z", to: "2020-12-31T21:42:59Z" } }
+            ];
+
+            $statsQuery.variables.filter = { list: filterItems };
             $statsQuery.variables.metrics = metricsInHistograms;
             $statsQuery.context.pause = false;
+
+            $rooflineHeatmapQuery.variables.filter = { list: filterItems };
+            $rooflineHeatmapQuery.variables.minX = 0.01;
+            $rooflineHeatmapQuery.variables.minY = 1.;
+            $rooflineHeatmapQuery.variables.maxX = 1000.;
+            $rooflineHeatmapQuery.variables.maxY = cluster.flopRateSimd;
+            $rooflineHeatmapQuery.context.pause = false;
         })
         .catch(err => console.error(err));
 
@@ -90,7 +119,16 @@
     }
 </script>
 
-<h1>Hello World!</h1>
+{#if $rooflineHeatmapQuery.error}
+    <Card body color="danger" class="mb-3">Error: {$rooflineHeatmapQuery.error.message}</Card>
+{:else if !$rooflineHeatmapQuery.data}
+    <Spinner secondary />
+{:else}
+    <Row>
+        <RooflinePlot width={600} height={300}
+            cluster={cluster} tiles={$rooflineHeatmapQuery.data.rooflineHeatmap} />
+    </Row>
+{/if}
 
 {#if $statsQuery.error}
     <Card body color="danger" class="mb-3">Error: {$statsQuery.error.message}</Card>
@@ -102,7 +140,7 @@
             buildHistogramData($statsQuery.data.jobMetricAverages[idx], metric)) as metric}
             <Col>
                 <h2>{metric.name}</h2>
-                <Histogram width={550} height={300}
+                <Histogram width={300} height={300}
                     data={metric.bins} label={metric.label} />
             </Col>
         {/each}
@@ -110,7 +148,7 @@
     <Row>
         {#each scatterPlotPairs as metricPair}
             <Col>
-                <ScatterPlot width={550} height={300}
+                <ScatterPlot width={300} height={300}
                    X={buildScatterData($statsQuery.data.jobMetricAverages, metricPair[0])}
                    Y={buildScatterData($statsQuery.data.jobMetricAverages, metricPair[1])}
                    xLabel={`${metricPair[0]} [${metricUnits[metricPair[0]]}]`}

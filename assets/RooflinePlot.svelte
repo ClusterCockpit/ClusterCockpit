@@ -55,7 +55,7 @@
     }
 
     function render(ctx, data, cluster, width, height) {
-        const [minX, maxX, minY, maxY] = [0.01, data.maxX, 1., cluster.flopRateSimd];
+        const [minX, maxX, minY, maxY] = [0.01, 1000, 1., cluster.flopRateSimd];
         const w = width - paddingLeft - paddingRight;
         const h = height - paddingTop - paddingBottom;
 
@@ -75,7 +75,52 @@
             return Math.round((h - y * h) + paddingTop);
         };
 
+        // Draw Data
+        if (data.x && data.y) {
+            for (let i = 0; i < data.x.length; i++) {
+                let x = data.x[i], y = data.y[i], c = data.c[i];
+                if (x == null || y == null || Number.isNaN(x) || Number.isNaN(y))
+                    continue;
+
+                const s = 3;
+                const px = getCanvasX(x);
+                const py = getCanvasY(y);
+
+                ctx.fillStyle = getRGB(c);
+                ctx.beginPath();
+                ctx.arc(px, py, s, 0, Math.PI * 2, false);
+                ctx.fill();
+            }
+        } else if (data.tiles) {
+            const rows = data.tiles.length;
+            const cols = data.tiles[0].length;
+
+            const tileWidth = w / cols;
+            const tileHeight = h / rows;
+
+            const max = data.tiles.reduce((max, row) =>
+                Math.max(max, row.reduce((max, val) =>
+                    Math.max(max, val)), 0), 0);
+
+            const tileColor = val => {
+                let col = 0xff - Math.floor((val / max) * 255);
+                let rgb = col.toString(16).padStart(2, '0');
+                return `#FF${rgb}${rgb}`;
+            };
+
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    let px = paddingLeft + (w - (j / (cols - 1)) * w);
+                    let py = paddingTop + (i / (rows - 1)) * h;
+
+                    ctx.fillStyle = tileColor(data.tiles[i][j]);
+                    ctx.fillRect(px, py, tileWidth, tileHeight);
+                }
+            }
+        }
+
         // Axes
+        ctx.fillStyle = 'black';
         ctx.strokeStyle = axesColor;
         ctx.font = `${fontSize}px sans-serif`;
         ctx.beginPath();
@@ -117,22 +162,6 @@
         }
         ctx.stroke();
 
-        // Draw Data
-        for (let i = 0; i < data.x.length; i++) {
-            let x = data.x[i], y = data.y[i], c = data.c[i];
-            if (x == null || y == null || Number.isNaN(x) || Number.isNaN(y))
-                continue;
-
-            const s = 3;
-            const px = getCanvasX(x);
-            const py = getCanvasY(y);
-
-            ctx.fillStyle = getRGB(c);
-            ctx.beginPath();
-            ctx.arc(px, py, s, 0, Math.PI * 2, false);
-            ctx.fill();
-        }
-
         // Draw roofs
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 2;
@@ -161,16 +190,18 @@
         }
         ctx.stroke();
 
-        // The Color Scale
-        ctx.fillStyle = 'black';
-        ctx.fillText('Time:', 17, height - 5);
-        const start = paddingLeft + 5;
-        for (let x = start; x < width - paddingRight; x += 15) {
-            let c = (x - start) / (width - start - paddingRight);
-            ctx.fillStyle = getRGB(c);
-            ctx.beginPath();
-            ctx.arc(x, height - 10, 5, 0, Math.PI * 2, false);
-            ctx.fill();
+        if (data.x && data.y) {
+            // The Color Scale
+            ctx.fillStyle = 'black';
+            ctx.fillText('Time:', 17, height - 5);
+            const start = paddingLeft + 5;
+            for (let x = start; x < width - paddingRight; x += 15) {
+                let c = (x - start) / (width - start - paddingRight);
+                ctx.fillStyle = getRGB(c);
+                ctx.beginPath();
+                ctx.arc(x, height - 10, 5, 0, Math.PI * 2, false);
+                ctx.fill();
+            }
         }
     }
 
@@ -197,7 +228,6 @@
 
         return {
             x, y, c,
-            maxX: 1000,
             xLabel: 'Intensity [FLOPS/byte]',
             yLabel: 'Performance [GFLOPS]'
         };
@@ -207,16 +237,25 @@
 <script>
     import { onMount } from 'svelte';
 
-    export let flopsAny
-    export let memBw;
+    export let flopsAny = null;
+    export let memBw = null;
     export let cluster;
     export let width;
     export let height;
+    export let tiles = null;
+
+    console.assert(tiles || (flopsAny && memBw), "you must provide flopsAny and memBw or tiles!");
 
     let ctx;
     let canvasElement;
     let mounted = false;
-    const data = transformData(flopsAny, memBw);
+    const data = flopsAny && memBw
+        ? transformData(flopsAny, memBw)
+        : {
+            tiles: tiles,
+            xLabel: 'Intensity [FLOPS/byte]',
+            yLabel: 'Performance [GFLOPS]'
+        };
 
     onMount(() => {
         canvasElement.width = width;

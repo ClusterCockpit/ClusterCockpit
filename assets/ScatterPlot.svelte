@@ -68,7 +68,7 @@
         ctx.strokeStyle = axesColor;
         ctx.font = `${fontSize}px sans-serif`;
         ctx.beginPath();
-        const stepsizeX = getStepSize(maxX, w, 50);
+        const stepsizeX = getStepSize(maxX, w, 75);
         for (let x = minX, i = 0; x <= maxX; i++) {
             let px = getCanvasX(x);
             let text = formatNumber(x);
@@ -85,7 +85,7 @@
         }
 
         ctx.textAlign = 'center';
-        const stepsizeY = getStepSize(maxY, h, 50);
+        const stepsizeY = getStepSize(maxY, h, 75);
         for (let y = minY, i = 0; y <= maxY; i++) {
             let py = getCanvasY(y);
             ctx.moveTo(paddingLeft - 5, py);

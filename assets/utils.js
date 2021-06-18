@@ -45,6 +45,9 @@ export async function fetchClusters(metricConfig = {}, metricUnits = {}) {
     const query = getClient().query(`query {
             clusters {
                 clusterID,
+                flopRateScalar,
+                flopRateSimd,
+                memoryBandwidth,
                 metricConfig {
                     name
                     unit
