@@ -189,10 +189,14 @@ class RootResolverMap extends ResolverMap
                     return $this->jobRepo->findFilteredStatistics($args['filter']);
                 },
 
-                'jobMetricStatistics' => function($value, Argument $args) {
+                'jobMetricAverages' => function($value, Argument $args) {
                     $jobs = $this->jobRepo->findFilteredJobs(false, $args['filter'], null);
-                    $this->logger->debug('jobs: '.count($jobs));
-                    return $this->jobStats->getStatsForMetrics($jobs, $args['metrics']);
+                    return $this->jobStats->getAverages($jobs, $args['metrics']);
+                },
+
+                'rooflineHeatmap' => function($value, Argument $args) {
+                    $jobs = $this->jobRepo->findFilteredJobs(false, $args['filter'], null);
+                    return $this->jobStats->rooflineHeatmap($jobs, $args['rows'], $args['cols']);
                 },
 
                 'userStats' => function($value, Argument $args) {
