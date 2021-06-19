@@ -32,16 +32,6 @@ use App\Service\Configuration;
 
 class IndexViewController extends AbstractController
 {
-    public function home(Configuration $configuration)
-    {
-        return $this->render('default/index.html.twig');
-    }
-
-    public function roofline(Configuration $configuration)
-    {
-        return $this->render('default/roofline.html.twig');
-    }
-
     public function imprint(Configuration $configuration)
     {
         return $this->render('default/imprint.html.twig');
