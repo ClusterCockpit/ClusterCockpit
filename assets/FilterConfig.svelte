@@ -116,6 +116,11 @@
     export let initialFilterTagId = null; /* If set, jobs are filtered by this tag from the start */
     export let appliedFilters = defaultFilters;
 
+    export function updateFilter(callback) {
+        callback(appliedFilters);
+        callback(filters);
+    }
+
     function deepCopy(obj) {
         return JSON.parse(JSON.stringify(obj));
     }

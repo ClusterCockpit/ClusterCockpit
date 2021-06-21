@@ -26,17 +26,13 @@
     {#if userInfos != null}
         <InfoBox icon="person-circle">
             {userInfos.userId}
+            {#if userInfos.name}
+                ({userInfos.name})
+            {/if}
+            {#if userInfos.email}
+                , <a href="mailto:{userInfos.email}">{userInfos.email}</a>
+            {/if}
         </InfoBox>
-        {#if userInfos.name}
-            <InfoBox icon="person-lines-fill">
-                {userInfos.name}
-            </InfoBox>
-        {/if}
-        {#if userInfos.emal}
-            <InfoBox icon="envelope">
-                {userInfos.email}
-            </InfoBox>
-        {/if}
     {/if}
 
     <InfoBox icon="cpu">
