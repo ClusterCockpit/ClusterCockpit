@@ -35,6 +35,15 @@
         return `rgb(${getGradientR(c)}, ${getGradientG(c)}, ${getGradientB(c)})`;
     }
 
+    function lineIntersect(x1, y1, x2, y2, x3, y3, x4, y4) {
+        let l = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+        let a = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / l;
+        return {
+            x: x1 + a * (x2 - x1),
+            y: y1 + a * (y2 - y1) 
+        };
+    }
+
     const power = [1, 1e3, 1e6, 1e9, 1e12];
     const suffix = ['', 'k', 'm', 'g'];
     function formatNumber(x) {
@@ -95,23 +104,26 @@
             const rows = data.tiles.length;
             const cols = data.tiles[0].length;
 
-            const tileWidth = w / cols;
-            const tileHeight = h / rows;
+            const tileWidth = Math.ceil(w / cols);
+            const tileHeight = Math.ceil(h / rows);
 
             const max = data.tiles.reduce((max, row) =>
                 Math.max(max, row.reduce((max, val) =>
                     Math.max(max, val)), 0), 0);
 
+            // const transform = x => Math.log(1. + x);
+            const transform = x => x;
+
             const tileColor = val => {
-                let col = 0xff - Math.floor((val / max) * 255);
-                let rgb = col.toString(16).padStart(2, '0');
+                let hexcol = Math.floor((transform(val) / transform(max)) * 0xff);
+                let rgb = (0xff - hexcol).toString(16).padStart(2, '0');
                 return `#FF${rgb}${rgb}`;
             };
 
             for (let i = 0; i < rows; i++) {
                 for (let j = 0; j < cols; j++) {
-                    let px = paddingLeft + (w - (j / (cols - 1)) * w);
-                    let py = paddingTop + (i / (rows - 1)) * h;
+                    let px = paddingLeft + (j / cols) * w;
+                    let py = paddingTop + (h - (i / rows) * h) - tileHeight;
 
                     ctx.fillStyle = tileColor(data.tiles[i][j]);
                     ctx.fillRect(px, py, tileWidth, tileHeight);
@@ -185,7 +197,13 @@
                 ctx.lineTo(width - paddingRight, flopRateSimdY);
             }
 
-            ctx.moveTo(getCanvasX(0.01), getCanvasY(ycut));
+            const { x, y } = lineIntersect(
+                getCanvasX(0.01), getCanvasY(ycut),
+                getCanvasX(simdKnee), flopRateSimdY,
+                0, height - paddingBottom,
+                width, height - paddingBottom);
+
+            ctx.moveTo(x, y);
             ctx.lineTo(getCanvasX(simdKnee), flopRateSimdY);
         }
         ctx.stroke();

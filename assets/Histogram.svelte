@@ -21,6 +21,8 @@
     export let data;
     export let width;
     export let height;
+    export let min = null;
+    export let max = null;
     export let label = (value) => value.toString();
 
     const paddingLeft = 35,
@@ -75,7 +77,7 @@
     function render() {
         const h = height - paddingTop - paddingBottom;
         const w = width - paddingLeft - paddingRight;
-        const barWidth = Math.round(w / (maxValue + 1));
+        const barWidth = Math.ceil(w / (maxValue + 1));
 
         const getCanvasX = (value) => (value / maxValue) * (w - barWidth) + paddingLeft + (barWidth / 2.);
         const getCanvasY = (count) => (h - (count / maxCount) * h) + paddingTop;
@@ -98,9 +100,21 @@
 
         ctx.fillStyle = 'black';
         ctx.textAlign = 'center';
-        const stepsizeX = getStepSize(maxValue, w, 150);
-        for (let x = 0; x <= maxValue; x += stepsizeX) {
-            ctx.fillText(label(x), getCanvasX(x), height - paddingBottom + 15);
+        if (min != null && max != null) {
+            const stepsizeX = getStepSize(max - min, w, 75);
+            let startX = 0;
+            while (startX < min)
+                startX += stepsizeX;
+
+            for (let x = startX; x < max; x += stepsizeX) {
+                let px = ((x - min) / (max - min)) * (w - barWidth) + paddingLeft + (barWidth / 2.);
+                ctx.fillText(`${x}`, px, height - paddingBottom + 15);
+            }
+        } else {
+            const stepsizeX = getStepSize(maxValue, w, 120);
+            for (let x = 0; x <= maxValue; x += stepsizeX) {
+                ctx.fillText(label(x), getCanvasX(x), height - paddingBottom + 15);
+            }
         }
 
         ctx.strokeStyle = `#bbbbbb`;

@@ -65,7 +65,10 @@ class JobStats
             if (file_exists($filepath)) {
                 $data = json_decode(file_get_contents($filepath), true);
                 foreach ($metrics as $idx => $metric) {
-                    $res[$idx][] = $data['statistics'][$metric]['avg'];
+                    if (isset($data['statistics'][$metric]))
+                        $res[$idx][] = $data['statistics'][$metric]['avg'];
+                    else
+                        $res[$idx][] = null;
                 }
             } else {
                 foreach ($metrics as $idx => $metric) {
@@ -122,8 +125,11 @@ class JobStats
                     if ($x < $minX || $x > $maxX  || $y < $minY || $y > $maxY)
                         continue;
 
-                    $x = floor((($x - $minX) / ($maxX - $minX)) * ($cols - 1));
-                    $y = floor((($y - $minY) / ($maxY - $minY)) * ($rows - 1));
+                    $x = floor((($x - $minX) / ($maxX - $minX)) * $cols);
+                    $y = floor((($y - $minY) / ($maxY - $minY)) * $rows);
+                    if ($y >= $rows || $x >= $cols)
+                        throw new Exception("Error Processing Request");
+
                     $tiles[$y][$x] += 1;
                 }
             }
