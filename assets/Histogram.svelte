@@ -103,7 +103,7 @@
         if (min != null && max != null) {
             const stepsizeX = getStepSize(max - min, w, 75);
             let startX = 0;
-            while (startX < min)
+            while (stepsizeX > 0 && startX < min)
                 startX += stepsizeX;
 
             for (let x = startX; x < max; x += stepsizeX) {
@@ -141,14 +141,13 @@
 
     let timeoutId = null;
     function sizeChanged() {
-        if (!mounted)
-            return;
-
         if (timeoutId != null)
             clearTimeout(timeoutId);
 
         timeoutId = setTimeout(() => {
             timeoutId = null;
+            if (!canvasElement)
+                return;
 
             canvasElement.width = width;
             canvasElement.height = height;

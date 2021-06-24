@@ -1,13 +1,15 @@
 <script>
-    import { Modal, ModalBody, ModalHeader, ModalFooter, Table,
+    import { Modal, ModalBody, ModalHeader, ModalFooter, InputGroup,
              Button, ListGroup, ListGroupItem, Icon } from 'sveltestrap';
-    import InfoBox from './InfoBox.svelte';
 
     export let availableMetrics;
     export let metricsInHistograms;
     export let metricsInScatterplots;
 
-    let isOpen = false;
+    let isHistogramConfigOpen = false;
+    let isScatterPlotConfigOpen = false;
+
+    let selectedMetric1 = null, selectedMetric2 = null;
 
     function checkboxChange(event, m1, m2) {
         let checked = event.target.checked;
@@ -19,34 +21,24 @@
     }
 </script>
 
-<Button  outline on:click={() => (isOpen = !isOpen)}>
-    <Icon name="speedometer" />
-    Select Metrics
+<Button outline
+    on:click={() => (isHistogramConfigOpen = true)}>
+    <Icon name=""/>
+    Select Plots for Histograms
 </Button>
 
-<div class="d-flex flex-row mb-2">
-    {#if metricsInHistograms.length > 0}
-        <InfoBox icon="bar-chart">
-            Histograms:
-            {@html metricsInHistograms.map(m => `<b>${m}</b>`).join(', ')}
-        </InfoBox>
-    {/if}
+<Button outline
+    on:click={() => (isScatterPlotConfigOpen = true)}>
+    <Icon name=""/>
+    Select Plots in Scatter Plots
+</Button>
 
-    {#if metricsInScatterplots.length > 0}
-        <InfoBox icon="graph-up">
-            Scatter Plots:
-            {@html metricsInScatterplots.map(([m1, m2]) =>
-                `<b>${m1}</b> / <b>${m2}</b>`).join(', ')}
-        </InfoBox>
-    {/if}
-</div>
-
-<Modal {isOpen} toggle={() => (isOpen = !isOpen)}>
+<Modal isOpen={isHistogramConfigOpen}
+    toggle={() => (isHistogramConfigOpen = !isHistogramConfigOpen)}>
     <ModalHeader>
-        Select Metrics
+        Select metrics presented in histograms
     </ModalHeader>
     <ModalBody>
-        <h5>For Histograms:</h5>
         <ListGroup>
             {#each availableMetrics as metric (metric)}
                 <ListGroupItem>
@@ -57,41 +49,66 @@
                 </ListGroupItem>
             {/each}
         </ListGroup>
-        <br/>
-        <h5>For Scatter Plots</h5>
-        <ListGroup>
-            <div style="overflow-x: scroll;">
-            <Table>
-                <thead>
-                    <tr>
-                        <th><!-- ... --></th>
-                        {#each availableMetrics as metric}
-                            <th scope="col">{metric}</th>
-                        {/each}
-                    </tr>
-                </thead>
-                <tbody>
-                    {#each availableMetrics as m1}
-                        <tr>
-                            <th scope="row">{m1}</th>
-                            {#each availableMetrics as m2}
-                                <td style="text-align: center;">
-                                {#if m1 != m2}
-                                    <input type="checkbox"
-                                        checked={metricsInScatterplots.find(pair =>
-                                            m1 == pair[0] && m2 == pair[1]) != null}
-                                        on:change={(e) => checkboxChange(e, m1, m2)} />
-                                {/if}
-                                </td>
-                            {/each}
-                        </tr>
-                    {/each}
-                </tbody>
-            </Table>
-            </div>
-        </ListGroup>
     </ModalBody>
     <ModalFooter>
-        <Button color="primary" on:click={() => (isOpen = false)}>Close</Button>
+        <Button color="primary"
+            on:click={() => (isHistogramConfigOpen = false)}>
+            Close
+        </Button>
+    </ModalFooter>
+</Modal>
+
+<Modal isOpen={isScatterPlotConfigOpen}
+    toggle={() => (isScatterPlotConfigOpen = !isScatterPlotConfigOpen)}>
+    <ModalHeader>
+        Select metric pairs presented in scatter plots
+    </ModalHeader>
+    <ModalBody>
+        <ListGroup>
+            {#each metricsInScatterplots as pair}
+                <ListGroupItem>
+                    <b>{pair[0]}</b> / <b>{pair[1]}</b>
+
+                    <Button style="float: right;" outline color="danger"
+                        on:click={() => (
+                            metricsInScatterplots = metricsInScatterplots.filter(p => pair != p)
+                        )}>
+                        <Icon name="x" />
+                    </Button>
+                </ListGroupItem>
+            {/each}
+        </ListGroup>
+
+        <br/>
+
+        <InputGroup>
+            <select bind:value={selectedMetric1} class="form-group">
+                <option value={null}>Choose Metric for X Axis</option>
+                {#each availableMetrics as metric}
+                    <option value={metric}>{metric}</option>
+                {/each}
+            </select>
+            <select bind:value={selectedMetric2} class="form-group">
+                <option value={null}>Choose Metric for Y Axis</option>
+                {#each availableMetrics as metric}
+                    <option value={metric}>{metric}</option>
+                {/each}
+            </select>
+            <Button outline disabled={selectedMetric1 == null || selectedMetric2 == null}
+                on:click={() => {
+                    metricsInScatterplots = [...metricsInScatterplots, [selectedMetric1, selectedMetric2]];
+                    selectedMetric1 = null;
+                    selectedMetric2 = null;
+                }}>
+                Add Plot
+            </Button>
+        </InputGroup>
+
+    </ModalBody>
+    <ModalFooter>
+        <Button color="primary"
+            on:click={() => (isScatterPlotConfigOpen = false)}>
+            Close
+        </Button>
     </ModalFooter>
 </Modal>

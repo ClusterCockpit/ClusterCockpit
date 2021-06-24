@@ -20,15 +20,6 @@
         return Math.abs(x) >= 1000 ? x.toExponential() : x.toString();
     }
 
-    function axisStepFactor(i) {
-        if (i % 3 == 0)
-            return 2;
-        else if (i % 3 == 1)
-            return 2.5;
-        else
-            return 2;
-    }
-
     function getStepSize(valueRange, pixelRange, minSpace) {
         const proposition = valueRange / (pixelRange / minSpace);
         const getStepSize = n => Math.pow(10, Math.floor(n / 3)) *
@@ -151,14 +142,13 @@
 
     let timeoutId = null;
     function sizeChanged() {
-        if (!mounted)
-            return;
-
         if (timeoutId != null)
             clearTimeout(timeoutId);
 
         timeoutId = setTimeout(() => {
             timeoutId = null;
+            if (!canvasElement)
+                return;
 
             canvasElement.width = width;
             canvasElement.height = height;
