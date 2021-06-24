@@ -27,11 +27,17 @@ namespace App\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Annotation\ApiResource;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
  */
+#[ApiResource(
+    collectionOperations: ['get','post'],
+    itemOperations: ['get','patch'],
+)]
 class JobTag
 {
     /**
@@ -43,11 +49,13 @@ class JobTag
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"read"})
      */
     public $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"read"})
      */
     private $type;
 

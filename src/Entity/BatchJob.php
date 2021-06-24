@@ -27,13 +27,18 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiProperty;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ApiResource(
+attributes: [
+    'normalization_context' => ['groups' => ['read']],
+    'denormalization_context' => ['groups' => ['write']],
+],
     collectionOperations: [],
     itemOperations: [
         'get',
         'patch' => [
-            'path' => '/jobs/stop_job/{id}',
+            'path' => '/jobs/stop_job/{jobId}',
             'requirements' => ['id' => '\s+'],
         ],
     ],
@@ -47,18 +52,20 @@ class BatchJob
      *  <clusterId>-<jobId>-<startTime> .
      *
      * @ApiProperty(identifier=true)
+     * @Groups({"read"})
      */
     public string $jobId;
 
     /**
      * When the job was started in Unix epoch time.
+     * @Groups({"read","write"})
      *
      */
     public int $stopTime;
 
     /**
      * The job object
-     *
+     * @Groups({"read"})
      */
     public $job;
 }

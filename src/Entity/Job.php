@@ -113,7 +113,7 @@ class Job
      *  @ORM\Column(type="integer")
      *  @Groups({"read","write"})
      */
-    public $duration;
+    public $duration = 0;
 
     /**
      * The node list of the job.
@@ -127,13 +127,9 @@ class Job
 
     /**
      *  @ORM\Column(type="boolean")
+     *  @Groups({"write"})
      */
     public $isRunning;
-
-    /**
-     *  @ORM\Column(type="boolean", options={"default":false})
-     */
-    public $isCached;
 
     /**
      *  @ORM\Column(type="text", nullable=true)
@@ -150,44 +146,44 @@ class Job
     /**
      * The maximum memory capacity used by the job.
      *
-     *  @ORM\Column(type="float")
+     *  @ORM\Column(type="float", options={"default":0})
      */
-    public $memUsedMax;
+    public $memUsedMax = 0;
 
     /**
      * The average flop rate of the job.
      *
-     *  @ORM\Column(type="float")
+     *  @ORM\Column(type="float", options={"default":0})
      */
-    public $flopsAnyAvg;
+    public $flopsAnyAvg = 0;
 
     /**
      * The average memory bandwidth of the job.
      *
-     *  @ORM\Column(type="float")
+     *  @ORM\Column(type="float", options={"default":0})
      */
-    public $memBwAvg;
+    public $memBwAvg = 0;
 
     /**
      * The average load of the job.
      *
-     *  @ORM\Column(type="float")
+     *  @ORM\Column(type="float", options={"default":0})
      */
-    public $loadAvg;
+    public $loadAvg = 0;
 
     /**
      * The average network bandwidth of the job.
      *
-     *  @ORM\Column(type="float")
+     *  @ORM\Column(type="float", options={"default":0})
      */
-    public $netBwAvg;
+    public $netBwAvg = 0;
 
     /**
      * The average file io bandwidth of the job.
      *
-     *  @ORM\Column(type="float")
+     *  @ORM\Column(type="float", options={"default":0})
      */
-    public $fileBwAvg;
+    public $fileBwAvg = 0;
 
     public $hasProfile;
 
@@ -195,7 +191,7 @@ class Job
      * Tags of the job.
      *
      * @ORM\ManyToMany(targetEntity="App\Entity\JobTag", inversedBy="jobs")
-     *  @Groups({"read"})
+     * @Groups({"read","write"})
      */
     public $tags;
 
