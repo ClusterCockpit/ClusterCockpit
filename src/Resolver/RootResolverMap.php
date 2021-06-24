@@ -186,7 +186,7 @@ class RootResolverMap extends ResolverMap
                 },
 
                 'jobsStatistics' => function($value, Argument $args) {
-                    return $this->jobRepo->findFilteredStatistics($args['filter']);
+                    return $this->jobRepo->findFilteredStatistics($args['filter'], $this->clusterCfg);
                 },
 
                 'jobMetricAverages' => function($value, Argument $args) {
