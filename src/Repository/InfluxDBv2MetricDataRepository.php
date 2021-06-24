@@ -27,29 +27,31 @@ namespace App\Repository;
 
 use Symfony\Component\Stopwatch\Stopwatch;
 use Psr\Log\LoggerInterface;
+use InfluxDB2;
 
 class InfluxDBv2MetricDataRepository implements MetricDataRepository
 {
     private $_timing;
     private $_client;
     private $_queryAPI;
-    /* private $_logger; */
+    #private $_logger;
 
     public function __construct(
-        /* LoggerInterface $logger */
+        #LoggerInterface $logger
     )
     {
         $this->_timer = new Stopwatch();
-        /* $this->_logger = $logger; */
+        #$this->_logger = $logger;
         $influxdbURL = getenv('INFLUXDB_URL');
         $influxdbToken = getenv('INFLUXDB_TOKEN');
-        /* $this->_logger->info("Scheme: $influxdbURL"); */
+        #$this->_logger->info("Scheme: $influxdbURL");
         $this->_client  = new InfluxDB2\Client([
-            "url" => $influxdbURL,
+            "url" => "http://cc-influxdb:8086",
             "token" => $influxdbToken,
-            "bucket" => "ClusterCockpit",
-            "org" => "nhr.fau",
-            "precision" => InfluxDB2\Model\WritePrecision::S
+            "bucket" => "ClusterCockpit/data",
+            "org" => "ClusterCockpit",
+            "precision" => InfluxDB2\Model\WritePrecision::S,
+            "debug" => true
         ]);
 
         $this->_queryApi = $this->_client->createQueryApi();
@@ -67,19 +69,31 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
         $startTime = date("Y-m-d\TH:i:s\Z",$job->startTime);
         $stopTime = date("Y-m-d\TH:i:s\Z",$job->startTime + $job->duration);
 
-        $query = "from(bucket:\"ClusterCockpit\")
+        $query = "from(bucket:\"ClusterCockpit/data\")
             |> range(start: {$startTime}, stop: {$stopTime})
             |> filter(fn: (r) =>
                           r._measurement == \"{$metric['measurement']}\" and
                           r._field == \"{$metric['name']}\" and
-                          r.host == \"{$nodes[0]}\"
+                          r.host == \"{$nodes[0]}\")#
             |> count()";
 
         $result = $this->_queryApi->query($query);
 
-        $points = $result->getPoints();
+        $points = $result[0]->records[0]->values['_value'];
 
-        if ( count($points) == 0 || $points[0]['count'] < 4 ){
+        #$resultJson = json_encode($result);
+        #$resultType = gettype($result);
+        #$pointsJson = json_encode($points);
+        #$pointsType = gettype($points);
+
+        #$this->_logger->info(">>>> QUERY: $query");
+        #$this->_logger->info(">>>> RESULTJSON: $resultJson");
+        #$this->_logger->info(">>>> RESULTTYPE: $resultType");
+        #$this->_logger->info(">>>> POINTSJSON: $pointsJson");
+        #$this->_logger->info(">>>> POINTSTYPE: $pointsType");
+
+        #Original: if ( count($points) == 0 || $points[0]['count'] < 4 )
+        if ( $points == 0 || $points < 4 ){
             $job->hasProfile = false;
             return false;
         } else {
