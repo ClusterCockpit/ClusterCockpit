@@ -74,7 +74,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
             |> filter(fn: (r) =>
                           r._measurement == \"{$metric['measurement']}\" and
                           r._field == \"{$metric['name']}\" and
-                          r.host == \"{$nodes[0]}\")#
+                          r.host == \"{$nodes[0]}\")
             |> count()";
 
         $result = $this->_queryApi->query($query);
