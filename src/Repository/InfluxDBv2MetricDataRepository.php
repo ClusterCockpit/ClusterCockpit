@@ -42,11 +42,11 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
     {
         $this->_timer = new Stopwatch();
         #$this->_logger = $logger;
-        $influxdbURL = getenv('INFLUXDB_URL');
+        $influxdbV2URL = getenv('INFLUXDB_V2_URL');
         $influxdbToken = getenv('INFLUXDB_TOKEN');
         #$this->_logger->info("Scheme: $influxdbURL");
         $this->_client  = new InfluxDB2\Client([
-            "url" => "http://cc-influxdb:8086",
+            "url" => $influxdbV2URL,
             "token" => $influxdbToken,
             "bucket" => "ClusterCockpit/data",
             "org" => "ClusterCockpit",
