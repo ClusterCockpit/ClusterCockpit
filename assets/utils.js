@@ -98,3 +98,18 @@ export async function fetchClusters(metricConfig = {}, metricUnits = {}) {
         metricUnits
     };
 }
+
+export function tilePlots(plotsPerRow, arr) {
+    let rows = [], i = 0;
+    for (let n = 0; n < arr.length; n += plotsPerRow) {
+        let row = [];
+        for (let m = 0; m < plotsPerRow; m++, i++) {
+            if (i < arr.length)
+                row.push(arr[i]);
+            else
+                row.push(null);
+        }
+        rows.push(row);
+    }
+    return rows;
+}
