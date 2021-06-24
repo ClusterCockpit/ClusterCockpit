@@ -54,7 +54,10 @@
         return Math.abs(x) >= 1000 ? x.toExponential() : x.toString();
     }
 
-    function axisStepFactor(i) {
+    function axisStepFactor(i, size) {
+        if (size && size < 500)
+            return 10;
+
         if (i % 3 == 0)
             return 2;
         else if (i % 3 == 1)
@@ -144,7 +147,7 @@
             ctx.moveTo(px, paddingTop - 5);
             ctx.lineTo(px, height - paddingBottom + 5);
 
-            x *= axisStepFactor(i);
+            x *= axisStepFactor(i, w);
         }
         if (data.xLabel) {
             let textWidth = ctx.measureText(data.xLabel).width;
@@ -286,14 +289,13 @@
 
     let timeoutId = null;
     function sizeChanged() {
-        if (!mounted)
-            return;
-
         if (timeoutId != null)
             clearTimeout(timeoutId);
 
         timeoutId = setTimeout(() => {
             timeoutId = null;
+            if (!canvasElement)
+                return;
 
             canvasElement.width = width;
             canvasElement.height = height;
