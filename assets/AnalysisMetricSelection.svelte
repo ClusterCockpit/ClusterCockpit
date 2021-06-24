@@ -1,7 +1,6 @@
 <script>
     import { Modal, ModalBody, ModalHeader, ModalFooter, Table,
              Button, ListGroup, ListGroupItem, Icon } from 'sveltestrap';
-    import InfoBox from './InfoBox.svelte';
 
     export let availableMetrics;
     export let metricsInHistograms;
@@ -23,23 +22,6 @@
     <Icon name="speedometer" />
     Select Metrics
 </Button>
-
-<div class="d-flex flex-row mb-2">
-    {#if metricsInHistograms.length > 0}
-        <InfoBox icon="bar-chart">
-            Histograms:
-            {@html metricsInHistograms.map(m => `<b>${m}</b>`).join(', ')}
-        </InfoBox>
-    {/if}
-
-    {#if metricsInScatterplots.length > 0}
-        <InfoBox icon="graph-up">
-            Scatter Plots:
-            {@html metricsInScatterplots.map(([m1, m2]) =>
-                `<b>${m1}</b> / <b>${m2}</b>`).join(', ')}
-        </InfoBox>
-    {/if}
-</div>
 
 <Modal {isOpen} toggle={() => (isOpen = !isOpen)}>
     <ModalHeader>

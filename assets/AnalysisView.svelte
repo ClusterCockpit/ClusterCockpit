@@ -1,18 +1,20 @@
 <script>
     import { setContext, getContext, onMount, tick } from 'svelte';
     import { initClient, operationStore, query } from '@urql/svelte';
-    import { Spinner, Row, Col, Card, Button, Icon, Table,
-             InputGroup, InputGroupText, Input } from 'sveltestrap';
+    import { Spinner, Row, Col, Card, Button, Icon,
+             InputGroup, InputGroupText } from 'sveltestrap';
     import Histogram from './Histogram.svelte';
     import ScatterPlot from './ScatterPlot.svelte';
     import RooflinePlot from './RooflinePlot.svelte';
     import FilterConfig from './FilterConfig.svelte';
     import FilterInfo from './DatatableInfo.svelte';
+    import Resizable from './Resizable.svelte';
     import MetricSelection from './AnalysisMetricSelection.svelte';
-    import { fetchClusters } from './utils.js';
+    import { fetchClusters, tilePlots } from './utils.js';
 
     const clusterCockpitConfig = getContext('cc-config');
 
+    let plotsPerRow = 3;
     let histogramBins = 50;
     let metricsToFetch = [];
     let showFilters = false;
@@ -26,13 +28,6 @@
 
     let metricsInHistograms = ['flops_any', 'mem_bw', 'cpu_load'];
     let metricsInScatterplots = [['flops_any', 'mem_bw'], ['flops_any', 'cpu_load'], ['mem_bw', 'cpu_load']];
-
-    onMount(() => {
-        if (selectedClusterId != null) {
-            filterConfig.updateFilter((filters) =>
-                (filters.cluster = selectedClusterId));
-        }
-    });
 
     initClient({
         url: typeof GRAPHQL_BACKEND !== 'undefined'
@@ -58,7 +53,7 @@
         }
     `, {
         filter: { list: [] },
-        rows: 50, cols: 100,
+        rows: 50, cols: 50,
         minX: 0.01, minY: 1., maxX: 1000., maxY: -1
     }, { pause: true });
 
@@ -113,6 +108,9 @@
 
             if (selectedClusterId != null) {
                 selectedCluster = clusters.find(c => c.clusterID == selectedClusterId);
+
+                tick().then(() => filterConfig.setCluster(selectedClusterId));
+
                 updateQueries([
                     { clusterId: { eq: selectedClusterId } }
                 ]);
@@ -141,9 +139,12 @@
             throw new Error('clusters-GraphQL-Query not finished!');
 
         let filterItems = event.detail.filterItems;
+        console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
         selectedClusterId = appliedFilters.cluster;
-        if (selectedClusterId == null)
+        if (selectedClusterId == null) {
+            selectedCluster = null;
             return;
+        }
 
         selectedCluster = clusters.find(c => c.clusterID == selectedClusterId);
         window.location.hash = `#${selectedClusterId}`;
@@ -205,34 +206,49 @@
     bind:appliedFilters
     on:update={filtersChanged} />
 
-<Button outline color=success
-    on:click={() => (showFilters = !showFilters)}>
-    <Icon name="filter" />
-</Button>
+<Row>
+    <Col>
+        <Button outline color=success
+            on:click={() => (showFilters = !showFilters)}>
+            <Icon name="filter" />
+        </Button>
 
-{#if selectedClusterId != null && clusters != null}
-    <MetricSelection
-        bind:metricsInHistograms
-        bind:metricsInScatterplots
-        availableMetrics={Object.keys(metricConfig[selectedClusterId])} />
-{/if}
-
-<InputGroup>
-    <InputGroupText>
-        Metric Histogram Bins
-    </InputGroupText>
-    <Input bind:value={histogramBins} type="number" min="3" max="300" />
-</InputGroup>
-<InputGroup>
-    <InputGroupText>
-        Roofline Plot Resolution
-    </InputGroupText>
-    <Input bind:value={$rooflineHeatmapQuery.variables.rows} type="number" />
-    <InputGroupText>
-        x
-    </InputGroupText>
-    <Input bind:value={$rooflineHeatmapQuery.variables.cols} type="number" />
-</InputGroup>
+        {#if selectedClusterId != null && clusters != null}
+            <MetricSelection
+                bind:metricsInHistograms
+                bind:metricsInScatterplots
+                availableMetrics={Object.keys(metricConfig[selectedClusterId])} />
+        {/if}
+    </Col>
+    <!-- <Col>
+        <InputGroup>
+            <InputGroupText>
+                Metric Histogram Bins
+            </InputGroupText>
+            <input class="form-control" bind:value={histogramBins} type="number" min="3" max="300" />
+        </InputGroup>
+    </Col>
+    <Col>
+        <InputGroup>
+            <InputGroupText>
+                Roofline Plot Resolution
+            </InputGroupText>
+            <input class="form-control" bind:value={$rooflineHeatmapQuery.variables.rows} type="number" />
+            <InputGroupText>
+                x
+            </InputGroupText>
+            <input class="form-control" bind:value={$rooflineHeatmapQuery.variables.cols} type="number" />
+        </InputGroup>
+    </Col>
+    <Col>
+        <InputGroup>
+            <InputGroupText>
+                Plots per Row
+            </InputGroupText>
+            <input class="form-control" bind:value={plotsPerRow} type="number" />
+        </InputGroup>
+    </Col> -->
+</Row>
 
 <FilterInfo
     {appliedFilters}
@@ -240,105 +256,132 @@
     {matchedJobs} />
 
 {#if selectedClusterId == null}
-    <Card body color="danger" class="mb-3">
-        Please select a single cluster!
-    </Card>
-{:else}
-    {#if $rooflineHeatmapQuery.error}
-        <Card body color="danger" class="mb-3">Error: {$rooflineHeatmapQuery.error.message}</Card>
-    {:else if $rooflineHeatmapQuery.fetching}
-        <Spinner secondary />
-    {:else if $rooflineHeatmapQuery.data && selectedCluster}
-        <Row>
+    <Row>
+        <Col>
+            <Card body color="danger" class="mb-3">
+                Please select a single cluster!
+            </Card>
+        </Col>
+    </Row>
+{/if}
+
+<Row><Col><hr/></Col></Row>
+
+<Row>
+    <Col xs="4">
+        {#if $rooflineHeatmapQuery.error}
+            <Card body color="danger" class="mb-3">Error: {$rooflineHeatmapQuery.error.message}</Card>
+        {:else if $rooflineHeatmapQuery.fetching}
+            <Spinner secondary />
+        {:else if $rooflineHeatmapQuery.data && selectedCluster}
             {#key $rooflineHeatmapQuery.data.rooflineHeatmap}
-                <RooflinePlot width={600} height={300} cluster={selectedCluster}
-                    tiles={$rooflineHeatmapQuery.data.rooflineHeatmap} />
+                <Resizable let:width>
+                    <RooflinePlot width={width}
+                        height={300} cluster={selectedCluster}
+                        tiles={$rooflineHeatmapQuery.data.rooflineHeatmap} />
+                </Resizable>
             {/key}
-        </Row>
-    {/if}
+        {/if}
+    </Col>
 
     {#if $metaStatsQuery.error}
-        <Card body color="danger" class="mb-3">Error: {$metaStatsQuery.error.message}</Card>
+        <Col>
+            <Card body color="danger" class="mb-3">Error: {$metaStatsQuery.error.message}</Card>
+        </Col>
     {:else if $metaStatsQuery.fetching}
-        <Spinner secondary />
-    {:else if $metaStatsQuery.data}
-        <Row>
-            <Col>
-                <Table>
-                    <tbody>
-                        <tr>
-                            <th scope="row">Total Jobs</th>
-                            <td>{$metaStatsQuery.data.jobsStatistics.totalJobs}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Short Jobs</th>
-                            <td>{$metaStatsQuery.data.jobsStatistics.shortJobs}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Total Walltime</th>
-                            <td>{$metaStatsQuery.data.jobsStatistics.totalWalltime}</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Total Core Hours</th>
-                            <td>{$metaStatsQuery.data.jobsStatistics.totalCoreHours}</td>
-                        </tr>
-                    </tbody>
-                </Table>
-            </Col>
-            <Col>
-                <h5>
-                    Walltime Histogram (Hours)
-                </h5>
-                {#key $metaStatsQuery.data.jobsStatistics.histWalltime}
-                    <Histogram width={250} height={200}
-                        data={$metaStatsQuery.data.jobsStatistics.histWalltime} />
-                {/key}
-            </Col>
-            <Col>
-                <h5>
-                    Number of Nodes
-                </h5>
-                {#key $metaStatsQuery.data.jobsStatistics.histNumNodes}
-                    <Histogram width={250} height={200}
-                        data={$metaStatsQuery.data.jobsStatistics.histNumNodes} />
-                {/key}
-            </Col>
-        </Row>
-    {/if}
-
-    {#if $statsQuery.error}
-        <Card body color="danger" class="mb-3">Error: {$statsQuery.error.message}</Card>
-    {:else if $statsQuery.fetching}
-        <Spinner secondary />
-    {:else if $statsQuery.data}
-        <h4>Shows where the Job averages fall</h4>
-        <div style="display: flex;">
-            {#each metricsInHistograms.map((metric, idx) =>
-                buildHistogramData($statsQuery.data.jobMetricAverages, metric, histogramBins)) as metric}
-                <div>
-                    <h5>{metric.name} [{metricUnits[metric.name]}]</h5>
-                    {#key metric}
-                        <Histogram width={300} height={300}
-                            min={metric.min} max={metric.max}
-                            data={metric.bins} label={metric.label} />
+        <Col><Spinner secondary /></Col>
+    {:else if selectedClusterId != null && $metaStatsQuery.data}
+        <Col xs="8">
+            <Row>
+                <Col style="text-align: center; font-size: 1.2rem;">
+                    <b>Short Jobs:</b>
+                    {$metaStatsQuery.data.jobsStatistics.shortJobs},
+                    <b>Total Walltime:</b>
+                    {$metaStatsQuery.data.jobsStatistics.totalWalltime},
+                    <b>Total Core Hours:</b>
+                    {$metaStatsQuery.data.jobsStatistics.totalCoreHours}
+                </Col>
+            </Row>
+            <Row>
+                <Col xs="6">
+                    <h5>Walltime Histogram (Hours)</h5>
+                    <Resizable let:width>
+                    {#key $metaStatsQuery.data.jobsStatistics.histWalltime}
+                        <Histogram width={width} height={250}
+                            data={$metaStatsQuery.data.jobsStatistics.histWalltime} />
                     {/key}
-                </div>
-            {/each}
-        </div>
+                    </Resizable>
+                </Col>
+                <Col xs="6">
+                    <h5>Number of Nodes</h5>
+                    <Resizable let:width>
+                    {#key $metaStatsQuery.data.jobsStatistics.histNumNodes}
+                        <Histogram width={width} height={250}
+                            data={$metaStatsQuery.data.jobsStatistics.histNumNodes} />
+                    {/key}
+                    </Resizable>
+                </Col>
+            </Row>
+        </Col>
+    {/if}
+</Row>
 
-        <h4>Shows where the Job averages fall</h4>
-        <div style="display: flex;">
-            {#each metricsInScatterplots as pair (pair)}
-                <div>
-                    {#key $statsQuery.data.jobMetricAverages}
-                        <ScatterPlot width={300} height={300}
+<Row><Col><hr/></Col></Row>
+
+{#if $statsQuery.error}
+    <Row>
+        <Col>
+            <Card body color="danger" class="mb-3">Error: {$statsQuery.error.message}</Card>
+        </Col>
+    </Row>
+{:else if $statsQuery.fetching}
+    <Row>
+        <Col><Spinner secondary /></Col>
+    </Row>
+{:else if selectedClusterId != null && $statsQuery.data}
+    <table style="width: 100%; table-layout: fixed;">
+    {#each tilePlots(plotsPerRow, metricsInHistograms.map((metric, idx) =>
+        buildHistogramData($statsQuery.data.jobMetricAverages, metric, histogramBins))) as row}
+        <tr>
+            {#each row as data}
+                <td>
+                    {#if data}
+                        <h5>{data.name} [{metricUnits[data.name]}]</h5>
+                        <Resizable let:width>
+                        {#key data}
+                        <Histogram width={width} height={300}
+                            min={data.min} max={data.max}
+                            data={data.bins} label={data.label} />
+                        {/key}
+                        </Resizable>
+                    {/if}
+                </td>
+            {/each}
+        </tr>
+    {/each}
+    </table>
+
+    <Row><Col><hr/></Col></Row>
+
+    <table style="width: 100%; table-layout: fixed;">
+    {#each tilePlots(plotsPerRow, metricsInScatterplots) as row}
+        <tr>
+            {#each row as pair}
+                <td>
+                    {#if pair}
+                        <Resizable let:width>
+                        {#key $statsQuery.data.jobMetricAverages}
+                        <ScatterPlot width={width} height={300}
                             X={buildScatterData($statsQuery.data.jobMetricAverages, pair[0])}
                             Y={buildScatterData($statsQuery.data.jobMetricAverages, pair[1])}
                             xLabel={`${pair[0]} [${metricUnits[pair[0]]}]`}
                             yLabel={`${pair[1]} [${metricUnits[pair[1]]}]`} />
-                    {/key}
-                </div>
+                        {/key}
+                        </Resizable>
+                    {/if}
+                </td>
             {/each}
-        </div>
-    {/if}
+        </tr>
+    {/each}
+    </table>
 {/if}
