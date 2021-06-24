@@ -13,7 +13,7 @@
         "influxdata/influxdb-client-php": "^1.12",
         "influxdb/influxdb-php": "^1.15",
         "nelmio/cors-bundle": "^2.1",
-        "overblog/graphql-bundle": "^0.13.5",
+        "overblog/graphql-bundle": "^0.13.6",
         "phpdocumentor/reflection-docblock": "^5.2",
         "predis/predis": "^1.1",
         "sensio/framework-extra-bundle": "^5.6",
