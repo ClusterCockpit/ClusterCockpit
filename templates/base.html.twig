@@ -17,7 +17,7 @@
                 <div class="container-fluid">
                     <a class="navbar-brand" href="{{ path('index') }}">
                         {% block brand %}
-                            <img alt="RRZE logo" src="{{ asset('img/rrze-logo.png') }}" class="d-inline-block align-top">
+                            <img alt="NHR@FAU logo" src="{{ asset('img/nhr-logo.png') }}" class="d-inline-block align-top">
                             <img alt="ClusterCockpit Logo" src="{{ asset('img/cc-logo.png') }}" class="d-inline-block align-top">
                         {% endblock %}
                     </a>
@@ -34,6 +34,12 @@
                                     <a class="nav-link fs-5" href="{{ path('systems') }}">
                                         Systems
                                         <i class="bi-hdd-stack-fill"></i>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link fs-5" href="{{ path('analysis') }}">
+                                        Analysis
+                                        <i class="bi-graph-up"></i>
                                     </a>
                                 </li>
                                 <li class="nav-item">

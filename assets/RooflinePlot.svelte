@@ -5,7 +5,6 @@
 <script context="module">
     const axesColor = '#aaaaaa';
     const fontSize = 12;
-    const colors = '#cc9900';
     const paddingLeft = 40,
         paddingRight = 10,
         paddingTop = 10,
@@ -36,6 +35,15 @@
         return `rgb(${getGradientR(c)}, ${getGradientG(c)}, ${getGradientB(c)})`;
     }
 
+    function lineIntersect(x1, y1, x2, y2, x3, y3, x4, y4) {
+        let l = (y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1);
+        let a = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / l;
+        return {
+            x: x1 + a * (x2 - x1),
+            y: y1 + a * (y2 - y1) 
+        };
+    }
+
     const power = [1, 1e3, 1e6, 1e9, 1e12];
     const suffix = ['', 'k', 'm', 'g'];
     function formatNumber(x) {
@@ -46,7 +54,10 @@
         return Math.abs(x) >= 1000 ? x.toExponential() : x.toString();
     }
 
-    function axisStepFactor(i) {
+    function axisStepFactor(i, size) {
+        if (size && size < 500)
+            return 10;
+
         if (i % 3 == 0)
             return 2;
         else if (i % 3 == 1)
@@ -56,7 +67,7 @@
     }
 
     function render(ctx, data, cluster, width, height) {
-        const [minX, maxX, minY, maxY] = [0.01, data.maxX, 1., cluster.flopRateSimd];
+        const [minX, maxX, minY, maxY] = [0.01, 1000, 1., cluster.flopRateSimd];
         const w = width - paddingLeft - paddingRight;
         const h = height - paddingTop - paddingBottom;
 
@@ -76,7 +87,55 @@
             return Math.round((h - y * h) + paddingTop);
         };
 
+        // Draw Data
+        if (data.x && data.y) {
+            for (let i = 0; i < data.x.length; i++) {
+                let x = data.x[i], y = data.y[i], c = data.c[i];
+                if (x == null || y == null || Number.isNaN(x) || Number.isNaN(y))
+                    continue;
+
+                const s = 3;
+                const px = getCanvasX(x);
+                const py = getCanvasY(y);
+
+                ctx.fillStyle = getRGB(c);
+                ctx.beginPath();
+                ctx.arc(px, py, s, 0, Math.PI * 2, false);
+                ctx.fill();
+            }
+        } else if (data.tiles) {
+            const rows = data.tiles.length;
+            const cols = data.tiles[0].length;
+
+            const tileWidth = Math.ceil(w / cols);
+            const tileHeight = Math.ceil(h / rows);
+
+            const max = data.tiles.reduce((max, row) =>
+                Math.max(max, row.reduce((max, val) =>
+                    Math.max(max, val)), 0), 0);
+
+            // const transform = x => Math.log(1. + x);
+            const transform = x => x;
+
+            const tileColor = val => {
+                let hexcol = Math.floor((transform(val) / transform(max)) * 0xff);
+                let rgb = (0xff - hexcol).toString(16).padStart(2, '0');
+                return `#FF${rgb}${rgb}`;
+            };
+
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    let px = paddingLeft + (j / cols) * w;
+                    let py = paddingTop + (h - (i / rows) * h) - tileHeight;
+
+                    ctx.fillStyle = tileColor(data.tiles[i][j]);
+                    ctx.fillRect(px, py, tileWidth, tileHeight);
+                }
+            }
+        }
+
         // Axes
+        ctx.fillStyle = 'black';
         ctx.strokeStyle = axesColor;
         ctx.font = `${fontSize}px sans-serif`;
         ctx.beginPath();
@@ -88,7 +147,7 @@
             ctx.moveTo(px, paddingTop - 5);
             ctx.lineTo(px, height - paddingBottom + 5);
 
-            x *= axisStepFactor(i);
+            x *= axisStepFactor(i, w);
         }
         if (data.xLabel) {
             let textWidth = ctx.measureText(data.xLabel).width;
@@ -118,22 +177,6 @@
         }
         ctx.stroke();
 
-        // Draw Data
-        for (let i = 0; i < data.x.length; i++) {
-            let x = data.x[i], y = data.y[i], c = data.c[i];
-            if (x == null || y == null || Number.isNaN(x) || Number.isNaN(y))
-                continue;
-
-            const s = 3;
-            const px = getCanvasX(x);
-            const py = getCanvasY(y);
-
-            ctx.fillStyle = getRGB(c);
-            ctx.beginPath();
-            ctx.arc(px, py, s, 0, Math.PI * 2, false);
-            ctx.fill();
-        }
-
         // Draw roofs
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 2;
@@ -157,21 +200,29 @@
                 ctx.lineTo(width - paddingRight, flopRateSimdY);
             }
 
-            ctx.moveTo(getCanvasX(0.01), getCanvasY(ycut));
+            const { x, y } = lineIntersect(
+                getCanvasX(0.01), getCanvasY(ycut),
+                getCanvasX(simdKnee), flopRateSimdY,
+                0, height - paddingBottom,
+                width, height - paddingBottom);
+
+            ctx.moveTo(x, y);
             ctx.lineTo(getCanvasX(simdKnee), flopRateSimdY);
         }
         ctx.stroke();
 
-        // The Color Scale
-        ctx.fillStyle = 'black';
-        ctx.fillText('Time:', 17, height - 5);
-        const start = paddingLeft + 5;
-        for (let x = start; x < width - paddingRight; x += 15) {
-            let c = (x - start) / (width - start - paddingRight);
-            ctx.fillStyle = getRGB(c);
-            ctx.beginPath();
-            ctx.arc(x, height - 10, 5, 0, Math.PI * 2, false);
-            ctx.fill();
+        if (data.x && data.y) {
+            // The Color Scale
+            ctx.fillStyle = 'black';
+            ctx.fillText('Time:', 17, height - 5);
+            const start = paddingLeft + 5;
+            for (let x = start; x < width - paddingRight; x += 15) {
+                let c = (x - start) / (width - start - paddingRight);
+                ctx.fillStyle = getRGB(c);
+                ctx.beginPath();
+                ctx.arc(x, height - 10, 5, 0, Math.PI * 2, false);
+                ctx.fill();
+            }
         }
     }
 
@@ -181,7 +232,6 @@
 
         /* c will contain values from 0 to 1 representing the time */
         const x = [], y = [], c = [];
-        let maxX = Number.NEGATIVE_INFINITY;
         for (let i = 0; i < nodes; i++) {
             const flopsData = flopsAny.series[i].data;
             const memBwData = memBw.series[i].data;
@@ -191,7 +241,6 @@
                 if (Number.isNaN(intensity) || !Number.isFinite(intensity))
                     continue;
 
-                maxX = Math.max(maxX, intensity);
                 x.push(intensity);
                 y.push(f);
                 c.push(j / timesteps);
@@ -199,7 +248,7 @@
         }
 
         return {
-            x, y, c, maxX,
+            x, y, c,
             xLabel: 'Intensity [FLOPS/byte]',
             yLabel: 'Performance [GFLOPS]'
         };
@@ -209,16 +258,25 @@
 <script>
     import { onMount } from 'svelte';
 
-    export let flopsAny
-    export let memBw;
+    export let flopsAny = null;
+    export let memBw = null;
     export let cluster;
     export let width;
     export let height;
+    export let tiles = null;
+
+    console.assert(tiles || (flopsAny && memBw), "you must provide flopsAny and memBw or tiles!");
 
     let ctx;
     let canvasElement;
     let mounted = false;
-    const data = transformData(flopsAny, memBw);
+    const data = flopsAny && memBw
+        ? transformData(flopsAny, memBw)
+        : {
+            tiles: tiles,
+            xLabel: 'Intensity [FLOPS/byte]',
+            yLabel: 'Performance [GFLOPS]'
+        };
 
     onMount(() => {
         canvasElement.width = width;
@@ -231,14 +289,13 @@
 
     let timeoutId = null;
     function sizeChanged() {
-        if (!mounted)
-            return;
-
         if (timeoutId != null)
             clearTimeout(timeoutId);
 
         timeoutId = setTimeout(() => {
             timeoutId = null;
+            if (!canvasElement)
+                return;
 
             canvasElement.width = width;
             canvasElement.height = height;

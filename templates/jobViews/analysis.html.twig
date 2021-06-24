@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel='stylesheet' href='/css/uPlot.min.css'>
+    {{ parent() }}
+    {{ encore_entry_link_tags('analysisview') }}
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        const clusterCockpitConfigPromise = Promise.resolve({});
+    </script>
+    {{ encore_entry_script_tags('analysisview') }}
+{% endblock %}
+
+{% block title %}
+    Job Analysis
+{% endblock %}
+
+{% block helptext %}
+{% endblock %}
+
+{% block body %}
+    <div id="svelte-app"></div>
+{% endblock %}

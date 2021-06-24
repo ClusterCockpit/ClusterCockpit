@@ -1,15 +1,15 @@
 <script>
     import { setContext, getContext } from 'svelte';
     import { Col, Row, Card, Spinner } from 'sveltestrap';
-    import { fetchClusters } from './utils.js';
-    import { initClient, getClient,
-             operationStore, query } from '@urql/svelte';
+    import { tilePlots } from './utils.js';
+    import { initClient, getClient } from '@urql/svelte';
     import Plot from './Plot.svelte';
     import RooflinePlot from './RooflinePlot.svelte';
     import JobMeta from './JobMeta.svelte';
     import NodeStats from './NodeStats.svelte';
     import TagControl from './TagControl.svelte';
     import PolarPlot from './PolarPlot.svelte';
+    import Resizable from './Resizable.svelte';
 
     export let jobInfos;
     const { clusterId, jobId } = jobInfos;
@@ -21,8 +21,10 @@
     let allTags = null;
     let jobMetrics = null;
     let queryError = null;
+    let plotHeight = 400;
 
     const clusterCockpitConfig = getContext('cc-config');
+    const plotsPerRow = clusterCockpitConfig.plot_view_plotsPerRow;
 
     const metricConfig = {};
     setContext('metric-config', metricConfig);
@@ -106,30 +108,6 @@
             queryError = err;
             fetching = false;
         });
-
-    const plotsPerRow = clusterCockpitConfig.plot_view_plotsPerRow;
-    function tilePlots() {
-        let rows = [], i = 0;
-        for (let n = 0; n < metrics.length; n += plotsPerRow) {
-            let row = [];
-            for (let m = 0; m < plotsPerRow; m++, i++) {
-                if (i < metrics.length) {
-                    let metric = jobMetrics.find(m => m.name == metrics[i]);
-                    row.push(metric || { name: metrics[i] });
-                } else {
-                    row.push('filler');
-                }
-            }
-            rows.push(row);
-        }
-        return rows;
-    }
-
-    let screenWidth = 0;
-    let metricPlotWidth;
-    let rooflinePlotWidth, rooflinePlotHeight = 300;
-    $: metricPlotWidth = (screenWidth - 50 * plotsPerRow) / plotsPerRow;
-    $: rooflinePlotWidth = screenWidth / 3;
 </script>
 
 <style>
@@ -142,11 +120,6 @@
     }
 </style>
 
-<Row>
-    <Col>
-        <div bind:clientWidth={screenWidth} style="width: 100%"><!-- Only for getting the row width --></div>
-    </Col>
-</Row>
 {#if fetching}
     <Row>
         <Col>
@@ -163,62 +136,63 @@
     </Row>
 {:else}
     <Row>
-        <Col>
+        <Col xs="4">
             <JobMeta job={job} />
             <TagControl bind:job={job} allTags={allTags} />
         </Col>
-        <Col>
+        <Col xs="4">
             {#if clusterCockpitConfig.plot_view_showPolarplot}
+                <Resizable let:width>
                 <PolarPlot
                     metrics={[ 'flops_any',  'mem_bw', 'mem_used', 'ib_bw', 'lustre_bw' ]}
                     cluster={cluster} jobMetrics={jobMetrics}
-                    width={rooflinePlotWidth} height={rooflinePlotHeight} />
+                    width={width} height={plotHeight} />
+                </Resizable>
             {/if}
         </Col>
-        <Col>
+        <Col xs="4">
             {#if clusterCockpitConfig.plot_view_showRoofline}
+                <Resizable let:width>
                 <RooflinePlot
                     flopsAny={jobMetrics.find(m => m.name == 'flops_any').metric}
                     memBw={jobMetrics.find(m => m.name == 'mem_bw').metric}
-                    cluster={cluster} width={rooflinePlotWidth} height={rooflinePlotHeight} />
+                    cluster={cluster} width={width} height={plotHeight} />
+                </Resizable>
             {/if}
         </Col>
     </Row>
     <br/>
-    {#each tilePlots(jobMetrics) as row}
-        <Row>
+    <table style="width: 100%; table-layout: fixed;">
+    {#each tilePlots(plotsPerRow, metrics.map(metric =>
+            jobMetrics.find(m => m.name == metric) || { name: metric })) as row}
+        <tr>
             {#each row as metric}
-                <Col>
-                {#if metric == 'filler'}
-                    <!-- Filling Space -->
-                {:else if !metric.metric}
+                <td>
+                {#if metric && !metric.metric}
                     <span class="plot-title">
                         {metric.name} [{metricConfig[clusterId][metric.name].unit}]
                     </span>
                     <br>
                     <Card body color="warning">No Profiling Data</Card>
-                {:else}
+                {:else if metric && metric.metric}
                     <span class="plot-title">
                         {metric.name} [{metricConfig[clusterId][metric.name].unit}]
                     </span>
+                    <Resizable let:width>
                     <Plot
                         metric={metric.name}
                         clusterId={clusterId}
                         data={metric.metric}
                         height={200}
-                        width={metricPlotWidth} />
+                        width={width} />
+                    </Resizable>
                 {/if}
-                </Col>
+                </td>
             {/each}
-        </Row>
-        <br/>
-    {:else}
-        <Row>
-            <Col>
-                <Card body color="warning">No Data</Card>
-            </Col>
-        </Row>
+        </tr>
     {/each}
+    </table>
+
     {#if clusterCockpitConfig.plot_view_showStatTable}
         <br/>
         <Row>

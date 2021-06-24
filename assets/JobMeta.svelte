@@ -1,5 +1,5 @@
 <script>
-    import { getColorForTag } from './utils.js';
+    import Tag from './Tag.svelte';
 
     export let job;
 
@@ -35,9 +35,7 @@
     <p class="fw-bold">{formatDuration(job["duration"])}</p>
     <p>
         {#each job["tags"] as tag}
-            <span class="badge rounded-pill {getColorForTag(tag)}">
-                {tag.tagType}: {tag.tagName}
-            </span>
+            <Tag tag={tag}/>
         {/each}
     </p>
 </div>

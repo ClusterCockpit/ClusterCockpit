@@ -83,6 +83,8 @@ type Query {
   jobs(filter: JobFilterList, page: PageRequest, order: OrderByInput): JobResultList!
   jobsStatistics(filter: JobFilterList): JobsStatistics!
   jobMetrics(jobId: String!, clusterId: String, metrics: [String]): [JobMetricWithName]!
+  jobMetricAverages(filter: JobFilterList!, metrics: [String]!): [[Float]]!
+  rooflineHeatmap(filter: JobFilterList!, rows: Int!, cols: Int!, minX: Float!, minY: Float!, maxX: Float!, maxY: Float!): [[Float!]]!
   tags: [JobTag!]!
   filterRanges: FilterRanges!
   userStats(startTime: Time, stopTime: Time, clusterId: String): [UserStats!]!

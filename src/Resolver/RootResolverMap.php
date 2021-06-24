@@ -34,6 +34,7 @@ use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Resolver\ResolverMap;
 
 use App\Service\JobData;
+use App\Service\JobStats;
 use App\Service\Configuration;
 use App\Service\ClusterConfiguration;
 use App\Repository\JobRepository;
@@ -43,6 +44,7 @@ class RootResolverMap extends ResolverMap
 {
     private $jobRepo;
     private $jobData;
+    private $jobStats;
     private $clusterCfg;
     private $jobTagRepo;
     private $logger;
@@ -53,6 +55,7 @@ class RootResolverMap extends ResolverMap
     public function __construct(
         JobRepository $jobRepo,
         JobData $jobData,
+        JobStats $jobStats,
         ClusterConfiguration $clusterCfg,
         JobTagRepository $jobTagRepo,
         LoggerInterface $logger,
@@ -63,6 +66,7 @@ class RootResolverMap extends ResolverMap
     {
         $this->jobRepo = $jobRepo;
         $this->jobData = $jobData;
+        $this->jobStats = $jobStats;
         $this->clusterCfg = $clusterCfg;
         $this->jobTagRepo = $jobTagRepo;
         $this->logger = $logger;
@@ -182,7 +186,18 @@ class RootResolverMap extends ResolverMap
                 },
 
                 'jobsStatistics' => function($value, Argument $args) {
-                    return $this->jobRepo->findFilteredStatistics($args['filter']);
+                    return $this->jobRepo->findFilteredStatistics($args['filter'], $this->clusterCfg);
+                },
+
+                'jobMetricAverages' => function($value, Argument $args) {
+                    $jobs = $this->jobRepo->findFilteredJobs(false, $args['filter'], null);
+                    return $this->jobStats->getAverages($jobs, $args['metrics']);
+                },
+
+                'rooflineHeatmap' => function($value, Argument $args) {
+                    $jobs = $this->jobRepo->findFilteredJobs(false, $args['filter'], null);
+                    return $this->jobStats->rooflineHeatmap($jobs, $args['rows'], $args['cols'],
+                        $args['minX'], $args['minY'], $args['maxX'], $args['maxY']);
                 },
 
                 'userStats' => function($value, Argument $args) {

@@ -17,6 +17,7 @@ Encore
     .addEntry('jobview', './assets/jobview.js')
     .addEntry('userlist', './assets/userlist.js')
     .addEntry('userview', './assets/userview.js')
+    .addEntry('analysisview', './assets/analysisview.js')
 ;
 
 let config = Encore.getWebpackConfig();

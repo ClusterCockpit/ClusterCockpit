@@ -27,20 +27,5 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-    App\Service\Plot\PlotGeneratorPlotly: ~
-    App\Service\Plot\PlotGeneratorChartJs: ~
-    App\Service\Plot\PlotGeneratorFlot: ~
-
-    # App\Command\ExportJob:
-    #     $projectDir: '%kernel.project_dir%'
-
-    # App\Service\ColorMap:
-    #     $projectDir: '%kernel.project_dir%'
-
-    App\Service\Plot\PlotGeneratorInterface: '@App\Service\Plot\PlotGeneratorPlotly'
-
     sensio_framework_extra.view.listener:
-        alias: Sensio\Bundle\FrameworkExtraBundle\EventListener\TemplateListener
-
+        alias: 'Sensio\Bundle\FrameworkExtraBundle\EventListener\TemplateListener'

@@ -1,17 +1,33 @@
-<div class="cc-plot">
+<div class="cc-plot"
+    on:mousemove={mousemove}
+    on:mouseleave={() => (infoText = '')}>
+    <span style="left: {paddingLeft + 5}px;">{infoText}</span>
     <canvas bind:this={canvasElement} width="{width}" height="{height}"></canvas>
 </div>
 
+<style>
+    .cc-plot {
+        position: relative;
+    }
+    .cc-plot > span {
+        position: absolute;
+        top: 0px;
+    }
+</style>
+
 <script>
-    import { onMount, onDestroy } from "svelte";
+    import { onMount } from "svelte";
 
     export let data;
     export let width;
     export let height;
+    export let min = null;
+    export let max = null;
+    export let label = (value) => value.toString();
 
-    const paddingLeft = 25,
+    const paddingLeft = 35,
         paddingRight = 20,
-        paddingTop = 15,
+        paddingTop = 20,
         paddingBottom = 20;
 
     let ctx;
@@ -38,12 +54,31 @@
         }
     }
 
+    let infoText = '';
+    function mousemove(event) {
+        let rect = event.target.getBoundingClientRect();
+        let x = event.clientX - rect.left;
+        if (x < paddingLeft || x > width - paddingRight) {
+            infoText = '';
+            return;
+        }
+
+        const w = width - paddingLeft - paddingRight;
+        const barWidth = Math.round(w / (maxValue + 1));
+        x = Math.floor((x - paddingLeft) / (w - barWidth) * maxValue);
+        let point = data.find(point => point.value == x);
+
+        if (point)
+            infoText = `count: ${point.count} (value: ${label(x)})`;
+        else
+            infoText = '';
+    }
+
     function render() {
         const h = height - paddingTop - paddingBottom;
         const w = width - paddingLeft - paddingRight;
-        const barWidth = Math.round(w / (maxValue + 1));
+        const barWidth = Math.ceil(w / (maxValue + 1));
 
-        // const getCanvasX = (value) => Math.floor((value / maxValue) * (w - barWidth) + paddingLeft + (barWidth / 2.));
         const getCanvasX = (value) => (value / maxValue) * (w - barWidth) + paddingLeft + (barWidth / 2.);
         const getCanvasY = (count) => (h - (count / maxCount) * h) + paddingTop;
 
@@ -65,9 +100,21 @@
 
         ctx.fillStyle = 'black';
         ctx.textAlign = 'center';
-        const stepsizeX = getStepSize(maxValue, w, 100);
-        for (let x = 0; x <= maxValue; x += stepsizeX) {
-            ctx.fillText(`${x}`, getCanvasX(x), height - paddingBottom + 15);
+        if (min != null && max != null) {
+            const stepsizeX = getStepSize(max - min, w, 75);
+            let startX = 0;
+            while (stepsizeX > 0 && startX < min)
+                startX += stepsizeX;
+
+            for (let x = startX; x < max; x += stepsizeX) {
+                let px = ((x - min) / (max - min)) * (w - barWidth) + paddingLeft + (barWidth / 2.);
+                ctx.fillText(`${x}`, px, height - paddingBottom + 15);
+            }
+        } else {
+            const stepsizeX = getStepSize(maxValue, w, 120);
+            for (let x = 0; x <= maxValue; x += stepsizeX) {
+                ctx.fillText(label(x), getCanvasX(x), height - paddingBottom + 15);
+            }
         }
 
         ctx.strokeStyle = `#bbbbbb`;
@@ -94,14 +141,13 @@
 
     let timeoutId = null;
     function sizeChanged() {
-        if (!mounted)
-            return;
-
         if (timeoutId != null)
             clearTimeout(timeoutId);
 
         timeoutId = setTimeout(() => {
             timeoutId = null;
+            if (!canvasElement)
+                return;
 
             canvasElement.width = width;
             canvasElement.height = height;

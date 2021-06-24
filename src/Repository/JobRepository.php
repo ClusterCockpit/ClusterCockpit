@@ -54,71 +54,6 @@ class JobRepository extends ServiceEntityRepository
         $this->_userRepository = $this->getEntityManager()->getRepository(User::class);
     }
 
-    /*
-    private function getHisto($settings, $target, $constraint = '', $join = ''): array
-    {
-        $startTime = $settings['startTime'];
-        $stopTime = $settings['stopTime'];
-        $histo = array();
-
-        foreach ( $settings['clusters'] as $cluster ){
-            $sql = "
-            SELECT $target AS bin, count(*) AS count
-            FROM job
-            $join
-            WHERE job.cluster_id=".$cluster['id']."
-            AND job.start_time BETWEEN $startTime AND $stopTime
-            $constraint
-            GROUP BY 1
-            ORDER BY 1
-            ";
-
-            $stat = $this->_connection->fetchAll($sql);
-
-            foreach ( $stat as $item ){
-                if (isset($histo[ $item['bin'] ] )){
-                    $histo[ $item['bin'] ] += $item['count'];
-                } else {
-                    $histo[ $item['bin'] ] = $item['count'];
-                }
-            }
-        }
-
-        return $histo;
-    }
-
-    private function getStats($settings, $constraint = '', $join = ''): array
-    {
-        $startTime = $settings['startTime'];
-        $stopTime = $settings['stopTime'];
-        $stat = array(
-            'totalWalltime' => 0,
-            'jobCount' => 0,
-            'totalCoreHours' => 0,
-        );
-
-        foreach ( $settings['clusters'] as $cluster ){
-            $sql = "
-            SELECT ROUND(SUM(job.duration)/3600,2) AS totalWalltime,
-                   COUNT(*) AS jobCount,
-                   ROUND(SUM(job.duration*job.num_nodes*".$cluster['coresPerNode'].")/3600,2) as totalCoreHours
-            FROM job
-            $join
-            WHERE job.cluster_id=".$cluster['id']."
-            AND job.start_time BETWEEN $startTime AND $stopTime
-            $constraint
-            ";
-
-            $tmp = $this->_connection->fetchAssoc($sql);
-            $stat['totalWalltime'] += $tmp['totalWalltime'];
-            $stat['jobCount'] += $tmp['jobCount'];
-            $stat['totalCoreHours'] += $tmp['totalCoreHours'];
-        }
-
-        return $stat;
-    }
-    */
-
     private function addStringCondition($qb, $field, $i, $cond)
     {
         if (isset($cond['eq']))
@@ -217,7 +152,7 @@ class JobRepository extends ServiceEntityRepository
         if ($page) {
             $qb->setFirstResult(($page['page'] - 1) * $page['itemsPerPage']);
             $qb->setMaxResults($page['itemsPerPage']);
-        } else {
+        } else if ($page === null) {
             $qb->setMaxResults(50);
         }
 
@@ -226,26 +161,45 @@ class JobRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    private function filteredStatisticsPerCluster($filter, $cluster)
+    {
+        $coresPerNode = $cluster['socketsPerNode'] * $cluster['coresPerSocket'];
+        $filter['clusterId'] = ['eq' => $cluster['clusterID']];
+        $qb = $this->createQueryBuilder('j');
+        $qb->select([
+            'COUNT(j.id)',
+            'SUM(j.duration) / 3600',
+            'SUM(j.duration * j.numNodes * '.$coresPerNode.') / 3600'
+        ]);
+        $this->buildJobFilter($qb, $filter, null);
+        $res = $qb->getQuery()->getSingleResult();
+        return [
+            'totalJobs' => $res[1],
+            'totalWalltime' => intval($res[2]),
+            'totalCoreHours' => intval($res[3])
+        ];
+    }
+
     /*
      * Filters are expected in the same format as for
      * findFilteredJobs() and countJobs() (therefore,
      * the GraphQL JobFilterList type).
      */
-    public function findFilteredStatistics($filter)
+    public function findFilteredStatistics($filter, $clusterCfg)
     {
-        $qb = $this->createQueryBuilder('j');
-        $qb->select([
-            'COUNT(j.id)',
-            'SUM(j.duration) / 3600',
-            'SUM(j.duration * j.numNodes) / 3600'
-        ]);
-        $this->buildJobFilter($qb, $filter, null);
-        $res = $qb->getQuery()->getSingleResult();
-        $stats = [
-            'totalJobs' => $res[1],
-            'totalWalltime' => intval($res[2]),
-            'totalCoreHours' => intval($res[3])
-        ];
+        $stats = null;
+        if (isset($filter['clusterId'])) {
+            $stats = $this->filteredStatisticsPerCluster($filter,
+                $clusterCfg->getClusterConfiguration($filter['clusterId']));
+        } else {
+            $stats = ['totalJobs' => 0, 'totalWalltime' => 0, 'totalCoreHours' => 0];
+            foreach ($clusterCfg->getConfigurations() as $cluster) {
+                $res = $this->filteredStatisticsPerCluster($filter, $cluster);
+                $stats['totalJobs'] += $res['totalJobs'];
+                $stats['totalWalltime'] += $res['totalWalltime'];
+                $stats['totalCoreHours'] += $res['totalCoreHours'];
+            }
+        }
 
         $qb = $this->createQueryBuilder('j');
         $qb->select('COUNT(j.id)')
@@ -254,29 +208,18 @@ class JobRepository extends ServiceEntityRepository
         $stats['shortJobs'] = $qb->getQuery()->getSingleResult()[1];
 
         // histWalltime
-        // TODO/FIXME: No int division in standard SQL?
+        $histWalltime = [];
         $qb = $this->createQueryBuilder('j');
         $qb->select([
-            '(j.duration / 3600) as value',
+            'ROUND(j.duration / 3600) as value',
             'count(j.id) as count'
         ]);
         $this->buildJobFilter($qb, $filter, null);
-        $qb->groupBy('value');
+        $qb->groupBy('value')->orderBy('value');
         $rows = $qb->getQuery()->getResult();
-        $histo = [];
-        // The problem: value is a float, grouping is broken
         foreach ($rows as $row) {
-            $value = intval($row['value']);
-            if (isset($histo[$value]))
-                $histo[$value] += $row['count'];
-            else
-                $histo[$value] = $row['count'];
+            $histWalltime[] = $row;
         }
-        $histWalltime = [];
-        foreach ($histo as $value => $count) {
-            $histWalltime[] = ['count' => $count, 'value' => $value];
-        }
-
 
         // histNumNodes
         $histNumNodes = [];
@@ -314,79 +257,6 @@ class JobRepository extends ServiceEntityRepository
             'startTime' => [ 'from' => intval($res[5]), 'to' => intval($res[6]) ]
         ];
     }
-
-    /*
-    public function findRunningJobs()
-    {
-        $qb = $this->createQueryBuilder('j');
-
-        return $qb
-            ->where("j.isRunning = true")
-            ->orderBy('j.startTime', 'DESC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findCachedJobs()
-    {
-        $qb = $this->createQueryBuilder('j');
-
-        return $qb
-            ->where("j.isRunning = false")
-            ->where("j.isCached = true")
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findJobsToClean($timestamp)
-    {
-        $qb = $this->createQueryBuilder('j');
-
-        return $qb
-            ->where("j.isCached = true")
-            ->andWhere($qb->expr()->lt( 'j.startTime', $timestamp))
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findJobsToBuild($timestamp)
-    {
-        $qb = $this->createQueryBuilder('j');
-
-        return $qb
-            ->where("j.isRunning = false")
-            ->andWhere("j.isCached = false")
-            ->andWhere($qb->expr()->gt( 'j.startTime', $timestamp))
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findByStartTime($startFrom, $startTo)
-    {
-        $qb = $this->createQueryBuilder('j');
-
-        return $qb
-            ->where($qb->expr()->between( 'j.startTime', $startFrom, $startTo))
-            ->getQuery()
-            ->getResult();
-    }
-
-    public function findStatByUser($userId, $control, $full=true)
-    {
-        $stat = array();
-        $settings = $this->getSettings($control);
-        $constraint = "AND job.user_id=$userId";
-        $stat['stat'] = $this->getStats($settings,$constraint);
-
-        if( $full ){
-            $stat['histo_runtime'] = $this->getHisto($settings,
-                'floor(duration/3600)+1',"AND job.user_id=$userId");
-            $stat['histo_numnodes'] = $this->getHisto($settings,
-                'num_nodes-1',"AND job.user_id=$userId");
-        }
-        return $stat;
-    }
-    */
 
     public function statUsers($startTime, $stopTime, $clusterId, $clusters)
     {

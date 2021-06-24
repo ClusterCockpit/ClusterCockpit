@@ -1,6 +1,6 @@
 <script context="module">
     /* The values in here are only
-     * used while the GraphQL clusters
+    * used while the GraphQL clusters
      * query is still loading. After that,
      * the values are replaced.
      */
@@ -106,12 +106,24 @@
     import { getColorForTag, fuzzySearchTags } from './utils.js';
     import { createEventDispatcher, getContext } from "svelte";
     import { Col, Row, FormGroup, Button, Input,
-             ListGroup, ListGroupItem, Card, Spinner } from 'sveltestrap';
+        ListGroup, ListGroupItem, Card, Alert, Spinner, Icon } from 'sveltestrap';
     import DoubleRangeSlider from './DoubleRangeSlider.svelte';
     import { operationStore, query } from '@urql/svelte';
 
+    export let showFilters; /* Hide/Show the filters */
+    export let clusters; /* Array of all clusters as returned by the GraphQL-Query (including filterRanges!) */
+    export let filterRanges; /* Global filter ranges for all clusters */
+    export let initialFilterTagId = null; /* If set, jobs are filtered by this tag from the start */
+    export let appliedFilters = defaultFilters;
+
     function deepCopy(obj) {
         return JSON.parse(JSON.stringify(obj));
+    }
+
+    export function setCluster(clusterId) {
+        filters.cluster = clusterId;
+        updateRanges();
+        appliedFilters = deepCopy(filters);
     }
 
     let filters = deepCopy(defaultFilters);
@@ -128,10 +140,15 @@
 
     query(tagsQuery);
 
-    export let showFilters = false;
-    export let clusters;
-    export let sorting;
-    export let filterRanges; /* Global filter ranges for all clusters */
+    $: {
+        if (initialFilterTagId != null && $tagsQuery.data) {
+            let tag = $tagsQuery.data.tags.find(tag => tag.id == initialFilterTagId);
+            console.assert(tag, "Don't just put random IDs in the URL!");
+            appliedFilters.tags[tag.id] = tag;
+            filters.tags[tag.id] = tag;
+        }
+    }
+
     const dispatch = createEventDispatcher();
 
     let tagFilterTerm = '';
@@ -145,7 +162,6 @@
             { from: 0, to: 0 }
         ]
     };
-    let appliedFilters = defaultFilters;
     let metricConfig = getContext('metric-config');
 
     $: filteredTags = fuzzySearchTags(tagFilterTerm, $tagsQuery.data && $tagsQuery.data.tags);
@@ -249,12 +265,6 @@
     $: setDefaultFilters(filterRanges);
     $: updateRanges(filterRanges, clusters);
 
-    function formatDuration({ hours, min }) {
-        hours = hours.toString().padStart(2, '0');
-        min = min.toString().padStart(2, '0');
-        return `${hours}:${min}h`
-    }
-
     function handleReset( ) {
         tagFilterTerm = '';
         filters = deepCopy(defaultFilters);
@@ -274,7 +284,7 @@
     function handleApply( ) {
         let filterItems = getFilterItems(filters);
         appliedFilters = deepCopy(filters);
-        dispatch("update", { filterItems });
+        dispatch("update", { filterItems: filterItems });
     }
 
     function handleNodesSlider({ detail }) {
@@ -304,10 +314,6 @@
         margin-top: 20px;
     }
 
-    .applied-filters {
-        margin-bottom: 10px;
-    }
-
     table th, table td {
         border-bottom: none;
     }
@@ -333,7 +339,7 @@
             <p>From</p>
             <Row>
                 <FormGroup class="col">
-                <Input type="date" name="date"  bind:value={filters["startTime"]["from"]["date"]}  placeholder="datetime placeholder" />
+                    <Input type="date" name="date"  bind:value={filters["startTime"]["from"]["date"]}  placeholder="datetime placeholder" />
                 </FormGroup>
                 <FormGroup class="col">
                     <Input type="time" name="date"  bind:value={filters["startTime"]["from"]["time"]}  placeholder="datetime placeholder" />
@@ -342,14 +348,12 @@
             <p>To</p>
             <Row>
                 <FormGroup class="col">
-                <Input type="date" name="date"  bind:value={filters["startTime"]["to"]["date"]}  placeholder="datetime placeholder" />
+                    <Input type="date" name="date"  bind:value={filters["startTime"]["to"]["date"]}  placeholder="datetime placeholder" />
                 </FormGroup>
                 <FormGroup class="col">
                     <Input type="time" name="date"  bind:value={filters["startTime"]["to"]["time"]}  placeholder="datetime placeholder" />
                 </FormGroup>
             </Row>
-        </Col>
-        <Col>
             <Row>
                 <Col>
                     <h5>Duration</h5>
@@ -391,8 +395,6 @@
                     </div>
                 </Col>
             </Row>
-        </Col>
-        <Col>
             <Row>
                 <Col>
                     <h5>Number of nodes</h5>
@@ -400,15 +402,53 @@
             </Row>
             <Row>
                 <DoubleRangeSlider on:change={handleNodesSlider}
-                    min={currentRanges.numNodes.from} max={currentRanges.numNodes.to}
-                    firstSlider={filters["numNodes"]["from"]} secondSlider={filters["numNodes"]["to"]}/>
+                                   min={currentRanges.numNodes.from} max={currentRanges.numNodes.to}
+                                   firstSlider={filters["numNodes"]["from"]} secondSlider={filters["numNodes"]["to"]}/>
             </Row>
         </Col>
-    </Row>
-    <Row>
-        <Col>
+        <Col xs="2">
             <Row>
                 <Col>
+                    <h5>Clusters</h5>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <ListGroup>
+                        <ListGroupItem>
+                            <input type="radio" value={null}
+                                   bind:group={filters["cluster"]}
+                                   on:change={updateRanges} />
+                            All
+                        </ListGroupItem>
+                        {#each (clusters || []) as cluster}
+                            <ListGroupItem>
+                                <input type="radio" value={cluster.clusterID}
+                                       bind:group={filters["cluster"]}
+                                       on:change={updateRanges} />
+                                {cluster.clusterID}
+                            </ListGroupItem>
+                        {/each}
+                    </ListGroup>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <br/>
+                    <h5>Project ID</h5>
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <input type="text"
+                           bind:value={filters.projectId}
+                           placeholder="Filter"
+                           style="width: 100%;">
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <br/>
                     <h5>Tags</h5>
                 </Col>
             </Row>
@@ -441,48 +481,6 @@
         <Col>
             <Row>
                 <Col>
-                    <h5>Clusters</h5>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <ListGroup>
-                        <ListGroupItem>
-                            <input type="radio" value={null}
-                                bind:group={filters["cluster"]}
-                                on:change={updateRanges} />
-                            All
-                        </ListGroupItem>
-                        {#each (clusters || []) as cluster}
-                            <ListGroupItem>
-                                <input type="radio" value={cluster.clusterID}
-                                    bind:group={filters["cluster"]}
-                                    on:change={updateRanges} />
-                                {cluster.clusterID}
-                            </ListGroupItem>
-                        {/each}
-                    </ListGroup>
-                </Col>
-            </Row>
-        </Col>
-        <Col>
-            <Row>
-                <Col>
-                    <h5>Project ID</h5>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <input type="text"
-                        bind:value={filters.projectId}
-                        placeholder="Filter"
-                        style="width: 100%;">
-                </Col>
-            </Row>
-        </Col>
-        <Col xs="6">
-            <Row>
-                <Col>
                     <h5>Job Statistics</h5>
                 </Col>
             </Row>
@@ -498,16 +496,16 @@
                         </thead>
                         <tbody>
                             {#each filters.statistics as stat, idx (stat)}
-                            <tr>
-                                <td>{stat.name}</td>
-                                <td><input type="checkbox" bind:checked={stat.enabled}></td>
-                                <td>
-                                    <DoubleRangeSlider on:change={(e) => handleStatisticsSlider(stat, e)}
-                                        min={currentRanges.statistics[idx].from}
-                                        max={currentRanges.statistics[idx].to}
-                                        firstSlider={stat.from} secondSlider={stat.to}/>
-                                </td>
-                            </tr>
+                                <tr>
+                                    <td>{stat.name}</td>
+                                    <td><input type="checkbox" bind:checked={stat.enabled}></td>
+                                    <td>
+                                        <DoubleRangeSlider on:change={(e) => handleStatisticsSlider(stat, e)}
+                                                           min={currentRanges.statistics[idx].from}
+                                                           max={currentRanges.statistics[idx].to}
+                                                           firstSlider={stat.from} secondSlider={stat.to}/>
+                                    </td>
+                                </tr>
                             {/each}
                         </tbody>
                     </table>
@@ -524,77 +522,3 @@
         </div>
     </div>
 {/if}
-
-<div class="applied-filters d-flex flex-row justify-content-between">
-    <div>
-        <b>Applied Filters:</b>
-    </div>
-    <div>
-        Clusters:
-        <br>
-        {appliedFilters["cluster"] == null
-            ? (clusters || []).map(c => c.clusterID).join(', ')
-            : appliedFilters["cluster"]}
-    </div>
-
-    {#if appliedFilters.projectId}
-        <div>
-            Project ID:
-            <br>
-            Contains: "{appliedFilters.projectId}"
-        </div>
-    {/if}
-
-    {#if Object.values(appliedFilters["tags"]).length > 0}
-        <div>
-            Tags:
-            {#each Object.values(appliedFilters["tags"]) as tag}
-                <br>
-                <span class="cc-tag badge rounded-pill {getColorForTag(tag)}">
-                    {tag.tagType}: {tag.tagName}
-                </span>
-            {/each}
-        </div>
-    {/if}
-
-    {#if appliedFilters.statistics.some(s => s.enabled)}
-        <div>
-            Job Statistics:
-            {#each appliedFilters.statistics.filter(s => s.enabled) as stat}
-                <br>
-                {stat.name}: {stat.from} - {stat.to}
-            {/each}
-        </div>
-    {/if}
-
-    <div>
-        Nodes:
-        <br>
-        {appliedFilters["numNodes"]["from"]} - {appliedFilters["numNodes"]["to"]}
-    </div>
-    <div>
-        Duration:
-        <br>
-        {formatDuration(appliedFilters["duration"]["from"])} -
-        {formatDuration(appliedFilters["duration"]["to"])}
-    </div>
-    <div>
-        Start Time:
-        <br>
-        {appliedFilters["startTime"]["from"]["date"]}
-        {appliedFilters["startTime"]["from"]["time"]}
-        -
-        {appliedFilters["startTime"]["to"]["date"]}
-        {appliedFilters["startTime"]["to"]["time"]}
-    </div>
-    <div>
-        Sorting:
-        <br>
-        {sorting.field}
-        {#if sorting.order == 'ASC'}
-            (<i class="bi bi-sort-up"></i>)
-        {:else if sorting.order == 'DESC'}
-            (<i class="bi bi-sort-down"></i>)
-        {/if}
-    </div>
-</div>

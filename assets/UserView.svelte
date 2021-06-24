@@ -5,14 +5,17 @@
     import { fetchClusters } from './utils.js';
     import Histogram from './Histogram.svelte';
     import Datatable from './Datatable.svelte';
-    import Filter from './FilterConfig.svelte';
+    import TableControl from './DatatableControl.svelte';
+    import TableInfo from './DatatableInfo.svelte';
 
     export let userInfos;
 
-    let showFilters = false;
     let sorting = { field: "startTime", order: "DESC" };
     let datatable;
     let filterItems = [{ userId: { eq: userInfos.userId } }];
+    let matchedJobs;
+    let appliedFilters;
+    let selectedMetrics;
 
     initClient({
         url: typeof GRAPHQL_BACKEND !== 'undefined'
@@ -64,11 +67,6 @@
     h5 {
         text-align: center;
     }
-
-    input[disabled] {
-        background-color: white;
-        color: #999999;
-    }
 </style>
 
 <Row>
@@ -77,49 +75,11 @@
     </Col>
 </Row>
 <Row>
-    <Col>
-        <div class="d-flex flex-row justify-content-between">
-            <div>
-                <Button outline color=success on:click={() => (showFilters = !showFilters)}><Icon name="filter" /></Button>
-            </div>
-            <div class="input-group w-100 mb-2 mr-sm-2" style="margin-left: 10px;">
-                <div class="input-group-prepend">
-                    <div class="input-group-text"><Icon name="person-circle"/></div>
-                </div>
-                <input type="search" value={userInfos.userId} class="form-control" disabled />
-            </div>
-            {#if userInfos.name}
-            <div class="input-group w-100 mb-2 mr-sm-2" style="margin-left: 10px;">
-                <div class="input-group-prepend">
-                    <div class="input-group-text"><Icon name="person"/></div>
-                </div>
-                <input type="search" value={userInfos.name} class="form-control" disabled />
-            </div>
-            {/if}
-            {#if userInfos.email}
-            <div class="input-group w-100 mb-2 mr-sm-2" style="margin-left: 10px;">
-                <div class="input-group-prepend">
-                    <div class="input-group-text">@</div>
-                </div>
-                <input type="search" value={userInfos.email} class="form-control" disabled />
-            </div>
-            {/if}
-        </div>
-    </Col>
-</Row>
-<Row>
-    <Col>
-        <hr/>
-    </Col>
-</Row>
-<Row>
-    <Col>
-        <Filter {showFilters}
-            clusters={clusters}
-            sorting={sorting}
-            filterRanges={filterRanges}
-            on:update={filtersChanged} />
-    </Col>
+    <TableInfo
+        {appliedFilters}
+        {clusters}
+        {matchedJobs}
+        {userInfos} />
 </Row>
 <Row>
     {#if $statsQuery.fetching}
@@ -177,15 +137,25 @@
 </Row>
 <Row>
     <Col>
-        <hr/>
+        <TableControl
+            {clusters}
+            {metricUnits}
+            {filterRanges}
+            bind:sorting
+            bind:selectedMetrics
+            bind:appliedFilters
+            limitedToUser=true
+            on:update={filtersChanged} />
     </Col>
 </Row>
 <Row>
     <Col>
         <Datatable
             bind:this={datatable}
-            bind:sorting={sorting}
+            bind:sorting
+            bind:matchedJobs
             initialFilterItems={filterItems}
-            metricUnits={metricUnits} />
+            {selectedMetrics}
+            {metricUnits} />
     </Col>
 </Row>
