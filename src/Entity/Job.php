@@ -127,7 +127,7 @@ class Job
     /**
      * The node list of the job.
      *
-     *  @ORM\Column(type="text", nullable=true)
+     *  @ORM\Column(type="text")
      *  @Groups({"read","write"})
      *  @Assert\NotBlank
      */
