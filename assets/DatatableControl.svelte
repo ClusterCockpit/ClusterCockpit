@@ -151,17 +151,14 @@
         <Button outline color=primary on:click={toggleColumnConfig}><Icon name="gear" /></Button>
     </div>
     <div class="me-2">
-        <Button outline on:click={toggleSortConfig}><Icon name="sort-down" /></Button>
-    </div>
-    <div class="pt-2">
-        {sorting.field}
-    </div>
-    <div class="pt-2">
-        {#if sorting.order == 'ASC'}
-            (<Icon name="sort-up"/>)
-        {:else if sorting.order == 'DESC'}
-            (<Icon name="sort-down"/>)
-        {/if}
+        <Button outline on:click={toggleSortConfig}>
+            {#if sorting.order == 'ASC'}
+                <Icon name="sort-up"/>
+            {:else if sorting.order == 'DESC'}
+                <Icon name="sort-down"/>
+            {/if}
+            {sorting.field}
+        </Button>
     </div>
 </div>
 
