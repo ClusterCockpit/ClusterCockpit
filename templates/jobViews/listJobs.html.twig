@@ -22,6 +22,15 @@
     Job List
 {% endblock %}
 
+{% block navitem_joblist %}
+    <li class="nav-item">
+        <a class="nav-link active fs-5" style="color: {{ active_link_color }};" aria-current="page" href="{{ path('list_jobs') }}">
+            Joblist
+            <i class="bi-card-list"></i>
+        </a>
+    </li>
+{% endblock %}
+
 {% block helptext %}
     <h5>Basic usage</h5>
     <p>

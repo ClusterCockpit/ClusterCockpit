@@ -1,20 +1,29 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Job tag counts
+    Job tags
+{% endblock %}
+
+{% block navitem_tags %}
+    <li class="nav-item">
+        <a class="nav-link active fs-5" style="color: {{ active_link_color }};" aria-current="page" href="{{ path('job_tag_types') }}">
+            Tags
+            <i class="bi-tag-fill"></i>
+        </a>
+    </li>
 {% endblock %}
 
 {% block body %}
     <div class="container">
         <div class="row  justify-content-center"">
             <div class="col-10">
-                {% for type, tags in tagHash %}
-                    <div class="my-3 p-2 bg-secondary text-white text-capitalize">
-                        {{ type }}
-                    </div>
-                    {% for tag in tags %}
-                        <a class="btn btn-lg btn-warning m-2" href="{{ path('list_jobs_tag', {id : tag.id}) }}" role="button">
-                            {{ tag.name }}<span class="badge bg-light text-dark ml-3">{{ tag.count }}</span>
+            {% for type, tags in tagHash %}
+                <div class="my-3 p-2 bg-secondary text-white text-capitalize">
+                {{ type }}
+                </div>
+                {% for tag in tags %}
+                    <a class="btn btn-lg btn-warning m-2" href="{{ path('list_jobs_tag', {id : tag.id}) }}" role="button">
+                    {{ tag.name }}<span class="badge bg-light text-dark ml-3">{{ tag.count }}</span>
                         </a>
                     {% endfor %}
                 {% endfor %}

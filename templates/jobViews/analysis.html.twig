@@ -17,6 +17,15 @@
     Job Analysis
 {% endblock %}
 
+{% block navitem_analysis %}
+    <li class="nav-item">
+        <a class="nav-link active fs-5" style="color: {{ active_link_color }};" aria-current="page" href="{{ path('analysis') }}">
+            Analysis
+            <i class="bi-graph-up"></i>
+        </a>
+    </li>
+{% endblock %}
+
 {% block helptext %}
 {% endblock %}
 

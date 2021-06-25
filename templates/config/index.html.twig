@@ -4,6 +4,15 @@
     Config Panel
 {% endblock %}
 
+{% block navitem_settings %}
+    <li class="nav-item">
+        <a class="nav-link active fs-5" style="color: {{ active_link_color }};" aria-current="page" href="{{ path('config_index') }}">
+            Settings
+            <i class="bi-gear-fill"></i>
+        </a>
+    </li>
+{% endblock %}
+
 {% block body %}
     <div class="container" style="margin-top:80px;">
         <div class="row">
