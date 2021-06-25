@@ -71,6 +71,8 @@ class Bootstrap extends Command
         array('general_user_scramble',        'false',  'default', 'Anonymize user names',                '',           ''),
         array('general_user_emailbase', '@mail.de',  'default', 'Email base adress used in user imports', '',           ''),
         array('plot_list_selectedMetrics', 'cpu_load,flops_any,mem_bw', 'default', 'Metrics to show in job list', '', ''),
+        array('analysis_view_histogramMetrics', '["flops_any","mem_bw","mem_used"]', 'default', 'Metrics to show in histograms on analysis view', '', 'Enter a JSON list of metrics'),
+        array('analysis_view_scatterPlotMetrics', '[["flops_any", "mem_bw"], ["flops_any", "cpu_load"], ["cpu_load", "mem_bw"]]', 'default', 'Pairs of metrics to show in scatter plots', '', 'Enter a JSON list of metric pairs')
     );
 
 

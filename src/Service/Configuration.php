@@ -26,6 +26,7 @@
 namespace App\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ConfigurationRepository;
+use App\Entity\Configuration as ConfigEntity;
 
 class Configuration
 {
@@ -51,20 +52,8 @@ class Configuration
 
     public function getUserConfig($user)
     {
-        if ( $this->_isInit == 0 ) {
-            $this->_initConfig();
-        }
-
+        $this->_repository = $this->_em->getRepository(\App\Entity\Configuration::class);
         return $this->_repository->findAllScope(array($user->getUsername()));
-    }
-
-    public function getConfig()
-    {
-        if ( $this->_isInit == 0 ) {
-            $this->_initConfig();
-        }
-
-        return $this->_config;
     }
 
     /*
@@ -72,22 +61,32 @@ class Configuration
      */
     public function setValue($scope, $key, $value)
     {
-        if ( $this->_isInit == 0 ) {
-            $this->_initConfig();
+        $this->_repository = $this->_em->getRepository(\App\Entity\Configuration::class);
+        $config = $this->_repository->findAllScope(array($scope));
+        if (array_key_exists($key, $config)) {
+            $entry = $config[$key];
+            if ( $entry->getScope() == 'default' ) {
+                $entry = clone $entry;
+            }
+
+            $entry->setValue($value);
+            $entry->setScope($scope);
+            $this->_em->persist($entry);
+            $this->_em->flush();
+            return true;
         }
 
-        if ( !array_key_exists ( $key , $this->_config) ) {
-            return false;
-        }
-
-        $configEntry = $this->_repository->findAllScope(array($scope))[$key];
-        if ( $configEntry->getScope() == 'default' ) {
-            $configEntry = clone $configEntry;
-        }
-
-        $configEntry->setValue($value);
-        $configEntry->setScope($scope);
-        $this->_em->persist($configEntry);
+        // This is a new key without a default value.
+        // In a production setup with a fresh database,
+        // this should not happen.
+        $entry = new ConfigEntity();
+        $entry->setName($key);
+        $entry->setValue($value);
+        $entry->setScope($scope);
+        $entry->setValidation("");
+        $entry->setLabel("unkown");
+        $entry->setFeedback("Please ask the DB Admin to set a default value");
+        $this->_em->persist($entry);
         $this->_em->flush();
         return true;
     }
