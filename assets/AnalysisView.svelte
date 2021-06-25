@@ -2,7 +2,7 @@
     import { setContext, getContext, onMount, tick } from 'svelte';
     import { initClient, operationStore, query } from '@urql/svelte';
     import { Spinner, Row, Col, Card, Button, Icon,
-             InputGroup, InputGroupText } from 'sveltestrap';
+             InputGroup, InputGroupText, Input } from 'sveltestrap';
     import Histogram from './Histogram.svelte';
     import ScatterPlot from './ScatterPlot.svelte';
     import RooflinePlot from './RooflinePlot.svelte';
@@ -15,7 +15,7 @@
     const clusterCockpitConfig = getContext('cc-config');
 
     let plotsPerRow = clusterCockpitConfig.plot_view_plotsPerRow || 3;
-    let histogramBins = 50;
+    let histogramBins = {};
     let metricsToFetch = [];
     let showFilters = false;
     let filterConfig;
@@ -97,6 +97,11 @@
         }
     }
 
+    $: {
+        for (let metric of metricsInHistograms)
+            histogramBins[metric] = histogramBins[metric] || 50;
+    }
+
     const metricUnits = {};
     const metricConfig = {};
     setContext('metric-config', metricConfig);
@@ -165,7 +170,7 @@
         }
         max += 1; // So that we have an exclusive range.
 
-        if (numBins == null || numBins < 3 || numBins > 300)
+        if (numBins == null || numBins < 3)
             numBins = 3;
 
         const bins = new Array(numBins).fill(0);
@@ -196,7 +201,8 @@
 
 <style>
     h5 {
-        text-align: center;
+        padding-left: 25px;
+        padding-right: 25px;
     }
 </style>
 
@@ -315,12 +321,25 @@
 {:else if selectedClusterId != null && $statsQuery.data}
     <table style="width: 100%; table-layout: fixed;">
     {#each tilePlots(plotsPerRow, metricsInHistograms.map((metric, idx) =>
-        buildHistogramData($statsQuery.data.jobMetricAverages, metric, histogramBins))) as row}
+        buildHistogramData($statsQuery.data.jobMetricAverages, metric, histogramBins[metric]))) as row}
         <tr>
             {#each row as data}
                 <td>
                     {#if data}
-                        <h5>{data.name} [{metricUnits[data.name]}]</h5>
+                        <h5>
+                            {data.name} [{metricUnits[data.name]}]
+
+                            <span style="float: right;">
+                            <InputGroup size="sm">
+                                <InputGroupText>
+                                    Bins:
+                                </InputGroupText>
+                                <Input style="margin-bottom: 0px;"
+                                    type="number" min="5"
+                                    bind:value={histogramBins[data.name]} />
+                            </InputGroup>
+                            </span>
+                        </h5>
                         <Resizable let:width>
                         {#key data}
                         <Histogram width={width} height={300}
