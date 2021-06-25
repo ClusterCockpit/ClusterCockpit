@@ -29,6 +29,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
@@ -70,8 +71,10 @@ class Job
     /**
      *  The jobId of this job.
      *
-     *  @ORM\Column(type="string")
+     *  @ORM\Column(type="integer")
      *  @Groups({"read","write"})
+     *  @Assert\Positive
+     *  @Assert\NotBlank
      */
     private $jobId;
 
@@ -80,6 +83,7 @@ class Job
      *
      *  @ORM\Column(type="string")
      *  @Groups({"read","write"})
+     *  @Assert\NotBlank
      */
     private $userId;
 
@@ -88,6 +92,7 @@ class Job
      *
      *  @ORM\Column(type="string")
      *  @Groups({"read","write"})
+     *  @Assert\NotBlank
      */
     private $clusterId;
 
@@ -96,6 +101,8 @@ class Job
      *
      *  @ORM\Column(type="integer")
      *  @Groups({"read","write"})
+     *  @Assert\Positive
+     *  @Assert\NotBlank
      */
     public $numNodes;
 
@@ -104,6 +111,8 @@ class Job
      *
      *  @ORM\Column(type="integer")
      *  @Groups({"read","write"})
+     *  @Assert\Positive
+     *  @Assert\NotBlank
      */
     public $startTime;
 
@@ -120,14 +129,14 @@ class Job
      *
      *  @ORM\Column(type="text", nullable=true)
      *  @Groups({"read","write"})
+     *  @Assert\NotBlank
      */
     public $nodeList;
-
-    public $jobCache;
 
     /**
      *  @ORM\Column(type="boolean")
      *  @Groups({"write"})
+     *  @Assert\NotBlank
      */
     public $isRunning;
 
@@ -242,13 +251,17 @@ class Job
 
     public function getNodes($delimiter)
     {
-        $nodes = explode(',', $this->nodeList);
-        return implode($delimiter, $nodes);
+        if ( strcmp($delimiter,'|') === 0 ) {
+            return $this->nodeList;
+        } else {
+            $nodes = explode('|', $this->nodeList);
+            return implode($delimiter, $nodes);
+        }
     }
 
     public function getNodeArray()
     {
-        return explode(',', $this->nodeList);
+        return explode('|', $this->nodeList);
     }
 
     public function getProjectId()

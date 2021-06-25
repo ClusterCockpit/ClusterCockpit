@@ -28,6 +28,7 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
 attributes: [
@@ -53,12 +54,15 @@ class BatchJob
      *
      * @ApiProperty(identifier=true)
      * @Groups({"read"})
+     * @Assert\NotBlank
      */
     public string $jobId;
 
     /**
      * When the job was started in Unix epoch time.
      * @Groups({"read","write"})
+     * @Assert\Positive
+     * @Assert\NotBlank
      *
      */
     public int $stopTime;
