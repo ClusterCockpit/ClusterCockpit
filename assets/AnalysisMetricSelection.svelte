@@ -1,23 +1,32 @@
 <script>
     import { Modal, ModalBody, ModalHeader, ModalFooter, InputGroup,
              Button, ListGroup, ListGroupItem, Icon } from 'sveltestrap';
+    import { mutation } from '@urql/svelte';
 
     export let availableMetrics;
     export let metricsInHistograms;
     export let metricsInScatterplots;
 
+    const updateConfigurationMutation = mutation({
+        query: `mutation($name: String!, $value: String!) {
+            updateConfiguration(name: $name, value: $value)
+        }`
+    });
+
     let isHistogramConfigOpen = false;
     let isScatterPlotConfigOpen = false;
-
     let selectedMetric1 = null, selectedMetric2 = null;
 
-    function checkboxChange(event, m1, m2) {
-        let checked = event.target.checked;
-        if (checked)
-            metricsInScatterplots = [...metricsInScatterplots, [m1, m2]];
-        else
-            metricsInScatterplots = metricsInScatterplots.filter(pair =>
-                !(pair[0] == m1 && pair[1] == m2));
+    function updateConfiguration(data) {
+        console.log('updateConfiguration:', data);
+        updateConfigurationMutation({
+                name: data.name,
+                value: JSON.stringify(data.value)
+            })
+            .then(res => {
+                if (res.error)
+                    console.error(res.error);
+            });
     }
 </script>
 
@@ -43,7 +52,11 @@
             {#each availableMetrics as metric (metric)}
                 <ListGroupItem>
                     <input type="checkbox" bind:group={metricsInHistograms}
-                        value={metric} />
+                        value={metric}
+                        on:change={() => updateConfiguration({
+                            name: 'analysis_view_histogramMetrics',
+                            value: metricsInHistograms
+                        })} />
 
                     {metric}
                 </ListGroupItem>
@@ -70,9 +83,13 @@
                     <b>{pair[0]}</b> / <b>{pair[1]}</b>
 
                     <Button style="float: right;" outline color="danger"
-                        on:click={() => (
-                            metricsInScatterplots = metricsInScatterplots.filter(p => pair != p)
-                        )}>
+                        on:click={() => {
+                            metricsInScatterplots = metricsInScatterplots.filter(p => pair != p);
+                            updateConfiguration({
+                                name: 'analysis_view_scatterPlotMetrics',
+                                value: metricsInScatterplots
+                            });
+                        }}>
                         <Icon name="x" />
                     </Button>
                 </ListGroupItem>
@@ -99,6 +116,10 @@
                     metricsInScatterplots = [...metricsInScatterplots, [selectedMetric1, selectedMetric2]];
                     selectedMetric1 = null;
                     selectedMetric2 = null;
+                    updateConfiguration({
+                        name: 'analysis_view_scatterPlotMetrics',
+                        value: metricsInScatterplots
+                    });
                 }}>
                 Add Plot
             </Button>

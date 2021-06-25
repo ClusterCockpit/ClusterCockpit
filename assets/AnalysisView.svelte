@@ -14,7 +14,7 @@
 
     const clusterCockpitConfig = getContext('cc-config');
 
-    let plotsPerRow = 3;
+    let plotsPerRow = clusterCockpitConfig.plot_view_plotsPerRow || 3;
     let histogramBins = 50;
     let metricsToFetch = [];
     let showFilters = false;
@@ -26,8 +26,10 @@
         ? window.location.hash.substring(1)
         : null;
 
-    let metricsInHistograms = ['flops_any', 'mem_bw', 'cpu_load'];
-    let metricsInScatterplots = [['flops_any', 'mem_bw'], ['flops_any', 'cpu_load'], ['mem_bw', 'cpu_load']];
+    let metricsInHistograms = clusterCockpitConfig.analysis_view_histogramMetrics
+            || ['flops_any', 'mem_bw', 'cpu_load'];
+    let metricsInScatterplots = clusterCockpitConfig.analysis_view_scatterPlotMetrics
+            || [['flops_any', 'mem_bw'], ['flops_any', 'cpu_load'], ['mem_bw', 'cpu_load']];
 
     initClient({
         url: typeof GRAPHQL_BACKEND !== 'undefined'
@@ -220,34 +222,6 @@
                 availableMetrics={Object.keys(metricConfig[selectedClusterId])} />
         {/if}
     </Col>
-    <!-- <Col>
-        <InputGroup>
-            <InputGroupText>
-                Metric Histogram Bins
-            </InputGroupText>
-            <input class="form-control" bind:value={histogramBins} type="number" min="3" max="300" />
-        </InputGroup>
-    </Col>
-    <Col>
-        <InputGroup>
-            <InputGroupText>
-                Roofline Plot Resolution
-            </InputGroupText>
-            <input class="form-control" bind:value={$rooflineHeatmapQuery.variables.rows} type="number" />
-            <InputGroupText>
-                x
-            </InputGroupText>
-            <input class="form-control" bind:value={$rooflineHeatmapQuery.variables.cols} type="number" />
-        </InputGroup>
-    </Col>
-    <Col>
-        <InputGroup>
-            <InputGroupText>
-                Plots per Row
-            </InputGroupText>
-            <input class="form-control" bind:value={plotsPerRow} type="number" />
-        </InputGroup>
-    </Col> -->
 </Row>
 
 <FilterInfo
