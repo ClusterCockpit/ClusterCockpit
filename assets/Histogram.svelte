@@ -82,22 +82,7 @@
         const getCanvasX = (value) => (value / maxValue) * (w - barWidth) + paddingLeft + (barWidth / 2.);
         const getCanvasY = (count) => (h - (count / maxCount) * h) + paddingTop;
 
-        ctx.fillStyle = '#0066cc';
-        for (let p of data) {
-            ctx.fillRect(
-                getCanvasX(p.value) - (barWidth / 2.),
-                getCanvasY(p.count),
-                barWidth,
-                (p.count / maxCount) * h);
-        }
-
-        ctx.beginPath();
-        ctx.moveTo(0, height - paddingBottom);
-        ctx.lineTo(width, height - paddingBottom);
-        ctx.moveTo(paddingLeft, 0);
-        ctx.lineTo(paddingLeft, height- paddingBottom);
-        ctx.stroke();
-
+        // X Axis
         ctx.fillStyle = 'black';
         ctx.textAlign = 'center';
         if (min != null && max != null) {
@@ -117,16 +102,37 @@
             }
         }
 
-        ctx.strokeStyle = `#bbbbbb`;
+        // Y Axis
+        ctx.fillStyle = 'black';
+        ctx.strokeStyle = '#bbbbbb';
         ctx.textAlign = 'right';
         ctx.beginPath();
         const stepsizeY = getStepSize(maxCount, h, 50);
         for (let y = stepsizeY; y <= maxCount; y += stepsizeY) {
-            const py = getCanvasY(y);
+            const py = Math.floor(getCanvasY(y));
             ctx.fillText(`${y}`, paddingLeft - 5, py);
             ctx.moveTo(paddingLeft, py);
             ctx.lineTo(width, py);
         }
+        ctx.stroke();
+
+        // Draw bars
+        ctx.fillStyle = '#0066cc';
+        for (let p of data) {
+            ctx.fillRect(
+                getCanvasX(p.value) - (barWidth / 2.),
+                getCanvasY(p.count),
+                barWidth,
+                (p.count / maxCount) * h);
+        }
+
+        // Fat lines left and below plotting area
+        ctx.strokeStyle = 'black';
+        ctx.beginPath();
+        ctx.moveTo(0, height - paddingBottom);
+        ctx.lineTo(width, height - paddingBottom);
+        ctx.moveTo(paddingLeft, 0);
+        ctx.lineTo(paddingLeft, height- paddingBottom);
         ctx.stroke();
     }
 
