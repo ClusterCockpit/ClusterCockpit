@@ -12,6 +12,7 @@
     export let jobMetrics;
 
     const fontSize = 12;
+    const fontFamily = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
     const metricConfig = getContext('metric-config')[cluster.clusterID];
 
     let ctx;
@@ -62,6 +63,9 @@
     ];
 
     function render() {
+        if (!width || Number.isNaN(width))
+            return;
+
         const centerX = width / 2;
         const centerY = height / 2 - 15;
         const radius = (Math.min(width, height) / 2) - 40;
@@ -80,18 +84,26 @@
         ctx.stroke();
 
         // Axis
-        ctx.font = `${fontSize}px sans-serif`;
+        ctx.font = `${fontSize}px ${fontFamily}`;
         ctx.textAlign = 'center';
-        ctx.fillText('1/3', centerX + radius * 0.333, centerY + 15);
-        ctx.fillText('2/3', centerX + radius * 0.666, centerY + 15);
-        ctx.fillText('1.0', centerX + radius * 1.0, centerY + 15);
+        ctx.fillText('1/3',
+            Math.floor(centerX + radius * 0.333),
+            Math.floor(centerY + 15));
+        ctx.fillText('2/3',
+            Math.floor(centerX + radius * 0.666),
+            Math.floor(centerY + 15));
+        ctx.fillText('1.0',
+            Math.floor(centerX + radius * 1.0),
+            Math.floor(centerY + 15));
 
         // Label text and straight lines from center
         for (let i = 0; i < labels.length; i++) {
             const angle = 2 * Math.PI * ((i + 1) / labels.length);
             const dx = Math.cos(angle) * radius;
             const dy = Math.sin(angle) * radius;
-            ctx.fillText(labels[i], centerX + dx * 1.1, centerY + dy * 1.1);
+            ctx.fillText(labels[i],
+                Math.floor(centerX + dx * 1.1),
+                Math.floor(centerY + dy * 1.1));
 
             ctx.beginPath();
             ctx.moveTo(centerX, centerY);

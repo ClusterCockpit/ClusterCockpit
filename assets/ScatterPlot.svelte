@@ -5,6 +5,7 @@
 <script context="module">
     const axesColor = '#aaaaaa';
     const fontSize = 12;
+    const fontFamily = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
     const paddingLeft = 40,
         paddingRight = 10,
         paddingTop = 10,
@@ -39,11 +40,19 @@
     }
 
     function render(ctx, X, Y, xLabel, yLabel, width, height) {
+        if (width <= 0)
+            return;
+
         const [minX, minY] = [0., 0.];
-        const maxX = X.reduce((maxX, x) => Math.max(maxX, x), minX);
-        const maxY = Y.reduce((maxY, y) => Math.max(maxY, y), minY);
+        let maxX = X.reduce((maxX, x) => Math.max(maxX, x), minX);
+        let maxY = Y.reduce((maxY, y) => Math.max(maxY, y), minY);
         const w = width - paddingLeft - paddingRight;
         const h = height - paddingTop - paddingBottom;
+
+        if (maxX == 0 && maxY == 0) {
+            maxX = 1;
+            maxY = 1;
+        }
 
         /* Value -> Pixel-Coordinate */
         const getCanvasX = (x) => {
@@ -57,14 +66,16 @@
 
         // Axes
         ctx.strokeStyle = axesColor;
-        ctx.font = `${fontSize}px sans-serif`;
+        ctx.font = `${fontSize}px ${fontFamily}`;
         ctx.beginPath();
         const stepsizeX = getStepSize(maxX, w, 75);
         for (let x = minX, i = 0; x <= maxX; i++) {
             let px = getCanvasX(x);
             let text = formatNumber(x);
             let textWidth = ctx.measureText(text).width;
-            ctx.fillText(text, px - (textWidth / 2), height - paddingBottom + fontSize + 5);
+            ctx.fillText(text,
+                Math.floor(px - (textWidth / 2)),
+                height - paddingBottom + fontSize + 5);
             ctx.moveTo(px, paddingTop - 5);
             ctx.lineTo(px, height - paddingBottom + 5);
 
@@ -72,7 +83,7 @@
         }
         if (xLabel) {
             let textWidth = ctx.measureText(xLabel).width;
-            ctx.fillText(xLabel, (width / 2) - (textWidth / 2), height - 20);
+            ctx.fillText(xLabel, Math.floor((width / 2) - (textWidth / 2)), height - 20);
         }
 
         ctx.textAlign = 'center';
@@ -92,7 +103,7 @@
         }
         if (yLabel) {
             ctx.save();
-            ctx.translate(15, height / 2);
+            ctx.translate(15, Math.floor(height / 2));
             ctx.rotate(-Math.PI / 2);
             ctx.fillText(yLabel, 0, 0);
             ctx.restore();

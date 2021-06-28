@@ -5,7 +5,7 @@
     `xs`.
 -->
 <script>
-    let width = 100;
+    let width = 0;
 </script>
 
 <div bind:clientWidth={width}>

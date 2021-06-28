@@ -5,6 +5,7 @@
 <script context="module">
     const axesColor = '#aaaaaa';
     const fontSize = 12;
+    const fontFamily = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
     const paddingLeft = 40,
         paddingRight = 10,
         paddingTop = 10,
@@ -67,6 +68,9 @@
     }
 
     function render(ctx, data, cluster, width, height) {
+        if (width <= 0)
+            return;
+
         const [minX, maxX, minY, maxY] = [0.01, 1000, 1., cluster.flopRateSimd];
         const w = width - paddingLeft - paddingRight;
         const h = height - paddingTop - paddingBottom;
@@ -110,15 +114,15 @@
             const tileWidth = Math.ceil(w / cols);
             const tileHeight = Math.ceil(h / rows);
 
-            const max = data.tiles.reduce((max, row) =>
+            let max = data.tiles.reduce((max, row) =>
                 Math.max(max, row.reduce((max, val) =>
                     Math.max(max, val)), 0), 0);
 
-            // const transform = x => Math.log(1. + x);
-            const transform = x => x;
+            if (max == 0)
+                max = 1;
 
             const tileColor = val => {
-                let hexcol = Math.floor((transform(val) / transform(max)) * 0xff);
+                let hexcol = Math.floor((val / max) * 0xff);
                 let rgb = (0xff - hexcol).toString(16).padStart(2, '0');
                 return `#FF${rgb}${rgb}`;
             };
@@ -137,13 +141,15 @@
         // Axes
         ctx.fillStyle = 'black';
         ctx.strokeStyle = axesColor;
-        ctx.font = `${fontSize}px sans-serif`;
+        ctx.font = `${fontSize}px ${fontFamily}`;
         ctx.beginPath();
         for (let x = minX, i = 0; x <= maxX; i++) {
             let px = getCanvasX(x);
             let text = formatNumber(x);
             let textWidth = ctx.measureText(text).width;
-            ctx.fillText(text, px - (textWidth / 2), height - paddingBottom + fontSize + 5);
+            ctx.fillText(text,
+                Math.floor(px - (textWidth / 2)),
+                height - paddingBottom + fontSize + 5);
             ctx.moveTo(px, paddingTop - 5);
             ctx.lineTo(px, height - paddingBottom + 5);
 
@@ -151,7 +157,7 @@
         }
         if (data.xLabel) {
             let textWidth = ctx.measureText(data.xLabel).width;
-            ctx.fillText(data.xLabel, (width / 2) - (textWidth / 2), height - 20);
+            ctx.fillText(data.xLabel, Math.floor((width / 2) - (textWidth / 2)), height - 20);
         }
 
         ctx.textAlign = 'center';
@@ -170,7 +176,7 @@
         }
         if (data.yLabel) {
             ctx.save();
-            ctx.translate(15, height / 2);
+            ctx.translate(15, Math.floor(height / 2));
             ctx.rotate(-Math.PI / 2);
             ctx.fillText(data.yLabel, 0, 0);
             ctx.restore();

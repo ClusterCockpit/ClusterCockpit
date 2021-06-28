@@ -25,6 +25,8 @@
     export let max = null;
     export let label = (value) => value.toString();
 
+    const fontSize = 12;
+    const fontFamily = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
     const paddingLeft = 35,
         paddingRight = 20,
         paddingTop = 20,
@@ -83,12 +85,13 @@
         const getCanvasY = (count) => (h - (count / maxCount) * h) + paddingTop;
 
         // X Axis
+        ctx.font = `${fontSize}px ${fontFamily}`;
         ctx.fillStyle = 'black';
         ctx.textAlign = 'center';
         if (min != null && max != null) {
             const stepsizeX = getStepSize(max - min, w, 75);
             let startX = 0;
-            while (stepsizeX > 0 && startX < min)
+            while (startX < min)
                 startX += stepsizeX;
 
             for (let x = startX; x < max; x += stepsizeX) {
