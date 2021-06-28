@@ -1,4 +1,5 @@
-import { getClient } from '@urql/svelte';
+import { initClient, getClient } from '@urql/svelte';
+import { readable } from 'svelte/store';
 
 export function getColorForTag(tag) {
     /* TODO: Make this configurable? */
@@ -35,69 +36,76 @@ export function fuzzySearchTags(term, tags) {
     });
 }
 
-/*
- * Fetch a list of all clusters and build:
- *
- * metricConfig[<clusterId>][<metricName>] = { name, unit, preak, ... };
- * metricUnits[<metricName>] = unit
- */
-export async function fetchClusters(metricConfig = {}, metricUnits = {}) {
-    const query = getClient().query(`query {
-            clusters {
-                clusterID,
-                flopRateScalar,
-                flopRateSimd,
-                memoryBandwidth,
-                metricConfig {
-                    name
-                    unit
-                    peak
-                    normal
-                    caution
-                    alert
-                }
-                filterRanges {
-                    duration { from, to }
-                    numNodes { from, to }
-                    startTime { from, to }
-                }
+export const clustersQuery = readable({ fetching: true }, (set) => {
+    initClient({
+        url: typeof GRAPHQL_BACKEND !== 'undefined'
+        ? GRAPHQL_BACKEND
+        : `${window.location.origin}/query`
+    });
+
+    const query = `
+    query {
+        clusters {
+            clusterID,
+            flopRateScalar,
+            flopRateSimd,
+            memoryBandwidth,
+           metricConfig {
+                name, unit, peak,
+                normal, caution, alert
             }
             filterRanges {
                 duration { from, to }
                 numNodes { from, to }
                 startTime { from, to }
             }
-        }`);
-
-    const res = await query.toPromise();
-    if (res.error)
-        throw res.error;
-
-    for (let cluster of res.data.clusters) {
-        metricConfig[cluster.clusterID] = {};
-        for (let config of cluster.metricConfig) {
-            metricConfig[cluster.clusterID][config.name] = config;
-
-            if (metricUnits[config.name] == null) {
-                metricUnits[config.name] = config.unit;
-                continue;
-            }
-
-            if (metricUnits[config.name] == config.unit)
-                continue;
-
-            metricUnits[config.name] += ', ' + config.unit;
-            console.warn(`unit for metric '${config.name}' differs: ${metricUnits[config.name]}`);
         }
-    }
+        filterRanges {
+            duration { from, to }
+            numNodes { from, to }
+            startTime { from, to }
+        }
+        tags { id, tagName, tagType }
+    }`;
 
-    return {
-        clusters: res.data.clusters,
-        filterRanges: res.data.filterRanges,
-        metricConfig,
-        metricUnits
-    };
-}
+    getClient().query(query).toPromise().then(({ error, data }) => {
+        if (error) {
+            console.error(error);
+            return set({ error });
+        }
+
+        const metricConfig = {};
+        const metricUnits = {};
+
+        for (let cluster of data.clusters) {
+            metricConfig[cluster.clusterID] = {};
+            for (let config of cluster.metricConfig) {
+                metricConfig[cluster.clusterID][config.name] = config;
+
+                if (metricUnits[config.name] == null) {
+                    metricUnits[config.name] = config.unit;
+                    continue;
+                }
+
+                if (metricUnits[config.name] == config.unit)
+                    continue;
+
+                metricUnits[config.name] += ', ' + config.unit;
+                console.warn(`unit for metric '${config.name}' differs: ${metricUnits[config.name]}`);
+            }
+        }
+
+        set({
+            tags: data.tags,
+            clusters: data.clusters,
+            filterRanges: data.filterRanges,
+            metricConfig,
+            metricUnits
+        });
+    })
+
+    return () => {};
+});
 
 export function tilePlots(plotsPerRow, arr) {
     let rows = [], i = 0;

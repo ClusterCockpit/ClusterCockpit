@@ -1,6 +1,6 @@
 <script>
-    import { setContext, getContext, onMount, tick } from 'svelte';
-    import { initClient, operationStore, query } from '@urql/svelte';
+    import { setContext, getContext, tick } from 'svelte';
+    import { operationStore, query } from '@urql/svelte';
     import { Spinner, Row, Col, Card, Button, Icon,
              InputGroup, InputGroupText, Input } from 'sveltestrap';
     import Histogram from './Histogram.svelte';
@@ -10,7 +10,7 @@
     import FilterInfo from './DatatableInfo.svelte';
     import Resizable from './Resizable.svelte';
     import MetricSelection from './AnalysisMetricSelection.svelte';
-    import { fetchClusters, tilePlots } from './utils.js';
+    import { clustersQuery, tilePlots } from './utils.js';
 
     const clusterCockpitConfig = getContext('cc-config');
 
@@ -31,11 +31,10 @@
     let metricsInScatterplots = clusterCockpitConfig.analysis_view_scatterPlotMetrics
             || [['flops_any', 'mem_bw'], ['flops_any', 'cpu_load'], ['mem_bw', 'cpu_load']];
 
-    initClient({
-        url: typeof GRAPHQL_BACKEND !== 'undefined'
-            ? GRAPHQL_BACKEND
-            : `${window.location.origin}/query`
-    });
+    const metricConfig = {};
+    $: Object.assign(metricConfig, $clustersQuery.metricConfig);
+    setContext('metric-config', metricConfig);
+    setContext('clusters-query', clustersQuery);
 
     const statsQuery = operationStore(`
         query($filter: JobFilterList!, $metrics: [String!]!) {
@@ -102,28 +101,19 @@
             histogramBins[metric] = histogramBins[metric] || 50;
     }
 
-    const metricUnits = {};
-    const metricConfig = {};
-    setContext('metric-config', metricConfig);
+    if (selectedClusterId != null)
+        clustersQuery.subscribe(({ clusters }) => {
+            if (!clusters)
+                return;
 
-    let clusters = null;
-    let filterRanges = null;
-    fetchClusters(metricConfig, metricUnits)
-        .then(res => {
-            clusters = res.clusters;
-            filterRanges = res.filterRanges;
+            selectedCluster = clusters.find(c => c.clusterID == selectedClusterId);
 
-            if (selectedClusterId != null) {
-                selectedCluster = clusters.find(c => c.clusterID == selectedClusterId);
+            tick().then(() => filterConfig.setCluster(selectedClusterId));
 
-                tick().then(() => filterConfig.setCluster(selectedClusterId));
-
-                updateQueries([
-                    { clusterId: { eq: selectedClusterId } }
-                ]);
-            }
-        })
-        .catch(err => console.error(err));
+            updateQueries([
+                { clusterId: { eq: selectedClusterId } }
+            ]);
+        });
 
     async function updateQueries(filterItems) {
         $statsQuery.variables.filter = { list: filterItems };
@@ -142,7 +132,7 @@
     }
 
     function filtersChanged(event) {
-        if (!clusters)
+        if (!$clustersQuery.clusters)
             throw new Error('clusters-GraphQL-Query not finished!');
 
         let filterItems = event.detail.filterItems;
@@ -153,7 +143,7 @@
             return;
         }
 
-        selectedCluster = clusters.find(c => c.clusterID == selectedClusterId);
+        selectedCluster = $clustersQuery.clusters.find(c => c.clusterID == selectedClusterId);
         window.location.hash = `#${selectedClusterId}`;
         updateQueries(filterItems);
     }
@@ -214,8 +204,6 @@
 <FilterConfig
     bind:this={filterConfig}
     {showFilters}
-    {clusters}
-    {filterRanges}
     bind:appliedFilters
     on:update={filtersChanged} />
 
@@ -226,7 +214,7 @@
             <Icon name="filter" />
         </Button>
 
-        {#if selectedClusterId != null && clusters != null}
+        {#if selectedClusterId != null && $clustersQuery.clusters != null}
             <MetricSelection
                 bind:metricsInHistograms
                 bind:metricsInScatterplots
@@ -237,7 +225,6 @@
 
 <FilterInfo
     {appliedFilters}
-    {clusters}
     {matchedJobs} />
 
 {#if selectedClusterId == null}
@@ -332,7 +319,7 @@
                 <td>
                     {#if data}
                         <h5>
-                            {data.name} [{metricUnits[data.name]}]
+                            {data.name} [{$clustersQuery.metricUnits[data.name]}]
 
                             <span style="float: right;">
                             <InputGroup size="sm">
@@ -372,8 +359,8 @@
                         <ScatterPlot width={width} height={300}
                             X={buildScatterData($statsQuery.data.jobMetricAverages, pair[0])}
                             Y={buildScatterData($statsQuery.data.jobMetricAverages, pair[1])}
-                            xLabel={`${pair[0]} [${metricUnits[pair[0]]}]`}
-                            yLabel={`${pair[1]} [${metricUnits[pair[1]]}]`} />
+                            xLabel={`${pair[0]} [${$clustersQuery.metricUnits[pair[0]]}]`}
+                            yLabel={`${pair[1]} [${$clustersQuery.metricUnits[pair[1]]}]`} />
                         {/key}
                         </Resizable>
                     {/if}

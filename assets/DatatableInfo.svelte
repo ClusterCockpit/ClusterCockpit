@@ -3,11 +3,13 @@
     import InfoBox  from './InfoBox.svelte';
     import Tag from './Tag.svelte';
     import { defaultFilters } from './FilterConfig.svelte';
+    import { getContext } from 'svelte';
 
     export let appliedFilters = defaultFilters;
     export let matchedJobs;
-    export let clusters;
     export let userInfos = null;
+
+    const clustersQuery = getContext('clusters-query');
 
     function formatDuration({ hours, min }) {
         hours = hours.toString().padStart(2, '0');
@@ -37,7 +39,7 @@
 
     <InfoBox icon="cpu">
         {appliedFilters["cluster"] == null
-        ? (clusters || []).map(c => c.clusterID).join(', ')
+        ? ($clustersQuery.clusters || []).map(c => c.clusterID).join(', ')
         : appliedFilters["cluster"]}
     </InfoBox>
 

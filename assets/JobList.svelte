@@ -1,18 +1,16 @@
 <script>
-    import { initClient } from '@urql/svelte';
     import { setContext } from 'svelte';
     import Datatable from './Datatable.svelte';
     import TableControl from './DatatableControl.svelte';
     import TableInfo from './DatatableInfo.svelte';
-    import { fetchClusters } from './utils.js';
+    import { clustersQuery } from './utils.js';
 
     export let filterPresets;
 
-    initClient({
-        url: typeof GRAPHQL_BACKEND !== 'undefined'
-        ? GRAPHQL_BACKEND
-        : `${window.location.origin}/query`
-    });
+    const metricConfig = {};
+    $: Object.assign(metricConfig, $clustersQuery.metricConfig);
+    setContext('metric-config', metricConfig);
+    setContext('clusters-query', clustersQuery);
 
     let sorting = { field: "startTime", order: "DESC" };
     let datatable;
@@ -23,18 +21,6 @@
 
     if (filterPresets && filterPresets.tagId)
         filterItems.push({ tags: [ filterPresets.tagId ] });
-
-    const metricUnits = {};
-    const metricConfig = {};
-    setContext('metric-config', metricConfig);
-
-    let clusters = null;
-    let filterRanges = null;
-    fetchClusters(metricConfig, metricUnits).then(res => {
-        clusters = res.clusters;
-        filterRanges = res.filterRanges;
-        metricUnits = metricUnits;
-    }, err => console.error(err));
 
     function filtersChanged(event) {
         if (event.detail && event.detail.filterItems) {
@@ -53,13 +39,9 @@
 
 <TableInfo
     {appliedFilters}
-    {clusters}
     {matchedJobs}/>
 
 <TableControl
-    {clusters}
-    {metricUnits}
-    {filterRanges}
     {filterPresets}
     bind:appliedFilters
     bind:sorting
@@ -71,5 +53,4 @@
     bind:matchedJobs
     initialFilterItems={filterItems}
     {selectedMetrics}
-    {metricUnits}
     {sorting} />

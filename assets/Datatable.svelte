@@ -6,11 +6,12 @@
     import JobMetricPlots from './JobMetricPlots.svelte';
     import { getContext } from 'svelte';
 
-    export let metricUnits; /* Metric units to show in table header. */
-    export let sorting; /* Used as output variable if changed and initial sorting. */
-    export let initialFilterItems; /* Can be empty, or for example used to restrict initially fetched jobs to single user. */
-    export let matchedJobs; /* Used as output variable (So that it can be passed to the FilterConfig) */
     const clusterCockpitConfig = getContext('cc-config');
+    const clustersQuery = getContext('clusters-query');
+
+    export let sorting; /* Used as output variable if changed and initial sorting. */
+    export let initialFilterItems = []; /* Can be empty, or for example used to restrict initially fetched jobs to single user. */
+    export let matchedJobs; /* Used as output variable (So that it can be passed to the FilterConfig) */
     export let selectedMetrics = clusterCockpitConfig.plot_list_selectedMetrics.split(',').map(s => s.trim());
 
     let itemsPerPage = 10;
@@ -110,8 +111,8 @@
                             <th class="position-sticky top-0 text-center" scope="col"
                                                                           style="width: {plotWidth}px">
                                 {metric}
-                                {#if metricUnits[metric]}
-                                    [{metricUnits[metric]}]
+                                {#if $clustersQuery.metricUnits && $clustersQuery.metricUnits[metric]}
+                                    [{$clustersQuery.metricUnits[metric]}]
                                 {/if}
                             </th>
                         {/each}

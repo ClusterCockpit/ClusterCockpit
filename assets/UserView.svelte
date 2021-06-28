@@ -2,7 +2,7 @@
     import { initClient, operationStore, query } from '@urql/svelte';
     import { Col, Row, Table, Card, Spinner, Button, Icon } from 'sveltestrap';
     import { setContext } from 'svelte';
-    import { fetchClusters } from './utils.js';
+    import { clustersQuery } from './utils.js';
     import Histogram from './Histogram.svelte';
     import Datatable from './Datatable.svelte';
     import TableControl from './DatatableControl.svelte';
@@ -16,12 +16,6 @@
     let matchedJobs;
     let appliedFilters;
     let selectedMetrics;
-
-    initClient({
-        url: typeof GRAPHQL_BACKEND !== 'undefined'
-            ? GRAPHQL_BACKEND
-            : `${window.location.origin}/query`
-    });
 
     const statsQuery = operationStore(`
     query($filter: JobFilterList!) {
@@ -50,17 +44,10 @@
         datatable.applyFilters(filterItems);
     }
 
-    const metricUnits = {};
     const metricConfig = {};
+    $: Object.assign(metricConfig, $clustersQuery.metricConfig);
     setContext('metric-config', metricConfig);
-
-    let clusters = null;
-    let filterRanges = null;
-    fetchClusters(metricConfig, metricUnits).then(res => {
-        clusters = res.clusters;
-        filterRanges = res.filterRanges;
-        metricUnits = metricUnits;
-    }, err => console.error(err));
+    setContext('clusters-query', clustersQuery);
 </script>
 
 <style>
@@ -77,7 +64,6 @@
 <Row>
     <TableInfo
         {appliedFilters}
-        {clusters}
         {matchedJobs}
         {userInfos} />
 </Row>
@@ -138,9 +124,6 @@
 <Row>
     <Col>
         <TableControl
-            {clusters}
-            {metricUnits}
-            {filterRanges}
             bind:sorting
             bind:selectedMetrics
             bind:appliedFilters
@@ -155,7 +138,6 @@
             bind:sorting
             bind:matchedJobs
             initialFilterItems={filterItems}
-            {selectedMetrics}
-            {metricUnits} />
+            {selectedMetrics} />
     </Col>
 </Row>

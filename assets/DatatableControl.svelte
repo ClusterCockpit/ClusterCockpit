@@ -7,10 +7,7 @@
 
     const clusterCockpitConfig = getContext('cc-config');
 
-    export let clusters;
     export let sorting;
-    export let metricUnits;
-    export let filterRanges;
     export let appliedFilters;
     export let filterPresets = null;
     export let limitedToUser = false;
@@ -124,14 +121,11 @@
 
 <ColumnConfig
     bind:isOpen={columnConfigOpen}
-    metrics={Object.keys(metricUnits)}
     bind:selectedMetrics={selectedMetrics} />
 
 <Filter
     showFilters={filterConfigOpen}
     bind:appliedFilters
-    {clusters}
-    {filterRanges}
     {filterPresets}
     on:update />
 

@@ -106,19 +106,16 @@
     import { getColorForTag, fuzzySearchTags } from './utils.js';
     import { createEventDispatcher, getContext } from "svelte";
     import { Col, Row, FormGroup, Button, Input,
-        ListGroup, ListGroupItem, Card, Alert, Spinner, Icon } from 'sveltestrap';
+        ListGroup, ListGroupItem, Spinner } from 'sveltestrap';
     import DoubleRangeSlider from './DoubleRangeSlider.svelte';
-    import { operationStore, query } from '@urql/svelte';
 
     export let showFilters; /* Hide/Show the filters */
-    export let clusters; /* Array of all clusters as returned by the GraphQL-Query (including filterRanges!) */
-    export let filterRanges; /* Global filter ranges for all clusters */
     export let filterPresets = null;
     export let appliedFilters = defaultFilters;
 
-    function deepCopy(obj) {
-        return JSON.parse(JSON.stringify(obj));
-    }
+    const clustersQuery = getContext('clusters-query');
+    const dispatch = createEventDispatcher();
+    const deepCopy = (obj) => JSON.parse(JSON.stringify(obj));
 
     // Has to be called after the clusters value resolved!
     export function setCluster(clusterId) {
@@ -128,29 +125,6 @@
     }
 
     let filters = deepCopy(defaultFilters);
-
-    let tagsQuery = operationStore(`
-        query {
-            tags {
-                id,
-                tagName,
-                tagType
-            }
-        }
-    `);
-
-    query(tagsQuery);
-
-    $: {
-        if (filterPresets && filterPresets.tagId != null && $tagsQuery.data) {
-            let tag = $tagsQuery.data.tags.find(tag => tag.id == filterPresets.tagId);
-            console.assert(tag, "Don't just put random IDs in the URL!");
-            appliedFilters.tags[tag.id] = tag;
-            filters.tags[tag.id] = tag;
-        }
-    }
-
-    const dispatch = createEventDispatcher();
 
     let tagFilterTerm = '';
     let filteredTags = [];
@@ -163,9 +137,8 @@
             { from: 0, to: 0 }
         ]
     };
-    let metricConfig = getContext('metric-config');
 
-    $: filteredTags = fuzzySearchTags(tagFilterTerm, $tagsQuery.data && $tagsQuery.data.tags);
+    $: filteredTags = fuzzySearchTags(tagFilterTerm, $clustersQuery && $clustersQuery.tags);
 
     function fromRFC3339(rfc3339) {
         let parts = rfc3339.split('T');
@@ -184,22 +157,22 @@
 
     function getPeakValue(metric) {
         if (filters.cluster)
-            return metricConfig[filters.cluster][metric].peak;
+            return $clustersQuery.metricConfig[filters.cluster][metric].peak;
 
-        return clusters.reduce((max, c) =>
-            Math.max(max, metricConfig[c.clusterID][metric].peak), 0);
+        return $clustersQuery.clusters.reduce((max, c) =>
+            Math.max(max, $clustersQuery.metricConfig[c.clusterID][metric].peak), 0);
     }
 
     /* Gets called when a cluster is selected
      * and once the filterRanges have been loaded (via GraphQL).
      */
     function updateRanges() {
-        if (!filterRanges || !clusters)
+        if (!$clustersQuery.filterRanges || !$clustersQuery.clusters)
             return;
 
         let ranges = filters.cluster
-            ? clusters.find(c => c.clusterID == filters.cluster).filterRanges
-            : filterRanges;
+            ? $clustersQuery.clusters.find(c => c.clusterID == filters.cluster).filterRanges
+            : $clustersQuery.filterRanges;
 
         currentRanges.numNodes = ranges.numNodes;
 
@@ -242,17 +215,22 @@
         }
     }
 
-    /* Later used for 'Reset' button: */
-    function setDefaultFilters() {
-        if (!filterRanges)
-            return null;
+    // For whatever reason, the generated code for the UI
+    // elements calls `$$invalidate(*, $clustersQuery)`, so
+    // thats why we need this variable. Might not be needed once
+    // Svelte stops invalidanting.
+    let initCalled = false;
+    const init = () => {
+        if (!$clustersQuery.clusters || initCalled)
+            return;
 
+        initCalled = true;
+
+        let filterRanges = $clustersQuery.filterRanges;
         defaultFilters.numNodes.from = filterRanges.numNodes.from;
         defaultFilters.numNodes.to = filterRanges.numNodes.to;
-
         defaultFilters.startTime.from = fromRFC3339(filterRanges.startTime.from);
         defaultFilters.startTime.to = fromRFC3339(filterRanges.startTime.to);
-
         defaultFilters.duration.from = secondsToHours(filterRanges.duration.from);
         defaultFilters.duration.to = secondsToHours(filterRanges.duration.to);
 
@@ -261,10 +239,18 @@
 
         appliedFilters = defaultFilters;
         filters = deepCopy(defaultFilters);
-    }
 
-    $: setDefaultFilters(filterRanges);
-    $: updateRanges(filterRanges, clusters);
+        if (filterPresets && filterPresets.tagId != null) {
+            let tag = $clustersQuery.tags.find(tag => tag.id == filterPresets.tagId);
+            console.assert(tag != null, `'${filterPresets.tagId}' does not exist`);
+            appliedFilters.tags[tag.id] = tag;
+            filters.tags[tag.id] = tag;
+        }
+
+        updateRanges($clustersQuery);
+    };
+
+    $: init($clustersQuery);
 
     function handleReset( ) {
         tagFilterTerm = '';
@@ -422,7 +408,7 @@
                                    on:change={updateRanges} />
                             All
                         </ListGroupItem>
-                        {#each (clusters || []) as cluster}
+                        {#each ($clustersQuery.clusters || []) as cluster}
                             <ListGroupItem>
                                 <input type="radio" value={cluster.clusterID}
                                        bind:group={filters["cluster"]}
@@ -455,27 +441,19 @@
             </Row>
             <Row>
                 <Col>
-                    {#if $tagsQuery.fetching}
-                        <div class="d-flex justify-content-center">
-                            <Spinner secondary />
-                        </div>
-                    {:else if $tagsQuery.error}
-                        <Card body color="danger" class="mb-3"><h2>Error: {$tagsQuery.error.message}</h2></Card>
-                    {:else}
-                        <ul class="list-group tags-list">
-                            {#each filteredTags as tag}
-                                <ListGroupItem class="{filters["tags"][tag.id] ? 'active' : ''}">
-                                    <span class="cc-tag badge rounded-pill {getColorForTag(tag)}" on:click={_ => handleTagSelection(tag)}>
-                                        {tag.tagType}: {tag.tagName}
-                                    </span>
-                                </ListGroupItem>
-                            {/each}
-                        </ul>
-                        <input
-                            class="tags-search-input" type="text"
-                            placeholder="Search Tags (Click to Select)"
-                            bind:value={tagFilterTerm}>
-                    {/if}
+                    <ul class="list-group tags-list">
+                        {#each filteredTags as tag}
+                            <ListGroupItem class="{filters["tags"][tag.id] ? 'active' : ''}">
+                                <span class="cc-tag badge rounded-pill {getColorForTag(tag)}" on:click={_ => handleTagSelection(tag)}>
+                                    {tag.tagType}: {tag.tagName}
+                                </span>
+                            </ListGroupItem>
+                        {/each}
+                    </ul>
+                    <input
+                        class="tags-search-input" type="text"
+                        placeholder="Search Tags (Click to Select)"
+                        bind:value={tagFilterTerm} />
                 </Col>
             </Row>
         </Col>
