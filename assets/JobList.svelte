@@ -6,6 +6,8 @@
     import TableInfo from './DatatableInfo.svelte';
     import { fetchClusters } from './utils.js';
 
+    export let filterPresets;
+
     initClient({
         url: typeof GRAPHQL_BACKEND !== 'undefined'
         ? GRAPHQL_BACKEND
@@ -19,6 +21,9 @@
     let appliedFilters;
     let selectedMetrics;
 
+    if (filterPresets && filterPresets.tagId)
+        filterItems.push({ tags: [ filterPresets.tagId ] });
+
     const metricUnits = {};
     const metricConfig = {};
     setContext('metric-config', metricConfig);
@@ -30,12 +35,6 @@
         filterRanges = res.filterRanges;
         metricUnits = metricUnits;
     }, err => console.error(err));
-
-    let initialFilterTagId = null;
-    if (window.location.hash.startsWith('#tag=')) {
-        initialFilterTagId = window.location.hash.substring(5);
-        filterItems.push({ tags: [ initialFilterTagId ] });
-    }
 
     function filtersChanged(event) {
         if (event.detail && event.detail.filterItems) {
@@ -61,7 +60,7 @@
     {clusters}
     {metricUnits}
     {filterRanges}
-    {initialFilterTagId}
+    {filterPresets}
     bind:appliedFilters
     bind:sorting
     bind:selectedMetrics

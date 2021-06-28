@@ -3,6 +3,6 @@
     export let tag; /* { id: String, tagType: String, tagName: String } */
 </script>
 
-<a target="_blank" href="/monitoring/jobs/#tag={tag.id}">
+<a target="_blank" href="/monitoring/tag/{tag.id}">
     <span class="cc-tag badge rounded-pill {getColorForTag(tag)}">{tag.tagType}: {tag.tagName}</span>
 </a>

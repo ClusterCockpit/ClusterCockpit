@@ -8,6 +8,10 @@
 
 {% block javascript %}
     <script>
+        const filterPresets = {{ (filterPresets is defined)
+                ? filterPresets | json_encode | raw
+                : "null" }};
+
         const clusterCockpitConfigPromise = Promise.resolve({
             plot_general_colorscheme: {{ colormap | json_encode | raw }},
             plot_general_lineWidth: {{ config.plot_general_lineWidth.value }},

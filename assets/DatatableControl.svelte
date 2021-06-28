@@ -12,7 +12,7 @@
     export let metricUnits;
     export let filterRanges;
     export let appliedFilters;
-    export let initialFilterTagId = null;
+    export let filterPresets = null;
     export let limitedToUser = false;
     export let selectedMetrics = clusterCockpitConfig.plot_list_selectedMetrics.split(',').map(s => s.trim());
 
@@ -132,7 +132,7 @@
     bind:appliedFilters
     {clusters}
     {filterRanges}
-    {initialFilterTagId}
+    {filterPresets}
     on:update />
 
 <div class="d-flex flex-row">

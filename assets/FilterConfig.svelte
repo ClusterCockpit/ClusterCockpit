@@ -113,13 +113,14 @@
     export let showFilters; /* Hide/Show the filters */
     export let clusters; /* Array of all clusters as returned by the GraphQL-Query (including filterRanges!) */
     export let filterRanges; /* Global filter ranges for all clusters */
-    export let initialFilterTagId = null; /* If set, jobs are filtered by this tag from the start */
+    export let filterPresets = null;
     export let appliedFilters = defaultFilters;
 
     function deepCopy(obj) {
         return JSON.parse(JSON.stringify(obj));
     }
 
+    // Has to be called after the clusters value resolved!
     export function setCluster(clusterId) {
         filters.cluster = clusterId;
         updateRanges();
@@ -141,8 +142,8 @@
     query(tagsQuery);
 
     $: {
-        if (initialFilterTagId != null && $tagsQuery.data) {
-            let tag = $tagsQuery.data.tags.find(tag => tag.id == initialFilterTagId);
+        if (filterPresets && filterPresets.tagId != null && $tagsQuery.data) {
+            let tag = $tagsQuery.data.tags.find(tag => tag.id == filterPresets.tagId);
             console.assert(tag, "Don't just put random IDs in the URL!");
             appliedFilters.tags[tag.id] = tag;
             filters.tags[tag.id] = tag;

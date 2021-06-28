@@ -164,8 +164,10 @@ class JobViewController extends AbstractController
     }
 
     public function listTag(
-        JobTag $id,
-        Configuration $configuration
+        JobTag $tag,
+        Configuration $configuration,
+        ColorMap $colorMaps,
+        $projectDir
     )
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
@@ -174,6 +176,7 @@ class JobViewController extends AbstractController
 
         return $this->render('jobViews/listJobs.html.twig',
             array(
+                'filterPresets' => array('tagId' => $tag->getId()),
                 'config' => $config,
                 'colormap' => $colorMaps->getColorMap()
             ));

@@ -6,6 +6,9 @@ import JobList from './JobList.svelte';
      */
     new JobList({
         target: document.getElementById('svelte-app'),
+        props: {
+            filterPresets: filterPresets
+        },
         context: new Map([
             ['cc-config', await clusterCockpitConfigPromise]
         ])
