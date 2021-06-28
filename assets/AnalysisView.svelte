@@ -164,11 +164,16 @@
         let stats = data[idx];
 
         let min = Number.MAX_VALUE, max = -min;
-        for (let s of stats) {
-            min = Math.min(min, s);
-            max = Math.max(max, s);
+        if (stats.length == 0) {
+            min = 0;
+            max = 0;
+        } else {
+            for (let s of stats) {
+                min = Math.min(min, s);
+                max = Math.max(max, s);
+            }
+            max += 1; // So that we have an exclusive range.
         }
-        max += 1; // So that we have an exclusive range.
 
         if (numBins == null || numBins < 3)
             numBins = 3;
