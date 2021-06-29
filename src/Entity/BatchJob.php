@@ -59,7 +59,8 @@ class BatchJob
     public string $jobId;
 
     /**
-     * When the job was started in Unix epoch time.
+     * When the job stopped in Unix epoch time seconds.
+     *
      * @Groups({"read","write"})
      * @Assert\Positive
      * @Assert\NotBlank
@@ -69,6 +70,7 @@ class BatchJob
 
     /**
      * The job object
+     *
      * @Groups({"read"})
      */
     public $job;

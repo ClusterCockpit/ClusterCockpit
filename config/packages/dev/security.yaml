@@ -13,14 +13,6 @@ security:
                 property: apiToken
 
     firewalls:
-        # rest_api:
-        #     pattern: ^/api
-        #     stateless: true
-        #     provider: db_api_provider
-        #     guard:
-        #       authenticators:
-        #         - App\Security\TokenAuthenticator
-
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
@@ -37,7 +29,6 @@ security:
                     - App\Security\LoginFormAuthenticator
                     - App\Security\LdapAuthenticator
                 entry_point: App\Security\LoginFormAuthenticator
-
 
     access_control:
         - { path: ^/monitoring, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}

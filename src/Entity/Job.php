@@ -61,6 +61,8 @@ attributes: [
 class Job
 {
     /**
+     *  The db id of this job.
+     *
      *  @ORM\Column(type="integer")
      *  @ORM\Id
      *  @ORM\GeneratedValue(strategy="AUTO")
@@ -107,7 +109,7 @@ class Job
     public $numNodes;
 
     /**
-     * When the job was started.
+     * When the job was started in unxi epoch time seconds.
      *
      *  @ORM\Column(type="integer")
      *  @Groups({"read","write"})
@@ -117,7 +119,7 @@ class Job
     public $startTime;
 
     /**
-     * The duration of the job.
+     * The duration of the job in seconds.
      *
      *  @ORM\Column(type="integer")
      *  @Groups({"read","write"})
@@ -125,7 +127,7 @@ class Job
     public $duration = 0;
 
     /**
-     * The node list of the job.
+     * The node list of the job as string list separated by | character.
      *
      *  @ORM\Column(type="text")
      *  @Groups({"read","write"})
@@ -134,6 +136,8 @@ class Job
     public $nodeList;
 
     /**
+     * Boolean flag if job is still running.
+     *
      *  @ORM\Column(type="boolean")
      *  @Groups({"write"})
      *  @Assert\NotBlank
@@ -141,12 +145,16 @@ class Job
     public $isRunning;
 
     /**
+     * The job script.
+     *
      *  @ORM\Column(type="text", nullable=true)
      *  @Groups({"write"})
      */
     private $jobScript;
 
     /**
+     * The userId for this job.
+     *
      *  @ORM\Column(type="text", options={"default":"noProject"})
      *  @Groups({"write"})
      */
