@@ -86,6 +86,10 @@ final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
             throw new HttpException(400, "Stop time earlier than start time");
         }
 
+        if ( $job->isRunning ) {
+            throw new HttpException(400, "Job already finished");
+        }
+
         $job->duration = $stopTime - $job->startTime;
         $job->isRunning = false;
 

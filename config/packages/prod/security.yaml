@@ -38,7 +38,6 @@ security:
                     - App\Security\LdapAuthenticator
                 entry_point: App\Security\LoginFormAuthenticator
 
-
     access_control:
         - { path: ^/monitoring, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
         - { path: ^/config, roles: ROLE_USER }
