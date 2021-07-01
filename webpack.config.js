@@ -13,11 +13,11 @@ Encore
         config.plugins.push('@babel/plugin-transform-runtime');
     })
     .enableSourceMaps(!Encore.isProduction())
-    .addEntry('joblist', './assets/joblist.js')
-    .addEntry('jobview', './assets/jobview.js')
-    .addEntry('userlist', './assets/userlist.js')
-    .addEntry('userview', './assets/userview.js')
-    .addEntry('analysisview', './assets/analysisview.js')
+    .addEntry('joblist', './assets/JobList/entrypoint.js')
+    .addEntry('jobview', './assets/JobView/entrypoint.js')
+    .addEntry('userlist', './assets/UserList/entrypoint.js')
+    .addEntry('userview', './assets/UserView/entrypoint.js')
+    .addEntry('analysisview', './assets/AnalysisView/entrypoint.js')
 ;
 
 let config = Encore.getWebpackConfig();

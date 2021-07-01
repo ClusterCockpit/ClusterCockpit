@@ -2,8 +2,8 @@
     import { mutation } from '@urql/svelte';
     import { Icon, Button, ListGroupItem, Spinner, Modal,
              ModalBody, ModalHeader, ModalFooter, Alert } from 'sveltestrap';
-    import { fuzzySearchTags } from './utils.js';
-    import Tag from './Tag.svelte';
+    import { fuzzySearchTags } from '../Common/utils.js';
+    import Tag from '../Common/Tag.svelte';
 
     export let job;
     export let allTags;

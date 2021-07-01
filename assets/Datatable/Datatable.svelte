@@ -3,7 +3,7 @@
     import { Row, Table, Card, Spinner } from 'sveltestrap';
     import Pagination from './Pagination.svelte';
     import JobMeta from './JobMeta.svelte';
-    import JobMetricPlots from './JobMetricPlots.svelte';
+    import RowOfPlots from './Row.svelte';
     import { getContext } from 'svelte';
 
     const clusterCockpitConfig = getContext('cc-config');
@@ -125,7 +125,7 @@
                                 <JobMeta job={row} />
                             </td>
                             {#if row["hasProfile"]}
-                                <JobMetricPlots
+                                <RowOfPlots
                                     jobId={row["jobId"]}
                                     clusterId={row["clusterId"]}
                                     width={plotWidth}

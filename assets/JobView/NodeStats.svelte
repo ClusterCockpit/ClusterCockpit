@@ -1,7 +1,7 @@
 <script>
     import { getContext } from 'svelte';
     import { Table, Icon, Button } from 'sveltestrap';
-    import ColumnConfig from './ColumnConfig.svelte';
+    import ColumnConfig from '../Common/ColumnConfig.svelte';
 
     export let job;
     export let jobMetrics;

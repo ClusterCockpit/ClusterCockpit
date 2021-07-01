@@ -1,5 +1,5 @@
 <script>
-    import Tag from './Tag.svelte';
+    import Tag from '../Common/Tag.svelte';
 
     export let job;
 

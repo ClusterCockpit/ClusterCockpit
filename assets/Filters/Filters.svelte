@@ -103,12 +103,12 @@
 </script>
 
 <script>
-    import { fuzzySearchTags } from './utils.js';
+    import { fuzzySearchTags } from '../Common/utils.js';
     import { createEventDispatcher, getContext } from "svelte";
     import { Col, Row, FormGroup, Button, Input,
         ListGroup, ListGroupItem, Spinner } from 'sveltestrap';
     import DoubleRangeSlider from './DoubleRangeSlider.svelte';
-    import Tag from './Tag.svelte';
+    import Tag from '../Common/Tag.svelte';
 
     export let showFilters; /* Hide/Show the filters */
     export let filterPresets = null;

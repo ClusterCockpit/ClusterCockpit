@@ -2,8 +2,8 @@
     import { createEventDispatcher, getContext } from "svelte";
     import { Icon, Button, ListGroup, ListGroupItem,
         Modal, ModalBody, ModalHeader, ModalFooter } from 'sveltestrap';
-    import ColumnConfig from './ColumnConfig.svelte';
-    import Filter from './FilterConfig.svelte';
+    import ColumnConfig from '../Common/ColumnConfig.svelte';
+    import Filter from '../Filters/Filters.svelte';
 
     const clusterCockpitConfig = getContext('cc-config');
     const clustersQuery = getContext('clusters-query');

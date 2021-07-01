@@ -1,9 +1,9 @@
 <script>
     import { setContext } from 'svelte';
-    import Datatable from './Datatable.svelte';
-    import TableControl from './DatatableControl.svelte';
-    import TableInfo from './DatatableInfo.svelte';
-    import { clustersQuery } from './utils.js';
+    import Datatable from '../Datatable/Datatable.svelte';
+    import TableControl from '../Filters/Control.svelte';
+    import TableInfo from '../Filters/Info.svelte';
+    import { clustersQuery } from '../Common/utils.js';
 
     export let filterPresets;
 

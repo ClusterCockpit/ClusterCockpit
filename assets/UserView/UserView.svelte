@@ -2,11 +2,11 @@
     import { initClient, operationStore, query } from '@urql/svelte';
     import { Col, Row, Table, Card, Spinner, Button, Icon } from 'sveltestrap';
     import { setContext } from 'svelte';
-    import { clustersQuery } from './utils.js';
-    import Histogram from './Histogram.svelte';
-    import Datatable from './Datatable.svelte';
-    import TableControl from './DatatableControl.svelte';
-    import TableInfo from './DatatableInfo.svelte';
+    import { clustersQuery } from '../Common/utils.js';
+    import Histogram from '../Plots/Histogram.svelte';
+    import Datatable from '../Datatable/Datatable.svelte';
+    import TableControl from '../Filters/Control.svelte';
+    import TableInfo from '../Filters/Info.svelte';
 
     export let userInfos;
 

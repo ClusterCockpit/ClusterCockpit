@@ -1,16 +1,16 @@
 <script>
     import { setContext, getContext } from 'svelte';
     import { Col, Row, Card, Spinner, Button, Icon } from 'sveltestrap';
-    import { tilePlots } from './utils.js';
+    import { tilePlots } from '../Common/utils.js';
     import { initClient, getClient } from '@urql/svelte';
-    import Plot from './Plot.svelte';
-    import RooflinePlot from './RooflinePlot.svelte';
-    import JobMeta from './JobMeta.svelte';
+    import Plot from '../Plots/Timeseries.svelte';
+    import RooflinePlot from '../Plots/Roofline.svelte';
+    import JobMeta from '../Datatable/JobMeta.svelte';
     import NodeStats from './NodeStats.svelte';
     import TagControl from './TagControl.svelte';
-    import PolarPlot from './PolarPlot.svelte';
-    import Resizable from './Resizable.svelte';
-    import ColumnConfig from './ColumnConfig.svelte';
+    import PolarPlot from '../Plots/Polar.svelte';
+    import Resizable from '../Common/Resizable.svelte';
+    import ColumnConfig from '../Common/ColumnConfig.svelte';
 
     export let jobInfos;
 

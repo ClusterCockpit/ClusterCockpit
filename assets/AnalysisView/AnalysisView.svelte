@@ -3,14 +3,14 @@
     import { operationStore, query } from '@urql/svelte';
     import { Spinner, Row, Col, Card, Button, Icon,
              InputGroup, InputGroupText, Input } from 'sveltestrap';
-    import Histogram from './Histogram.svelte';
-    import ScatterPlot from './ScatterPlot.svelte';
-    import RooflinePlot from './RooflinePlot.svelte';
-    import FilterConfig from './FilterConfig.svelte';
-    import FilterInfo from './DatatableInfo.svelte';
-    import Resizable from './Resizable.svelte';
-    import MetricSelection from './AnalysisMetricSelection.svelte';
-    import { clustersQuery, tilePlots } from './utils.js';
+    import Histogram from '../Plots/Histogram.svelte';
+    import ScatterPlot from '../Plots/Scatter.svelte';
+    import RooflinePlot from '../Plots/Roofline.svelte';
+    import FilterConfig from '../Filters/Filters.svelte';
+    import FilterInfo from '../Filters/Info.svelte';
+    import Resizable from '../Common/Resizable.svelte';
+    import PlotSelection from './PlotSelection.svelte';
+    import { clustersQuery, tilePlots } from '../Common/utils.js';
 
     const clusterCockpitConfig = getContext('cc-config');
 
@@ -215,7 +215,7 @@
         </Button>
 
         {#if selectedClusterId != null && $clustersQuery.clusters != null}
-            <MetricSelection
+            <PlotSelection
                 bind:metricsInHistograms
                 bind:metricsInScatterplots
                 availableMetrics={Object.keys(metricConfig[selectedClusterId])} />

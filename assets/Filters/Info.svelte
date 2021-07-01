@@ -1,8 +1,8 @@
 <script>
     import { Alert } from 'sveltestrap';
     import InfoBox  from './InfoBox.svelte';
-    import Tag from './Tag.svelte';
-    import { defaultFilters } from './FilterConfig.svelte';
+    import Tag from '../Common/Tag.svelte';
+    import { defaultFilters } from './Filters.svelte';
     import { getContext } from 'svelte';
 
     export let appliedFilters = defaultFilters;

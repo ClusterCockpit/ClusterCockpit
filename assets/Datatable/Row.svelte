@@ -1,7 +1,7 @@
 <script>
     import { Card, Spinner } from 'sveltestrap';
     import { operationStore, query, getClient } from '@urql/svelte';
-    import Plot from './Plot.svelte';
+    import Plot from '../Plots/Timeseries.svelte';
 
     export let jobId;
     export let clusterId;
