@@ -1,6 +1,6 @@
 <script>
     import { setContext, getContext } from 'svelte';
-    import { Col, Row, Card, Spinner } from 'sveltestrap';
+    import { Col, Row, Card, Spinner, Button, Icon } from 'sveltestrap';
     import { tilePlots } from './utils.js';
     import { initClient, getClient } from '@urql/svelte';
     import Plot from './Plot.svelte';
@@ -10,9 +10,12 @@
     import TagControl from './TagControl.svelte';
     import PolarPlot from './PolarPlot.svelte';
     import Resizable from './Resizable.svelte';
+    import ColumnConfig from './ColumnConfig.svelte';
 
     export let jobInfos;
-    const { clusterId, jobId } = jobInfos;
+
+    const { clusterId } = jobInfos;
+    const clusterCockpitConfig = getContext('cc-config');
 
     let fetching = true;
     let cluster = null;
@@ -22,8 +25,10 @@
     let jobMetrics = null;
     let queryError = null;
     let plotHeight = 400;
-
-    const clusterCockpitConfig = getContext('cc-config');
+    let metricSelectionOpen = false;
+    let selectedMetrics = clusterCockpitConfig.job_view_selectedMetrics
+        ? clusterCockpitConfig.job_view_selectedMetrics.split(',').map(s => s.trim())
+        : ['flops_any', 'mem_bw', 'mem_used'];
     const plotsPerRow = clusterCockpitConfig.plot_view_plotsPerRow;
 
     const metricConfig = {};
@@ -138,13 +143,26 @@
     <Row>
         <Col xs="4">
             <JobMeta job={job} />
+            <br/>
+
             <TagControl bind:job={job} allTags={allTags} />
+
+            <ColumnConfig
+                configName="job_view_selectedMetrics"
+                bind:isOpen={metricSelectionOpen}
+                bind:selectedMetrics={selectedMetrics} />
+
+            <Button outline color="secondary"
+                on:click={() => (metricSelectionOpen = !metricSelectionOpen)}>
+                Select Metrics
+                <Icon name="graph-up" />
+            </Button>
         </Col>
         <Col xs="4">
             {#if clusterCockpitConfig.plot_view_showPolarplot}
                 <Resizable let:width>
                 <PolarPlot
-                    metrics={[ 'flops_any',  'mem_bw', 'mem_used', 'ib_bw', 'lustre_bw' ]}
+                    metrics={[ 'flops_any',  'mem_bw', 'mem_used', 'net_bw', 'file_bw' ]}
                     cluster={cluster} jobMetrics={jobMetrics}
                     width={width} height={plotHeight} />
                 </Resizable>
@@ -163,7 +181,7 @@
     </Row>
     <br/>
     <table style="width: 100%; table-layout: fixed;">
-    {#each tilePlots(plotsPerRow, metrics.map(metric =>
+    {#each tilePlots(plotsPerRow, selectedMetrics.map(metric =>
             jobMetrics.find(m => m.name == metric) || { name: metric })) as row}
         <tr>
             {#each row as metric}

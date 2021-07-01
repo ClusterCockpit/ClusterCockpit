@@ -1,19 +1,20 @@
 <script>
     import { getContext } from 'svelte';
-    import { Table, Icon, Button,
-             ListGroup, ListGroupItem,
-             Modal, ModalBody, ModalHeader, ModalFooter } from 'sveltestrap';
+    import { Table, Icon, Button } from 'sveltestrap';
+    import ColumnConfig from './ColumnConfig.svelte';
 
     export let job;
     export let jobMetrics;
 
+    const clusterCockpitConfig = getContext('cc-config');
     const metricConfig = getContext('metric-config')[job.clusterId];
-    const metrics = Object.keys(metricConfig);
 
     let nodes = jobMetrics[0].metric.series.map(s => s.node_id);
-    let selectedMetrics = [...metrics];
     let columnConfigOpen = false;
     let currentSorting = null;
+    let selectedMetrics = clusterCockpitConfig.job_view_nodestats_selectedMetrics
+        ? clusterCockpitConfig.job_view_nodestats_selectedMetrics.split(',').map(s => s.trim())
+        : ['flops_any', 'mem_bw', 'mem_used'];
 
     function getStats(metric, nodeId) {
         let data = jobMetrics.find(m => m.name === metric);
@@ -25,10 +26,6 @@
 
         console.assert(series != null);
         return series.statistics;
-    }
-
-    function toggleColumnConfig() {
-        columnConfigOpen = !columnConfigOpen;
     }
 
     function changeNodeSorting(metric, stat, event) {
@@ -55,35 +52,24 @@
 </script>
 
 <style media="screen">
-    td {
+    td, th {
         text-align: center;
     }
 </style>
 
-<Modal isOpen={columnConfigOpen} toggle={toggleColumnConfig}>
-    <ModalHeader>
-        Select Metrics
-    </ModalHeader>
-    <ModalBody>
-        <ListGroup>
-            {#each metrics as metric}
-                <ListGroupItem>
-                    <input type="checkbox" bind:group={selectedMetrics} value="{metric}"/>
-                    {metric}
-                </ListGroupItem>
-            {/each}
-        </ListGroup>
-    </ModalBody>
-    <ModalFooter>
-        <Button color="primary" on:click={toggleColumnConfig}>Close</Button>
-    </ModalFooter>
-</Modal>
+<ColumnConfig
+    configName="job_view_nodestats_selectedMetrics"
+    bind:isOpen={columnConfigOpen}
+    bind:selectedMetrics={selectedMetrics} />
 
 <Table>
     <thead>
         <tr>
             <th>
-                <Button outline on:click={toggleColumnConfig}><Icon name="gear" /></Button>
+                <Button outline
+                    on:click={() => (columnConfigOpen = !columnConfigOpen)}>
+                    <Icon name="gear" />
+                </Button>
             </th>
             {#each selectedMetrics as metric}
                 <th scope="col" colspan="3">
@@ -93,7 +79,7 @@
         </tr>
         <tr>
             <th>Nodes</th>
-            {#each selectedMetrics as metric}
+            {#each selectedMetrics as metric (metric)}
                 {#each ['min', 'max', 'avg'] as stat}
                     <th scope="col">
                         {stat}
@@ -107,7 +93,7 @@
         </tr>
     </thead>
     <tbody>
-        {#each nodes as nodeId (nodeId)}
+        {#each nodes as nodeId}
             <tr>
                 <th scope="row">{nodeId}</th>
                 {#each selectedMetrics.map(metric => getStats(metric, nodeId)) as stats}
