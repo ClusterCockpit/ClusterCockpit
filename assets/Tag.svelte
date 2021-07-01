@@ -1,8 +1,17 @@
 <script>
-    import { getColorForTag, fuzzySearchTags } from './utils.js';
     export let tag; /* { id: String, tagType: String, tagName: String } */
 </script>
 
-<a target="_blank" href="/monitoring/tag/{tag.id}">
-    <span class="cc-tag badge rounded-pill {getColorForTag(tag)}">{tag.tagType}: {tag.tagName}</span>
+<style>
+    a {
+        margin-left: 0.5rem;
+        line-height: 2;
+    }
+    span {
+        font-size: 0.9rem;
+    }
+</style>
+
+<a target="_blank" href="{tag.id != null ? "/monitoring/tag/" + tag.id : "#"}">
+    <span class="badge bg-warning text-dark">{tag.tagType}: {tag.tagName}</span>
 </a>

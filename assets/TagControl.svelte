@@ -1,8 +1,7 @@
 <script>
     import { mutation } from '@urql/svelte';
-    import { Icon, Button, ListGroup, ListGroupItem, Spinner,
-             Modal, ModalBody, ModalHeader, ModalFooter, Alert,
-             Input, InputGroup, InputGroupText, } from 'sveltestrap';
+    import { Icon, Button, ListGroupItem, Spinner, Modal,
+             ModalBody, ModalHeader, ModalFooter, Alert } from 'sveltestrap';
     import { fuzzySearchTags } from './utils.js';
     import Tag from './Tag.svelte';
 
@@ -11,21 +10,14 @@
 
     let newTagType = '';
     let newTagName = '';
-    let createDeleteTagsOpen = false;
-    let addRemoveTagsOpen = false;
-    let allTagsFiltered = [...allTags];
-    let allTagsFilterTerm = '';
+    let allTagsFiltered;
+    let filterTerm = '';
     let pendingChange = false;
+    let isOpen = false;
 
     const createTagMutation = mutation({
         query: `mutation($type: String!, $name: String!) {
             createTag(type: $type, name: $name) { id, tagType, tagName }
-        }`
-    });
-
-    const deleteTagMutation = mutation({
-        query: `mutation($id: ID!) {
-            deleteTag(id: $id)
         }`
     });
 
@@ -41,11 +33,23 @@
         }`
     });
 
-    $: allTagsFiltered = fuzzySearchTags(allTagsFilterTerm, allTags);
+    $: allTagsFiltered = fuzzySearchTags(filterTerm, allTags);
+
+    $: {
+        newTagType = '';
+        newTagName = '';
+        if (allTagsFiltered.length == 0) {
+            let parts = filterTerm.split(':').map(s => s.trim());
+            if (parts.length == 2 && parts.every(s => s.length > 1)) {
+                newTagType = parts[0];
+                newTagName = parts[1];
+            }
+        }
+    }
 
     function createTag(tagType, tagName) {
         pendingChange = true;
-        createTagMutation({ type: tagType, name: tagName })
+        return createTagMutation({ type: tagType, name: tagName })
             .then(res => {
                 if (res.error)
                     throw res.error;
@@ -53,22 +57,8 @@
                 pendingChange = false;
                 allTags.push(res.data.createTag);
                 allTags = allTags; // Let Svelte do its magic...
+                return res.data.createTag;
             }, err => console.error(err));
-    }
-
-    function deleteTag(tag) {
-        pendingChange = true;
-        deleteTagMutation({ id: tag.id })
-            .then(res => {
-                if (res.error)
-                    throw res.error;
-
-                pendingChange = false;
-                allTags = allTags.filter(({ id }) => id != tag.id);
-                job.tags = job.tags.filter(({ id }) => id != tag.id);
-                job = job; // Let Svelte do its magic...
-            })
-            .catch(err => console.error(err));
     }
 
     function addTagToJob(tag) {
@@ -100,81 +90,48 @@
     }
 </script>
 
-<Modal isOpen={createDeleteTagsOpen} toggle={() => (createDeleteTagsOpen = !createDeleteTagsOpen)}>
+<style>
+    ul.list-group {
+        max-height: 450px;
+        margin-bottom: 10px;
+        overflow: scroll;
+    }
+</style>
+
+<Modal {isOpen} toggle={() => (isOpen = !isOpen)}>
     <ModalHeader>
-        Create/Delete Tags
-        {#if pendingChange === true}
-            <Spinner secondary />
+        Manage Tags
+        {#if pendingChange !== false}
+            <Spinner size="sm" secondary />
+        {:else}
+            <Icon name="tags" />
         {/if}
     </ModalHeader>
     <ModalBody>
         <input style="width: 100%;"
-            type="text" placeholder="Fuzzy Search Tags"
-            bind:value={allTagsFilterTerm} />
+            type="text" placeholder="Search Tags"
+            bind:value={filterTerm} />
 
-        <Alert color="warning">
-            Warning: Deleting a tag here will also remove
-            the tag from <b>all</b> jobs!
+        <Alert color="info">
+            Search using "<code>type: name</code>". If no tag matches your search,
+            a button for creating a new one will appear.
         </Alert>
 
-        <ListGroup>
-            {#each allTagsFiltered as tag}
-                <ListGroupItem>
-                    <Tag tag={tag}/>
-
-                    <span style="float: right;">
-                        <Button outline color="danger"
-                            on:click={() => deleteTag(tag)}>
-                            <Icon name="x-circle" />
-                        </Button>
-                    </span>
-                </ListGroupItem>
-            {:else}
-                <ListGroupItem disabled>
-                    <i>No Tags</i>
-                </ListGroupItem>
-            {/each}
-        </ListGroup>
-        <br/>
-        <InputGroup>
-            <Input type="text" bind:value={newTagType} placeholder="Tag Type" />
-            <Input type="text" bind:value={newTagName} placeholder="Tag Name" />
-            <Button
-                disabled={!newTagType || !newTagName || pendingChange !== false ? 'disabled' : undefined}
-                outline on:click={() => createTag(newTagType, newTagName)}>
-                Create Tag
-            </Button>
-        </InputGroup>
-    </ModalBody>
-    <ModalFooter>
-        <Button color="primary" on:click={() => (createDeleteTagsOpen = false)}>Close</Button>
-    </ModalFooter>
-</Modal>
-
-<Modal isOpen={addRemoveTagsOpen} toggle={() => (addRemoveTagsOpen = !addRemoveTagsOpen)}>
-    <ModalHeader>
-        Add/Remove Tags
-    </ModalHeader>
-    <ModalBody>
-        <input style="width: 100%;"
-            type="text" placeholder="Fuzzy Search Tags"
-            bind:value={allTagsFilterTerm} />
-
-        <ListGroup>
+        <ul class="list-group">
             {#each allTagsFiltered as tag}
                 <ListGroupItem>
                     <Tag tag={tag}/>
 
                     <span style="float: right;">
                         {#if pendingChange === tag.id}
-                            <Spinner secondary />
+                            <Spinner size="sm" secondary />
                         {:else if job.tags.find(t => t.id == tag.id)}
-                            <Button outline color="danger"
+                            <Button size="sm" outline color="danger"
                                 on:click={() => removeTagFromJob(tag)}>
                                 <Icon name="x" />
                             </Button>
                         {:else}
-                            <Button outline color="success"
+                            <Button size="sm" outline color="success"
                                 on:click={() => addTagToJob(tag)}>
                                 <Icon name="plus" />
                             </Button>
@@ -183,22 +140,30 @@
                 </ListGroupItem>
             {:else}
                 <ListGroupItem disabled>
-                    <i>No Tags</i>
+                    <i>No tags matching</i>
                 </ListGroupItem>
             {/each}
-        </ListGroup>
+        </ul>
+        <br/>
+        {#if allTagsFiltered.length === 0}
+            {#if newTagType && newTagName}
+                <Button outline color="success"
+                    on:click={e => (e.preventDefault(), createTag(newTagType, newTagName))
+                        .then(tag => addTagToJob(tag))}>
+
+                    Create & Add Tag:
+                    <Tag tag={({ tagType: newTagType, tagName: newTagName })}></Tag>
+                </Button>
+            {:else}
+                <Alert>Search Term is not a valid Tag (<code>type: name</code>)</Alert>
+            {/if}
+        {/if}
     </ModalBody>
     <ModalFooter>
-        <Button color="primary" on:click={() => (addRemoveTagsOpen = false)}>Close</Button>
+        <Button color="primary" on:click={() => (isOpen = false)}>Close</Button>
     </ModalFooter>
 </Modal>
 
-<Button outline on:click={() => (addRemoveTagsOpen = true)}>
-    Add/Remove Tag to this Job
-    <Icon name="tag" />
-</Button>
-
-<Button outline on:click={() => (createDeleteTagsOpen = true)}>
-    Create/Delete Tags
-    <Icon name="tags" />
+<Button outline on:click={() => (isOpen = true)}>
+    Manage Tags <Icon name="tags" />
 </Button>

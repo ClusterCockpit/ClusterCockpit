@@ -1,17 +1,6 @@
 import { initClient, getClient } from '@urql/svelte';
 import { readable } from 'svelte/store';
 
-export function getColorForTag(tag) {
-    /* TODO: Make this configurable? */
-    if (tag.tagType == 'pathological' || tag.tagName == 'pathological')
-        return 'bg-danger';
-
-    if (tag.tagType == 'bottleneck' || tag.tagName == 'bottleneck')
-        return 'bg-warning';
-
-    return 'bg-info';
-}
-
 function fuzzyMatch(term, string) {
     return string.toLowerCase().includes(term);
 }
@@ -22,8 +11,7 @@ export function fuzzySearchTags(term, tags) {
 
     let results = [];
     for (let tag of tags) {
-        if (fuzzyMatch(term, tag.tagType) ||
-            fuzzyMatch(term, tag.tagName))
+        if (fuzzyMatch(term, `${tag.tagType}: ${tag.tagName}`))
             results.push(tag);
     }
 

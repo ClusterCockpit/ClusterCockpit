@@ -103,11 +103,12 @@
 </script>
 
 <script>
-    import { getColorForTag, fuzzySearchTags } from './utils.js';
+    import { fuzzySearchTags } from './utils.js';
     import { createEventDispatcher, getContext } from "svelte";
     import { Col, Row, FormGroup, Button, Input,
         ListGroup, ListGroupItem, Spinner } from 'sveltestrap';
     import DoubleRangeSlider from './DoubleRangeSlider.svelte';
+    import Tag from './Tag.svelte';
 
     export let showFilters; /* Hide/Show the filters */
     export let filterPresets = null;
@@ -286,7 +287,7 @@
 </script>
 
 <style>
-    .cc-tag.badge.rounded-pill {
+    .list-group.tags-list span {
         cursor: pointer;
     }
 
@@ -444,8 +445,8 @@
                     <ul class="list-group tags-list">
                         {#each filteredTags as tag}
                             <ListGroupItem class="{filters["tags"][tag.id] ? 'active' : ''}">
-                                <span class="cc-tag badge rounded-pill {getColorForTag(tag)}" on:click={_ => handleTagSelection(tag)}>
-                                    {tag.tagType}: {tag.tagName}
+                                <span on:click={e => (e.preventDefault(), handleTagSelection(tag))}>
+                                    <Tag tag={tag}/>
                                 </span>
                             </ListGroupItem>
                         {/each}
