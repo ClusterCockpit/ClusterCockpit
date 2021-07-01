@@ -12,7 +12,7 @@
     export let appliedFilters;
     export let filterPresets = null;
     export let limitedToUser = false;
-    export let selectedMetrics = clusterCockpitConfig.plot_list_selectedMetrics.split(',').map(s => s.trim());
+    export let selectedMetrics = clusterCockpitConfig['plot_list_selectedMetrics'];
 
     let filterConfigOpen = false;
     let columnConfigOpen = false;

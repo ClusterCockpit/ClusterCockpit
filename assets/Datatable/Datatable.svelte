@@ -12,7 +12,7 @@
     export let sorting; /* Used as output variable if changed and initial sorting. */
     export let initialFilterItems = []; /* Can be empty, or for example used to restrict initially fetched jobs to single user. */
     export let matchedJobs; /* Used as output variable (So that it can be passed to the FilterConfig) */
-    export let selectedMetrics = clusterCockpitConfig.plot_list_selectedMetrics.split(',').map(s => s.trim());
+    export let selectedMetrics = clusterCockpitConfig['plot_list_selectedMetrics'];
 
     let itemsPerPage = 10;
     let page = 1;

@@ -13,7 +13,7 @@
     let columnConfigOpen = false;
     let currentSorting = null;
     let selectedMetrics = clusterCockpitConfig.job_view_nodestats_selectedMetrics
-        ? clusterCockpitConfig.job_view_nodestats_selectedMetrics.split(',').map(s => s.trim())
+        ? clusterCockpitConfig['job_view_nodestats_selectedMetrics']
         : ['flops_any', 'mem_bw', 'mem_used'];
 
     function getStats(metric, nodeId) {

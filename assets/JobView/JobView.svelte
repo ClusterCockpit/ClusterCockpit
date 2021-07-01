@@ -27,7 +27,7 @@
     let plotHeight = 400;
     let metricSelectionOpen = false;
     let selectedMetrics = clusterCockpitConfig.job_view_selectedMetrics
-        ? clusterCockpitConfig.job_view_selectedMetrics.split(',').map(s => s.trim())
+        ? clusterCockpitConfig['job_view_selectedMetrics']
         : ['flops_any', 'mem_bw', 'mem_used'];
     const plotsPerRow = clusterCockpitConfig.plot_view_plotsPerRow;
 

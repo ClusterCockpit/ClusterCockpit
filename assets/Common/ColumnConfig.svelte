@@ -54,7 +54,7 @@
 
         updateConfiguration({
                 name: configName,
-                value: selectedMetrics.join(',')
+                value: JSON.stringify(selectedMetrics)
             })
             .then(res => {
                 if (res.error)
