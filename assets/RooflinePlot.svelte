@@ -91,53 +91,6 @@
             return Math.round((h - y * h) + paddingTop);
         };
 
-        // Draw Data
-        if (data.x && data.y) {
-            for (let i = 0; i < data.x.length; i++) {
-                let x = data.x[i], y = data.y[i], c = data.c[i];
-                if (x == null || y == null || Number.isNaN(x) || Number.isNaN(y))
-                    continue;
-
-                const s = 3;
-                const px = getCanvasX(x);
-                const py = getCanvasY(y);
-
-                ctx.fillStyle = getRGB(c);
-                ctx.beginPath();
-                ctx.arc(px, py, s, 0, Math.PI * 2, false);
-                ctx.fill();
-            }
-        } else if (data.tiles) {
-            const rows = data.tiles.length;
-            const cols = data.tiles[0].length;
-
-            const tileWidth = Math.ceil(w / cols);
-            const tileHeight = Math.ceil(h / rows);
-
-            let max = data.tiles.reduce((max, row) =>
-                Math.max(max, row.reduce((max, val) =>
-                    Math.max(max, val)), 0), 0);
-
-            if (max == 0)
-                max = 1;
-
-            const tileColor = val => {
-                let hexcol = Math.floor((val / max) * 0xff);
-                let rgb = (0xff - hexcol).toString(16).padStart(2, '0');
-                return `#FF${rgb}${rgb}`;
-            };
-
-            for (let i = 0; i < rows; i++) {
-                for (let j = 0; j < cols; j++) {
-                    let px = paddingLeft + (j / cols) * w;
-                    let py = paddingTop + (h - (i / rows) * h) - tileHeight;
-
-                    ctx.fillStyle = tileColor(data.tiles[i][j]);
-                    ctx.fillRect(px, py, tileWidth, tileHeight);
-                }
-            }
-        }
-
         // Axes
         ctx.fillStyle = 'black';
         ctx.strokeStyle = axesColor;
@@ -182,6 +135,49 @@
             ctx.restore();
         }
         ctx.stroke();
+
+        // Draw Data
+        if (data.x && data.y) {
+            for (let i = 0; i < data.x.length; i++) {
+                let x = data.x[i], y = data.y[i], c = data.c[i];
+                if (x == null || y == null || Number.isNaN(x) || Number.isNaN(y))
+                    continue;
+
+                const s = 3;
+                const px = getCanvasX(x);
+                const py = getCanvasY(y);
+
+                ctx.fillStyle = getRGB(c);
+                ctx.beginPath();
+                ctx.arc(px, py, s, 0, Math.PI * 2, false);
+                ctx.fill();
+            }
+        } else if (data.tiles) {
+            const rows = data.tiles.length;
+            const cols = data.tiles[0].length;
+
+            const tileWidth = Math.ceil(w / cols);
+            const tileHeight = Math.ceil(h / rows);
+
+            let max = data.tiles.reduce((max, row) =>
+                Math.max(max, row.reduce((max, val) =>
+                    Math.max(max, val)), 0), 0);
+
+            if (max == 0)
+                max = 1;
+
+            const tileColor = val => `rgba(255, 0, 0, ${(val / max)})`;
+
+            for (let i = 0; i < rows; i++) {
+                for (let j = 0; j < cols; j++) {
+                    let px = paddingLeft + (j / cols) * w;
+                    let py = paddingTop + (h - (i / rows) * h) - tileHeight;
+
+                    ctx.fillStyle = tileColor(data.tiles[i][j]);
+                    ctx.fillRect(px, py, tileWidth, tileHeight);
+                }
+            }
+        }
 
         // Draw roofs
         ctx.strokeStyle = 'black';
