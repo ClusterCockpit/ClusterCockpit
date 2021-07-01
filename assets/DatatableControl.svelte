@@ -6,6 +6,7 @@
     import Filter from './FilterConfig.svelte';
 
     const clusterCockpitConfig = getContext('cc-config');
+    const clustersQuery = getContext('clusters-query');
 
     export let sorting;
     export let appliedFilters;
@@ -119,9 +120,13 @@
     </ModalFooter>
 </Modal>
 
-<ColumnConfig
-    bind:isOpen={columnConfigOpen}
-    bind:selectedMetrics={selectedMetrics} />
+{#if $clustersQuery.metricConfig}
+    <!-- ColumnConfig will want getContext('metric-config') to be initialized
+         when it is initialising! -->
+    <ColumnConfig
+        bind:isOpen={columnConfigOpen}
+        bind:selectedMetrics={selectedMetrics} />
+{/if}
 
 <Filter
     showFilters={filterConfigOpen}

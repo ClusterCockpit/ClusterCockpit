@@ -6,25 +6,26 @@
 
     export let selectedMetrics;
     export let isOpen;
+    export let configName = 'plot_list_selectedMetrics';
 
-    const clustersQuery = getContext('clusters-query');
+    const metricConfig = getContext('metric-config');
 
-    let newMetricsOrder;
-    let unorderedSelectedMetrics;
-    let columnHovering;
+    let columnHovering = null;
+
+    let metrics = new Set();
+    for (let cluster in metricConfig)
+        for (let metric in metricConfig[cluster])
+            metrics.add(metric);
+
+    let newMetricsOrder = [...metrics].filter(m => !selectedMetrics.includes(m));
+    newMetricsOrder.unshift(...selectedMetrics);
+    let unorderedSelectedMetrics = [...selectedMetrics];
 
     const updateConfiguration = mutation({
         query: `mutation($name: String!, $value: String!) {
             updateConfiguration(name: $name, value: $value)
         }`
     });
-
-    function selectedMetricsChanged(_, metrics) {
-        // The selectedMetrics shall be in order and at the start.
-        newMetricsOrder = metrics.filter(m => !selectedMetrics.includes(m));
-        newMetricsOrder.unshift(...selectedMetrics);
-        unorderedSelectedMetrics = [...selectedMetrics];
-    }
 
     function columnsDragStart(event, i) {
         event.dataTransfer.effectAllowed = 'move';
@@ -43,6 +44,7 @@
             newMetricsOrder.splice(start + 1, 1);
         }
         columnHovering = null;
+        newMetricsOrder = newMetricsOrder;
     }
 
     function closeAndApply() {
@@ -51,7 +53,7 @@
         isOpen = false;
 
         updateConfiguration({
-                name: 'plot_list_selectedMetrics',
+                name: configName,
                 value: selectedMetrics.join(',')
             })
             .then(res => {
@@ -59,9 +61,6 @@
                     console.error(res.error);
             });
     }
-
-    $: selectedMetricsChanged(
-        selectedMetrics, Object.keys($clustersQuery.metricUnits || {}));
 </script>
 
 <style>
@@ -97,8 +96,8 @@
                     {/if}
                     {metric}
                     <span style="float: right;">
-                        {Object.keys($clustersQuery.metricConfig || {})
-                            .filter(c => $clustersQuery.metricConfig[c][metric] != null)
+                        {Object.keys(metricConfig || {})
+                            .filter(c => metricConfig[c][metric] != null)
                             .join(', ')}
                     </span>
                 </li>
