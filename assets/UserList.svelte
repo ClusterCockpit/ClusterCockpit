@@ -12,7 +12,11 @@
     let stopTime = null;
     let clusterId = null;
 
-    let rawStartTime, rawStopTime;
+    const lastMonth = new Date();
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+    let rawStartTime = lastMonth.toISOString().split('T')[0];
+    let rawStopTime = (new Date()).toISOString().split('T')[0];
 
     let sorting = { field: 'totalJobs', direction: 'down' };
 
@@ -54,8 +58,6 @@
 
     $: $usersQuery.variables.clusterId = clusterId;
 
-    query(usersQuery);
-
     let clusters = [];
     getClient()
         .query(`query {
@@ -88,17 +90,23 @@
     }
 
     $: dateSelected(rawStartTime, rawStopTime);
-    $: console.log('user stats filters:', $usersQuery.variables);
 
+    query(usersQuery);
 </script>
 
 <style>
     th[scope="col"] > :global(button) {
         float: right;
     }
+    input, select {
+        margin-bottom: 0px;
+    }
 </style>
 
 <Row>
+    <Col style="display: flex; align-items: center;">
+        Filters on jobs in the statistics:
+    </Col>
     <Col>
         Cluster:
         <select bind:value={clusterId}>
@@ -109,7 +117,7 @@
         </select>
     </Col>
     <Col>
-        Time:
+        Start Time:
         From
         <input type="date" bind:value={rawStartTime} />
         to
