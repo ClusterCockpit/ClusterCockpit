@@ -1,6 +1,6 @@
 <script>
     import { initClient, operationStore, query, getClient } from '@urql/svelte';
-    import { Table, Card, Spinner, Icon, Button, Row, Col } from 'sveltestrap';
+    import { Table, Card, Spinner, Icon, Button, Row, Col, Alert } from 'sveltestrap';
 
     initClient({
         url: typeof GRAPHQL_BACKEND !== 'undefined'
@@ -59,6 +59,7 @@
     $: $usersQuery.variables.clusterId = clusterId;
 
     let clusters = [];
+    let errorMessage = null;
     getClient()
         .query(`query {
             clusters { clusterID }
@@ -66,6 +67,7 @@
         .toPromise()
         .then((res) => {
             if (res.error) {
+                errorMessage = res.error.message;
                 console.error(res.error);
                 return;
             }
@@ -105,7 +107,11 @@
 
 <Row>
     <Col style="display: flex; align-items: center;">
-        Filters on jobs in the statistics:
+        {#if errorMessage == null}
+            Filters on jobs in the statistics:
+        {:else}
+            <Alert color="danger">{errorMessage}</Alert>
+        {/if}
     </Col>
     <Col>
         Cluster:

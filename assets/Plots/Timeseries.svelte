@@ -82,7 +82,8 @@
     export let width;
     export let height;
 
-    const metricConfig = getContext('metric-config')[clusterId][metric];
+    const metricConfig = getContext('metric-config')[clusterId]
+        && getContext('metric-config')[clusterId][metric];
 
     let plotWrapper;
     let uplot = null;

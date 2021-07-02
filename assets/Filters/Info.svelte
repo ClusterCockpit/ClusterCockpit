@@ -1,5 +1,5 @@
 <script>
-    import { Alert } from 'sveltestrap';
+    import { Alert, Spinner } from 'sveltestrap';
     import InfoBox  from './InfoBox.svelte';
     import Tag from '../Common/Tag.svelte';
     import { defaultFilters } from './Filters.svelte';
@@ -19,8 +19,17 @@
 </script>
 
 <div class="d-flex flex-row mb-2">
+{#if $clustersQuery.fetching}
+    <Alert color="light" class="p-2 me-2" fade={false}>
+        <Spinner secondary/>
+    </Alert>
+{:else if $clustersQuery.error}
+    <Alert color="danger" class="p-2 me-2" fade={false}>
+        {$clustersQuery.error}
+    </Alert>
+{:else}
     {#if matchedJobs != null}
-        <Alert class="p-2 me-2" >
+        <Alert class="p-2 me-2" fade={false}>
             Matching {matchedJobs} Jobs
         </Alert>
     {/if}
@@ -81,4 +90,5 @@
             {/each}
         </InfoBox>
     {/if}
+{/if}
 </div>
