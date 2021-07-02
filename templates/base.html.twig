@@ -12,67 +12,84 @@
         <link rel='icon' type='image/png' href="{{ asset('favicon.png') }}" />
     </head>
     <body class="Site" data-id="{{ id|default(0) }}">
+        {% set active_link_color="cornflowerblue" %}
         <header>
             <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-light">
                 <div class="container-fluid">
                     <a class="navbar-brand" href="{{ path('index') }}">
                         {% block brand %}
-                            <img alt="NHR@FAU logo" src="{{ asset('img/nhr-logo.png') }}" class="d-inline-block align-top">
+                            <img alt="NHR@FAU Logo" src="{{ asset('img/logo.png') }}" class="d-inline-block align-top">
                             <img alt="ClusterCockpit Logo" src="{{ asset('img/cc-logo.png') }}" class="d-inline-block align-top">
                         {% endblock %}
                     </a>
                     {% block navigation %}
                         <ul class="navbar-nav mr-auto">
+                            {% block navitem_joblist %}
                             <li class="nav-item">
                                 <a class="nav-link fs-5" href="{{ path('list_jobs') }}">
                                     Joblist
-                                    <i class="bi-list"></i>
+                                    <i class="bi-card-list"></i>
                                 </a>
                             </li>
+                            {% endblock %}
                             {% if is_granted('ROLE_ADMIN') %}
+                            {% block navitem_systems %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('systems') }}">
                                         Systems
                                         <i class="bi-hdd-stack-fill"></i>
                                     </a>
                                 </li>
+                            {% endblock %}
+                            {% block navitem_analysis %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('analysis') }}">
                                         Analysis
                                         <i class="bi-graph-up"></i>
                                     </a>
                                 </li>
+                            {% endblock %}
+                            {% block navitem_users %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('user_stat') }}">
                                         Users
                                         <i class="bi-people-fill"></i>
                                     </a>
                                 </li>
+                            {% endblock %}
+                            {% block navitem_tags %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('job_tag_types') }}">
                                         Tags
                                         <i class="bi-tag-fill"></i>
                                     </a>
                                 </li>
+                            {% endblock %}
+                            {% block navitem_settings %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('config_index') }}">
                                         Settings
                                         <i class="bi-gear-fill"></i>
                                     </a>
                                 </li>
+                            {% endblock %}
                             {% else %}
+                            {% block navitem_stats %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('show_user', {id : app.user.id}) }}">
                                         Statistics
                                         <i class="bi-bar-chart-line-fill"></i>
                                     </a>
                                 </li>
+                            {% endblock %}
+                            {% block navitem_usersettings %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('config_user') }}">
                                         Settings
                                         <i class="bi-gear-fill"></i>
                                     </a>
                                 </li>
+                            {% endblock %}
                             {% endif %}
                         </ul>
                         <button type="button" class="btn btn-outline-secondary fs-6"  href="#helpmodal"  data-toggle="modal" data-target="#helpmodal">

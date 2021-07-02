@@ -28,20 +28,24 @@ namespace App\Service;
 use App\Entity\Job;
 use App\Service\ClusterConfiguration;
 use App\Repository\InfluxDBMetricDataRepository;
+#use App\Repository\InfluxDBv2MetricDataRepository;
 
 class JobData
 {
     private $_metricDataRepository;
+    #private $_metricDataRepositoryV2;
     private $_clusterCfg;
     private $projectDir;
 
     public function __construct(
         InfluxDBMetricDataRepository $metricRepo,
+        #InfluxDBv2MetricDataRepository $metricRepoV2,
         ClusterConfiguration $clusterCfg,
         $projectDir
     )
     {
         $this->_metricDataRepository = $metricRepo;
+        #$this->_metricDataRepositoryV2 = $metricRepoV2;
         $this->_clusterCfg = $clusterCfg;
         $this->_rootdir = "$projectDir/var/job-archive";
     }
@@ -66,10 +70,17 @@ class JobData
             $this->_getJobDataPath($job->getJobId(),
             $job->getClusterId()));
 
+        # V1 Repository-Code for InfluxDB 1.*
         if (!$job->hasProfile){
             $this->_metricDataRepository->hasProfile($job,
             $this->_clusterCfg->getSingleMetric($job->getClusterId()));
         }
+
+        # V2 Repository-Code for InfluxDB 2.*
+        #if (!$job->hasProfile){
+        #    $this->_metricDataRepositoryV2->hasProfile($job,
+        #    $this->_clusterCfg->getSingleMetric($job->getClusterId()));
+        #}
 
         return $job->hasProfile;
     }

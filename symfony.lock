@@ -407,6 +407,9 @@
     "symfony/inflector": {
         "version": "v4.1.1"
     },
+    "symfony/intl": {
+        "version": "v5.2.10"
+    },
     "symfony/ldap": {
         "version": "v4.1.3"
     },
@@ -439,9 +442,6 @@
     },
     "symfony/orm-pack": {
         "version": "v1.0.5"
-    },
-    "symfony/password-hasher": {
-        "version": "v5.3.2"
     },
     "symfony/phpunit-bridge": {
         "version": "4.1",

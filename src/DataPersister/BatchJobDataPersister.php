@@ -25,6 +25,7 @@
 
 namespace App\DataPersister;
 
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use Psr\Log\LoggerInterface;
@@ -82,7 +83,11 @@ final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
         }
 
         if ( $stopTime < $job->startTime  ) {
-            throw new HttpException(400, "Stop time before start time");
+            throw new HttpException(400, "Stop time earlier than start time");
+        }
+
+        if ( $job->isRunning ) {
+            throw new HttpException(400, "Job already finished");
         }
 
         $job->duration = $stopTime - $job->startTime;

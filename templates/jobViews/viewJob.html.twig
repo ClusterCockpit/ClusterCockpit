@@ -1,7 +1,7 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Job {{ job.jobId }}
+    View job {{ job.jobId }}
 {% endblock %}
 
 {% block stylesheets %}
@@ -25,7 +25,13 @@
             plot_view_showRoofline: {{ config.plot_view_showRoofline.value }},
             plot_view_showPolarplot: {{ config.plot_view_showPolarplot.value }},
             plot_view_showStatTable: {{ config.plot_view_showStatTable.value }},
-            plot_view_plotsPerRow: {{ config.plot_view_plotsPerRow.value }}
+            plot_view_plotsPerRow: {{ config.plot_view_plotsPerRow.value }},
+            job_view_selectedMetrics: {{ (config.job_view_selectedMetrics is defined)
+                ? config.job_view_selectedMetrics.value | raw
+                : "null" }},
+            job_view_nodestats_selectedMetrics: {{ (config.job_view_nodestats_selectedMetrics is defined)
+                ? config.job_view_nodestats_selectedMetrics.value | raw
+                : "null" }},
         });
     </script>
     {{ encore_entry_script_tags('jobview') }}

@@ -288,39 +288,30 @@ class JobRepository extends ServiceEntityRepository
             }
         }
 
-        // TODO/FIXME: Change Table Layout?
-        $sql = "
-        SELECT DISTINCT job.user_id, user.id FROM job
-        JOIN user ON user.username = job.user_id
-        ";
+        $sql = "SELECT id, username as user_id FROM user;";
         $rows = $this->_connection->fetchAll($sql);
-        $mapping = array();
         foreach ($rows as $row) {
-            $mapping[$row['user_id']] = $row['id'];
-        }
+            if (isset($users[$row['user_id']])) {
+                $user = &$users[$row['user_id']];
+                $user['id'] = $row['id'];
+                $user['userId'] = $row['user_id'];
+                $user['totalWalltime'] = 0;
+                $user['totalJobs'] = 0;
+                $user['totalCoreHours'] = 0;
 
-        foreach ( $users as $id => &$user ){
-            /* TODO Remove workaround */
-            if ( is_null($id) ){
-                $id = 1;
-            }
-            $user['id'] = $mapping[$id];
-            $user['userId'] = $id;
-            $user['totalWalltime'] = 0;
-            $user['totalJobs'] = 0;
-            $user['totalCoreHours'] = 0;
-
-            foreach ( $clusters as $cluster ){
-                if (isset($user[ $cluster['clusterID'] ])) {
-                    $user['totalWalltime'] += $user[ $cluster['clusterID'] ]['totalWalltime'];
-                    $user['totalCoreHours'] += $user[ $cluster['clusterID'] ]['coreHours'];
-                    $user['totalJobs'] += $user[ $cluster['clusterID'] ]['totalJobs'];
+                foreach ( $clusters as $cluster ){
+                    if (isset($user[ $cluster['clusterID'] ])) {
+                        $user['totalWalltime'] += $user[ $cluster['clusterID'] ]['totalWalltime'];
+                        $user['totalCoreHours'] += $user[ $cluster['clusterID'] ]['coreHours'];
+                        $user['totalJobs'] += $user[ $cluster['clusterID'] ]['totalJobs'];
+                    }
                 }
+            } else {
+                $users[$row['user_id']] = [
+                    'id' => $row['id'], 'userId' => $row['user_id'],
+                    'totalWalltime' => 0, 'totalJobs' => 0, 'totalCoreHours' => 0
+                ];
             }
-        }
-
-        foreach ( $users as $id => &$user ){
-
         }
 
         return $users;

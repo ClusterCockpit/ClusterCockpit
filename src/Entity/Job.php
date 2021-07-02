@@ -29,6 +29,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
@@ -60,6 +61,8 @@ attributes: [
 class Job
 {
     /**
+     *  The db id of this job.
+     *
      *  @ORM\Column(type="integer")
      *  @ORM\Id
      *  @ORM\GeneratedValue(strategy="AUTO")
@@ -70,8 +73,10 @@ class Job
     /**
      *  The jobId of this job.
      *
-     *  @ORM\Column(type="string")
+     *  @ORM\Column(type="integer")
      *  @Groups({"read","write"})
+     *  @Assert\Positive
+     *  @Assert\NotBlank
      */
     private $jobId;
 
@@ -80,6 +85,7 @@ class Job
      *
      *  @ORM\Column(type="string")
      *  @Groups({"read","write"})
+     *  @Assert\NotBlank
      */
     private $userId;
 
@@ -88,6 +94,7 @@ class Job
      *
      *  @ORM\Column(type="string")
      *  @Groups({"read","write"})
+     *  @Assert\NotBlank
      */
     private $clusterId;
 
@@ -96,19 +103,23 @@ class Job
      *
      *  @ORM\Column(type="integer")
      *  @Groups({"read","write"})
+     *  @Assert\Positive
+     *  @Assert\NotBlank
      */
     public $numNodes;
 
     /**
-     * When the job was started.
+     * When the job was started in unxi epoch time seconds.
      *
      *  @ORM\Column(type="integer")
      *  @Groups({"read","write"})
+     *  @Assert\Positive
+     *  @Assert\NotBlank
      */
     public $startTime;
 
     /**
-     * The duration of the job.
+     * The duration of the job in seconds.
      *
      *  @ORM\Column(type="integer")
      *  @Groups({"read","write"})
@@ -116,28 +127,34 @@ class Job
     public $duration = 0;
 
     /**
-     * The node list of the job.
+     * The node list of the job as string list separated by | character.
      *
-     *  @ORM\Column(type="text", nullable=true)
+     *  @ORM\Column(type="text")
      *  @Groups({"read","write"})
+     *  @Assert\NotBlank
      */
     public $nodeList;
 
-    public $jobCache;
-
     /**
+     * Boolean flag if job is still running.
+     *
      *  @ORM\Column(type="boolean")
      *  @Groups({"write"})
+     *  @Assert\NotBlank
      */
     public $isRunning;
 
     /**
+     * The job script.
+     *
      *  @ORM\Column(type="text", nullable=true)
      *  @Groups({"write"})
      */
     private $jobScript;
 
     /**
+     * The userId for this job.
+     *
      *  @ORM\Column(type="text", options={"default":"noProject"})
      *  @Groups({"write"})
      */
@@ -242,13 +259,17 @@ class Job
 
     public function getNodes($delimiter)
     {
-        $nodes = explode(',', $this->nodeList);
-        return implode($delimiter, $nodes);
+        if ( strcmp($delimiter,'|') === 0 ) {
+            return $this->nodeList;
+        } else {
+            $nodes = explode('|', $this->nodeList);
+            return implode($delimiter, $nodes);
+        }
     }
 
     public function getNodeArray()
     {
-        return explode(',', $this->nodeList);
+        return explode('|', $this->nodeList);
     }
 
     public function getProjectId()
