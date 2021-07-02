@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,49 +25,42 @@
 
 namespace App\Repository\Service;
 
-use App\Repository\DoctrineMetricDataRepository;
+use App\Repository\PrometheusMetricDataRepository;
 use App\Entity\Job;
+use App\Service\ClusterConfiguration;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class DoctrineMetricDataRepositoryTest extends KernelTestCase
+/* 579945 */
+/* '523286' */
+
+class PrometheusMetricDataRepositoryTest extends KernelTestCase
 {
     private $entityManager;
+    private $clusterConfiguration;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $kernel = self::bootKernel();
 
         $this->entityManager = $kernel->getContainer()
              ->get('doctrine')
              ->getManager();
-    }
 
-    public function testGetJobRoofline()
-    {
-        $job = $this->entityManager
-                    ->getRepository(Job::class)
-                    ->find('579945');
-                    /* ->find('523286'); */
-        $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
-
-        $metricData = new DoctrineMetricDataRepository($this->entityManager);
-        $returnValue = $metricData->getJobRoofline($job, $metrics);
-        /* var_dump($returnValue); */
-
-        $this->assertCount(14300, $returnValue);
+        $this->clusterConfiguration = new ClusterConfiguration('/Users/jan/dev/web/ClusterCockpit');
     }
 
     public function testHasProfile()
     {
         $job = $this->entityManager
                     ->getRepository(Job::class)
-                    ->find('579945');
                     /* ->find('523286'); */
+                    ->find('579945');
 
-        $metricData = new DoctrineMetricDataRepository($this->entityManager);
-        $returnValue = $metricData->hasProfile($job);
+        $metricData = new PrometheusMetricDataRepository();
+        $returnValue = $metricData->hasProfile($job,
+            $this->clusterConfiguration->getSingleMetric($job->getClusterId()));
 
         $this->assertTrue($returnValue);
     }
@@ -76,45 +69,35 @@ class DoctrineMetricDataRepositoryTest extends KernelTestCase
     {
         $job = $this->entityManager
                     ->getRepository(Job::class)
-                    ->find('579945');
                     /* ->find('523286'); */
-        $metrics = $job->getCluster()->getMetricList('stat')->getMetrics();
+                    /* ->find('579945'); */
+                    ->find('1249812');
+        $metrics =
+            $this->clusterConfiguration->getMetricConfiguration($job->getClusterId(), ['flops_any','mem_bw']);
 
-        $metricData = new DoctrineMetricDataRepository($this->entityManager);
+        $metricData = new PrometheusMetricDataRepository();
         $returnValue = $metricData->getJobStats($job, $metrics);
         /* var_dump($returnValue); */
-        $this->assertCount(17, $returnValue);
+        $this->assertCount(23, $returnValue['nodeStats']);
     }
 
     public function testGetMetricData()
     {
         $job = $this->entityManager
                     ->getRepository(Job::class)
-                    ->find('579945');
                     /* ->find('523286'); */
-        $metrics = $job->getCluster()->getMetricList('list')->getMetrics();
+                    ->find('1249812');
+                    /* ->find('579945'); */
+        $metrics =
+            $this->clusterConfiguration->getMetricConfiguration($job->getClusterId(), ['flops_any','mem_bw','rapl_power','clock']);
 
-        $metricData = new DoctrineMetricDataRepository($this->entityManager);
+        $metricData = new PrometheusMetricDataRepository();
         $returnValue = $metricData->getMetricData($job, $metrics);
-        /* var_dump($returnValue); */
-        $this->assertCount(17, $returnValue);
+        var_dump($returnValue);
+        $this->assertCount(5, $returnValue);
     }
 
-    public function testGetMetricCount()
-    {
-        $job = $this->entityManager
-                    ->getRepository(Job::class)
-                    /* ->find('523286'); */
-                    ->find('579945');
-        $metrics = $job->getCluster()->getMetricList('list')->getMetrics();
-
-        $metricData = new DoctrineMetricDataRepository($this->entityManager);
-        $returnValue = $metricData->getMetricCount($job, $metrics);
-        $this->assertEquals(1400, $returnValue);
-    }
-
-
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
