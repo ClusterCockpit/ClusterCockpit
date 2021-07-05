@@ -207,7 +207,7 @@
     bind:appliedFilters
     on:update={filtersChanged} />
 
-<Row>
+<Row style="margin-bottom: 0.5rem;">
     <Col>
         <Button outline color=success
             on:click={() => (showFilters = !showFilters)}>
@@ -223,9 +223,13 @@
     </Col>
 </Row>
 
-<FilterInfo
-    {appliedFilters}
-    {matchedJobs} />
+<Row>
+    <Col>
+        <FilterInfo
+            {appliedFilters}
+            {matchedJobs} />
+    </Col>
+</Row>
 
 {#if selectedClusterId == null}
     <Row>
