@@ -127,6 +127,7 @@
 
     let filters = deepCopy(defaultFilters);
 
+    let globalFilterRanges = null;
     let tagFilterTerm = '';
     let filteredTags = [];
     let currentRanges = {
@@ -168,12 +169,12 @@
      * and once the filterRanges have been loaded (via GraphQL).
      */
     function updateRanges() {
-        if (!$clustersQuery.filterRanges || !$clustersQuery.clusters)
+        if (!$clustersQuery.clusters)
             return;
 
         let ranges = filters.cluster
             ? $clustersQuery.clusters.find(c => c.clusterID == filters.cluster).filterRanges
-            : $clustersQuery.filterRanges;
+            : globalFilterRanges;
 
         currentRanges.numNodes = ranges.numNodes;
 
@@ -227,7 +228,28 @@
 
         initCalled = true;
 
-        let filterRanges = $clustersQuery.filterRanges;
+        console.assert($clustersQuery.clusters.length > 0, 'Whoops');
+
+        let fr = $clustersQuery.clusters[0].filterRanges;
+        globalFilterRanges = {
+            numNodes: { from: fr.numNodes.from, to: fr.numNodes.to },
+            startTime: { from: fr.startTime.from, to: fr.startTime.to },
+            duration: { from: fr.duration.from, to: fr.duration.to },
+        };
+
+        for (let i = 1; i < $clustersQuery.clusters.length; i++) {
+            let fr = $clustersQuery.clusters[i].filterRanges;
+            globalFilterRanges.numNodes.from = Math.min(globalFilterRanges.numNodes.from, fr.numNodes.from);
+            globalFilterRanges.numNodes.to = Math.max(globalFilterRanges.numNodes.to, fr.numNodes.to);
+            globalFilterRanges.startTime.from = Date.parse(globalFilterRanges.startTime.from) < Date.parse(fr.startTime.from)
+                    ? globalFilterRanges.startTime.from : fr.startTime.from;
+            globalFilterRanges.startTime.to = Date.parse(globalFilterRanges.startTime.to) > Date.parse(fr.startTime.to)
+                    ? globalFilterRanges.startTime.to : fr.startTime.to;
+            globalFilterRanges.duration.from = Math.min(globalFilterRanges.duration.from, fr.duration.from);
+            globalFilterRanges.duration.to = Math.max(globalFilterRanges.duration.to, fr.duration.to);
+        }
+
+        let filterRanges = globalFilterRanges;
         defaultFilters.numNodes.from = filterRanges.numNodes.from;
         defaultFilters.numNodes.to = filterRanges.numNodes.to;
         defaultFilters.startTime.from = fromRFC3339(filterRanges.startTime.from);

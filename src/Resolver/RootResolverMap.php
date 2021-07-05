@@ -144,9 +144,18 @@ class RootResolverMap extends ResolverMap
                 'clusters' => function($value, Argument $args, $context, ResolveInfo $info) {
                     $clusters = $this->clusterCfg->getConfigurations();
 
-                    // Getting the filter ranges is expensive, so only fetch them if requested.
                     if (array_key_exists('filterRanges', $info->getFieldSelection())) {
                         foreach ($clusters as &$cluster) {
+                            if (isset($cluster['filterRanges'])) {
+                                // This startTime of the last job on that cluster is a special
+                                // case, let's simply use now as the upper bound.
+                                if ($cluster['filterRanges']['startTime']['to'] == null)
+                                    $cluster['filterRanges']['startTime']['to'] = time();
+                                continue;
+                            }
+
+                            // The following database query can be very expensive, so it is only done if there are
+                            // no filterRanges specified in the cluster.json files and it is explicitly requested.
                             $cluster['filterRanges'] = $this->jobRepo->getFilterRanges($cluster['clusterID']);
                         }
                     }
@@ -155,9 +164,11 @@ class RootResolverMap extends ResolverMap
                 },
 
                 'filterRanges' => function() {
+                    // TODO: Use filterRanges from cluster.json files?
+                    // This query is not used by the frontend anymore,
+                    // so it could also be removed.
                     return $this->jobRepo->getFilterRanges(null);
                 },
-
 
                 'tags' => function($value, Argument $args) {
                     return $this->getTagsArray($this->jobTagRepo->getAllTags());
@@ -269,6 +280,11 @@ class RootResolverMap extends ResolverMap
             // use RFC3339 to communicate and UNIX-timestamps internally
             'Time' => [
                 self::SERIALIZE => function ($value) {
+                    // If a string is served by another resolver, it better
+                    // allready be formated as RFC3339!
+                    if (is_string($value))
+                        return $value;
+
                     if (!is_int($value))
                         throw new Error('Cannot serialize to Time scalar: '.gettype($value));
 

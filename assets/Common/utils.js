@@ -59,11 +59,6 @@ export const clustersQuery = readable({ fetching: true }, (set) => {
                 startTime { from, to }
             }
         }
-        filterRanges {
-            duration { from, to }
-            numNodes { from, to }
-            startTime { from, to }
-        }
         tags { id, tagName, tagType }
     }`;
 
@@ -97,7 +92,6 @@ export const clustersQuery = readable({ fetching: true }, (set) => {
         set({
             tags: data.tags,
             clusters: data.clusters,
-            filterRanges: data.filterRanges,
             metricConfig,
             metricUnits
         });
