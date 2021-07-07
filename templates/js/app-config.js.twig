@@ -1,68 +1,95 @@
-$("button").click(function(e) {
-    e.preventDefault();
-    id = "#"+ $(this).attr("value");
-    action = $(this).attr("name");
-    value = $(id).val();
-    validation = $(id).attr("data-validation");
-    re = new RegExp(validation);
-
-    if ( ! re.test(value) ) {
-        $(id).addClass('is-invalid');
-        return;
+function handleErrors (response) {
+    if (response.ok) {
+       return response
     }
 
-    data = {
-        id: $(this).attr("id"),
-        value: value,
-        name: $(id).attr("id"),
-        scope: 'user'
-    };
+     document.querySelector(id+"-help").textContent = "Error!";
+     document.querySelector(id+"-help").classList.remove("invisible");
+}
 
-    if ( action == 'update' ) {
-        $.ajax({
-            type: "PATCH",
-            url: "{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/web/configurations/"+$(this).attr("id"),
-            data: JSON.stringify(data),
-            processData: false,
-            contentType : 'application/json',
-            dataType: 'json',
-            success: function(result) {
-                $(id+"-help").text('Success!');
-                $(id+"-help").removeClass('invisible');
-            },
-            error: function(result) {
-                $(id+"-help").text('Error!');
-                $(id+"-help").removeClass('invisible');
-            }
-        });
-    } else if ( action == 'reset' ) {
-        $.ajax({
-            type: "DELETE",
-            url: "{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/web/configurations/"+$(this).attr("id"),
-            success: function(result) {
-                location.reload();
-            },
-            error: function(result) {
-                $(id+"-help").text('Error!');
-                $(id+"-help").removeClass('invisible');
-            }
-        });
-    } else if ( action == 'replace' ) {
-        $.ajax({
-            type: "POST",
-            data: JSON.stringify(data),
-            processData: false,
-            contentType : 'application/json',
-            dataType: 'json',
-            url: "{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/web/configurations",
-            success: function(result) {
-                location.reload();
-            },
-            error: function(result) {
-                $(id+"-help").text('Error!');
-                $(id+"-help").removeClass('invisible');
-            }
-        });
-    }
+document.querySelectorAll("button").forEach( button => {
+    button.addEventListener("click", (e) => {
+          e.preventDefault();
+          id = "#"+ e.target.getAttribute("value");
+          action = e.target.getAttribute("name");
+          value = document.querySelector(id).value;
+          validation = document.querySelector(id).getAttribute("data-validation");
+          re = new RegExp(validation);
+
+          if ( ! re.test(value) ) {
+              document.querySelector(id).addClass('is-invalid');
+              return;
+          }
+
+          let payload = {
+              name: document.querySelector(id).getAttribute("id"),
+              value: value,
+              scope: '{{ scope }}'
+          };
+
+          fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations/"+e.target.getAttribute("id"), {
+              method: 'GET',
+              mode: 'cors', // no-cors, *cors, same-origin
+              credentials: 'same-origin', // include, *same-origin, omit
+              headers: {
+                  'content-type': 'application/json'
+              },
+          })
+          .then(handleErrors)
+          .then(response => response.json())
+          .then(data => {
+             payload.label = data.label;
+             payload.validation = data.validation;
+             payload.feedback = data.feedback;
+           })
+
+           if ( action == 'update' ) {
+               fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations/"+e.target.getAttribute("id"), {
+                   method: 'PATCH',
+                   mode: 'cors', // no-cors, *cors, same-origin
+                   credentials: 'same-origin', // include, *same-origin, omit
+                   headers: {
+                       'Content-Type': 'application/merge-patch+json'
+                   },
+                   body: JSON.stringify(payload) // body data type must match "Content-Type" header
+               })
+               .then(handleErrors)
+               .then(response => {
+                       document.querySelector(id+"-help").textContent = "Success!";
+                       document.querySelector(id+"-help").classList.remove("invisible");
+                       // console.log(response.json());
+                 });
+               console.log('update');
+           } else if ( action == 'reset' ) {
+               fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations/"+e.target.getAttribute("id"), {
+                   method: 'DELETE',
+                   mode: 'cors', // no-cors, *cors, same-origin
+                   credentials: 'same-origin', // include, *same-origin, omit
+               })
+               .then(handleErrors)
+               .then(response => {
+                       // location.reload();
+                 })
+
+               console.log('reset');
+           } else if ( action == 'replace' ) {
+               console.log(payload);
+               // console.log(payload);
+               fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations", {
+                   method: 'POST',
+                   mode: 'cors', // no-cors, *cors, same-origin
+                   credentials: 'same-origin', // include, *same-origin, omit
+                   headers: {
+                       'content-type': 'application/json'
+                   },
+                   body: JSON.stringify(payload) // body data type must match "Content-Type" header
+               })
+               .then(handleErrors)
+               .then(response => {
+                       // location.reload();
+                 })
+               console.log('replace');
+           }
+     })
 });
 

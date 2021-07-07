@@ -231,6 +231,7 @@ class ConfigViewController extends AbstractController
             array(
                 'configHash' => $config['plot'],
                 'defaultmode' => true,
+                'scope' => 'default',
                 'sidebar' => $this->_sidebar(
                     array('menu'=>1,'item'=>0)
                 )
@@ -256,10 +257,10 @@ class ConfigViewController extends AbstractController
 
         } else {
             $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-            $user = $this->getUser();
+            $username = $this->getUser()->getUsername();
             $config = $this->getDoctrine()
                            ->getRepository(\App\Entity\Configuration::class)
-                           ->findAllScope(array($user->getUsername()));
+                           ->findAllScope(array($username));
 
             $sidebar = $this->_userSidebar(
                     array('menu'=>0,'item'=>1)
@@ -276,6 +277,7 @@ class ConfigViewController extends AbstractController
                 'colors' => $colors,
                 'current' => $currentColorMap,
                 'defaultmode' => $mode,
+                'scope' => 'default',
                 'sidebar' => $sidebar
             ));
     }
@@ -283,16 +285,17 @@ class ConfigViewController extends AbstractController
     public function userOptions(Request $request)
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        $user = $this->getUser();
+        $username = $this->getUser()->getUsername();
 
         $config = $this->getDoctrine()
                        ->getRepository(\App\Entity\Configuration::class)
-                       ->findAllScopeHierarchy(array($user->getUsername()));
+                       ->findAllScopeHierarchy(array($username));
 
         return $this->render('config/editConfigOptions.html.twig',
             array(
                 'configHash' => $config['plot'],
                 'defaultmode' => false,
+                'scope' => $username,
                 'sidebar' => $this->_userSidebar(
                     array('menu'=>0,'item'=>0)
                 )
