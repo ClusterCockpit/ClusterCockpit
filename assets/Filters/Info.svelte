@@ -83,11 +83,10 @@
         </InfoBox>
     {/if}
 
-    {#if appliedFilters.statistics.some(s => s.enabled)}
+    {#if appliedFilters.statistics.some(s => s.changed)}
         <InfoBox icon="bar-chart-line">
-            {#each appliedFilters.statistics.filter(s => s.enabled) as stat}
-                {stat.name}: {stat.from} - {stat.to}
-            {/each}
+            {appliedFilters.statistics.filter(s => s.changed).map(stat =>
+                `${stat.name}: ${stat.from} - ${stat.to}`).join(', ')}
         </InfoBox>
     {/if}
 {/if}
