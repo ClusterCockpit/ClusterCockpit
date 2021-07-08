@@ -111,8 +111,8 @@ class JobStats
             }
 
             for ($n = 0; $n < $job->getNumNodes(); $n++) {
-                $flopsAnyData = $flopsAny->series[$n]->data;
-                $memBwData = $memBw->series[$n]->data;
+                $flopsAnyData = $flopsAny['series'][$n]['data'];
+                $memBwData = $memBw['series'][$n]['data'];
                 $count = count($flopsAnyData);
                 for ($i = 0; $i < $count; $i++) {
                     $f = $flopsAnyData[$i];

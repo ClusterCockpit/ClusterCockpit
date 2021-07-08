@@ -126,7 +126,7 @@ class JobData
             $path = $this->_getJobDataPath($job->getJobId(), $job->getClusterId());
             $data = @file_get_contents($path);
 
-            $data = json_decode($data);
+            $data = json_decode($data, true);
             $res = [];
             foreach ($data as $metricName => $metricData) {
                 if ($metrics && !in_array($metricName, $metrics))
