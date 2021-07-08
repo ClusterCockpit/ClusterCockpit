@@ -261,7 +261,6 @@ class JobRepository extends ServiceEntityRepository
     public function statUsers($startTime, $stopTime, $clusterId, $clusters)
     {
         $users = array();
-        $lookup = array();
 
         foreach ( $clusters as $cluster ){
             if ($clusterId != null && $cluster['clusterID'] != $clusterId)
@@ -288,12 +287,11 @@ class JobRepository extends ServiceEntityRepository
             }
         }
 
-        $sql = "SELECT id, username as user_id FROM user;";
+        $sql = "SELECT username as user_id FROM user;";
         $rows = $this->_connection->fetchAll($sql);
         foreach ($rows as $row) {
             if (isset($users[$row['user_id']])) {
                 $user = &$users[$row['user_id']];
-                $user['id'] = $row['id'];
                 $user['userId'] = $row['user_id'];
                 $user['totalWalltime'] = 0;
                 $user['totalJobs'] = 0;
@@ -308,7 +306,7 @@ class JobRepository extends ServiceEntityRepository
                 }
             } else {
                 $users[$row['user_id']] = [
-                    'id' => $row['id'], 'userId' => $row['user_id'],
+                    'userId' => $row['user_id'],
                     'totalWalltime' => 0, 'totalJobs' => 0, 'totalCoreHours' => 0
                 ];
             }

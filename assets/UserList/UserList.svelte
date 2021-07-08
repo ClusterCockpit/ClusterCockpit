@@ -40,19 +40,23 @@
                 ? (a, b) => a[sorting.field] - b[sorting.field]
                 : (a, b) => b[sorting.field] - a[sorting.field]);
 
-        users.sort(cmp);
-        return users;
+        if (hideUsersWithNoJobs)
+            users = users.filter(u => u.totalJobs > 0);
+
+        if (usernameFilter)
+            users = users.filter(u => u.userId.includes(usernameFilter));
+
+        return users.sort(cmp);
     }
 
     const usersQuery = operationStore(`
     query($startTime: Time, $stopTime: Time, $clusterId: String) {
-       userStats(startTime: $startTime, stopTime: $stopTime, clusterId: $clusterId) {
-           id,
-           userId
-           totalJobs
-           totalWalltime
-           totalCoreHours
-       }
+        userStats(startTime: $startTime, stopTime: $stopTime, clusterId: $clusterId) {
+            userId
+            totalJobs
+            totalWalltime
+            totalCoreHours
+        }
     }
     `, { startTime, stopTime, clusterId });
 
@@ -180,7 +184,7 @@
             {#each sortUsers($usersQuery.data.userStats, sorting) as user (user.userId)}
                 <tr>
                     <td>
-                        <a href="/monitoring/user/{user.id}" target="_blank">
+                        <a href="/monitoring/user/{user.userId}" target="_blank">
                             {user.userId}
                         </a>
                     </td>

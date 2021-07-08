@@ -174,7 +174,7 @@ class ConfigViewController extends AbstractController
         $userList['Select user'] = 0;
 
         foreach  ( $users as $user ){
-            $userList[$user->getUsername()] = $user->getId();
+            $userList[$user->getUsername()] = $user->getUsername();
         }
 
         return $userList;

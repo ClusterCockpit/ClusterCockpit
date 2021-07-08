@@ -189,8 +189,7 @@ type JobsStatistics  {
 }
 
 type UserStats {
-    id: ID!,
-    userId: String!
+    userId: ID!
     totalJobs: Int!
     totalWalltime: Float!
     totalCoreHours: Float!
