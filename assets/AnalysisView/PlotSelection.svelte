@@ -99,13 +99,13 @@
         <br/>
 
         <InputGroup>
-            <select bind:value={selectedMetric1} class="form-group">
+            <select bind:value={selectedMetric1} class="form-group form-select">
                 <option value={null}>Choose Metric for X Axis</option>
                 {#each availableMetrics as metric}
                     <option value={metric}>{metric}</option>
                 {/each}
             </select>
-            <select bind:value={selectedMetric2} class="form-group">
+            <select bind:value={selectedMetric2} class="form-group form-select">
                 <option value={null}>Choose Metric for Y Axis</option>
                 {#each availableMetrics as metric}
                     <option value={metric}>{metric}</option>
