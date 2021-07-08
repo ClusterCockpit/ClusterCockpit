@@ -1,14 +1,7 @@
-function handleErrors (response) {
-    if (response.ok) {
-       return response
-    }
-
-     document.querySelector(id+"-help").textContent = "Error!";
-     document.querySelector(id+"-help").classList.remove("invisible");
-}
-
 document.querySelectorAll("button").forEach( button => {
-    button.addEventListener("click", (e) => {
+    button.addEventListener("click", async (e) => {
+        let id, action, value, validation, re;
+        try {
           e.preventDefault();
           id = "#"+ e.target.getAttribute("value");
           action = e.target.getAttribute("name");
@@ -27,7 +20,7 @@ document.querySelectorAll("button").forEach( button => {
               scope: '{{ scope }}'
           };
 
-          fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations/"+e.target.getAttribute("id"), {
+          let response = await fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations/"+e.target.getAttribute("id"), {
               method: 'GET',
               mode: 'cors', // no-cors, *cors, same-origin
               credentials: 'same-origin', // include, *same-origin, omit
@@ -35,16 +28,17 @@ document.querySelectorAll("button").forEach( button => {
                   'content-type': 'application/json'
               },
           })
-          .then(handleErrors)
-          .then(response => response.json())
-          .then(data => {
-             payload.label = data.label;
-             payload.validation = data.validation;
-             payload.feedback = data.feedback;
-           })
 
-           if ( action == 'update' ) {
-               fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations/"+e.target.getAttribute("id"), {
+          // The promise returned by response.json()
+          // will be rejected if the response was not ok,
+          // so await will throw an error in that case.
+          let data = await response.json();
+          payload.label = data.label;
+          payload.validation = data.validation;
+          payload.feedback = data.feedback;
+
+          if ( action == 'update' ) {
+               response = await fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations/"+e.target.getAttribute("id"), {
                    method: 'PATCH',
                    mode: 'cors', // no-cors, *cors, same-origin
                    credentials: 'same-origin', // include, *same-origin, omit
@@ -53,29 +47,14 @@ document.querySelectorAll("button").forEach( button => {
                    },
                    body: JSON.stringify(payload) // body data type must match "Content-Type" header
                })
-               .then(handleErrors)
-               .then(response => {
-                       document.querySelector(id+"-help").textContent = "Success!";
-                       document.querySelector(id+"-help").classList.remove("invisible");
-                       // console.log(response.json());
-                 });
-               console.log('update');
-           } else if ( action == 'reset' ) {
-               fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations/"+e.target.getAttribute("id"), {
+          } else if ( action == 'reset' ) {
+               response = await fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations/"+e.target.getAttribute("id"), {
                    method: 'DELETE',
                    mode: 'cors', // no-cors, *cors, same-origin
                    credentials: 'same-origin', // include, *same-origin, omit
                })
-               .then(handleErrors)
-               .then(response => {
-                       // location.reload();
-                 })
-
-               console.log('reset');
-           } else if ( action == 'replace' ) {
-               console.log(payload);
-               // console.log(payload);
-               fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations", {
+          } else if ( action == 'replace' ) {
+               response = await fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations", {
                    method: 'POST',
                    mode: 'cors', // no-cors, *cors, same-origin
                    credentials: 'same-origin', // include, *same-origin, omit
@@ -84,12 +63,17 @@ document.querySelectorAll("button").forEach( button => {
                    },
                    body: JSON.stringify(payload) // body data type must match "Content-Type" header
                })
-               .then(handleErrors)
-               .then(response => {
-                       // location.reload();
-                 })
-               console.log('replace');
-           }
-     })
+          }
+
+          if (!response.ok)
+            throw new Error("Unexpected response status code: " + response.status);
+
+          document.querySelector(id+"-help").textContent = "Success!";
+          document.querySelector(id+"-help").classList.remove("invisible");
+        } catch (e) {
+          document.querySelector(id+"-help").textContent = "Error!";
+          document.querySelector(id+"-help").classList.remove("invisible");
+        }
+    })
 });
 
