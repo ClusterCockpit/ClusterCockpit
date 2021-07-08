@@ -7,30 +7,32 @@
 {% block javascript %}
     {{ parent() }}
     <script>
-        $(document).ready(function () {
-        feather.replace()
-            $('input[type=radio][name=colorMap]').change(function(){
-                data = {
-                    id: {{ current.id }},
-                    value: $(this).attr("value"),
-                    name: '{{ current.name }}',
-                    scope: 'default'
-                };
+document.querySelectorAll("input").foreach( input => {
+    button.addEventListener("click", (e) => {
+          e.preventDefault();
+          value = e.target.getAttribute("value");
+          data = {
+              id: {{ current.id }},
+              value: value,
+              name: '{{ current.name }}',
+              scope: 'default'
+          };
 
-                $.ajax({
-                    type: "PATCH",
-                    url: "{{ path('patch_configuration', {id : current.id}) }}",
-                    data: JSON.stringify(data),
-                    processData: false,
-                    contentType : 'application/json',
-                    dataType: 'json',
-                    success: function(result) {
-                    },
-                    error: function(result) {
-                    }
-                });
-            });
-        });
+        fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations/{{ current.id }}"), {
+                   method: 'PATCH',
+                   mode: 'cors',
+                   credentials: 'same-origin',
+                   headers: {
+                       'Content-Type': 'application/merge-patch+json'
+                   },
+                   body: JSON.stringify(data)
+               })
+        .then(data => {
+               console.log("Success!");
+        }).catch(error => {
+               console.log("Error!");
+                 });
+                 });
     </script>
 {% endblock %}
 
