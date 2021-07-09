@@ -29,6 +29,7 @@ use App\Entity\Job;
 use App\Service\ClusterConfiguration;
 use App\Repository\InfluxDBMetricDataRepository;
 #use App\Repository\InfluxDBv2MetricDataRepository;
+#use Psr\Log\LoggerInterface;
 
 class JobData
 {
@@ -36,17 +37,20 @@ class JobData
     #private $_metricDataRepositoryV2;
     private $_clusterCfg;
     private $projectDir;
+    #private $_logger;
 
     public function __construct(
         InfluxDBMetricDataRepository $metricRepo,
         #InfluxDBv2MetricDataRepository $metricRepoV2,
         ClusterConfiguration $clusterCfg,
+        #LoggerInterface $logger,
         $projectDir
     )
     {
         $this->_metricDataRepository = $metricRepo;
         #$this->_metricDataRepositoryV2 = $metricRepoV2;
         $this->_clusterCfg = $clusterCfg;
+        #$this->_logger = $logger;
         $this->_rootdir = "$projectDir/var/job-archive";
     }
 
@@ -89,16 +93,23 @@ class JobData
     {
         if (! $this->hasData($job) ) {
             return false;
+        } else {
         }
 
         if ( $job->isRunning()) {
             $metricConfig = $this->_clusterCfg->getMetricConfiguration($job->getClusterId(), $metrics);
+
+            # V1 Repository-Code for InfluxDB 1.*
             $stats = $this->_metricDataRepository->getJobStats($job, $metricConfig);
             $data = $this->_metricDataRepository->getMetricData($job, $metricConfig);
+
+            # V2 Repository-Code for InfluxDB 2.*
+            #$stats = $this->_metricDataRepositoryV2->getJobStats($job, $metricConfig);
+            #$data = $this->_metricDataRepositoryV2->getMetricData($job, $metricConfig);
+
             $res = [];
 
             foreach ( $metrics as $metricName => $metric) {
-
                 $series = [];
                 foreach ( $data[$metricName] as $nodeId => $nodedata) {
                     $series[] = [
