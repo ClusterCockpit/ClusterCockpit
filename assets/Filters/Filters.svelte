@@ -336,63 +336,70 @@
 
 {#if showFilters}
     <TabContent>
-        <TabPane tabId="filter-start-time" tab="Start Time" active>
+        <TabPane tabId="filter-start-time-duration" tab="Start Time & Duration" active>
             <Row style="height: 1rem;"></Row>
-            <p>From</p>
             <Row>
-                <FormGroup class="col">
-                    <Input type="date" name="date"  bind:value={filters["startTime"]["from"]["date"]}  placeholder="datetime placeholder" />
-                </FormGroup>
-                <FormGroup class="col">
-                    <Input type="time" name="date"  bind:value={filters["startTime"]["from"]["time"]}  placeholder="datetime placeholder" />
-                </FormGroup>
+                <Col><h5>Start Time</h5></Col>
+                <Col><h5>Duration</h5></Col>
             </Row>
-            <p>To</p>
-            <Row>
-                <FormGroup class="col">
-                    <Input type="date" name="date"  bind:value={filters["startTime"]["to"]["date"]}  placeholder="datetime placeholder" />
-                </FormGroup>
-                <FormGroup class="col">
-                    <Input type="time" name="date"  bind:value={filters["startTime"]["to"]["time"]}  placeholder="datetime placeholder" />
-                </FormGroup>
-            </Row>
-        </TabPane>
-        <TabPane tabId="filter-duration" tab="Duration">
-            <Row style="height: 1rem;"></Row>
-            <p>Between</p>
             <Row>
                 <Col>
-                    <div class="input-group mb-2 mr-sm-2">
-                        <input type="number" class="form-control"  bind:value={filters["duration"]["from"]["hours"]} >
-                        <div class="input-group-append">
-                            <div class="input-group-text">h</div>
-                        </div>
-                    </div>
+                    <p>From</p>
+                    <Row>
+                        <FormGroup class="col">
+                            <Input type="date" name="date"  bind:value={filters["startTime"]["from"]["date"]}  placeholder="datetime placeholder" />
+                        </FormGroup>
+                        <FormGroup class="col">
+                            <Input type="time" name="date"  bind:value={filters["startTime"]["from"]["time"]}  placeholder="datetime placeholder" />
+                        </FormGroup>
+                    </Row>
+                    <p>To</p>
+                    <Row>
+                        <FormGroup class="col">
+                            <Input type="date" name="date"  bind:value={filters["startTime"]["to"]["date"]}  placeholder="datetime placeholder" />
+                        </FormGroup>
+                        <FormGroup class="col">
+                            <Input type="time" name="date"  bind:value={filters["startTime"]["to"]["time"]}  placeholder="datetime placeholder" />
+                        </FormGroup>
+                    </Row>
                 </Col>
                 <Col>
-                    <div class="input-group mb-2 mr-sm-2">
-                        <input type="number" class="form-control" bind:value={filters["duration"]["from"]["min"]} >
-                        <div class="input-group-append">
-                            <div class="input-group-text">m</div>
-                        </div>
-                    </div>
-                </Col>
-                <p>and</p>
-                <Col>
-                    <div class="input-group mb-2 mr-sm-2">
-                        <input type="number" class="form-control" bind:value={filters["duration"]["to"]["hours"]}  >
-                        <div class="input-group-append">
-                            <div class="input-group-text">h</div>
-                        </div>
-                    </div>
-                </Col>
-                <Col>
-                    <div class="input-group mb-2 mr-sm-2">
-                        <input type="number" class="form-control" bind:value={filters["duration"]["to"]["min"]}  >
-                        <div class="input-group-append">
-                            <div class="input-group-text">m</div>
-                        </div>
-                    </div>
+                    <p>Between</p>
+                    <Row>
+                        <Col>
+                            <div class="input-group mb-2 mr-sm-2">
+                                <input type="number" class="form-control"  bind:value={filters["duration"]["from"]["hours"]} >
+                                <div class="input-group-append">
+                                    <div class="input-group-text">h</div>
+                                </div>
+                            </div>
+                        </Col>
+                        <Col>
+                            <div class="input-group mb-2 mr-sm-2">
+                                <input type="number" class="form-control" bind:value={filters["duration"]["from"]["min"]} >
+                                <div class="input-group-append">
+                                    <div class="input-group-text">m</div>
+                                </div>
+                            </div>
+                        </Col>
+                        <p>and</p>
+                        <Col>
+                            <div class="input-group mb-2 mr-sm-2">
+                                <input type="number" class="form-control" bind:value={filters["duration"]["to"]["hours"]}  >
+                                <div class="input-group-append">
+                                    <div class="input-group-text">h</div>
+                                </div>
+                            </div>
+                        </Col>
+                        <Col>
+                            <div class="input-group mb-2 mr-sm-2">
+                                <input type="number" class="form-control" bind:value={filters["duration"]["to"]["min"]}  >
+                                <div class="input-group-append">
+                                    <div class="input-group-text">m</div>
+                                </div>
+                            </div>
+                        </Col>
+                    </Row>
                 </Col>
             </Row>
         </TabPane>
