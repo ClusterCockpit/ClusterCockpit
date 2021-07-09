@@ -76,7 +76,7 @@
                             {% else %}
                             {% block navitem_stats %}
                                 <li class="nav-item">
-                                    <a class="nav-link fs-5" href="{{ path('show_user', {id : app.user.id}) }}">
+                                    <a class="nav-link fs-5" href="{{ path('show_user', {id : app.user.username}) }}">
                                         Statistics
                                         <i class="bi-bar-chart-line-fill"></i>
                                     </a>
@@ -107,7 +107,11 @@
                             </li>
                         </ul>
                         <form class="d-flex my-0" onsubmit="this.action='{{ path('search_id') }}';">
+                            {% if is_granted('ROLE_ADMIN') %}
                             <input class="form-control me-2" type="search" name="searchId" placeholder="jobId / userId" id="searchId" aria-label="Search">
+                            {% else %}
+                            <input class="form-control me-2" type="search" name="searchId" placeholder="jobId" id="searchId" aria-label="Search">
+                            {% endif %}
                             <button class="btn btn-outline-success fs-6" type="submit">Search</button>
                         </form>
                 </div>
