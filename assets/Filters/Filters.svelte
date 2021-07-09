@@ -21,28 +21,28 @@
                 filter: 'flopsAnyAvg',
                 metric: 'flops_any',
                 name: 'Flops Any (Avg)',
-                enabled: false,
+                changed: false,
                 from: 0, to: 0
             },
             {
                 filter: 'memBwAvg',
                 metric: 'mem_bw',
                 name: 'Mem. Bw. (Avg)',
-                enabled: false,
+                changed: false,
                 from: 0, to: 0
             },
             {
                 filter: 'loadAvg',
                 metric: 'cpu_load',
                 name: 'Load (Avg)',
-                enabled: false,
+                changed: false,
                 from: 0, to: 0
             },
             {
                 filter: 'memUsedMax',
                 metric: 'mem_used',
                 name: 'Mem. Used (Max)',
-                enabled: false,
+                changed: false,
                 from: 0, to: 0
             }
         ],
@@ -85,7 +85,7 @@
             filterItems.push({ tags });
 
         for (let stat of filters.statistics) {
-            if (!stat.enabled)
+            if (!stat.changed)
                 continue;
 
             filterItems.push({
@@ -106,7 +106,7 @@
     import { fuzzySearchTags } from '../Common/utils.js';
     import { createEventDispatcher, getContext } from "svelte";
     import { Col, Row, FormGroup, Button, Input,
-        ListGroup, ListGroupItem, Spinner } from 'sveltestrap';
+        TabContent, TabPane, ListGroup, ListGroupItem } from 'sveltestrap';
     import DoubleRangeSlider from './DoubleRangeSlider.svelte';
     import Tag from '../Common/Tag.svelte';
 
@@ -303,6 +303,7 @@
     }
 
     function handleStatisticsSlider(stat, { detail }) {
+        stat.changed = true;
         stat.from = detail[0];
         stat.to = detail[1];
     }
@@ -324,106 +325,107 @@
         margin-top: 20px;
     }
 
-    table th, table td {
+    table td {
         border-bottom: none;
     }
-    table thead tr th:nth-child(1) {
-        width: 9em;
-    }
-    table thead tr th:nth-child(2) {
-        width: 3em;
-    }
-    table tbody tr td:nth-child(1), table tbody tr td:nth-child(2) {
+
+    table tbody tr td:nth-child(1) {
         vertical-align: middle;
     }
 </style>
 
 {#if showFilters}
-    <Row>
-        <Col>
+    <TabContent>
+        <TabPane tabId="filter-start-time-duration" tab="Start Time & Duration" active>
+            <Row style="height: 1rem;"></Row>
             <Row>
-                <Col>
-                    <h5>Start time</h5>
-                </Col>
-            </Row>
-            <p>From</p>
-            <Row>
-                <FormGroup class="col">
-                    <Input type="date" name="date"  bind:value={filters["startTime"]["from"]["date"]}  placeholder="datetime placeholder" />
-                </FormGroup>
-                <FormGroup class="col">
-                    <Input type="time" name="date"  bind:value={filters["startTime"]["from"]["time"]}  placeholder="datetime placeholder" />
-                </FormGroup>
-            </Row>
-            <p>To</p>
-            <Row>
-                <FormGroup class="col">
-                    <Input type="date" name="date"  bind:value={filters["startTime"]["to"]["date"]}  placeholder="datetime placeholder" />
-                </FormGroup>
-                <FormGroup class="col">
-                    <Input type="time" name="date"  bind:value={filters["startTime"]["to"]["time"]}  placeholder="datetime placeholder" />
-                </FormGroup>
+                <Col><h5>Start Time</h5></Col>
+                <Col><h5>Duration</h5></Col>
             </Row>
             <Row>
                 <Col>
-                    <h5>Duration</h5>
+                    <p>From</p>
+                    <Row>
+                        <FormGroup class="col">
+                            <Input type="date" name="date"  bind:value={filters["startTime"]["from"]["date"]}  placeholder="datetime placeholder" />
+                        </FormGroup>
+                        <FormGroup class="col">
+                            <Input type="time" name="date"  bind:value={filters["startTime"]["from"]["time"]}  placeholder="datetime placeholder" />
+                        </FormGroup>
+                    </Row>
+                    <p>To</p>
+                    <Row>
+                        <FormGroup class="col">
+                            <Input type="date" name="date"  bind:value={filters["startTime"]["to"]["date"]}  placeholder="datetime placeholder" />
+                        </FormGroup>
+                        <FormGroup class="col">
+                            <Input type="time" name="date"  bind:value={filters["startTime"]["to"]["time"]}  placeholder="datetime placeholder" />
+                        </FormGroup>
+                    </Row>
+                </Col>
+                <Col>
+                    <p>Between</p>
+                    <Row>
+                        <Col>
+                            <div class="input-group mb-2 mr-sm-2">
+                                <input type="number" class="form-control"  bind:value={filters["duration"]["from"]["hours"]} >
+                                <div class="input-group-append">
+                                    <div class="input-group-text">h</div>
+                                </div>
+                            </div>
+                        </Col>
+                        <Col>
+                            <div class="input-group mb-2 mr-sm-2">
+                                <input type="number" class="form-control" bind:value={filters["duration"]["from"]["min"]} >
+                                <div class="input-group-append">
+                                    <div class="input-group-text">m</div>
+                                </div>
+                            </div>
+                        </Col>
+                        <p>and</p>
+                        <Col>
+                            <div class="input-group mb-2 mr-sm-2">
+                                <input type="number" class="form-control" bind:value={filters["duration"]["to"]["hours"]}  >
+                                <div class="input-group-append">
+                                    <div class="input-group-text">h</div>
+                                </div>
+                            </div>
+                        </Col>
+                        <Col>
+                            <div class="input-group mb-2 mr-sm-2">
+                                <input type="number" class="form-control" bind:value={filters["duration"]["to"]["min"]}  >
+                                <div class="input-group-append">
+                                    <div class="input-group-text">m</div>
+                                </div>
+                            </div>
+                        </Col>
+                    </Row>
                 </Col>
             </Row>
-            <p>Between</p>
+        </TabPane>
+        <TabPane tabId="filter-nodes-project" tab="Nodes & Project">
+            <Row style="height: 1rem;"></Row>
             <Row>
                 <Col>
-                    <div class="input-group mb-2 mr-sm-2">
-                        <input type="number" class="form-control"  bind:value={filters["duration"]["from"]["hours"]} >
-                        <div class="input-group-append">
-                            <div class="input-group-text">h</div>
-                        </div>
-                    </div>
+                    <h5>Number of Nodes</h5>
+                    <DoubleRangeSlider on:change={handleNodesSlider}
+                        min={currentRanges.numNodes.from} max={currentRanges.numNodes.to}
+                        firstSlider={filters["numNodes"]["from"]} secondSlider={filters["numNodes"]["to"]}/>
                 </Col>
                 <Col>
-                    <div class="input-group mb-2 mr-sm-2">
-                        <input type="number" class="form-control" bind:value={filters["duration"]["from"]["min"]} >
-                        <div class="input-group-append">
-                            <div class="input-group-text">m</div>
-                        </div>
-                    </div>
-                </Col>
-                <p>and</p>
-                <Col>
-                    <div class="input-group mb-2 mr-sm-2">
-                        <input type="number" class="form-control" bind:value={filters["duration"]["to"]["hours"]}  >
-                        <div class="input-group-append">
-                            <div class="input-group-text">h</div>
-                        </div>
-                    </div>
-                </Col>
-                <Col>
-                    <div class="input-group mb-2 mr-sm-2">
-                        <input type="number" class="form-control" bind:value={filters["duration"]["to"]["min"]}  >
-                        <div class="input-group-append">
-                            <div class="input-group-text">m</div>
-                        </div>
-                    </div>
+                    <h5>Project ID</h5>
+                    <input type="text"
+                           bind:value={filters.projectId}
+                           placeholder="Project ID"
+                           style="width: 100%;">
                 </Col>
             </Row>
-            <Row>
-                <Col>
-                    <h5>Number of nodes</h5>
-                </Col>
-            </Row>
-            <Row>
-                <DoubleRangeSlider on:change={handleNodesSlider}
-                                   min={currentRanges.numNodes.from} max={currentRanges.numNodes.to}
-                                   firstSlider={filters["numNodes"]["from"]} secondSlider={filters["numNodes"]["to"]}/>
-            </Row>
-        </Col>
-        <Col xs="2">
+        </TabPane>
+        <TabPane tabId="filer-cluster-tags" tab="Cluster & Tags">
+            <Row style="height: 1rem;"></Row>
             <Row>
                 <Col>
                     <h5>Clusters</h5>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
                     <ListGroup>
                         <ListGroupItem>
                             <input type="radio" value={null}
@@ -441,29 +443,8 @@
                         {/each}
                     </ListGroup>
                 </Col>
-            </Row>
-            <Row>
                 <Col>
-                    <br/>
-                    <h5>Project ID</h5>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <input type="text"
-                           bind:value={filters.projectId}
-                           placeholder="Filter"
-                           style="width: 100%;">
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <br/>
                     <h5>Tags</h5>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
                     <ul class="list-group tags-list">
                         {#each filteredTags as tag}
                             <ListGroupItem class="{filters["tags"][tag.id] ? 'active' : ''}">
@@ -479,42 +460,26 @@
                         bind:value={tagFilterTerm} />
                 </Col>
             </Row>
-        </Col>
-        <Col>
-            <Row>
-                <Col>
-                    <h5>Job Statistics</h5>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Statistic</th>
-                                <th>Enabled</th>
-                                <th>Range</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {#each filters.statistics as stat, idx (stat)}
-                                <tr>
-                                    <td>{stat.name}</td>
-                                    <td><input type="checkbox" bind:checked={stat.enabled}></td>
-                                    <td>
-                                        <DoubleRangeSlider on:change={(e) => handleStatisticsSlider(stat, e)}
-                                                           min={currentRanges.statistics[idx].from}
-                                                           max={currentRanges.statistics[idx].to}
-                                                           firstSlider={stat.from} secondSlider={stat.to}/>
-                                    </td>
-                                </tr>
-                            {/each}
-                        </tbody>
-                    </table>
-                </Col>
-            </Row>
-        </Col>
-    </Row>
+        </TabPane>
+        <TabPane tabId="filter-stats" tab="Job Statistics">
+            <table class="table">
+                <tbody>
+                    {#each filters.statistics as stat, idx (stat)}
+                        <tr>
+                            <td>{stat.name}</td>
+                            <td>
+                                <DoubleRangeSlider on:change={(e) => handleStatisticsSlider(stat, e)}
+                                                   min={currentRanges.statistics[idx].from}
+                                                   max={currentRanges.statistics[idx].to}
+                                                   firstSlider={stat.from} secondSlider={stat.to}/>
+                            </td>
+                        </tr>
+                    {/each}
+                </tbody>
+            </table>
+        </TabPane>
+    </TabContent>
+    <hr/>
     <div class="d-flex flex-row justify-content-center">
         <div class="p-2">
             <Button color=secondary on:click={handleReset}>Reset</Button>
