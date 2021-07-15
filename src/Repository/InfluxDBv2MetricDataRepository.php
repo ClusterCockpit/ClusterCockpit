@@ -173,55 +173,43 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
 
     public function getMetricData($job, $metrics)
     {
-        set_time_limit(120); // Long Load Buffer for Long Jobs before Error
+        #set_time_limit(120); // Debug Long Load Buffer
         $nodes = $job->getNodes('|');
+        $measurement = $metrics[array_key_first($metrics)]['measurement'];
+
         $startTime = date("Y-m-d\TH:i:s\Z",$job->startTime);
         $stopTime  = date("Y-m-d\TH:i:s\Z",$job->startTime + $job->duration);
 
-        foreach ( $metrics as $metric ) {
+        $query = "from(bucket:\"ClusterCockpit/data\")
+            |> range(start: {$startTime}, stop: {$stopTime})
+            |> filter(fn: (r) =>
+                r._measurement == \"{$measurement}\" and
+                r.host =~ /{$nodes}/
+            )
+        ";
 
-            $name = $metric['name'];
+        #$this->_logger->info(">>>> QUERY:  $query");
 
-            $query = "from(bucket:\"ClusterCockpit/data\")
-                |> range(start: {$startTime}, stop: {$stopTime})
-                |> filter(fn: (r) =>
-                  r._measurement == \"{$metric['measurement']}\" and
-                  r.host =~ /{$nodes}/
-                )
-            ";
-
-            #$this->_logger->info(">>>> QUERY:  $query");
-
-            $this->_timer->start( 'InfluxDBv2');
-            $results = $this->_queryApi->query($query);
-            $this->_timer->stop( 'InfluxDBv2');
-
-            #$resultJson  = json_encode($result);
-            #$this->_logger->info(">>>> RESULTJSON:  $resultJson");
-
-      #### V1
-            #$query = "SELECT
-            #    MEAN({$metric['name']})  AS {$metric['name']}
-            #    FROM {$metric['measurement']}
-            #    WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
-            #    AND host =~ /$nodes/ GROUP BY time({$metric['sampletime']}s), host";
-
-        }
+        $this->_timer->start( 'InfluxDBv2');
+        $result = $this->_queryApi->query($query);
+        $this->_timer->stop( 'InfluxDBv2');
 
         $data = array();
 
-        foreach ( $results as $table ){
-            $tableRecords = $table->records;
-            $nodeId = $tableRecords[0]->values["host"];
-            $metric = $tableRecords[0]->values["_field"];
+        foreach ( $result as $table ){
+          $tableRecords = $table->records;
+          $nodeId = $tableRecords[0]->values["host"];
+          $metric = $tableRecords[0]->values["_field"];
 
-            foreach ( $tableRecords as $record) {
-                $data[$metric][$nodeId][] = $record->values["_value"];
-            }
+          foreach ( $tableRecords as $record) {
+              $data[$metric][$nodeId][] = $record->values["_value"];
+          }
         }
 
         #$dataJson  = json_encode($data);
         #$this->_logger->info(">>>> DATAJSON:  $dataJson");
+
+        #$this->_logger->info(">>>> COMPLETED METRICS");
 
         return $data;
     }
