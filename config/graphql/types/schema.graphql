@@ -128,7 +128,7 @@ input JobFilter {
   duration: IntRange
   numNodes: IntRange
   startTime: TimeRange
-  hasProfile: Boolean
+  isRunning: Boolean
   flopsAnyAvg: FloatRange
   memBwAvg: FloatRange
   loadAvg: FloatRange

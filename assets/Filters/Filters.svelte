@@ -46,6 +46,7 @@
                 from: 0, to: 0
             }
         ],
+        isRunning: null,
         projectId: '',
         cluster: null,
         tags: {}
@@ -79,6 +80,9 @@
 
         if (filters.projectId)
             filterItems.push({ projectId: { contains: filters.projectId } });
+
+        if (filters.isRunning != null)
+            filterItems.push({ isRunning: filters.isRunning });
 
         let tags = Object.keys(filters["tags"]);
         if (tags.length > 0)
@@ -339,10 +343,24 @@
         <TabPane tabId="filter-start-time-duration" tab="Start Time & Duration" active>
             <Row style="height: 1rem;"></Row>
             <Row>
+                <Col xs="2"><h5>Job State</h5></Col>
                 <Col><h5>Start Time</h5></Col>
                 <Col><h5>Duration</h5></Col>
             </Row>
             <Row>
+                <Col xs="2">
+                    <ListGroup>
+                        <ListGroupItem>
+                            <input type="radio" bind:group={filters["isRunning"]} value={null} /> Any
+                        </ListGroupItem>
+                        <ListGroupItem>
+                            <input type="radio" bind:group={filters["isRunning"]} value={true} /> Running
+                        </ListGroupItem>
+                        <ListGroupItem>
+                            <input type="radio" bind:group={filters["isRunning"]} value={false} /> Stopped
+                        </ListGroupItem>
+                    </ListGroup>
+                </Col>
                 <Col>
                     <p>From</p>
                     <Row>
