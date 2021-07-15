@@ -26,30 +26,21 @@
 namespace App\Service;
 
 use App\Service\JobData;
+use App\Service\JobArchive;
 use App\Entity\Job;
 
 class JobStats
 {
-    private $_rootdir;
     private $_jobData;
+    private $_jobArchive;
 
     public function __construct(
-        $projectDir,
-        JobData $jobData
+        JobData $jobData,
+        JobArchive $jobArchive
     )
     {
-        $this->_rootdir = "$projectDir/var/job-archive";
         $this->_jobData = $jobData;
-    }
-
-    private function _getJobMetaPath($jobId, $clusterId)
-    {
-        $jobId = intval(explode('.', $jobId)[0]);
-        $lvl1 = intdiv($jobId, 1000);
-        $lvl2 = $jobId % 1000;
-        $path = sprintf('%s/%s/%d/%03d/meta.json',
-            $this->_rootdir, $clusterId, $lvl1, $lvl2);
-        return $path;
+        $this->_jobArchive = $jobArchive;
     }
 
     public function getAverages($jobs, $metrics)
@@ -61,19 +52,18 @@ class JobStats
         }
 
         foreach ($jobs as $job) {
-            $filepath = $this->_getJobMetaPath($job->getJobId(), $job->getClusterId());
-            if (file_exists($filepath)) {
-                $data = json_decode(file_get_contents($filepath), true);
-                foreach ($metrics as $idx => $metric) {
-                    if (isset($data['statistics'][$metric]))
-                        $res[$idx][] = $data['statistics'][$metric]['avg'];
-                    else
-                        $res[$idx][] = null;
-                }
-            } else {
-                foreach ($metrics as $idx => $metric) {
+            if (!$this->_jobArchive->isArchived($job)) {
+                // TODO: Fetch stats from MetricDataRepositories!
+                throw new Exception("unimplemented!");
+            }
+
+            $stats = $this->_jobArchive->getMeta($job)['statistics'];
+
+            foreach ($metrics as $idx => $metric) {
+                if (isset($stats[$metric]))
+                    $res[$idx][] = $stats[$metric]['avg'];
+                else
                     $res[$idx][] = null;
-                }
             }
         }
 
