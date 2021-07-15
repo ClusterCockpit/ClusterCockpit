@@ -19,8 +19,14 @@
     let appliedFilters;
     let selectedMetrics;
 
-    if (filterPresets && filterPresets.tagId)
+    if (filterPresets && filterPresets.tagId != null)
         filterItems.push({ tags: [ filterPresets.tagId ] });
+
+    if (filterPresets && filterPresets.clusterId != null)
+        filterItems.push({ clusterId: { eq: filterPresets.clusterId } });
+
+    if (filterPresets && filterPresets.isRunning != null)
+        filterItems.push({ isRunning: filterPresets.isRunning });
 
     function filtersChanged(event) {
         if (event.detail && event.detail.filterItems) {

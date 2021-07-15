@@ -269,9 +269,21 @@
 
         if (filterPresets && filterPresets.tagId != null) {
             let tag = $clustersQuery.tags.find(tag => tag.id == filterPresets.tagId);
-            console.assert(tag != null, `'${filterPresets.tagId}' does not exist`);
+            console.assert(tag != null, `Tag '${filterPresets.tagId}' does not exist`);
             appliedFilters.tags[tag.id] = tag;
             filters.tags[tag.id] = tag;
+        }
+
+        if (filterPresets && filterPresets.clusterId != null) {
+            console.assert($clustersQuery.clusters.find(c => c.clusterID == filterPresets.clusterId) != null,
+                    `Cluster '${filterPresets.clusterId}' does not exist`);
+            appliedFilters.cluster = filterPresets.clusterId;
+            filters.cluster = filterPresets.clusterId;
+        }
+
+        if (filterPresets && filterPresets.isRunning != null) {
+            appliedFilters.isRunning = filterPresets.isRunning;
+            filters.isRunning = filterPresets.isRunning;
         }
 
         updateRanges($clustersQuery);
