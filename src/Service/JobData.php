@@ -86,6 +86,11 @@ class JobData
             return false;
         }
 
+        if ($metrics == null) {
+            $cluster = $this->_clusterCfg->getClusterConfiguration($job->getClusterId());
+            $metrics = array_keys($cluster['metricConfig']);
+        }
+
         if ($job->isRunning()) {
             $metricConfig = $this->_clusterCfg->getMetricConfiguration($job->getClusterId(), $metrics);
 
