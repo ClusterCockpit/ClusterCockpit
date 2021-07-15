@@ -34,11 +34,9 @@ use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Adapter\LdapManager;
-/* use App\Service\JobCache; */
 use App\Service\PasswdFileReader;
 use App\Service\Configuration;
 use App\Entity\User;
-use App\Entity\UnixGroup;
 use Psr\Log\LoggerInterface;
 use \DateTimeZone;
 use \DateTime;
@@ -49,8 +47,6 @@ class Cron extends Command
     private $_em;
     private $_configuration;
     private $_ldap;
-    private $_jobCache;
-    private $_cache;
     private $_timer;
     private $_logger;
 
@@ -58,7 +54,6 @@ class Cron extends Command
         LdapManager $ldap,
         EntityManagerInterface $em,
         LoggerInterface $logger,
-        /* JobCache $jobcache, */
         StopWatch $stopwatch
     )
     {
@@ -66,155 +61,8 @@ class Cron extends Command
         $this->_ldap = $ldap;
         $this->_timer = $stopwatch;
         $this->_logger = $logger;
-        /* $this->_jobCache = $jobcache; */
 
         parent::__construct();
-    }
-
-    private function warmupCache($output)
-    {
-        /* $repository = $this->_em->getRepository(\App\Entity\Job::class); */
-        /* $jobs = $repository->findRunningJobs(); */
-        /* $this->_configuration = new Configuration($this->_em); */
-
-        /* $options['plot_view_showPolarplot']      = $this->_configuration->getValue('plot_view_showPolarplot'); */
-        /* $options['plot_view_showRoofline']       = $this->_configuration->getValue('plot_view_showRoofline'); */
-        /* $options['plot_view_showStatTable']      = $this->_configuration->getValue('plot_view_showStatTable'); */
-        /* $options['plot_list_samples']            = $this->_configuration->getValue('plot_list_samples'); */
-        /* $options['plot_general_colorBackground'] = $this->_configuration->getValue('plot_general_colorBackground'); */
-        /* $options['plot_general_colorscheme']     = $this->_configuration->getValue('plot_general_colorscheme'); */
-        /* $options['plot_general_lineWidth']       = $this->_configuration->getValue('plot_general_lineWidth'); */
-        /* $options['data_time_digits']             = $this->_configuration->getValue('data_time_digits'); */
-        /* $options['data_cache_numpoints']         = $this->_configuration->getValue('data_cache_numpoints'); */
-
-        /* $this->_timer->start('WarmupCache'); */
-        /* foreach ( $jobs as $job ){ */
-
-        /*     if ( $job->getNumNodes() > 0 && $job->duration > 400 ) { */
-        /*         $this->_jobCache->warmupCache( */
-        /*             $job, $options); */
-        /*         $this->_em->persist($job); */
-        /*         $this->_em->flush(); */
-        /*     } */
-        /* } */
-        /* $event = $this->_timer->stop('WarmupCache'); */
-        /* $seconds =  floor($event->getDuration()/ 1000); */
-        /* $count = count($jobs); */
-        /* $this->_logger->info("CRON:warmupCache $count jobs in $seconds s"); */
-    }
-
-    private function updateCache($output, $interactive)
-    {
-        $this->_timer->start('UpdateCache');
-        $repository = $this->_em->getRepository(\App\Entity\Job::class);
-
-        /* cleanup jobs with isCached flag set but cache not existing */
-        $jobs = $repository->findCachedJobs();
-
-        if ( $interactive ){
-            $output->writeln(["STAGE 1: Sanitize"]);
-            $jobCount = count($jobs);
-            $progressBar = new ProgressBar($output, $jobCount);
-            $progressBar->setRedrawFrequency(25);
-            $progressBar->start();
-        }
-
-        foreach ( $jobs as $job ){
-
-            if ( $interactive ){
-                $progressBar->advance();
-            }
-
-
-            if ( ! $this->_jobCache->hasCache($job, 'view') ) {
-                $job->isCached = false;
-                $this->_em->persist($job);
-                $this->_em->flush();
-            }
-        }
-
-        if ( $interactive ){
-            $progressBar->finish();
-            $progressBar->clear();
-        }
-
-        $options['plot_view_showPolarplot']      = $this->_configuration->getValue('plot_view_showPolarplot');
-        $options['plot_view_showRoofline']       = $this->_configuration->getValue('plot_view_showRoofline');
-        $options['plot_view_showStatTable']      = $this->_configuration->getValue('plot_view_showStatTable');
-        $options['plot_list_samples']            = $this->_configuration->getValue('plot_list_samples');
-        $options['plot_general_colorBackground'] = $this->_configuration->getValue('plot_general_colorBackground');
-        $options['plot_general_lineWidth']       = $this->_configuration->getValue('plot_general_lineWidth');
-        $options['data_cache_numpoints']         = $this->_configuration->getValue('data_cache_numpoints');
-
-        $days = $this->_configuration->getValue('data_cache_period');
-        $timestamp = strtotime("-$days day");
-
-        /* delete cache for jobs outside grace period */
-        $jobs = $repository->findJobsToClean($timestamp);
-
-        if ( $interactive ){
-            $output->writeln(["STAGE 2: Cleanup"]);
-            $jobCount = count($jobs);
-            $progressBar->setMaxSteps($jobCount);
-            $progressBar->start();
-        }
-
-        foreach ( $jobs as $job ){
-
-            if ( $interactive ){
-                $progressBar->advance();
-            }
-
-            $this->_jobCache->dropCache($job);
-            $this->_em->persist($job);
-            $this->_em->flush();
-        }
-
-        if ( $interactive ){
-            $progressBar->finish();
-            $progressBar->clear();
-        }
-
-        /* build cache for jobs inside grace period */
-        $jobs = $repository->findJobsToBuild($timestamp);
-
-        if ( $interactive ){
-            $output->writeln(["STAGE 3: Rebuild cache"]);
-            $jobCount = count($jobs);
-            $progressBar->setMaxSteps($jobCount);
-            $progressBar->start();
-        }
-
-        foreach ( $jobs as $job ){
-
-            if ( $interactive ){
-                $progressBar->advance();
-            }
-
-            $this->_jobCache->warmupCache($job, $options);
-            $this->_em->persist($job);
-            $this->_em->flush();
-        }
-
-        $event = $this->_timer->stop('UpdateCache');
-        $seconds =  floor($event->getDuration()/ 1000);
-
-        if ( $interactive ){
-            $d1 = new DateTime();
-            $d2 = new DateTime();
-            $d2->add(new DateInterval('PT'.$seconds.'S'));
-            $iv = $d2->diff($d1);
-
-            $output->writeln([
-                'Total runtime:',
-                $iv->format('%h h %i m')
-            ]);
-
-            $progressBar->finish();
-            $progressBar->clear();
-        } else {
-            $this->_logger->info("CRON:updateCache $seconds s");
-        }
     }
 
     private function _syncUsers($output, $users)
@@ -306,7 +154,7 @@ class Cron extends Command
         $this
             ->setName('app:cron')
             ->setDescription('Cron job execution manager.')
-            ->setHelp('This command allows to execute the following tasks: syncUsers, importUsers, warmupCache, updateCache')
+            ->setHelp('This command allows to execute the following tasks: syncUsers, importUsers')
             ->addArgument('task', InputArgument::REQUIRED, 'Task to perform')
             ->addOption(
                 'interactive',
@@ -339,12 +187,10 @@ class Cron extends Command
             } else {
                 $output->writeln("CRON Error: You have to specify the filename option for the importUsers task !");
             }
-        } else if ( $task === 'warmupCache' ){
-            $this->warmupCache($output);
-        } else if ( $task === 'updateCache' ){
-            $this->updateCache($output, $interactive);
         } else {
-            $output->writeln("CRON Error: Unknown command $task !");
+            $output->writeln("CRON Error: Unknown command $task!");
+            return 1;
         }
+        return 0;
     }
 }

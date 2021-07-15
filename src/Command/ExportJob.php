@@ -40,29 +40,26 @@ use App\Repository\JobRepository;
 use App\Entity\Job;
 use App\Entity\User;
 use App\Service\JobData;
-use App\Service\ClusterConfiguration;
+use App\Service\JobArchive;
 
 class ExportJob extends Command
 {
     private $_em;
     private $_filesystem;
-    private $_root;
     private $_jobData;
-    private $_clusterCfg;
+    private $_jobArchive;
 
     public function __construct(
         EntityManagerInterface $em,
         JobData $jobData,
-        ClusterConfiguration $clusterCfg,
-        $projectDir,
+        JobArchive $jobArchive,
         FileSystem $filesystem
     )
     {
         $this->_em = $em;
         $this->_jobData = $jobData;
-        $this->_clusterCfg = $clusterCfg;
+        $this->_jobArchive = $jobArchive;
         $this->_filesystem = $filesystem;
-        $this->_root = $projectDir.'/var/export';
 
         parent::__construct();
     }
@@ -72,9 +69,10 @@ class ExportJob extends Command
         $this
             ->setName('app:job:export')
             ->setDescription('Export a job to disk')
-            ->setHelp('.')
-            ->addArgument('id', InputArgument::REQUIRED, 'The jobID for the job to export.')
-            ->addArgument('cluster', InputArgument::REQUIRED, 'The cluster for the job to export.')
+            ->setHelp('This command will write the files data.json and meta.json to the specified directory')
+            ->addArgument('id', InputArgument::REQUIRED, 'The jobID for the job to export')
+            ->addArgument('cluster', InputArgument::REQUIRED, 'The cluster for the job to export')
+            ->addArgument('dest-dir', InputArgument::REQUIRED, 'Directory into which to put the data.json and meta.json files');
         ;
     }
 
@@ -82,6 +80,7 @@ class ExportJob extends Command
     {
         $jobId = $input->getArgument('id');
         $clusterId = $input->getArgument('cluster');
+        $dstPath = $input->getArgument('dest-dir');
         $repository = $this->_em->getRepository(\App\Entity\Job::class);
 
         $output->writeln([
@@ -95,6 +94,8 @@ class ExportJob extends Command
             $output->writeln("Job does not exist");
             return 1;
         }
+
+        $output->writeln(['Export to ', $dstPath]);
 
         $rows = array();
         $rows[] = array("DB Id", $job->id);
@@ -111,66 +112,13 @@ class ExportJob extends Command
             ->setRows($rows);
         $table->render();
 
-        $cluster = $this->_clusterCfg->getClusterConfiguration($clusterId);
-        $allMetrics = array_keys($cluster['metricConfig']);
-        $jobData = $this->_jobData->getData($job, $allMetrics);
+        $jobData = $this->_jobData->getData($job, null);
         if ($jobData === false) {
-            $output->writeln("Job has no profile!");
+            $output->writeln("Job has no data");
             return 1;
         }
 
-        $level1 = $jobId / 1000;
-        $level2 = $jobId % 1000;
-        $dstPath = sprintf("%s/%d/%03d", $this->_root, $level1, $level2);
-        try {
-            $this->_filesystem->mkdir($dstPath);
-        } catch (IOExceptionInterface $exception) {
-            echo "An error occurred while creating job export directory at ".$exception->getPath();
-        }
-        $output->writeln(['Export to ', $dstPath]);
-
-        $jsonMeta = [
-            'job_id' => $jobId,
-            'user_id' => $job->getUserId(),
-            'project_id' => $job->getProjectId(),
-            'cluster_id' => $clusterId,
-            'num_nodes' => $job->getNumNodes(),
-            'nodes' => $job->getNodeArray(),
-            'tags' => $job->getTagsArray(),
-            'start_time' => $job->getStartTime(),
-            'stop_time' => $job->getStartTime() + $job->getDuration(),
-            'duration' => $job->getDuration(),
-            'statistics' => [],
-        ];
-        $jsonData = [];
-
-        foreach ($jobData as $data) {
-            $unit = $data['metric']['unit'];
-            $series = $data['metric']['series'];
-            $min = $series[0]['statistics']['min'];
-            $max = $series[0]['statistics']['max'];
-            $avg = $series[0]['statistics']['avg'];
-
-            for ($i = 1; $i < count($series); $i++) {
-                $stats = $series[$i]['statistics'];
-                $min = min($min, $stats['min']);
-                $max = max($max, $stats['max']);
-                $avg += $stats['avg'];
-            }
-
-            $avg /= count($series);
-            $jsonMeta['statistics'][$data['name']] = [
-                'unit' => $unit,
-                'min' => $min,
-                'max' => $max,
-                'avg' => $avg
-            ];
-
-            $jsonData[$data['name']] = $data['metric'];
-        }
-
-        $this->_filesystem->dumpFile($dstPath.'/meta.json', json_encode($jsonMeta));
-        $this->_filesystem->dumpFile($dstPath.'/data.json', json_encode($jsonData));
+        $this->_jobArchive->archiveJob($job, $jobData, $dstPath);
         return 0;
     }
 }
