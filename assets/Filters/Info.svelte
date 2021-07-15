@@ -69,6 +69,12 @@
         {appliedFilters["startTime"]["to"]["time"]}
     </InfoBox>
 
+    {#if appliedFilters.isRunning != null}
+        <InfoBox icon="gear">
+            {appliedFilters.isRunning ? "Is running" : "Has stopped"}
+        </InfoBox>
+    {/if}
+
     {#if appliedFilters.projectId}
         <InfoBox icon="people">
             Project ID contains: "{appliedFilters.projectId}"

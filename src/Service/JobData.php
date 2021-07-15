@@ -26,6 +26,7 @@
 namespace App\Service;
 
 use App\Entity\Job;
+use App\Service\JobArchive;
 use App\Service\ClusterConfiguration;
 use App\Repository\InfluxDBMetricDataRepository;
 #use App\Repository\InfluxDBv2MetricDataRepository;
@@ -36,43 +37,33 @@ class JobData
     private $_metricDataRepository;
     #private $_metricDataRepositoryV2;
     private $_clusterCfg;
-    private $projectDir;
+    private $_jobArchive;
     #private $_logger;
 
     public function __construct(
         InfluxDBMetricDataRepository $metricRepo,
         #InfluxDBv2MetricDataRepository $metricRepoV2,
         ClusterConfiguration $clusterCfg,
+        JobArchive $jobArchive
         #LoggerInterface $logger,
-        $projectDir
     )
     {
         $this->_metricDataRepository = $metricRepo;
         #$this->_metricDataRepositoryV2 = $metricRepoV2;
         $this->_clusterCfg = $clusterCfg;
+        $this->_jobArchive = $jobArchive;
         #$this->_logger = $logger;
-        $this->_rootdir = "$projectDir/var/job-archive";
     }
 
-    private function _getJobDataPath($jobId, $clusterId)
-    {
-        $jobId = intval(explode('.', $jobId)[0]);
-        $lvl1 = intdiv($jobId, 1000);
-        $lvl2 = $jobId % 1000;
-        $path = sprintf('%s/%s/%d/%03d/data.json',
-            $this->_rootdir, $clusterId, $lvl1, $lvl2);
-        return $path;
-    }
+
 
     public function hasData($job)
     {
-        if ( $job->isRunning()) {
+        if ($job->isRunning()) {
             $job->duration = time() - $job->startTime;
         }
 
-        $job->hasProfile = file_exists(
-            $this->_getJobDataPath($job->getJobId(),
-            $job->getClusterId()));
+        $job->hasProfile = $this->_jobArchive->isArchived($job);
 
         # V1 Repository-Code for InfluxDB 1.*
         if (!$job->hasProfile){
@@ -93,10 +84,14 @@ class JobData
     {
         if (! $this->hasData($job) ) {
             return false;
-        } else {
         }
 
-        if ( $job->isRunning()) {
+        if ($metrics == null) {
+            $cluster = $this->_clusterCfg->getClusterConfiguration($job->getClusterId());
+            $metrics = array_keys($cluster['metricConfig']);
+        }
+
+        if ($job->isRunning()) {
             $metricConfig = $this->_clusterCfg->getMetricConfiguration($job->getClusterId(), $metrics);
 
             # V1 Repository-Code for InfluxDB 1.*
@@ -134,10 +129,7 @@ class JobData
                 ];
             }
         } else {
-            $path = $this->_getJobDataPath($job->getJobId(), $job->getClusterId());
-            $data = @file_get_contents($path);
-
-            $data = json_decode($data, true);
+            $data = $this->_jobArchive->getData($job);
             $res = [];
             foreach ($data as $metricName => $metricData) {
                 if ($metrics && !in_array($metricName, $metrics))

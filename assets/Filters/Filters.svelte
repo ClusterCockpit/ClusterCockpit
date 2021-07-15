@@ -46,6 +46,7 @@
                 from: 0, to: 0
             }
         ],
+        isRunning: null,
         projectId: '',
         cluster: null,
         tags: {}
@@ -79,6 +80,9 @@
 
         if (filters.projectId)
             filterItems.push({ projectId: { contains: filters.projectId } });
+
+        if (filters.isRunning != null)
+            filterItems.push({ isRunning: filters.isRunning });
 
         let tags = Object.keys(filters["tags"]);
         if (tags.length > 0)
@@ -265,9 +269,21 @@
 
         if (filterPresets && filterPresets.tagId != null) {
             let tag = $clustersQuery.tags.find(tag => tag.id == filterPresets.tagId);
-            console.assert(tag != null, `'${filterPresets.tagId}' does not exist`);
+            console.assert(tag != null, `Tag '${filterPresets.tagId}' does not exist`);
             appliedFilters.tags[tag.id] = tag;
             filters.tags[tag.id] = tag;
+        }
+
+        if (filterPresets && filterPresets.clusterId != null) {
+            console.assert($clustersQuery.clusters.find(c => c.clusterID == filterPresets.clusterId) != null,
+                    `Cluster '${filterPresets.clusterId}' does not exist`);
+            appliedFilters.cluster = filterPresets.clusterId;
+            filters.cluster = filterPresets.clusterId;
+        }
+
+        if (filterPresets && filterPresets.isRunning != null) {
+            appliedFilters.isRunning = filterPresets.isRunning;
+            filters.isRunning = filterPresets.isRunning;
         }
 
         updateRanges($clustersQuery);
@@ -339,10 +355,24 @@
         <TabPane tabId="filter-start-time-duration" tab="Start Time & Duration" active>
             <Row style="height: 1rem;"></Row>
             <Row>
+                <Col xs="2"><h5>Job State</h5></Col>
                 <Col><h5>Start Time</h5></Col>
                 <Col><h5>Duration</h5></Col>
             </Row>
             <Row>
+                <Col xs="2">
+                    <ListGroup>
+                        <ListGroupItem>
+                            <input type="radio" bind:group={filters["isRunning"]} value={null} /> Any
+                        </ListGroupItem>
+                        <ListGroupItem>
+                            <input type="radio" bind:group={filters["isRunning"]} value={true} /> Running
+                        </ListGroupItem>
+                        <ListGroupItem>
+                            <input type="radio" bind:group={filters["isRunning"]} value={false} /> Stopped
+                        </ListGroupItem>
+                    </ListGroup>
+                </Col>
                 <Col>
                     <p>From</p>
                     <Row>

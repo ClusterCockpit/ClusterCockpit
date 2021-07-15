@@ -31,21 +31,29 @@ use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
 use Psr\Log\LoggerInterface;
 use App\Repository\JobRepository;
 use App\Entity\BatchJob;
+use App\Service\JobArchive;
+use App\Service\JobData;
 
 final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
 {
     private $_em;
     private JobRepository $_repository;
+    private JobArchive $_jobArchive;
+    private JobData $_jobData;
     private $_logger;
 
     public function __construct(
         EntityManagerInterface $em,
         LoggerInterface $logger,
-        JobRepository $repository
+        JobRepository $repository,
+        JobArchive $jobArchive,
+        JobData $jobData
     )
     {
         $this->_em = $em;
         $this->_repository = $repository;
+        $this->_jobArchive = $jobArchive;
+        $this->_jobData = $jobData;
         $this->_logger = $logger;
     }
 
@@ -97,7 +105,23 @@ final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
         $this->_em->flush();
         $data->job = $job;
 
+        $this->writeToArchive($job);
+
         return $data;
+    }
+
+    private function writeToArchive($job)
+    {
+        if ($this->_jobArchive->isArchived($job)) {
+            throw new HttpException(500, "Job already archived");
+        }
+
+        $jobData = $this->_jobData->getData($job, null);
+        if ($jobData === false) {
+            throw new HttpException(500, "Job has no data (MetricRepository failure?)");
+        }
+
+        $this->_jobArchive->archiveJob($job, $jobData, null);
     }
 
     public function remove($data, array $context = [])

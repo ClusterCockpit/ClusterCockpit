@@ -102,8 +102,8 @@ class JobRepository extends ServiceEntityRepository
                        ->setParameter("startTime_from_$i", $filter['startTime']['from'])
                        ->setParameter("startTime_to_$i", $filter['startTime']['to']);
 
-                if (isset($filter['hasProfile']))
-                    $qb->andWhere('j.hasProfile = '.$filter['hasProfile']);
+                if (isset($filter['isRunning']))
+                    $qb->andWhere('j.isRunning = '.($filter['isRunning'] ? 'true' : 'false'));
 
                 if (isset($filter['tags']))
                     $qb->join('j.tags', 't')
