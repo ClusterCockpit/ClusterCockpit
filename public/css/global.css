@@ -34,7 +34,7 @@ body {
     flex: none;
 }
 
-input:not(.form-control), button:not(.btn), select:not(.form-select), textarea {
+input:not(.form-control):not(.form-check-input), button:not(.btn), select:not(.form-select), textarea {
 	font-family: inherit;
 	font-size: inherit;
 	-webkit-padding: 0.4em 0;

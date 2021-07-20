@@ -2,6 +2,7 @@
     import { setContext, getContext, tick } from 'svelte';
     import { operationStore, query } from '@urql/svelte';
     import { Spinner, Row, Col, Card, Button, Icon,
+             ListGroup, ListGroupItem,
              InputGroup, InputGroupText, Input } from 'sveltestrap';
     import Histogram from '../Plots/Histogram.svelte';
     import ScatterPlot from '../Plots/Scatter.svelte';
@@ -132,17 +133,22 @@
     }
 
     function filtersChanged(event) {
-        if (!$clustersQuery.clusters)
-            throw new Error('clusters-GraphQL-Query not finished!');
 
-        let filterItems = event.detail.filterItems;
-        console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
-        selectedClusterId = appliedFilters.cluster;
-        if (selectedClusterId == null) {
-            selectedCluster = null;
-            return;
+        let filterItems;
+        if (event.detail) {
+            filterItems = event.detail.filterItems;
+            selectedClusterId = appliedFilters.cluster;
+            if (selectedClusterId == null) {
+                selectedCluster = null;
+                return;
+            }
+        } else if (event.cluster) {
+            filterItems = [ { clusterId: { eq: event.cluster } } ];
+            selectedClusterId = event.cluster;
+            tick().then(() => filterConfig.setCluster(selectedClusterId));
         }
 
+        console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
         selectedCluster = $clustersQuery.clusters.find(c => c.clusterID == selectedClusterId);
         window.location.hash = `#${selectedClusterId}`;
         updateQueries(filterItems);
@@ -201,10 +207,33 @@
     }
 </style>
 
+{#if selectedClusterId == null || $clustersQuery.error}
+<Row>
+    <Col>
+        {#if $clustersQuery.fetching}
+            <Spinner secondary />
+        {:else if $clustersQuery.error}
+            <Card body color="danger" class="mb-3">{$clustersQuery.error.message}</Card>
+        {:else if $clustersQuery.clusters}
+            <ListGroup>
+                <ListGroupItem disabled>Select one of the following clusters:</ListGroupItem>
+                {#each $clustersQuery.clusters.map(c => c.clusterID) as cluster}
+                    <ListGroupItem>
+                        <Button outline on:click={() => filtersChanged({ cluster })}>
+                            {cluster}
+                        </Button>
+                    </ListGroupItem>
+                {/each}
+            </ListGroup>
+        {/if}
+    </Col>
+</Row>
+{:else}
 <FilterConfig
     bind:this={filterConfig}
     {showFilters}
     bind:appliedFilters
+    availableFilters={{ userId: true }}
     on:update={filtersChanged} />
 
 <Row style="margin-bottom: 0.5rem;">
@@ -374,3 +403,5 @@
     {/each}
     </table>
 {/if}
+
+{/if} <!-- selectedClusterId -->
