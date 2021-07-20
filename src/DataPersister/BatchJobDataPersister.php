@@ -94,18 +94,17 @@ final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
             throw new HttpException(400, "Stop time earlier than start time");
         }
 
-        if ( $job->isRunning ) {
+        if (! $job->isRunning ) {
             throw new HttpException(400, "Job already finished");
         }
 
         $job->duration = $stopTime - $job->startTime;
-        $job->isRunning = false;
+        $this->writeToArchive($job);
 
+        $job->isRunning = false;
         $this->_em->persist($job);
         $this->_em->flush();
         $data->job = $job;
-
-        $this->writeToArchive($job);
 
         return $data;
     }
@@ -121,7 +120,11 @@ final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
             throw new HttpException(500, "Job has no data (MetricRepository failure?)");
         }
 
-        $this->_jobArchive->archiveJob($job, $jobData, null);
+        try {
+            $this->_jobArchive->archiveJob($job, $jobData, null);
+        } catch (\Throwable $e) {
+            throw new HttpException(500, $e->getMessage());
+        }
     }
 
     public function remove($data, array $context = [])

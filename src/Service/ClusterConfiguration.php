@@ -34,6 +34,7 @@ class ClusterConfiguration
         $projectDir
     )
     {
+        $this->_config = [];
         $rootdir = "$projectDir/var/job-archive";
         $dh =  opendir($rootdir);
 

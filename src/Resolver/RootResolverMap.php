@@ -127,12 +127,16 @@ class RootResolverMap extends ResolverMap
                     $page = $args['page'];
                     $orderBy = $args['order'];
 
-                    $jobs = $this->jobRepo->findFilteredJobs($page, $filter, $orderBy);
-                    $count = $this->jobRepo->countJobs($filter, $orderBy);
+                    try {
+                        $jobs = $this->jobRepo->findFilteredJobs($page, $filter, $orderBy);
+                        $count = $this->jobRepo->countJobs($filter, $orderBy);
 
-                    $items = [];
-                    foreach ($jobs as $job) {
-                        $items[] = $this->jobEntityToArray($job);
+                        $items = [];
+                        foreach ($jobs as $job) {
+                            $items[] = $this->jobEntityToArray($job);
+                        }
+                    } catch (\Throwable $e) {
+                        throw new Error($e->getMessage());
                     }
 
                     return [
@@ -143,6 +147,8 @@ class RootResolverMap extends ResolverMap
 
                 'clusters' => function($value, Argument $args, $context, ResolveInfo $info) {
                     $clusters = $this->clusterCfg->getConfigurations();
+                    if ($clusters == null || count($clusters) == 0)
+                        throw new Error("No clusters configured");
 
                     if (array_key_exists('filterRanges', $info->getFieldSelection())) {
                         foreach ($clusters as &$cluster) {
