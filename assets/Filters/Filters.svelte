@@ -48,6 +48,7 @@
         ],
         isRunning: null,
         projectId: '',
+        userId: null,
         cluster: null,
         tags: {}
     };
@@ -84,6 +85,9 @@
         if (filters.isRunning != null)
             filterItems.push({ isRunning: filters.isRunning });
 
+        if (filters.userId != null)
+            filterItems.push({ userId: filters.userId });
+
         let tags = Object.keys(filters["tags"]);
         if (tags.length > 0)
             filterItems.push({ tags });
@@ -109,7 +113,7 @@
 <script>
     import { fuzzySearchTags } from '../Common/utils.js';
     import { createEventDispatcher, getContext } from "svelte";
-    import { Col, Row, FormGroup, Button, Input,
+    import { Col, Row, FormGroup, Button, Input, InputGroup, InputGroupText,
         TabContent, TabPane, ListGroup, ListGroupItem } from 'sveltestrap';
     import DoubleRangeSlider from './DoubleRangeSlider.svelte';
     import Tag from '../Common/Tag.svelte';
@@ -117,6 +121,7 @@
     export let showFilters; /* Hide/Show the filters */
     export let filterPresets = null;
     export let appliedFilters = defaultFilters;
+    export let availableFilters = { userId: false };
 
     const clustersQuery = getContext('clusters-query');
     const dispatch = createEventDispatcher();
@@ -433,7 +438,7 @@
                 </Col>
             </Row>
         </TabPane>
-        <TabPane tabId="filter-nodes-project" tab="Nodes & Project">
+        <TabPane tabId="filter-nodes-project" tab="{availableFilters.userId ? 'Nodes, Project & User' : 'Nodes & Project'}">
             <Row style="height: 1rem;"></Row>
             <Row>
                 <Col>
@@ -448,6 +453,33 @@
                            bind:value={filters.projectId}
                            placeholder="Project ID"
                            style="width: 100%;">
+
+                    {#if availableFilters.userId}
+                        <h5>User Id</h5>
+                        <InputGroup>
+                            <Input type="text" placeholder="User Id"
+                                on:change={(e) => {
+                                    let checkbox = e.target.parentElement.children[2].children[0];
+                                    filters.userId = checkbox.checked
+                                        ? { eq: e.target.value }
+                                        : { contains: e.target.value };
+                                }} />
+                            <InputGroupText>
+                                Exact Match:
+                            </InputGroupText>
+                            <InputGroupText>
+                                <Input type="checkbox"
+                                    on:change={(e) => {
+                                        if (!filters.userId)
+                                            return;
+
+                                        filters.userId = filters.userId.eq
+                                            ? { contains: filters.userId.eq }
+                                            : { eq: filters.userId.contains };
+                                    }} />
+                            </InputGroupText>
+                        </InputGroup>
+                    {/if}
                 </Col>
             </Row>
         </TabPane>
