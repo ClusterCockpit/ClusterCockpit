@@ -42,6 +42,8 @@ use App\Repository\JobTagRepository;
 
 class RootResolverMap extends ResolverMap
 {
+    const ANALYSIS_MAX_JOBS = 500;
+
     private $jobRepo;
     private $jobData;
     private $jobStats;
@@ -203,18 +205,37 @@ class RootResolverMap extends ResolverMap
                 },
 
                 'jobsStatistics' => function($value, Argument $args) {
-                    return $this->jobRepo->findFilteredStatistics($args['filter'], $this->clusterCfg);
+                    try {
+                        return $this->jobRepo->findFilteredStatistics(
+                            $args['filter'], $this->clusterCfg);
+                    } catch (\Throwable $e) {
+                        throw new Error($e->getMessage());
+                    }
                 },
 
                 'jobMetricAverages' => function($value, Argument $args) {
-                    $jobs = $this->jobRepo->findFilteredJobs(false, $args['filter'], null);
-                    return $this->jobStats->getAverages($jobs, $args['metrics']);
+                    try {
+                        $jobs = $this->jobRepo->findFilteredJobs(false, $args['filter'], null);
+                        if (count($jobs) > RootResolverMap::ANALYSIS_MAX_JOBS)
+                            throw new Error("too many jobs matched (".count($jobs).", max: ".RootResolverMap::ANALYSIS_MAX_JOBS.")");
+
+                        return $this->jobStats->getAverages($jobs, $args['filter'], $args['metrics']);
+                    } catch (\Throwable $e) {
+                        throw new Error($e->getMessage());
+                    }
                 },
 
                 'rooflineHeatmap' => function($value, Argument $args) {
-                    $jobs = $this->jobRepo->findFilteredJobs(false, $args['filter'], null);
-                    return $this->jobStats->rooflineHeatmap($jobs, $args['rows'], $args['cols'],
-                        $args['minX'], $args['minY'], $args['maxX'], $args['maxY']);
+                    try {
+                        $jobs = $this->jobRepo->findFilteredJobs(false, $args['filter'], null);
+                        if (count($jobs) > RootResolverMap::ANALYSIS_MAX_JOBS)
+                            throw new Error("too many jobs matched (".count($jobs).", max: ".RootResolverMap::ANALYSIS_MAX_JOBS.")");
+
+                        return $this->jobStats->rooflineHeatmap($jobs, $args['filter'], $args['rows'], $args['cols'],
+                            $args['minX'], $args['minY'], $args['maxX'], $args['maxY']);
+                    } catch (\Throwable $e) {
+                        throw new Error($e->getMessage());
+                    }
                 },
 
                 'userStats' => function($value, Argument $args) {

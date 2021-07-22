@@ -164,7 +164,7 @@ class JobRepository extends ServiceEntityRepository
     private function filteredStatisticsPerCluster($filter, $cluster)
     {
         $coresPerNode = $cluster['socketsPerNode'] * $cluster['coresPerSocket'];
-        $filter['clusterId'] = ['eq' => $cluster['clusterID']];
+        $filter['list'][] = ['clusterId' => ['eq' => $cluster['clusterID']]];
         $qb = $this->createQueryBuilder('j');
         $qb->select([
             'COUNT(j.id)',
@@ -180,6 +180,16 @@ class JobRepository extends ServiceEntityRepository
         ];
     }
 
+    private function getSelectedCluster($filter)
+    {
+        foreach ($filter['list'] as $filterItem) {
+            if (isset($filterItem['clusterId'])) {
+                return $filterItem['clusterId']['eq'];
+            }
+        }
+        return null;
+    }
+
     /*
      * Filters are expected in the same format as for
      * findFilteredJobs() and countJobs() (therefore,
@@ -187,10 +197,11 @@ class JobRepository extends ServiceEntityRepository
      */
     public function findFilteredStatistics($filter, $clusterCfg)
     {
+        $selectedCluster = $this->getSelectedCluster($filter);
         $stats = null;
-        if (isset($filter['clusterId'])) {
+        if ($selectedCluster != null) {
             $stats = $this->filteredStatisticsPerCluster($filter,
-                $clusterCfg->getClusterConfiguration($filter['clusterId']));
+                $clusterCfg->getClusterConfiguration($selectedCluster));
         } else {
             $stats = ['totalJobs' => 0, 'totalWalltime' => 0, 'totalCoreHours' => 0];
             foreach ($clusterCfg->getConfigurations() as $cluster) {
