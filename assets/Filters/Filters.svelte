@@ -134,6 +134,10 @@
         appliedFilters = deepCopy(filters);
     }
 
+    export function getFilters() {
+        return getFilterItems(filters);
+    }
+
     let filters = deepCopy(defaultFilters);
 
     let globalFilterRanges = null;
@@ -289,6 +293,13 @@
         if (filterPresets && filterPresets.isRunning != null) {
             appliedFilters.isRunning = filterPresets.isRunning;
             filters.isRunning = filterPresets.isRunning;
+        }
+
+        if (filterPresets && filterPresets.startTime) {
+            appliedFilters.startTime.from = fromRFC3339(filterPresets.startTime.from);
+            appliedFilters.startTime.to = fromRFC3339(filterPresets.startTime.to);
+            filters.startTime.from = appliedFilters.startTime.from;
+            filters.startTime.to = appliedFilters.startTime.to;
         }
 
         updateRanges($clustersQuery);

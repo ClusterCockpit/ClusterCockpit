@@ -78,8 +78,8 @@
 
     query(metaStatsQuery);
 
-    $: matchedJobs = $statsQuery.data
-        ? $statsQuery.data.jobMetricAverages[0].length
+    $: matchedJobs = $metaStatsQuery.data
+        ? $metaStatsQuery.data.jobsStatistics.totalJobs
         : null;
 
     $: {
@@ -103,20 +103,21 @@
     }
 
     if (selectedClusterId != null)
-        clustersQuery.subscribe(({ clusters }) => {
+        clustersQuery.subscribe(async ({ clusters }) => {
             if (!clusters)
                 return;
 
+            // Wait for filterConfig to be updated!
+            await tick();
+
             selectedCluster = clusters.find(c => c.clusterID == selectedClusterId);
-
-            tick().then(() => filterConfig.setCluster(selectedClusterId));
-
-            updateQueries([
-                { clusterId: { eq: selectedClusterId } }
-            ]);
+            filterConfig.setCluster(selectedClusterId);
+            updateQueries(filterConfig.getFilters());
         });
 
     async function updateQueries(filterItems) {
+        console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
+
         $statsQuery.variables.filter = { list: filterItems };
         $statsQuery.context.pause = false;
 
@@ -133,7 +134,6 @@
     }
 
     function filtersChanged(event) {
-
         let filterItems;
         if (event.detail) {
             filterItems = event.detail.filterItems;
@@ -143,12 +143,11 @@
                 return;
             }
         } else if (event.cluster) {
-            filterItems = [ { clusterId: { eq: event.cluster } } ];
             selectedClusterId = event.cluster;
-            tick().then(() => filterConfig.setCluster(selectedClusterId));
+            filterConfig.setCluster(selectedClusterId);
+            filterItems = filterConfig.getFilters();
         }
 
-        console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
         selectedCluster = $clustersQuery.clusters.find(c => c.clusterID == selectedClusterId);
         window.location.hash = `#${selectedClusterId}`;
         updateQueries(filterItems);
@@ -207,6 +206,28 @@
     }
 </style>
 
+<FilterConfig
+    bind:this={filterConfig}
+    {showFilters}
+    bind:appliedFilters
+    availableFilters={{ userId: true }}
+    filterPresets={{
+        startTime: {
+            from: (() => {
+                let d = new Date();
+                d.setHours(0, 0, 0, 0);
+                d.setMonth(d.getMonth() - 1);
+                return d.toISOString();
+            })(),
+            to: (() => {
+                let d = new Date();
+                d.setHours(0, 0, 0, 0);
+                return d.toISOString();
+            })()
+        }
+    }}
+    on:update={filtersChanged} />
+
 {#if selectedClusterId == null || $clustersQuery.error}
 <Row>
     <Col>
@@ -229,13 +250,6 @@
     </Col>
 </Row>
 {:else}
-<FilterConfig
-    bind:this={filterConfig}
-    {showFilters}
-    bind:appliedFilters
-    availableFilters={{ userId: true }}
-    on:update={filtersChanged} />
-
 <Row style="margin-bottom: 0.5rem;">
     <Col>
         <Button outline color=success
@@ -274,10 +288,10 @@
 
 <Row>
     <Col xs="4">
-        {#if $rooflineHeatmapQuery.error}
-            <Card body color="danger" class="mb-3">Error: {$rooflineHeatmapQuery.error.message}</Card>
-        {:else if $rooflineHeatmapQuery.fetching}
+        {#if $rooflineHeatmapQuery.fetching}
             <Spinner secondary />
+        {:else if $rooflineHeatmapQuery.error}
+            <Card body color="danger" class="mb-3">Error: {$rooflineHeatmapQuery.error.message}</Card>
         {:else if $rooflineHeatmapQuery.data && selectedCluster}
             {#key $rooflineHeatmapQuery.data.rooflineHeatmap}
                 <Resizable let:width>
@@ -289,12 +303,12 @@
         {/if}
     </Col>
 
-    {#if $metaStatsQuery.error}
+    {#if $metaStatsQuery.fetching}
+        <Col><Spinner secondary /></Col>
+    {:else if $metaStatsQuery.error}
         <Col>
             <Card body color="danger" class="mb-3">Error: {$metaStatsQuery.error.message}</Card>
         </Col>
-    {:else if $metaStatsQuery.fetching}
-        <Col><Spinner secondary /></Col>
     {:else if selectedClusterId != null && $metaStatsQuery.data}
         <Col xs="8">
             <Row>
@@ -333,15 +347,15 @@
 
 <Row><Col><hr/></Col></Row>
 
-{#if $statsQuery.error}
+{#if $statsQuery.fetching}
+    <Row>
+        <Col><Spinner secondary /></Col>
+    </Row>
+{:else if $statsQuery.error}
     <Row>
         <Col>
             <Card body color="danger" class="mb-3">Error: {$statsQuery.error.message}</Card>
         </Col>
-    </Row>
-{:else if $statsQuery.fetching}
-    <Row>
-        <Col><Spinner secondary /></Col>
     </Row>
 {:else if selectedClusterId != null && $statsQuery.data}
     <table style="width: 100%; table-layout: fixed;">
