@@ -28,34 +28,46 @@ namespace App\Service;
 use App\Entity\Job;
 use App\Service\JobArchive;
 use App\Service\ClusterConfiguration;
+use App\Repository\MetricDataRepository;
 use App\Repository\InfluxDBMetricDataRepository;
-#use App\Repository\InfluxDBv2MetricDataRepository;
-#use Psr\Log\LoggerInterface;
+use App\Repository\InfluxDBv2MetricDataRepository;
+use Psr\Log\LoggerInterface;
 
 class JobData
 {
     private $_metricDataRepository;
-    #private $_metricDataRepositoryV2;
+    private $_metricDataRepositoryV2;
     private $_clusterCfg;
     private $_jobArchive;
-    #private $_logger;
+    private $_logger;
 
     public function __construct(
         InfluxDBMetricDataRepository $metricRepo,
-        #InfluxDBv2MetricDataRepository $metricRepoV2,
+        InfluxDBv2MetricDataRepository $metricRepoV2,
         ClusterConfiguration $clusterCfg,
-        JobArchive $jobArchive
-        #LoggerInterface $logger,
+        JobArchive $jobArchive,
+        LoggerInterface $logger,
     )
     {
         $this->_metricDataRepository = $metricRepo;
-        #$this->_metricDataRepositoryV2 = $metricRepoV2;
+        $this->_metricDataRepositoryV2 = $metricRepoV2;
         $this->_clusterCfg = $clusterCfg;
         $this->_jobArchive = $jobArchive;
-        #$this->_logger = $logger;
+        $this->_logger = $logger;
     }
 
-
+    /*
+     * This function is used by the JobStats Service to access a MetricDataRepository.
+     * Having this function here makes it simpler to switch repos.
+     *
+     * For the future, I would like to suggest using the MetricDataRepository interface together with
+     * symfony's autowiring to automatically inject one or the other reporsitory depending on a setting in config/.
+     */
+    public function getMetricRepo(): MetricDataRepository
+    {
+        // return $this->_metricDataRepository;
+        return $this->_metricDataRepositoryV2;
+    }
 
     public function hasData($job)
     {
@@ -68,17 +80,10 @@ class JobData
 
         $job->hasProfile = $this->_jobArchive->isArchived($job);
 
-        # V1 Repository-Code for InfluxDB 1.*
         if (!$job->hasProfile){
-            $this->_metricDataRepository->hasProfile($job,
-            $this->_clusterCfg->getSingleMetric($job->getClusterId()));
+            $this->getMetricRepo()->hasProfile($job,
+                $this->_clusterCfg->getSingleMetric($job->getClusterId()));
         }
-
-        # V2 Repository-Code for InfluxDB 2.*
-        #if (!$job->hasProfile){
-        #    $this->_metricDataRepositoryV2->hasProfile($job,
-        #    $this->_clusterCfg->getSingleMetric($job->getClusterId()));
-        #}
 
         return $job->hasProfile;
     }
@@ -97,17 +102,12 @@ class JobData
         if ($job->isRunning()) {
             $metricConfig = $this->_clusterCfg->getMetricConfiguration($job->getClusterId(), $metrics);
 
-            # V1 Repository-Code for InfluxDB 1.*
-            $stats = $this->_metricDataRepository->getJobStats($job, $metricConfig);
-            $data = $this->_metricDataRepository->getMetricData($job, $metricConfig);
-
-            # V2 Repository-Code for InfluxDB 2.*
-            #$stats = $this->_metricDataRepositoryV2->getJobStats($job, $metricConfig);
-            #$data = $this->_metricDataRepositoryV2->getMetricData($job, $metricConfig);
+            $stats = $this->getMetricRepo()->getJobStats($job, $metricConfig);
+            $data = $this->getMetricRepo()->getMetricData($job, $metricConfig);
 
             $res = [];
 
-            foreach ( $metrics as $metricName => $metric) {
+            foreach ( $metricConfig as $metricName => $metric) {
                 $series = [];
                 foreach ( $data[$metricName] as $nodeId => $nodedata) {
                     $series[] = [
@@ -125,7 +125,7 @@ class JobData
                     'name' => $metricName,
                     'metric' => [
                         'unit' => $metric['unit'],
-                        'scope' => $metric['scope'],
+                        'scope' => 'node', // TODO: Add scope to cluster.json/metricConfig? // $metric['scope'],
                         'timestep' => $metric['sampletime'],
                         'series' => $series
                     ]

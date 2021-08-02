@@ -25,43 +25,73 @@
 
 namespace App\Service;
 
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Psr\Log\LoggerInterface;
+
 use App\Service\JobData;
 use App\Service\JobArchive;
+use App\Service\ClusterConfiguration;
 use App\Entity\Job;
 
 class JobStats
 {
     private $_jobData;
     private $_jobArchive;
+    private $_cacheDir;
+    private $_logger;
+    private $_clusterCfg;
 
     public function __construct(
         JobData $jobData,
-        JobArchive $jobArchive
+        JobArchive $jobArchive,
+        ParameterBagInterface $params,
+        ClusterConfiguration $clusterCfg,
+        LoggerInterface $logger
     )
     {
         $this->_jobData = $jobData;
         $this->_jobArchive = $jobArchive;
+        $this->_cacheDir = $params->get('kernel.cache_dir').'/job-statistics';
+        $this->_clusterCfg = $clusterCfg;
+        $this->_logger = $logger;
     }
 
-    public function getAverages($jobs, $metrics)
+    /*
+     * TODO: Implement something that creates the files asked for here...
+     */
+    private function getCachePath($name, $filter)
     {
-        $res = [];
+        return $this->_cacheDir."/".$name."-".md5(serialize($filter)).".json";
+    }
 
+    public function getAverages($jobs, $filter, $metrics)
+    {
+        $filename = $this->getCachePath("averages", [$filter, $metrics]);
+        if (file_exists($filename))
+            return json_decode(file_get_contents($filename), true);
+
+        $res = [];
         foreach ($metrics as $idx => $metric) {
             $res[$idx] = [];
         }
 
         foreach ($jobs as $job) {
-            if (!$this->_jobArchive->isArchived($job)) {
-                // TODO: Fetch stats from MetricDataRepositories!
-                throw new Exception("unimplemented!");
+            if ($this->_jobArchive->isArchived($job)) {
+                $stats = $this->_jobArchive->getMeta($job)['statistics'];
+                foreach ($metrics as $idx => $metric) {
+                    if (isset($stats[$metric]))
+                        $res[$idx][] = $stats[$metric]['avg'];
+                    else
+                        $res[$idx][] = null;
+                }
+                continue;
             }
 
-            $stats = $this->_jobArchive->getMeta($job)['statistics'];
-
+            $metricConfig = $this->_clusterCfg->getMetricConfiguration($job->getClusterId(), $metrics);
+            $stats = $this->_jobData->getMetricRepo()->getJobStats($job, $metricConfig);
             foreach ($metrics as $idx => $metric) {
-                if (isset($stats[$metric]))
-                    $res[$idx][] = $stats[$metric]['avg'];
+                if (isset($stats[$metric.'_avg']))
+                    $res[$idx][] = $stats[$metric.'_avg'];
                 else
                     $res[$idx][] = null;
             }
@@ -70,8 +100,12 @@ class JobStats
         return $res;
     }
 
-    public function rooflineHeatmap($jobs, $rows, $cols, $minX, $minY, $maxX, $maxY)
+    public function rooflineHeatmap($jobs, $filter, $rows, $cols, $minX, $minY, $maxX, $maxY)
     {
+        $filename = $this->getCachePath("roofline", [$filter, $rows, $cols, $minX, $minY, $maxX, $maxY]);
+        if (file_exists($filename))
+            return json_decode(file_get_contents($filename), true);
+
         $tiles = [];
         for ($i = 0; $i < $rows; $i++) {
             $tiles[$i] = [];
