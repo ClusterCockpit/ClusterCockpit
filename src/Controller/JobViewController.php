@@ -193,7 +193,10 @@ class JobViewController extends AbstractController
         $config = $configuration->getUserConfig($this->getUser());
         $colorMaps->setColormap($config['plot_general_colorscheme']->value, $projectDir);
 
-        if ( $job->isRunning ) {
+        // For actually running jobs, resetting the duration here is fine.
+        // For jobs from the development testing data where 'duration' and 'isRunning'
+        // can both be > 0, this messes things up.
+        if ( $job->isRunning && ($job->duration == null || $job->duration == 0) ) {
             $job->duration = time() - $job->startTime;
         }
 
