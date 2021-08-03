@@ -25,7 +25,8 @@
 
 namespace App\Service;
 
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 use Psr\Log\LoggerInterface;
 
 use App\Service\JobData;
@@ -35,41 +36,46 @@ use App\Entity\Job;
 
 class JobStats
 {
+    const CACHE_EXPIRES_AFTER = 60 * 60; // 1h
+
     private $_jobData;
     private $_jobArchive;
-    private $_cacheDir;
     private $_logger;
     private $_clusterCfg;
+    private $_cache;
 
     public function __construct(
         JobData $jobData,
         JobArchive $jobArchive,
-        ParameterBagInterface $params,
         ClusterConfiguration $clusterCfg,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        CacheInterface $cache
     )
     {
         $this->_jobData = $jobData;
         $this->_jobArchive = $jobArchive;
-        $this->_cacheDir = $params->get('kernel.cache_dir').'/job-statistics';
         $this->_clusterCfg = $clusterCfg;
         $this->_logger = $logger;
+        $this->_cache = $cache;
     }
 
-    /*
-     * TODO: Implement something that creates the files asked for here...
-     */
-    private function getCachePath($name, $filter)
+    private function getCacheKey($name, $filter)
     {
-        return $this->_cacheDir."/".$name."-".md5(serialize($filter)).".json";
+        return $name."_".md5(serialize($filter));
     }
 
     public function getAverages($jobs, $filter, $metrics)
     {
-        $filename = $this->getCachePath("averages", [$filter, $metrics]);
-        if (file_exists($filename))
-            return json_decode(file_get_contents($filename), true);
+        $key = $this->getCacheKey("analysisview-averages", [$filter, $metrics]);
+        return $this->_cache->get($key, function (ItemInterface $item) use ($jobs, $metrics) {
+            $item->expiresAfter(self::CACHE_EXPIRES_AFTER);
+            $this->_logger->info("Fetching Averages of ".count($jobs)." jobs for AnalysisView...");
+            return $this->_fetchAverages($jobs, $metrics);
+        });
+    }
 
+    private function _fetchAverages($jobs, $metrics)
+    {
         $res = [];
         foreach ($metrics as $idx => $metric) {
             $res[$idx] = [];
@@ -102,10 +108,16 @@ class JobStats
 
     public function rooflineHeatmap($jobs, $filter, $rows, $cols, $minX, $minY, $maxX, $maxY)
     {
-        $filename = $this->getCachePath("roofline", [$filter, $rows, $cols, $minX, $minY, $maxX, $maxY]);
-        if (file_exists($filename))
-            return json_decode(file_get_contents($filename), true);
+        $key = $this->getCacheKey("analysisview-roofline", [$filter, $rows, $cols, $minX, $minY, $maxX, $maxY]);
+        return $this->_cache->get($key, function (ItemInterface $item) use ($jobs, $rows, $cols, $minX, $minY, $maxX, $maxY) {
+            $item->expiresAfter(self::CACHE_EXPIRES_AFTER);
+            $this->_logger->info("Building Roofline-Plot from ".count($jobs)." jobs for AnalysisView...");
+            return $this->_calcRooflineHeatmap($jobs, $rows, $cols, $minX, $minY, $maxX, $maxY);
+        });
+    }
 
+    private function _calcRooflineHeatmap($jobs, $rows, $cols, $minX, $minY, $maxX, $maxY)
+    {
         $tiles = [];
         for ($i = 0; $i < $rows; $i++) {
             $tiles[$i] = [];
