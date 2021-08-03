@@ -25,6 +25,9 @@
 
 namespace App\Service;
 
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\CacheInterface;
+
 use App\Entity\Job;
 use App\Service\JobArchive;
 use App\Service\ClusterConfiguration;
@@ -35,6 +38,9 @@ use Psr\Log\LoggerInterface;
 
 class JobData
 {
+    const CACHE_EXPIRES_AFTER_RUNNING = 60; // 1min
+    const CACHE_EXPIRES_AFTER_ARCHIVED = 60 * 60; // 1h
+
     private $_metricDataRepository;
     private $_metricDataRepositoryV2;
     private $_clusterCfg;
@@ -47,6 +53,7 @@ class JobData
         ClusterConfiguration $clusterCfg,
         JobArchive $jobArchive,
         LoggerInterface $logger,
+        CacheInterface $cache
     )
     {
         $this->_metricDataRepository = $metricRepo;
@@ -54,6 +61,7 @@ class JobData
         $this->_clusterCfg = $clusterCfg;
         $this->_jobArchive = $jobArchive;
         $this->_logger = $logger;
+        $this->_cache = $cache;
     }
 
     /*
@@ -89,6 +97,19 @@ class JobData
     }
 
     public function getData($job, $metrics)
+    {
+        $key = $job->getClusterId()."-".$job->getJobId()."-".$job->getStartTime()."-".md5(serialize($metrics));
+        return $this->_cache->get($key, function (ItemInterface $item) use ($job, $metrics) {
+            if ($job->isRunning)
+                $item->expiresAfter(self::CACHE_EXPIRES_AFTER_RUNNING);
+            else
+                $item->expiresAfter(self::CACHE_EXPIRES_AFTER_ARCHIVED);
+
+            return $this->_getData($job, $metrics);
+        });
+    }
+
+    private function _getData($job, $metrics)
     {
         if (! $this->hasData($job) ) {
             return false;
