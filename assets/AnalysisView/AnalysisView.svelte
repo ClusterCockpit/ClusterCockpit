@@ -2,6 +2,7 @@
     import { setContext, getContext, tick } from 'svelte';
     import { operationStore, query } from '@urql/svelte';
     import { Spinner, Row, Col, Card, Button, Icon,
+             ListGroup, ListGroupItem,
              InputGroup, InputGroupText, Input } from 'sveltestrap';
     import Histogram from '../Plots/Histogram.svelte';
     import ScatterPlot from '../Plots/Scatter.svelte';
@@ -77,8 +78,8 @@
 
     query(metaStatsQuery);
 
-    $: matchedJobs = $statsQuery.data
-        ? $statsQuery.data.jobMetricAverages[0].length
+    $: matchedJobs = $metaStatsQuery.data
+        ? $metaStatsQuery.data.jobsStatistics.totalJobs
         : null;
 
     $: {
@@ -102,20 +103,21 @@
     }
 
     if (selectedClusterId != null)
-        clustersQuery.subscribe(({ clusters }) => {
+        clustersQuery.subscribe(async ({ clusters }) => {
             if (!clusters)
                 return;
 
+            // Wait for filterConfig to be updated!
+            await tick();
+
             selectedCluster = clusters.find(c => c.clusterID == selectedClusterId);
-
-            tick().then(() => filterConfig.setCluster(selectedClusterId));
-
-            updateQueries([
-                { clusterId: { eq: selectedClusterId } }
-            ]);
+            filterConfig.setCluster(selectedClusterId);
+            updateQueries(filterConfig.getFilters());
         });
 
     async function updateQueries(filterItems) {
+        console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
+
         $statsQuery.variables.filter = { list: filterItems };
         $statsQuery.context.pause = false;
 
@@ -132,15 +134,18 @@
     }
 
     function filtersChanged(event) {
-        if (!$clustersQuery.clusters)
-            throw new Error('clusters-GraphQL-Query not finished!');
-
-        let filterItems = event.detail.filterItems;
-        console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
-        selectedClusterId = appliedFilters.cluster;
-        if (selectedClusterId == null) {
-            selectedCluster = null;
-            return;
+        let filterItems;
+        if (event.detail) {
+            filterItems = event.detail.filterItems;
+            selectedClusterId = appliedFilters.cluster;
+            if (selectedClusterId == null) {
+                selectedCluster = null;
+                return;
+            }
+        } else if (event.cluster) {
+            selectedClusterId = event.cluster;
+            filterConfig.setCluster(selectedClusterId);
+            filterItems = filterConfig.getFilters();
         }
 
         selectedCluster = $clustersQuery.clusters.find(c => c.clusterID == selectedClusterId);
@@ -205,9 +210,47 @@
     bind:this={filterConfig}
     {showFilters}
     bind:appliedFilters
+    availableFilters={{ userId: true }}
+    filterPresets={{
+        startTime: {
+            from: (() => {
+                let d = new Date();
+                d.setHours(0, 0, 0, 0);
+                d.setMonth(d.getMonth() - 1);
+                return d.toISOString();
+            })(),
+            to: (() => {
+                let d = new Date();
+                d.setHours(0, 0, 0, 0);
+                return d.toISOString();
+            })()
+        }
+    }}
     on:update={filtersChanged} />
 
+{#if selectedClusterId == null || $clustersQuery.error}
 <Row>
+    <Col>
+        {#if $clustersQuery.fetching}
+            <Spinner secondary />
+        {:else if $clustersQuery.error}
+            <Card body color="danger" class="mb-3">{$clustersQuery.error.message}</Card>
+        {:else if $clustersQuery.clusters}
+            <ListGroup>
+                <ListGroupItem disabled>Select one of the following clusters:</ListGroupItem>
+                {#each $clustersQuery.clusters.map(c => c.clusterID) as cluster}
+                    <ListGroupItem>
+                        <Button outline on:click={() => filtersChanged({ cluster })}>
+                            {cluster}
+                        </Button>
+                    </ListGroupItem>
+                {/each}
+            </ListGroup>
+        {/if}
+    </Col>
+</Row>
+{:else}
+<Row style="margin-bottom: 0.5rem;">
     <Col>
         <Button outline color=success
             on:click={() => (showFilters = !showFilters)}>
@@ -223,9 +266,13 @@
     </Col>
 </Row>
 
-<FilterInfo
-    {appliedFilters}
-    {matchedJobs} />
+<Row>
+    <Col>
+        <FilterInfo
+            {appliedFilters}
+            {matchedJobs} />
+    </Col>
+</Row>
 
 {#if selectedClusterId == null}
     <Row>
@@ -241,10 +288,10 @@
 
 <Row>
     <Col xs="4">
-        {#if $rooflineHeatmapQuery.error}
-            <Card body color="danger" class="mb-3">Error: {$rooflineHeatmapQuery.error.message}</Card>
-        {:else if $rooflineHeatmapQuery.fetching}
+        {#if $rooflineHeatmapQuery.fetching}
             <Spinner secondary />
+        {:else if $rooflineHeatmapQuery.error}
+            <Card body color="danger" class="mb-3">Error: {$rooflineHeatmapQuery.error.message}</Card>
         {:else if $rooflineHeatmapQuery.data && selectedCluster}
             {#key $rooflineHeatmapQuery.data.rooflineHeatmap}
                 <Resizable let:width>
@@ -256,12 +303,12 @@
         {/if}
     </Col>
 
-    {#if $metaStatsQuery.error}
+    {#if $metaStatsQuery.fetching}
+        <Col><Spinner secondary /></Col>
+    {:else if $metaStatsQuery.error}
         <Col>
             <Card body color="danger" class="mb-3">Error: {$metaStatsQuery.error.message}</Card>
         </Col>
-    {:else if $metaStatsQuery.fetching}
-        <Col><Spinner secondary /></Col>
     {:else if selectedClusterId != null && $metaStatsQuery.data}
         <Col xs="8">
             <Row>
@@ -300,15 +347,15 @@
 
 <Row><Col><hr/></Col></Row>
 
-{#if $statsQuery.error}
+{#if $statsQuery.fetching}
+    <Row>
+        <Col><Spinner secondary /></Col>
+    </Row>
+{:else if $statsQuery.error}
     <Row>
         <Col>
             <Card body color="danger" class="mb-3">Error: {$statsQuery.error.message}</Card>
         </Col>
-    </Row>
-{:else if $statsQuery.fetching}
-    <Row>
-        <Col><Spinner secondary /></Col>
     </Row>
 {:else if selectedClusterId != null && $statsQuery.data}
     <table style="width: 100%; table-layout: fixed;">
@@ -370,3 +417,5 @@
     {/each}
     </table>
 {/if}
+
+{/if} <!-- selectedClusterId -->

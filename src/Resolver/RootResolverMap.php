@@ -42,6 +42,8 @@ use App\Repository\JobTagRepository;
 
 class RootResolverMap extends ResolverMap
 {
+    const ANALYSIS_MAX_JOBS = 500;
+
     private $jobRepo;
     private $jobData;
     private $jobStats;
@@ -127,12 +129,16 @@ class RootResolverMap extends ResolverMap
                     $page = $args['page'];
                     $orderBy = $args['order'];
 
-                    $jobs = $this->jobRepo->findFilteredJobs($page, $filter, $orderBy);
-                    $count = $this->jobRepo->countJobs($filter, $orderBy);
+                    try {
+                        $jobs = $this->jobRepo->findFilteredJobs($page, $filter, $orderBy);
+                        $count = $this->jobRepo->countJobs($filter, $orderBy);
 
-                    $items = [];
-                    foreach ($jobs as $job) {
-                        $items[] = $this->jobEntityToArray($job);
+                        $items = [];
+                        foreach ($jobs as $job) {
+                            $items[] = $this->jobEntityToArray($job);
+                        }
+                    } catch (\Throwable $e) {
+                        throw new Error($e->getMessage());
                     }
 
                     return [
@@ -143,10 +149,21 @@ class RootResolverMap extends ResolverMap
 
                 'clusters' => function($value, Argument $args, $context, ResolveInfo $info) {
                     $clusters = $this->clusterCfg->getConfigurations();
+                    if ($clusters == null || count($clusters) == 0)
+                        throw new Error("No clusters configured");
 
-                    // Getting the filter ranges is expensive, so only fetch them if requested.
                     if (array_key_exists('filterRanges', $info->getFieldSelection())) {
                         foreach ($clusters as &$cluster) {
+                            if (isset($cluster['filterRanges'])) {
+                                // This startTime of the last job on that cluster is a special
+                                // case, let's simply use now as the upper bound.
+                                if ($cluster['filterRanges']['startTime']['to'] == null)
+                                    $cluster['filterRanges']['startTime']['to'] = time();
+                                continue;
+                            }
+
+                            // The following database query can be very expensive, so it is only done if there are
+                            // no filterRanges specified in the cluster.json files and it is explicitly requested.
                             $cluster['filterRanges'] = $this->jobRepo->getFilterRanges($cluster['clusterID']);
                         }
                     }
@@ -155,9 +172,11 @@ class RootResolverMap extends ResolverMap
                 },
 
                 'filterRanges' => function() {
+                    // TODO: Use filterRanges from cluster.json files?
+                    // This query is not used by the frontend anymore,
+                    // so it could also be removed.
                     return $this->jobRepo->getFilterRanges(null);
                 },
-
 
                 'tags' => function($value, Argument $args) {
                     return $this->getTagsArray($this->jobTagRepo->getAllTags());
@@ -186,18 +205,37 @@ class RootResolverMap extends ResolverMap
                 },
 
                 'jobsStatistics' => function($value, Argument $args) {
-                    return $this->jobRepo->findFilteredStatistics($args['filter'], $this->clusterCfg);
+                    try {
+                        return $this->jobRepo->findFilteredStatistics(
+                            $args['filter'], $this->clusterCfg);
+                    } catch (\Throwable $e) {
+                        throw new Error($e->getMessage());
+                    }
                 },
 
                 'jobMetricAverages' => function($value, Argument $args) {
-                    $jobs = $this->jobRepo->findFilteredJobs(false, $args['filter'], null);
-                    return $this->jobStats->getAverages($jobs, $args['metrics']);
+                    try {
+                        $jobs = $this->jobRepo->findFilteredJobs(false, $args['filter'], null);
+                        if (count($jobs) > RootResolverMap::ANALYSIS_MAX_JOBS)
+                            throw new Error("too many jobs matched (".count($jobs).", max: ".RootResolverMap::ANALYSIS_MAX_JOBS.")");
+
+                        return $this->jobStats->getAverages($jobs, $args['filter'], $args['metrics']);
+                    } catch (\Throwable $e) {
+                        throw new Error($e->getMessage());
+                    }
                 },
 
                 'rooflineHeatmap' => function($value, Argument $args) {
-                    $jobs = $this->jobRepo->findFilteredJobs(false, $args['filter'], null);
-                    return $this->jobStats->rooflineHeatmap($jobs, $args['rows'], $args['cols'],
-                        $args['minX'], $args['minY'], $args['maxX'], $args['maxY']);
+                    try {
+                        $jobs = $this->jobRepo->findFilteredJobs(false, $args['filter'], null);
+                        if (count($jobs) > RootResolverMap::ANALYSIS_MAX_JOBS)
+                            throw new Error("too many jobs matched (".count($jobs).", max: ".RootResolverMap::ANALYSIS_MAX_JOBS.")");
+
+                        return $this->jobStats->rooflineHeatmap($jobs, $args['filter'], $args['rows'], $args['cols'],
+                            $args['minX'], $args['minY'], $args['maxX'], $args['maxY']);
+                    } catch (\Throwable $e) {
+                        throw new Error($e->getMessage());
+                    }
                 },
 
                 'userStats' => function($value, Argument $args) {
@@ -269,6 +307,11 @@ class RootResolverMap extends ResolverMap
             // use RFC3339 to communicate and UNIX-timestamps internally
             'Time' => [
                 self::SERIALIZE => function ($value) {
+                    // If a string is served by another resolver, it better
+                    // allready be formated as RFC3339!
+                    if (is_string($value))
+                        return $value;
+
                     if (!is_int($value))
                         throw new Error('Cannot serialize to Time scalar: '.gettype($value));
 

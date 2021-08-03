@@ -1,6 +1,7 @@
 <script>
     import { initClient, operationStore, query, getClient } from '@urql/svelte';
-    import { Table, Card, Spinner, Icon, Button, Row, Col, Alert } from 'sveltestrap';
+    import { Table, Card, Spinner, Icon, Button, Row, Col, Alert,
+             Input, InputGroup, InputGroupText } from 'sveltestrap';
 
     initClient({
         url: typeof GRAPHQL_BACKEND !== 'undefined'
@@ -11,6 +12,8 @@
     let startTime = null;
     let stopTime = null;
     let clusterId = null;
+    let hideUsersWithNoJobs = false;
+    let usernameFilter = '';
 
     const lastMonth = new Date();
     lastMonth.setMonth(lastMonth.getMonth() - 1);
@@ -31,7 +34,7 @@
         sorting = { field, direction };
     }
 
-    function sortUsers(users, sorting) {
+    function sortUsers(users, sorting, hideUsersWithNoJobs, usernameFilter) {
         let cmp = sorting.field == 'userId'
             ? (sorting.direction == 'up'
                 ? (a, b) => a.userId < b.userId
@@ -40,19 +43,23 @@
                 ? (a, b) => a[sorting.field] - b[sorting.field]
                 : (a, b) => b[sorting.field] - a[sorting.field]);
 
-        users.sort(cmp);
-        return users;
+        if (hideUsersWithNoJobs)
+            users = users.filter(u => u.totalJobs > 0);
+
+        if (usernameFilter)
+            users = users.filter(u => u.userId.includes(usernameFilter));
+
+        return users.sort(cmp);
     }
 
     const usersQuery = operationStore(`
     query($startTime: Time, $stopTime: Time, $clusterId: String) {
-       userStats(startTime: $startTime, stopTime: $stopTime, clusterId: $clusterId) {
-           id,
-           userId
-           totalJobs
-           totalWalltime
-           totalCoreHours
-       }
+        userStats(startTime: $startTime, stopTime: $stopTime, clusterId: $clusterId) {
+            userId
+            totalJobs
+            totalWalltime
+            totalCoreHours
+        }
     }
     `, { startTime, stopTime, clusterId });
 
@@ -100,34 +107,56 @@
     th[scope="col"] > :global(button) {
         float: right;
     }
-    input, select {
-        margin-bottom: 0px;
-    }
 </style>
 
 <Row>
-    <Col style="display: flex; align-items: center;">
+    <Col xs="auto">
         {#if errorMessage == null}
-            Filters on jobs in the statistics:
+            <InputGroup>
+                <InputGroupText><Icon name="sliders" /></InputGroupText>
+            </InputGroup>
         {:else}
             <Alert color="danger">{errorMessage}</Alert>
         {/if}
     </Col>
-    <Col>
-        Cluster:
-        <select bind:value={clusterId}>
-            <option value={null}>Any</option>
-            {#each clusters as cluster}
-                <option value={cluster}>{cluster}</option>
-            {/each}
-        </select>
+    <Col xs="auto">
+        <InputGroup>
+            <InputGroupText><Icon name="person-circle" /></InputGroupText>
+            <input class="form-control" type="text"
+                bind:value={usernameFilter} placeholder="Search User" />
+            <InputGroupText>
+                Hide 0 job users:
+            </InputGroupText>
+            <InputGroupText>
+                <input bind:checked={hideUsersWithNoJobs}
+                    style="margin-bottom: 0px;" type="checkbox" />
+            </InputGroupText>
+        </InputGroup>
     </Col>
-    <Col>
-        Start Time:
-        From
-        <input type="date" bind:value={rawStartTime} />
-        to
-        <input type="date" bind:value={rawStopTime} />
+    <Col xs="auto">
+        <InputGroup>
+            <InputGroupText><Icon name="cpu"/></InputGroupText>
+            <InputGroupText>
+                Cluster
+            </InputGroupText>
+            <select class="form-select" bind:value={clusterId}>
+                <option value={null}>Any</option>
+                {#each clusters as cluster}
+                    <option value={cluster}>{cluster}</option>
+                {/each}
+            </select>
+        </InputGroup>
+    </Col>
+    <Col xs="auto">
+        <InputGroup>
+            <InputGroupText><Icon name="calendar-range" /></InputGroupText>
+            <InputGroupText>
+                Start Time between
+            </InputGroupText>
+            <input class="form-control" type="date" bind:value={rawStartTime} />
+            <InputGroupText>and</InputGroupText>
+            <input class="form-control" type="date" bind:value={rawStopTime} />
+        </InputGroup>
     </Col>
 </Row>
 <Table>
@@ -177,16 +206,22 @@
                 </td>
             </tr>
         {:else}
-            {#each sortUsers($usersQuery.data.userStats, sorting) as user (user.userId)}
+            {#each sortUsers($usersQuery.data.userStats, sorting, hideUsersWithNoJobs, usernameFilter) as user (user.userId)}
                 <tr>
                     <td>
-                        <a href="/monitoring/user/{user.id}" target="_blank">
+                        <a href="/monitoring/user/{user.userId}" target="_blank">
                             {user.userId}
                         </a>
                     </td>
                     <td>{user.totalJobs}</td>
                     <td>{user.totalWalltime.toFixed(2)}</td>
                     <td>{user.totalCoreHours.toFixed(2)}</td>
+                </tr>
+            {:else}
+                <tr>
+                    <td colspan="4">
+                        <i>No Users</i>
+                    </td>
                 </tr>
             {/each}
         {/if}

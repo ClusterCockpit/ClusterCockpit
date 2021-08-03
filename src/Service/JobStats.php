@@ -25,63 +25,87 @@
 
 namespace App\Service;
 
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Psr\Log\LoggerInterface;
+
 use App\Service\JobData;
+use App\Service\JobArchive;
+use App\Service\ClusterConfiguration;
 use App\Entity\Job;
 
 class JobStats
 {
-    private $_rootdir;
     private $_jobData;
+    private $_jobArchive;
+    private $_cacheDir;
+    private $_logger;
+    private $_clusterCfg;
 
     public function __construct(
-        $projectDir,
-        JobData $jobData
+        JobData $jobData,
+        JobArchive $jobArchive,
+        ParameterBagInterface $params,
+        ClusterConfiguration $clusterCfg,
+        LoggerInterface $logger
     )
     {
-        $this->_rootdir = "$projectDir/var/job-archive";
         $this->_jobData = $jobData;
+        $this->_jobArchive = $jobArchive;
+        $this->_cacheDir = $params->get('kernel.cache_dir').'/job-statistics';
+        $this->_clusterCfg = $clusterCfg;
+        $this->_logger = $logger;
     }
 
-    private function _getJobMetaPath($jobId, $clusterId)
+    /*
+     * TODO: Implement something that creates the files asked for here...
+     */
+    private function getCachePath($name, $filter)
     {
-        $jobId = intval(explode('.', $jobId)[0]);
-        $lvl1 = intdiv($jobId, 1000);
-        $lvl2 = $jobId % 1000;
-        $path = sprintf('%s/%s/%d/%03d/meta.json',
-            $this->_rootdir, $clusterId, $lvl1, $lvl2);
-        return $path;
+        return $this->_cacheDir."/".$name."-".md5(serialize($filter)).".json";
     }
 
-    public function getAverages($jobs, $metrics)
+    public function getAverages($jobs, $filter, $metrics)
     {
+        $filename = $this->getCachePath("averages", [$filter, $metrics]);
+        if (file_exists($filename))
+            return json_decode(file_get_contents($filename), true);
+
         $res = [];
-
         foreach ($metrics as $idx => $metric) {
             $res[$idx] = [];
         }
 
         foreach ($jobs as $job) {
-            $filepath = $this->_getJobMetaPath($job->getJobId(), $job->getClusterId());
-            if (file_exists($filepath)) {
-                $data = json_decode(file_get_contents($filepath), true);
+            if ($this->_jobArchive->isArchived($job)) {
+                $stats = $this->_jobArchive->getMeta($job)['statistics'];
                 foreach ($metrics as $idx => $metric) {
-                    if (isset($data['statistics'][$metric]))
-                        $res[$idx][] = $data['statistics'][$metric]['avg'];
+                    if (isset($stats[$metric]))
+                        $res[$idx][] = $stats[$metric]['avg'];
                     else
                         $res[$idx][] = null;
                 }
-            } else {
-                foreach ($metrics as $idx => $metric) {
+                continue;
+            }
+
+            $metricConfig = $this->_clusterCfg->getMetricConfiguration($job->getClusterId(), $metrics);
+            $stats = $this->_jobData->getMetricRepo()->getJobStats($job, $metricConfig);
+            foreach ($metrics as $idx => $metric) {
+                if (isset($stats[$metric.'_avg']))
+                    $res[$idx][] = $stats[$metric.'_avg'];
+                else
                     $res[$idx][] = null;
-                }
             }
         }
 
         return $res;
     }
 
-    public function rooflineHeatmap($jobs, $rows, $cols, $minX, $minY, $maxX, $maxY)
+    public function rooflineHeatmap($jobs, $filter, $rows, $cols, $minX, $minY, $maxX, $maxY)
     {
+        $filename = $this->getCachePath("roofline", [$filter, $rows, $cols, $minX, $minY, $maxX, $maxY]);
+        if (file_exists($filename))
+            return json_decode(file_get_contents($filename), true);
+
         $tiles = [];
         for ($i = 0; $i < $rows; $i++) {
             $tiles[$i] = [];
@@ -111,8 +135,8 @@ class JobStats
             }
 
             for ($n = 0; $n < $job->getNumNodes(); $n++) {
-                $flopsAnyData = $flopsAny->series[$n]->data;
-                $memBwData = $memBw->series[$n]->data;
+                $flopsAnyData = $flopsAny['series'][$n]['data'];
+                $memBwData = $memBw['series'][$n]['data'];
                 $count = count($flopsAnyData);
                 for ($i = 0; $i < $count; $i++) {
                     $f = $flopsAnyData[$i];

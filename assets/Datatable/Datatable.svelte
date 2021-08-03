@@ -18,7 +18,7 @@
     let page = 1;
     let paging = { itemsPerPage: itemsPerPage, page: page };
     let tableWidth, plotWidth;
-    let jobMetaWidth = 200;
+    let jobMetaWidth = 250;
     let rowHeight = 200;
     $: {
         const elm = document.querySelector('.cc-table-wrapper tbody td:first-child > div');

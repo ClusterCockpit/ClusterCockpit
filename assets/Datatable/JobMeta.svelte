@@ -23,7 +23,7 @@
         ({job["clusterId"]})
     </div>
     <div class="fst-italic">
-        {job["userId"]}
+        <a href="/monitoring/user/{job["userId"]}" target="_blank">{job["userId"]}</a>
         {#if job["projectId"] && job["projectId"] != 'no project'}
             ({job["projectId"]})
         {/if}

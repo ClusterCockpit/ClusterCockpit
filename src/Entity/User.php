@@ -39,13 +39,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 class User implements UserInterface, \Serializable
 {
     /**
-     *  @ORM\Id
-     *  @ORM\GeneratedValue(strategy="AUTO")
-     *  @ORM\Column(type="integer")
-     */
-    private $id;
-
-    /**
+     * @ORM\Id
      * @ORM\Column(type="string", length=255, unique=true)
      * @Assert\NotBlank()
      */
@@ -86,11 +80,6 @@ class User implements UserInterface, \Serializable
      * @ORM\Column(type="string", unique=true, nullable=true)
      */
     private $apiToken;
-
-    public function getId()
-    {
-        return $this->id;
-    }
 
     public function getSalt()
     {
@@ -133,7 +122,6 @@ class User implements UserInterface, \Serializable
     public function serialize()
     {
         return serialize(array(
-            $this->id,
             $this->username,
             $this->password,
         ));
@@ -143,7 +131,6 @@ class User implements UserInterface, \Serializable
     public function unserialize($serialized)
     {
         list (
-            $this->id,
             $this->username,
             $this->password,
         ) = unserialize($serialized, ['allowed_classes' => false]);

@@ -34,7 +34,7 @@ body {
     flex: none;
 }
 
-input, button, select, textarea {
+input:not(.form-control):not(.form-check-input), button:not(.btn), select:not(.form-select), textarea {
 	font-family: inherit;
 	font-size: inherit;
 	-webkit-padding: 0.4em 0;
@@ -122,9 +122,9 @@ button {
 
 .legal li {
     list-style: none;
-￼    margin: 0;
-￼    padding: 0;
-￼    min-height: 20px;
+     margin: 0;
+    padding: 0;
+    min-height: 20px;
     color: #444;
     font-family: Roboto,sans-serif;
     font-style: normal;

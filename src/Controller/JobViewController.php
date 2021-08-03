@@ -55,9 +55,9 @@ class JobViewController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         if ( false === $authChecker->isGranted('ROLE_ADMIN') ) {
-            $userId = $this->getUser()->getId();
+            $userId = $this->getUser()->getUsername();
             $job = $jobRepo->findOneBy(
-                ['jobId' => $searchId, 'user' => $userId]
+                ['jobId' => $searchId, 'userId' => $userId]
             );
 
             if (!$job) {
@@ -66,7 +66,7 @@ class JobViewController extends AbstractController
                         'message' => 'No such job!'
                     ));
             } else {
-                return $this->redirectToRoute('show_job', array('id' => $job->getId()));
+                return $this->redirectToRoute('show_job', array('id' => $job->id));
             }
         } else {
             $job = $jobRepo->findOneBy(['jobId' => $searchId]);
@@ -80,10 +80,10 @@ class JobViewController extends AbstractController
                             'message' => 'No such job or user!'
                         ));
                 } else {
-                    return $this->redirectToRoute('show_user', array('id' => $user->getId()));
+                    return $this->redirectToRoute('show_user', array('id' => $user->getUsername()));
                 }
             } else {
-                return $this->redirectToRoute('show_job', array('id' => $job->getId()));
+                return $this->redirectToRoute('show_job', array('id' => $job->id));
             }
         }
     }
@@ -193,7 +193,10 @@ class JobViewController extends AbstractController
         $config = $configuration->getUserConfig($this->getUser());
         $colorMaps->setColormap($config['plot_general_colorscheme']->value, $projectDir);
 
-        if ( $job->isRunning ) {
+        // For actually running jobs, resetting the duration here is fine.
+        // For jobs from the development testing data where 'duration' and 'isRunning'
+        // can both be > 0, this messes things up.
+        if ( $job->isRunning && ($job->duration == null || $job->duration == 0) ) {
             $job->duration = time() - $job->startTime;
         }
 

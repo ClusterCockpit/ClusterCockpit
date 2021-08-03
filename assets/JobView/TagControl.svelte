@@ -38,13 +38,18 @@
     $: {
         newTagType = '';
         newTagName = '';
-        if (allTagsFiltered.length == 0) {
-            let parts = filterTerm.split(':').map(s => s.trim());
-            if (parts.length == 2 && parts.every(s => s.length > 1)) {
-                newTagType = parts[0];
-                newTagName = parts[1];
-            }
+        let parts = filterTerm.split(':').map(s => s.trim());
+        if (parts.length == 2 && parts.every(s => s.length > 0)) {
+            newTagType = parts[0];
+            newTagName = parts[1];
         }
+    }
+
+    function isNewTag(tagType, tagName) {
+        for (let tag of allTagsFiltered)
+            if (tag.tagType == tagType && tag.tagName == tagName)
+                return false;
+        return true;
     }
 
     function createTag(tagType, tagName) {
@@ -145,18 +150,15 @@
             {/each}
         </ul>
         <br/>
-        {#if allTagsFiltered.length === 0}
-            {#if newTagType && newTagName}
-                <Button outline color="success"
-                    on:click={e => (e.preventDefault(), createTag(newTagType, newTagName))
-                        .then(tag => addTagToJob(tag))}>
-
-                    Create & Add Tag:
-                    <Tag tag={({ tagType: newTagType, tagName: newTagName })}></Tag>
-                </Button>
-            {:else}
-                <Alert>Search Term is not a valid Tag (<code>type: name</code>)</Alert>
-            {/if}
+        {#if newTagType && newTagName && isNewTag(newTagType, newTagName)}
+            <Button outline color="success"
+                on:click={e => (e.preventDefault(), createTag(newTagType, newTagName))
+                    .then(tag => addTagToJob(tag))}>
+                Create & Add Tag:
+                <Tag tag={({ tagType: newTagType, tagName: newTagName })}></Tag>
+            </Button>
+        {:else if allTagsFiltered.length == 0}
+            <Alert>Search Term is not a valid Tag (<code>type: name</code>)</Alert>
         {/if}
     </ModalBody>
     <ModalFooter>

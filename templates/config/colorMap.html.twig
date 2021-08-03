@@ -7,30 +7,36 @@
 {% block javascript %}
     {{ parent() }}
     <script>
-        $(document).ready(function () {
-        feather.replace()
-            $('input[type=radio][name=colorMap]').change(function(){
-                data = {
-                    id: {{ current.id }},
-                    value: $(this).attr("value"),
-                    name: '{{ current.name }}',
-                    scope: 'default'
-                };
+document.querySelectorAll('input[type=radio][name=colorMap]').forEach(input =>
+    input.addEventListener("change", (e) => {
+        if (!e.target.checked)
+            return;
 
-                $.ajax({
-                    type: "PATCH",
-                    url: "{{ path('patch_configuration', {id : current.id}) }}",
-                    data: JSON.stringify(data),
-                    processData: false,
-                    contentType : 'application/json',
-                    dataType: 'json',
-                    success: function(result) {
-                    },
-                    error: function(result) {
-                    }
-                });
-            });
-        });
+        e.preventDefault();
+        let value = e.target.getAttribute("value");
+
+        data = {
+            id: '{{ current.id }}',
+            value: value,
+            name: '{{ current.name }}',
+            scope: 'default',
+            validation: '*', // TODO
+            feedback: 'Colorscheme in Timeseries Plots'
+        };
+
+        fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations/{{ current.id }}", {
+                method: 'PATCH',
+                mode: 'cors',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/merge-patch+json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(data => console.log("Success!"))
+            .catch(error => console.error(error));
+    })
+);
     </script>
 {% endblock %}
 
@@ -44,7 +50,7 @@
                     {% if current.value == color %}
                     <div class="col-4 bg-light">
                         <div class="form-check">
-                                <input class="form-check-input" type="radio" name="colorMap" id="{{ color }}" value="{{ color }}" checked>
+                            <input class="form-check-input" type="radio" name="colorMap" id="{{ color }}" value="{{ color }}" checked>
                             <label class="form-check-label" for="{{ color }}">
                                 {{ color }}
                             </label>
@@ -53,7 +59,7 @@
                 {% else %}
                     <div class="col-4">
                         <div class="form-check">
-                                <input class="form-check-input" type="radio" name="colorMap" id="{{ color }}" value="{{ color }}">
+                            <input class="form-check-input" type="radio" name="colorMap" id="{{ color }}" value="{{ color }}">
                             <label class="form-check-label" for="{{ color }}">
                                 {{ color }}
                             </label>

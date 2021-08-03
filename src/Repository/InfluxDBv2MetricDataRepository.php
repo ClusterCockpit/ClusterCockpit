@@ -34,14 +34,14 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
     private $_timing;
     private $_client;
     private $_queryAPI;
-    #private $_logger;
+    private $_logger;
 
     public function __construct(
-        #LoggerInterface $logger
+        LoggerInterface $logger
     )
     {
         $this->_timer = new Stopwatch();
-        #$this->_logger = $logger;
+        $this->_logger = $logger;
         $influxdbV2URL = getenv('INFLUXDB_V2_URL');
         $influxdbToken = getenv('INFLUXDB_TOKEN');
         #$this->_logger->info("Scheme: $influxdbURL");
@@ -50,8 +50,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
             "token" => $influxdbToken,
             "bucket" => "ClusterCockpit/data",
             "org" => "ClusterCockpit",
-            "precision" => InfluxDB2\Model\WritePrecision::S,
-            "debug" => true
+            "precision" => InfluxDB2\Model\WritePrecision::S
         ]);
 
         $this->_queryApi = $this->_client->createQueryApi();
@@ -82,17 +81,8 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
         $points = $result[0]->records[0]->values['_value'];
 
         #$resultJson = json_encode($result);
-        #$resultType = gettype($result);
-        #$pointsJson = json_encode($points);
-        #$pointsType = gettype($points);
-
-        #$this->_logger->info(">>>> QUERY: $query");
         #$this->_logger->info(">>>> RESULTJSON: $resultJson");
-        #$this->_logger->info(">>>> RESULTTYPE: $resultType");
-        #$this->_logger->info(">>>> POINTSJSON: $pointsJson");
-        #$this->_logger->info(">>>> POINTSTYPE: $pointsType");
 
-        #Original: if ( count($points) == 0 || $points[0]['count'] < 4 )
         if ( $points == 0 || $points < 4 ){
             $job->hasProfile = false;
             return false;
@@ -102,115 +92,124 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
         }
     }
 
+
     public function getJobStats($job, $metrics)
     {
         $nodes = $job->getNodes('|');
+
         $startTime = date("Y-m-d\TH:i:s\Z",$job->startTime);
         $stopTime = date("Y-m-d\TH:i:s\Z",$job->startTime + $job->duration);
 
         foreach ( $metrics as $metric ) {
+
             $name = $metric['name'];
 
-            $query = "from(bucket:\"ClusterCockpit\")
+            $query = "data = from(bucket:\"ClusterCockpit/data\")
                 |> range(start: {$startTime}, stop: {$stopTime})
                 |> filter(fn: (r) =>
-                r._measurement == \"{$metric['measurement']}\" and
-                r._field == \"{$metric['name']}\" and
-                r.host == \"{$nodes[0]}\"
-                |> count()";
+                  r._measurement == \"{$metric['measurement']}\" and
+                  r._field == \"{$name}\" and
+                  r.host =~ /{$nodes}/
+                )
 
+                {$name}_avg = data |> mean(column: \"_value\") |> set(key: \"_field\", value: \"{$name}_avg\")
+                {$name}_min = data |> min(column:  \"_value\") |> set(key: \"_field\", value: \"{$name}_min\")
+                {$name}_max = data |> max(column:  \"_value\") |> set(key: \"_field\", value: \"{$name}_max\")
+
+                union(tables: [{$name}_avg, {$name}_min, {$name}_max])
+                |> pivot(rowKey:[\"host\"], columnKey: [\"_field\"], valueColumn: \"_value\")
+                |> group()
+            ";
+
+            $this->_timer->start( 'InfluxDBv2');
             $result = $this->_queryApi->query($query);
+            $records = $result[0]->records;
+            $recordsCount = count($records);
+            $this->_timer->stop( 'InfluxDBv2');
 
+            #$resultJson  = json_encode($result);
+            #$this->_logger->info(">>>> RESULTJSON:  $resultJson");
 
-
-            $query = "SELECT
-                MEAN($name)  AS {$name}_avg
-                ,MIN($name)  AS {$name}_min
-                ,MAX($name)  AS {$name}_max
-                FROM {$metric['measurement']}
-                WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
-                AND host =~ /$nodes/ GROUP BY host";
-
-            $this->_timer->start( 'InfluxDB');
-            $result = $this->_queryApi->query($query);
-            $queries[] = $result->getSeries();
-            $this->_timer->stop( 'InfluxDB');
-
-            $query = "SELECT
-                MEAN($name)  AS {$name}_avg
-                ,MIN($name)  AS {$name}_min
-                ,MAX($name)  AS {$name}_max
-                FROM {$metric['measurement']}
-                WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
-                AND host =~ /$nodes/";
-
-	    /* $this->_logger->info("InfluxDB JobStat QUERY: $query"); */
-            $this->_timer->start( 'InfluxDB');
-            $result = $this->_database->query($query);
-            $points = $result->getPoints();
-            $this->_timer->stop( 'InfluxDB');
-
-            foreach ( $points[0] as $index => $value ){
-                if ($index != 'time'){
-                    $stats[$index] = round($value,2);
-                }
+            foreach ( $records as $index => $record ){
+                // Collect stats from nodes in arrays //
+                $jobStats['avg']["{$name}_avg"][] =  $record->values["{$name}_avg"];
+                $jobStats['min']["{$name}_min"][] =  $record->values["{$name}_min"];
+                $jobStats['max']["{$name}_max"][] =  $record->values["{$name}_max"];
+                // Collect stats per node //
+                $nodeId = $record->values["host"];
+                $stats['nodeStats'][$nodeId]['nodeId'] = $nodeId;
+                $stats['nodeStats'][$nodeId]["{$name}_avg"] = round($record->values["{$name}_avg"], 2);
+                $stats['nodeStats'][$nodeId]["{$name}_min"] = round($record->values["{$name}_min"], 2);
+                $stats['nodeStats'][$nodeId]["{$name}_max"] = round($record->values["{$name}_max"], 2);
             }
         }
 
-        foreach ($queries as $queryresult) {
-            foreach ($queryresult as $data) {
-                $nodeId = $data['tags']['host'];
-                $nodeData[$nodeId]['nodeId'] = $nodeId;
-
-                foreach ( $data['columns'] as $index => $metric ){
-                    if ($metric != 'time'){
-                        $nodeData[$nodeId][$metric] = round($data['values'][0][$index],2);
-                    }
-                }
-            }
+        // Find JobStats from Node-Value-Arrays //
+        foreach ($jobStats as $type => $stat) {
+          switch ($type) {
+            case 'avg':
+              foreach ($stat as $name => $values) {
+                $stats[$name] = round((array_sum($values) / $recordsCount), 2);
+              }
+              break;
+            case 'min':
+              foreach ($stat as $name => $values) {
+                $stats[$name] = round(min($values), 2);
+              }
+              break;
+            case 'max':
+              foreach ($stat as $name => $values) {
+                $stats[$name] = round(max($values), 2);
+              }
+              break;
+          }
         }
 
-/*         foreach ($nodeData as $node) { */
-/*             $nodeStat[] = $node; */
-/*         } */
-
-        $stats['nodeStats'] = $nodeData;
+        #$statsJson = json_encode($stats);
+        #$this->_logger->info(">>>> STATSJSON:  $statsJson");
 
         return $stats;
     }
 
     public function getMetricData($job, $metrics)
     {
+        #set_time_limit(120); // Debug Long Load Buffer
         $nodes = $job->getNodes('|');
-        $stopTime = $job->startTime + $job->duration;
+        $measurement = $metrics[array_key_first($metrics)]['measurement'];
 
-        foreach ( $metrics as $metric ) {
-            $query = "SELECT
-                MEAN({$metric['name']})  AS {$metric['name']}
-                FROM {$metric['measurement']}
-                WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
-                AND host =~ /$nodes/ GROUP BY time({$metric['sampletime']}s), host";
+        $startTime = date("Y-m-d\TH:i:s\Z",$job->startTime);
+        $stopTime  = date("Y-m-d\TH:i:s\Z",$job->startTime + $job->duration);
 
-            $this->_timer->start( 'InfluxDB');
-            $result = $this->_database->query($query, ['epoch' => 's']);
-            $queries[] = $result->getSeries();
-            $this->_timer->stop( 'InfluxDB');
-        }
+        $query = "from(bucket:\"ClusterCockpit/data\")
+            |> range(start: {$startTime}, stop: {$stopTime})
+            |> filter(fn: (r) =>
+                r._measurement == \"{$measurement}\" and
+                r.host =~ /{$nodes}/
+            )
+        ";
+
+        #$this->_logger->info(">>>> QUERY:  $query");
+
+        $this->_timer->start( 'InfluxDBv2');
+        $result = $this->_queryApi->query($query);
+        $this->_timer->stop( 'InfluxDBv2');
 
         $data = array();
 
-        foreach ($queries as $queryresult) {
-            foreach ($queryresult as $seriesdata) {
-                $nodeId = $seriesdata['tags']['host'];
-                $start = $seriesdata['values'][0][0];
+        foreach ( $result as $table ){
+          $tableRecords = $table->records;
+          $nodeId = $tableRecords[0]->values["host"];
+          $metric = $tableRecords[0]->values["_field"];
 
-                foreach ( $seriesdata['columns'] as $index => $metric ){
-                    foreach ( $seriesdata['values'] as $row ){
-                        $data[$metric][$nodeId][] = $row[$index];
-                    }
-                }
-            }
+          foreach ( $tableRecords as $record) {
+              $data[$metric][$nodeId][] = $record->values["_value"];
+          }
         }
+
+        #$dataJson  = json_encode($data);
+        #$this->_logger->info(">>>> DATAJSON:  $dataJson");
+
+        #$this->_logger->info(">>>> COMPLETED METRICS");
 
         return $data;
     }

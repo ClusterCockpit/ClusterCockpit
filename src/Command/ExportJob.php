@@ -37,32 +37,29 @@ use Doctrine\ORM\EntityManagerInterface;
 use \DateInterval;
 
 use App\Repository\JobRepository;
-/* use App\Service\JobCache; */
-use App\Service\ColorMap;
-use App\Service\Configuration;
-use App\Entity\JobSearch;
 use App\Entity\Job;
-use App\Entity\Plot;
 use App\Entity\User;
+use App\Service\JobData;
+use App\Service\JobArchive;
 
 class ExportJob extends Command
 {
     private $_em;
     private $_filesystem;
-    private $_root;
-    /* private $_jobcache; */
+    private $_jobData;
+    private $_jobArchive;
 
     public function __construct(
         EntityManagerInterface $em,
-        /* JobCache $jobCache, */
-        $projectDir,
+        JobData $jobData,
+        JobArchive $jobArchive,
         FileSystem $filesystem
     )
     {
         $this->_em = $em;
-        /* $this->_jobcache = $jobCache; */
+        $this->_jobData = $jobData;
+        $this->_jobArchive = $jobArchive;
         $this->_filesystem = $filesystem;
-        $this->_root = $projectDir.'/var/export';
 
         parent::__construct();
     }
@@ -72,16 +69,19 @@ class ExportJob extends Command
         $this
             ->setName('app:job:export')
             ->setDescription('Export a job to disk')
-            ->setHelp('.')
-            ->addArgument('id', InputArgument::REQUIRED, 'The jobID for the job to export.')
+            ->setHelp('This command will write the files data.json and meta.json to the specified directory')
+            ->addArgument('id', InputArgument::REQUIRED, 'The jobID for the job to export')
+            ->addArgument('cluster', InputArgument::REQUIRED, 'The cluster for the job to export')
+            ->addArgument('dest-dir', InputArgument::REQUIRED, 'Directory into which to put the data.json and meta.json files');
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $id = $input->getArgument('id');
+        $jobId = $input->getArgument('id');
+        $clusterId = $input->getArgument('cluster');
+        $dstPath = $input->getArgument('dest-dir');
         $repository = $this->_em->getRepository(\App\Entity\Job::class);
-        $configuration = new Configuration($this->_em);
 
         $output->writeln([
             'Job File Export',
@@ -89,16 +89,22 @@ class ExportJob extends Command
             '',
         ]);
 
-        $job = $repository->findOneBy(['jobId' => $id]);
+        $job = $repository->findOneBy(['jobId' => $jobId, 'clusterId' => $clusterId]);
+        if ($job == null) {
+            $output->writeln("Job does not exist");
+            return 1;
+        }
+
+        $output->writeln(['Export to ', $dstPath]);
 
         $rows = array();
-        $rows[] = array("Job id",$job->getJobId());
-        $rows[] = array("User name",$job->getUser()->getName());
-        $rows[] = array("User id",$job->getUser()->getUserId());
-        $rows[] = array("NumNodes",$job->getNumNodes());
+        $rows[] = array("DB Id", $job->id);
+        $rows[] = array("Job Id", $job->getJobId());
+        $rows[] = array("User Id", $job->getUserId());
+        $rows[] = array("NumNodes", $job->getNumNodes());
         $rows[] = array("Duration [h]",  $job->getDuration()/3600);
         $rows[] = array("Start time",date('r', $job->getStartTime()));
-        $rows[] = array("Stop time", date('r', $job->getStopTime()));
+        $rows[] = array("Stop time", date('r', $job->getStartTime() + $job->getDuration()));
 
         $table = new Table($output);
         $table
@@ -106,110 +112,13 @@ class ExportJob extends Command
             ->setRows($rows);
         $table->render();
 
-        /* $this->_jobcache->getArchive($job); */
-
-        if ( $job->hasProfile ) {
-            $jobID = $job->getJobId();
-            $jobID = str_replace(".eadm", "", $jobID);
-            $level1 = $jobID/1000;
-            $level2 = $jobID%1000;
-            $dstPath = sprintf("%s/%d/%03d", $this->_root, $level1, $level2);
-
-            try {
-                $this->_filesystem->mkdir($dstPath);
-            } catch (IOExceptionInterface $exception) {
-                echo "An error occurred while creating job export directory at ".$exception->getPath();
-            }
-
-            $duration = $job->getDuration();
-            $jobCache = $job->jobCache;
-            $jsonMeta = array();
-            $jsonMeta['job_id'] = $job->getJobId();
-            $jsonMeta['user_id'] = $job->getUser()->getUserId();
-            $jsonMeta['project_id'] = 'no project';
-            $jsonMeta['cluster_id'] = $job->getCluster()->getName();
-            $jsonMeta['num_nodes'] = $job->getNumNodes();
-            $jsonMeta['walltime'] = 10;
-            $jsonMeta['job_state'] = 'completed';
-            $jsonMeta['start_time'] = $job->getStartTime();
-            $jsonMeta['stop_time'] = $job->getStopTime();
-            $jsonMeta['duration'] = $duration;
-            $jsonMeta['nodes'] = $job->getNodeIdArray();
-            $jsonMeta['tags'] = $job->getTagsArray();
-            $output->writeln(['Export to ', $dstPath]);
-
-            $jsonData = array();
-            $plots = $jobCache->getPlots();
-            $statistics = array();
-
-            foreach ( $plots as $plot ) {
-                $nodes = $plot->getData();
-                $options = $plot->getOptions();
-                $statData = array();
-
-                $metricData     = array(
-                    'unit'     => $options['unit'],
-                    'scope'    => 'node',
-                    'timestep' => $options['timestep'],
-                    'series'   => array()
-                );
-
-                $sum = 0.0;
-                $max = 0.0;
-                $min = PHP_FLOAT_MAX;
-                $count = 0;
-
-                foreach ($nodes as $node){
-                    $length = count($node['y']);
-                    $data = array();
-                    $sum_node = 0.0;
-                    $max_node = 0.0;
-                    $min_node = PHP_FLOAT_MAX;
-                    $count_node = 0;
-
-                    for ($j=1; $j<$length-1; $j++) {
-                        if (is_null($node['y'][$j])) {
-                            $data[] = NULL;
-                        } else {
-                            $sum_node += $node['y'][$j];
-                            $max_node = $max_node>$node['y'][$j]?$max_node:$node['y'][$j];
-                            $min_node = $min_node<$node['y'][$j]?$min_node:$node['y'][$j];
-                            $count_node++;
-                            $data[] = round($node['y'][$j],2);
-                        }
-                    }
-
-                    $sum += $sum_node;
-                    $max = $max>$max_node?$max:$max_node;
-                    $min = $min<$min_node?$min:$min_node;
-                    $count += $count_node;
-
-                    $metricData['series'][] = array(
-                        'node_id' => $node['name'],
-                        'statistics' => array(
-                            'avg'  => round($sum_node / $count_node, 2),
-                            'min'  => round($min_node, 2),
-                            'max'  => round($max_node, 2)
-                        ),
-                        'data' => $data
-                    );
-                }
-
-                $statistics[$plot->name] = array(
-                    'unit' => $options['unit'],
-                    'avg'  => round($sum / $count, 2),
-                    'min'  => round($min, 2),
-                    'max'  => round($max, 2)
-                );
-
-                $jsonData[$plot->name] = $metricData;
-            }
-
-            $jsonMeta['statistics'] = $statistics;
-            $this->_filesystem->dumpFile($dstPath.'/meta.json', json_encode($jsonMeta));
-            $this->_filesystem->dumpFile($dstPath.'/data.json', json_encode($jsonData));
-        } else {
-            $output->writeln("Job has no profile!");
+        $jobData = $this->_jobData->getData($job, null);
+        if ($jobData === false) {
+            $output->writeln("Job has no data");
+            return 1;
         }
+
+        $this->_jobArchive->archiveJob($job, $jobData, $dstPath);
+        return 0;
     }
 }

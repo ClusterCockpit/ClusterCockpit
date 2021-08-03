@@ -10,9 +10,20 @@ export function fuzzySearchTags(term, tags) {
         return [];
 
     let results = [];
-    for (let tag of tags) {
-        if (fuzzyMatch(term, `${tag.tagType}: ${tag.tagName}`))
-            results.push(tag);
+    let termparts = term.split(':').map(s => s.trim()).filter(s => s.length > 0);
+
+    if (termparts.length == 0) {
+        results = tags.slice();
+    } else if (termparts.length == 1) {
+        for (let tag of tags)
+            if (fuzzyMatch(termparts[0], tag.tagType)
+                || fuzzyMatch(termparts[0], tag.tagName))
+                results.push(tag);
+    } else if (termparts.length == 2) {
+        for (let tag of tags)
+            if (fuzzyMatch(termparts[0], tag.tagType)
+                && fuzzyMatch(termparts[1], tag.tagName))
+                results.push(tag);
     }
 
     return results.sort((a, b) => {
@@ -48,11 +59,6 @@ export const clustersQuery = readable({ fetching: true }, (set) => {
                 startTime { from, to }
             }
         }
-        filterRanges {
-            duration { from, to }
-            numNodes { from, to }
-            startTime { from, to }
-        }
         tags { id, tagName, tagType }
     }`;
 
@@ -86,7 +92,6 @@ export const clustersQuery = readable({ fetching: true }, (set) => {
         set({
             tags: data.tags,
             clusters: data.clusters,
-            filterRanges: data.filterRanges,
             metricConfig,
             metricUnits
         });
