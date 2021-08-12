@@ -32,6 +32,7 @@ use Psr\Log\LoggerInterface;
 use App\Service\JobData;
 use App\Service\JobArchive;
 use App\Service\ClusterConfiguration;
+use App\Repository\MetricDataRepository;
 use App\Entity\Job;
 
 class JobStats
@@ -40,6 +41,7 @@ class JobStats
 
     private $_jobData;
     private $_jobArchive;
+    private $_metricDataRepository;
     private $_logger;
     private $_clusterCfg;
     private $_cache;
@@ -47,6 +49,7 @@ class JobStats
     public function __construct(
         JobData $jobData,
         JobArchive $jobArchive,
+        MetricDataRepository $metricRepo,
         ClusterConfiguration $clusterCfg,
         LoggerInterface $logger,
         CacheInterface $cache
@@ -54,6 +57,7 @@ class JobStats
     {
         $this->_jobData = $jobData;
         $this->_jobArchive = $jobArchive;
+        $this->_metricDataRepository = $metricRepo;
         $this->_clusterCfg = $clusterCfg;
         $this->_logger = $logger;
         $this->_cache = $cache;
@@ -94,7 +98,7 @@ class JobStats
             }
 
             $metricConfig = $this->_clusterCfg->getMetricConfiguration($job->getClusterId(), $metrics);
-            $stats = $this->_jobData->getMetricRepo()->getJobStats($job, $metricConfig);
+            $stats = $this->_metricDataRepository->getJobStats($job, $metricConfig);
             foreach ($metrics as $idx => $metric) {
                 if (isset($stats[$metric.'_avg']))
                     $res[$idx][] = $stats[$metric.'_avg'];

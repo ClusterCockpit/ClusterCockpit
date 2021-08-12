@@ -27,5 +27,9 @@ services:
         resource: '../src/Controller'
         tags: ['controller.service_arguments']
 
+    # configure which implementation of MetricDataRepository
+    # to inject in other services such as JobData and JobStats
+    App\Repository\MetricDataRepository: '@App\Repository\InfluxDBv2MetricDataRepository'
+
     sensio_framework_extra.view.listener:
         alias: 'Sensio\Bundle\FrameworkExtraBundle\EventListener\TemplateListener'
