@@ -110,15 +110,11 @@
 </style>
 
 <Row>
-    <Col xs="auto">
-        {#if errorMessage == null}
-            <InputGroup>
-                <InputGroupText><Icon name="sliders" /></InputGroupText>
-            </InputGroup>
-        {:else}
+    {#if errorMessage != null}
+        <Col xs="auto">
             <Alert color="danger">{errorMessage}</Alert>
-        {/if}
-    </Col>
+        </Col>
+    {/if}
     <Col xs="auto">
         <InputGroup>
             <InputGroupText><Icon name="person-circle" /></InputGroupText>

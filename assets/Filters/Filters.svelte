@@ -376,6 +376,10 @@
     table tbody tr td:nth-child(1) {
         vertical-align: middle;
     }
+
+    :global(.tab-content > .nav-tabs > .nav-item > a:not(.active)) {
+        color: #848484;
+    }
 </style>
 
 {#if showFilters}
