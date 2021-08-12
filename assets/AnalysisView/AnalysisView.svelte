@@ -15,6 +15,8 @@
 
     const clusterCockpitConfig = getContext('cc-config');
 
+    export let filterPresets = null;
+
     let plotsPerRow = clusterCockpitConfig.plot_view_plotsPerRow || 3;
     let histogramBins = {};
     let metricsToFetch = [];
@@ -209,23 +211,9 @@
 <FilterConfig
     bind:this={filterConfig}
     {showFilters}
+    {filterPresets}
     bind:appliedFilters
     availableFilters={{ userId: true }}
-    filterPresets={{
-        startTime: {
-            from: (() => {
-                let d = new Date();
-                d.setHours(0, 0, 0, 0);
-                d.setMonth(d.getMonth() - 1);
-                return d.toISOString();
-            })(),
-            to: (() => {
-                let d = new Date();
-                d.setHours(0, 0, 0, 0);
-                return d.toISOString();
-            })()
-        }
-    }}
     on:update={filtersChanged} />
 
 {#if selectedClusterId == null || $clustersQuery.error}

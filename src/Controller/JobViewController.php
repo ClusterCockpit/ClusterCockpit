@@ -124,18 +124,27 @@ class JobViewController extends AbstractController
 
     public function analysis(
         Configuration $configuration,
-        ColorMap $colorMaps,
         $projectDir
     )
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());
-        $colorMaps->setColormap($config['plot_general_colorscheme']->value, $projectDir);
+
+        $today = new \DateTime("now");
+        $today->setTime(0, 0);
+
+        $lastMonth = clone $today;
+        $lastMonth->modify('-1 month');
 
         return $this->render('jobViews/analysis.html.twig',
             array(
                 'config' => $config,
-                'colormap' => $colorMaps->getColorMap()
+                'filterPresets' => [
+                    'startTime' => [
+                        'from' => $lastMonth->format(\DateTime::RFC3339),
+                        'to' => $today->format(\DateTime::RFC3339)
+                    ]
+                ]
             ));
     }
 
