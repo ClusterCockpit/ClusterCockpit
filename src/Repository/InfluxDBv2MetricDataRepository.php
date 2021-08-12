@@ -78,6 +78,11 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
 
         $result = $this->_queryApi->query($query);
 
+        if (!isset($result[0])) {
+            $job->hasProfile = false;
+            return false;
+        }
+
         $points = $result[0]->records[0]->values['_value'];
 
         #$resultJson = json_encode($result);
