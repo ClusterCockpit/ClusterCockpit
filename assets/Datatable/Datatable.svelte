@@ -4,7 +4,7 @@
     import Pagination from './Pagination.svelte';
     import JobMeta from './JobMeta.svelte';
     import RowOfPlots from './Row.svelte';
-    import { getContext } from 'svelte';
+    import { getContext, onDestroy } from 'svelte';
 
     const clusterCockpitConfig = getContext('cc-config');
     const clustersQuery = getContext('clusters-query');
@@ -62,6 +62,42 @@
         console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
         $jobQuery.variables.filter = { "list": filterItems };
     }
+
+    // Make datatable header stick below the app header:
+    let headerPaddingTop = 10;
+    const header = document.querySelector('header > nav.navbar');
+    if (header) {
+        // This will only really work if there is only one Datatable per page!
+        // Read [this](https://developer.mozilla.org/en-US/docs/Web/API/Document/scroll_event)
+        // about why there is this ticking stuff...
+        let ticking = false;
+        let tableHeader = null;
+        const onScroll = (event) => {
+            if (ticking)
+                return;
+
+            ticking = true;
+            window.requestAnimationFrame(() => {
+                if (!tableHeader)
+                    tableHeader = document
+                        .querySelector('table.table > thead > tr > th.position-sticky:nth-child(1)');
+
+                const refPos = tableHeader.getBoundingClientRect().top;
+                const newHeaderPaddingTop = refPos < header.clientHeight
+                    ? (header.clientHeight - refPos) + 10
+                    : 10;
+
+                // Only do this assignment when really needed so that
+                // svelte reactivity is not triggered when not needed.
+                if (newHeaderPaddingTop != headerPaddingTop)
+                    headerPaddingTop = newHeaderPaddingTop;
+                ticking = false;
+            });
+        };
+        document.addEventListener('scroll', onScroll);
+        onDestroy(() => document.removeEventListener('scroll', onScroll));
+    }
+
 </script>
 
 <style>
@@ -104,12 +140,13 @@
             <Table cellspacing="0px" cellpadding="0px">
                 <thead>
                     <tr>
-                        <th class="position-sticky top-0" scope="col" style="width: {jobMetaWidth}px">
+                        <th class="position-sticky top-0" scope="col"
+                            style="width: {jobMetaWidth}px; padding-top: {headerPaddingTop}px">
                             Job Info
                         </th>
                         {#each selectedMetrics as metric}
                             <th class="position-sticky top-0 text-center" scope="col"
-                                                                          style="width: {plotWidth}px">
+                                style="width: {plotWidth}px; padding-top: {headerPaddingTop}px">
                                 {metric}
                                 {#if $clustersQuery.metricUnits && $clustersQuery.metricUnits[metric]}
                                     [{$clustersQuery.metricUnits[metric]}]
