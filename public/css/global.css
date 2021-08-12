@@ -130,6 +130,12 @@ button {
     font-style: normal;
 }
 
+@media only screen and (max-width: 97.5rem)  {
+    header span.cc-nav-text {
+        display: none;
+    }
+}
+
 footer {
     width: 100%;
     padding: 0.1rem 1.0rem;
