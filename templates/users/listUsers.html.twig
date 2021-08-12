@@ -20,6 +20,9 @@
 
 {% block javascript %}
     <script type="text/javascript">
+        const filterPresets = {{ (filterPresets is defined)
+                ? filterPresets | json_encode | raw
+                : "null" }};
         const clusterCockpitConfigPromise = Promise.resolve({});
     </script>
     {{ encore_entry_script_tags('userlist') }}

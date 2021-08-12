@@ -1,7 +1,9 @@
 <script>
     import { initClient, operationStore, query, getClient } from '@urql/svelte';
     import { Table, Card, Spinner, Icon, Button, Row, Col, Alert,
-             Input, InputGroup, InputGroupText } from 'sveltestrap';
+             InputGroup, InputGroupText } from 'sveltestrap';
+
+    export let filterPresets = null;
 
     initClient({
         url: typeof GRAPHQL_BACKEND !== 'undefined'
@@ -9,17 +11,19 @@
             : `${window.location.origin}/query`
     });
 
-    let startTime = null;
-    let stopTime = null;
+    let startTime = null, stopTime = null;
+    let rawStartTime = null, rawStopTime = null;
     let clusterId = null;
     let hideUsersWithNoJobs = false;
     let usernameFilter = '';
 
-    const lastMonth = new Date();
-    lastMonth.setMonth(lastMonth.getMonth() - 1);
-
-    let rawStartTime = lastMonth.toISOString().split('T')[0];
-    let rawStopTime = (new Date()).toISOString().split('T')[0];
+    if (filterPresets && filterPresets.startTime) {
+        startTime = new Date(filterPresets.startTime.from);
+        stopTime = new Date(filterPresets.startTime.to);
+        const pad = (n) => n.toString().padStart(2, '0');
+        rawStartTime = `${startTime.getFullYear()}-${pad(startTime.getMonth() + 1)}-${pad(startTime.getDate())}`;
+        rawStopTime = `${stopTime.getFullYear()}-${pad(stopTime.getMonth() + 1)}-${pad(stopTime.getDate())}`;
+    }
 
     let sorting = { field: 'totalJobs', direction: 'down' };
 
@@ -84,9 +88,6 @@
 
 
     function dateSelected() {
-        if (!rawStartTime && !rawStopTime)
-            return;
-
         startTime = new Date(rawStartTime || 0);
         stopTime = new Date(rawStopTime || Date.now());
 
@@ -119,7 +120,7 @@
         <InputGroup>
             <InputGroupText><Icon name="person-circle" /></InputGroupText>
             <input class="form-control" type="text"
-                bind:value={usernameFilter} placeholder="Search User" />
+                bind:value={usernameFilter} placeholder="Filter users" />
             <InputGroupText>
                 Hide 0 job users:
             </InputGroupText>
