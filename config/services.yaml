@@ -31,5 +31,9 @@ services:
     # to inject in other services such as JobData and JobStats
     App\Repository\MetricDataRepository: '@App\Repository\InfluxDBv2MetricDataRepository'
 
+    App\Resolver\RootResolverMap:
+        tags:
+            - { name: overblog_graphql.resolver_map, schema: default }
+
     sensio_framework_extra.view.listener:
         alias: 'Sensio\Bundle\FrameworkExtraBundle\EventListener\TemplateListener'
