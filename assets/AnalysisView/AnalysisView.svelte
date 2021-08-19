@@ -95,6 +95,7 @@
         if (metrics.length != metricsToFetch.length
                 || metrics.reduce((equal, m, i) => equal && metricsToFetch[i] == i)) {
             $statsQuery.variables.metrics = metrics;
+            $statsQuery.reexecute();
             metricsToFetch = metrics;
         }
     }
@@ -122,9 +123,11 @@
 
         $statsQuery.variables.filter = { list: filterItems };
         $statsQuery.context.pause = false;
+        $statsQuery.reexecute();
 
         $metaStatsQuery.variables.filter = { list: filterItems };
         $metaStatsQuery.context.pause = false;
+        $metaStatsQuery.reexecute();
 
         // So that the other two queries to go out before this one.
         // Only needed in dev mode for convenience.
@@ -133,6 +136,7 @@
         $rooflineHeatmapQuery.variables.filter = { list: filterItems };
         $rooflineHeatmapQuery.variables.maxY = selectedCluster.flopRateSimd;
         $rooflineHeatmapQuery.context.pause = false;
+        $rooflineHeatmapQuery.reexecute();
     }
 
     function filtersChanged(event) {

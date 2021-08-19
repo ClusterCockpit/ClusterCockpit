@@ -19,14 +19,14 @@
 
     const statsQuery = operationStore(`
     query($filter: JobFilterList!) {
-       jobsStatistics(filter: $filter) {
-           totalJobs
-           shortJobs
-           totalWalltime
-           totalCoreHours
-           histWalltime { count, value }
-           histNumNodes { count, value }
-       }
+        jobsStatistics(filter: $filter) {
+            totalJobs
+            shortJobs
+            totalWalltime
+            totalCoreHours
+            histWalltime { count, value }
+            histNumNodes { count, value }
+        }
     }
     `, { filter: { list: [ { userId: { eq: userInfos.userId } } ] } });
 
@@ -41,6 +41,7 @@
         filterItems.push({ userId: { eq: userInfos.userId }});
 
         $statsQuery.variables.filter = { list: filterItems };
+        $statsQuery.reexecute();
         datatable.applyFilters(filterItems);
     }
 

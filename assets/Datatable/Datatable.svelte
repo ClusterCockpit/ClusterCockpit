@@ -30,37 +30,39 @@
 
     const jobQuery = operationStore(`
     query($filter: JobFilterList!, $sorting: OrderByInput!, $paging: PageRequest! ){
-       jobs(filter: $filter, order: $sorting, page: $paging) {
-           items {
-             id
-             jobId
-             userId
-             projectId
-             clusterId
-             startTime
-             duration
-             numNodes
-             hasProfile
-             tags { id, tagType, tagName }
-           }
-           count
-         }
+        jobs(filter: $filter, order: $sorting, page: $paging) {
+            items {
+                id
+                jobId
+                userId
+                projectId
+                clusterId
+                startTime
+                duration
+                numNodes
+                hasProfile
+                tags { id, tagType, tagName }
+            }
+            count
+        }
     }
     `, {filter: { list: initialFilterItems }, sorting, paging});
 
     query(jobQuery);
     $: matchedJobs = $jobQuery.data != null ? $jobQuery.data.jobs.count : 0;
-    $: $jobQuery.variables.sorting = sorting;
+    $: $jobQuery.variables = { ...$jobQuery.variables, sorting };
 
     function handlePaging( event ) {
         itemsPerPage = event.detail.itemsPerPage;
         page = event.detail.page;
-        $jobQuery.variables.paging = {itemsPerPage: itemsPerPage, page: page };
+        $jobQuery.variables.paging = { itemsPerPage: itemsPerPage, page: page };
+        $jobQuery.reexecute();
     }
 
     export function applyFilters(filterItems) {
         console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
         $jobQuery.variables.filter = { "list": filterItems };
+        $jobQuery.reexecute();
     }
 
     // Make datatable header stick below the app header:
@@ -83,14 +85,10 @@
                         .querySelector('table.table > thead > tr > th.position-sticky:nth-child(1)');
 
                 const refPos = tableHeader.getBoundingClientRect().top;
-                const newHeaderPaddingTop = refPos < header.clientHeight
+                headerPaddingTop = refPos < header.clientHeight
                     ? (header.clientHeight - refPos) + 10
                     : 10;
 
-                // Only do this assignment when really needed so that
-                // svelte reactivity is not triggered when not needed.
-                if (newHeaderPaddingTop != headerPaddingTop)
-                    headerPaddingTop = newHeaderPaddingTop;
                 ticking = false;
             });
         };

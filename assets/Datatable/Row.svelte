@@ -108,6 +108,7 @@
     function updateQuery() {
         $jobDataQuery.variables.jobId = jobId;
         $jobDataQuery.variables.clusterId = clusterId;
+        $jobDataQuery.reexecute();
         oldSelectedMetrics = null;
         oldQueryData = null;
     }

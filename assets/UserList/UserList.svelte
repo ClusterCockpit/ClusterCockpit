@@ -67,7 +67,7 @@
     }
     `, { startTime, stopTime, clusterId });
 
-    $: $usersQuery.variables.clusterId = clusterId;
+    $: $usersQuery.variables = { ...$usersQuery.variables, clusterId };
 
     let clusters = [];
     let errorMessage = null;
@@ -97,6 +97,7 @@
 
         $usersQuery.variables.startTime = startTime;
         $usersQuery.variables.stopTime = stopTime;
+        $usersQuery.reexecute();
     }
 
     $: dateSelected(rawStartTime, rawStopTime);
