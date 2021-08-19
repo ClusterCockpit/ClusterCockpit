@@ -186,6 +186,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
                 r._measurement == \"{$measurement}\" and
                 r.host =~ /{$nodes}/
             )
+            |> truncateTimeColumn(unit: 1m)
         ";
 
         #$this->_logger->info(">>>> QUERY:  $query");
