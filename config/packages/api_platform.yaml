@@ -1,4 +1,7 @@
 api_platform:
+  title: 'ClusterCockpit REST API'
+  description: 'API for batch job control and configuration access.'
+  version: '0.0.1'
   defaults:
     pagination_client_items_per_page: true
     pagination_items_per_page: 50
@@ -9,5 +12,13 @@ api_platform:
     json: ['application/merge-patch+json']
   swagger:
     versions: [3]
+    api_keys:
+      -
+        name: 'X-AUTH-TOKEN'
+        type: 'header'
   graphql:
     enabled: false
+    graphiql:
+      enabled: false
+  enable_swagger_ui: false
+  enable_re_doc: false

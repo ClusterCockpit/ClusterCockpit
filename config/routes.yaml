@@ -1,3 +1,6 @@
+swagger_ui:
+    path: /docs
+    controller: api_platform.swagger.action.ui
 index:
     path: /
     controller:  Symfony\Bundle\FrameworkBundle\Controller\RedirectController
