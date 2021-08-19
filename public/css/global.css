@@ -30,7 +30,7 @@ body {
     flex: 1 0 auto;
 }
 
-.Site-footer {
+.site-footer {
     flex: none;
 }
 
@@ -139,17 +139,7 @@ button {
 footer {
     width: 100%;
     padding: 0.1rem 1.0rem;
-    background-color: #4b4a56;
-    color: #dedee3;
     line-height: 1.5;
-}
-
-.footer-link {
-    color: #dedee3;
-}
-
-.footer-link:hover {
-    color: inherit;
 }
 
 .footer-list {
