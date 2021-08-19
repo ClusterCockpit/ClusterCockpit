@@ -1,3 +1,4 @@
+# see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
     secret: '%env(APP_SECRET)%'
     form: ~
@@ -5,15 +6,26 @@ framework:
     validation: { enable_annotations: true }
     serializer: { enable_annotations: true }
     default_locale: 'en'
-    trusted_hosts: ~
+    # trusted_hosts: ~
     cache:
+        # If using the cc-docker setup, REDIS_URL will be cc-redis and things should work just fine.
+        # You can also use your own redis instance or use alternative cache adapters such as
+        # https://symfony.com/doc/current/components/cache/adapters/array_cache_adapter.html.
         app: cache.adapter.redis
-        default_redis_provider: 'redis://cc-redis'
+        default_redis_provider: '%env(REDIS_URL)%'
     session:
-        handler_id: session.handler.native_file
-        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'
-    fragments: ~
-    http_method_override: true
-    assets: ~
+        handler_id: null
+        cookie_secure: auto
+        cookie_samesite: lax
+        storage_factory_id: session.storage.factory.native
+
+    #esi: true
+    #fragments: true
     php_errors:
         log: true
+
+when@test:
+    framework:
+        test: true
+        session:
+            storage_factory_id: session.storage.factory.mock_file

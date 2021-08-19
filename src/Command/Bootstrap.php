@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 use App\Entity\Configuration;
@@ -79,14 +79,15 @@ class Bootstrap extends Command
 
 
     private $_em;
+    private $_passwordHasher;
 
     public function __construct(
         EntityManagerInterface $em,
-        UserPasswordEncoderInterface $encoder
+        UserPasswordHasherInterface $hasher
     )
     {
         $this->_em = $em;
-        $this->_encoder = $encoder;
+        $this->_passwordHasher = $hasher;
 
         parent::__construct();
     }
@@ -185,8 +186,7 @@ class Bootstrap extends Command
                 $user->addRole('ROLE_ANALYST');
                 $user->addRole('ROLE_ADMIN');
                 $user->setIsActive(true);
-                $password = $this->_encoder->encodePassword($user, $plainPassword);
-                $user->setPassword($password);
+                $user->setPassword($this->_passwordHasher->hashPassword($user, $plainPassword));
                 $this->_em->persist($user);
                 $this->_em->flush();
                 $output->writeln('Create admin user: done.');

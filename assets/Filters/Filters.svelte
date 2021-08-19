@@ -53,8 +53,28 @@
         tags: {}
     };
 
-    function toRFC3339({ date, time }, secs = '00') {
-        return `${date}T${time}:${secs}Z`;
+    function toRFC3339({ date, time }, secs = 0) {
+        const dparts = date.split('-');
+        const tparts = time.split(':');
+        const d = new Date(
+            Number.parseInt(dparts[0]),
+            Number.parseInt(dparts[1]) - 1,
+            Number.parseInt(dparts[2]),
+            Number.parseInt(tparts[0]),
+            Number.parseInt(tparts[1]), secs);
+        // console.log(`toRFC3339: ${date} ${time} -> ${d.toISOString()}`);
+        return d.toISOString();
+    }
+
+    function fromRFC3339(rfc3339) {
+        const d = new Date(rfc3339);
+        const pad = (n) => n.toString().padStart(2, '0');
+
+        const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+        const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+        // console.log(`fromRFC3339: ${rfc3339} -> ${date} ${time}`);
+        return { date, time };
     }
 
     function getFilterItems(filters) {
@@ -67,7 +87,7 @@
 
         filterItems.push({ startTime: {
             from: toRFC3339(filters["startTime"]["from"]),
-            to:   toRFC3339(filters["startTime"]["to"], '59')
+            to:   toRFC3339(filters["startTime"]["to"], 59)
         }});
 
         let from = filters["duration"]["from"]["hours"] * 3600
@@ -154,14 +174,6 @@
     };
 
     $: filteredTags = fuzzySearchTags(tagFilterTerm, $clustersQuery && $clustersQuery.tags);
-
-    function fromRFC3339(rfc3339) {
-        let parts = rfc3339.split('T');
-        return {
-            date: parts[0],
-            time: parts[1].split(':', 2).join(':')
-        };
-    }
 
     function secondsToHours(duration) {
         const hours = Math.floor(duration / 3600);
@@ -363,6 +375,10 @@
 
     table tbody tr td:nth-child(1) {
         vertical-align: middle;
+    }
+
+    :global(.tab-content > .nav-tabs > .nav-item > a:not(.active)) {
+        color: #848484;
     }
 </style>
 

@@ -42,7 +42,21 @@ class UserViewController extends AbstractController
 {
     public function list(Request $request)
     {
-        return $this->render('users/listUsers.html.twig', array());
+        // Only include jobs started within the last month in
+        // the statistics shown in the users table.
+        $today = new \DateTime("now");
+        $today->setTime(0, 0);
+        $lastMonth = clone $today;
+        $lastMonth->modify('-1 month');
+        return $this->render('users/listUsers.html.twig',
+            array(
+                'filterPresets' => [
+                    'startTime' => [
+                        'from' => $lastMonth->format(\DateTime::RFC3339),
+                        'to' => $today->format(\DateTime::RFC3339)
+                    ]
+                ]
+            ));
     }
 
     public function show(

@@ -32,8 +32,6 @@ use App\Entity\Job;
 use App\Service\JobArchive;
 use App\Service\ClusterConfiguration;
 use App\Repository\MetricDataRepository;
-use App\Repository\InfluxDBMetricDataRepository;
-use App\Repository\InfluxDBv2MetricDataRepository;
 use Psr\Log\LoggerInterface;
 
 class JobData
@@ -42,14 +40,12 @@ class JobData
     const CACHE_EXPIRES_AFTER_ARCHIVED = 60 * 60; // 1h
 
     private $_metricDataRepository;
-    private $_metricDataRepositoryV2;
     private $_clusterCfg;
     private $_jobArchive;
     private $_logger;
 
     public function __construct(
-        InfluxDBMetricDataRepository $metricRepo,
-        InfluxDBv2MetricDataRepository $metricRepoV2,
+        MetricDataRepository $metricRepo,
         ClusterConfiguration $clusterCfg,
         JobArchive $jobArchive,
         LoggerInterface $logger,
@@ -57,24 +53,10 @@ class JobData
     )
     {
         $this->_metricDataRepository = $metricRepo;
-        $this->_metricDataRepositoryV2 = $metricRepoV2;
         $this->_clusterCfg = $clusterCfg;
         $this->_jobArchive = $jobArchive;
         $this->_logger = $logger;
         $this->_cache = $cache;
-    }
-
-    /*
-     * This function is used by the JobStats Service to access a MetricDataRepository.
-     * Having this function here makes it simpler to switch repos.
-     *
-     * For the future, I would like to suggest using the MetricDataRepository interface together with
-     * symfony's autowiring to automatically inject one or the other reporsitory depending on a setting in config/.
-     */
-    public function getMetricRepo(): MetricDataRepository
-    {
-        // return $this->_metricDataRepository;
-        return $this->_metricDataRepositoryV2;
     }
 
     public function hasData($job)
@@ -89,7 +71,7 @@ class JobData
         $job->hasProfile = $this->_jobArchive->isArchived($job);
 
         if (!$job->hasProfile){
-            $this->getMetricRepo()->hasProfile($job,
+            $this->_metricDataRepository->hasProfile($job,
                 $this->_clusterCfg->getSingleMetric($job->getClusterId()));
         }
 
@@ -123,8 +105,8 @@ class JobData
         if ($job->isRunning()) {
             $metricConfig = $this->_clusterCfg->getMetricConfiguration($job->getClusterId(), $metrics);
 
-            $stats = $this->getMetricRepo()->getJobStats($job, $metricConfig);
-            $data = $this->getMetricRepo()->getMetricData($job, $metricConfig);
+            $stats = $this->_metricDataRepository->getJobStats($job, $metricConfig);
+            $data = $this->_metricDataRepository->getMetricData($job, $metricConfig);
 
             $res = [];
 

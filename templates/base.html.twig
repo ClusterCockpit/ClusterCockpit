@@ -27,24 +27,16 @@
                             {% block navitem_joblist %}
                             <li class="nav-item">
                                 <a class="nav-link fs-5" href="{{ path('list_jobs') }}">
-                                    Joblist
+                                    <span class="cc-nav-text">Joblist</span>
                                     <i class="bi-card-list"></i>
                                 </a>
                             </li>
                             {% endblock %}
                             {% if is_granted('ROLE_ADMIN') %}
-                            {% block navitem_systems %}
-                                <li class="nav-item">
-                                    <a class="nav-link fs-5" href="{{ path('systems') }}">
-                                        Systems
-                                        <i class="bi-hdd-stack-fill"></i>
-                                    </a>
-                                </li>
-                            {% endblock %}
                             {% block navitem_analysis %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('analysis') }}">
-                                        Analysis
+                                        <span class="cc-nav-text">Analysis</span>
                                         <i class="bi-graph-up"></i>
                                     </a>
                                 </li>
@@ -52,7 +44,7 @@
                             {% block navitem_users %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('user_stat') }}">
-                                        Users
+                                        <span class="cc-nav-text">Users</span>
                                         <i class="bi-people-fill"></i>
                                     </a>
                                 </li>
@@ -60,7 +52,7 @@
                             {% block navitem_tags %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('job_tag_types') }}">
-                                        Tags
+                                        <span class="cc-nav-text">Tags</span>
                                         <i class="bi-tag-fill"></i>
                                     </a>
                                 </li>
@@ -68,7 +60,7 @@
                             {% block navitem_settings %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('config_index') }}">
-                                        Settings
+                                        <span class="cc-nav-text">Settings</span>
                                         <i class="bi-gear-fill"></i>
                                     </a>
                                 </li>
@@ -77,7 +69,7 @@
                             {% block navitem_stats %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('show_user', {id : app.user.username}) }}">
-                                        Statistics
+                                        <span class="cc-nav-text">Statistics</span>
                                         <i class="bi-bar-chart-line-fill"></i>
                                     </a>
                                 </li>
@@ -85,23 +77,20 @@
                             {% block navitem_usersettings %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('config_user') }}">
-                                        Settings
+                                        <span class="cc-nav-text">Settings</span>
                                         <i class="bi-gear-fill"></i>
                                     </a>
                                 </li>
                             {% endblock %}
                             {% endif %}
                         </ul>
-                        <button type="button" class="btn btn-outline-secondary fs-6"  href="#helpmodal"  data-toggle="modal" data-target="#helpmodal">
-                            <i class="bi-question-circle"></i> Help
-                        </button>
                     {% endblock %}
                     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                         <div class="d-flex align-items-end">
                         <ul class="navbar-nav ml-auto">
                             <li class="nav-item">
                                 <a class="nav-link fs-5" href="{{ path('security_logout') }}">
-                                    {{ app.user.username }} Logout
+                                    <span class="cc-nav-text">{{ app.user.username }} Logout</span>
                                     <i class="bi-box-arrow-right"></i>
                                 </a>
                             </li>
@@ -150,10 +139,10 @@
         </main>
 
         {% block footer %}
-            <footer class="Site-footer">
+            <footer class="site-footer bg-light">
                 <ul class="footer-list">
-                    <li class="footer-list-item"><a class="footer-link" href="/imprint" title="Imprint" rel="nofollow">Imprint</a></li>
-                    <li class="footer-list-item"><a class="footer-link" href="/privacy" title="Privacy Policy" rel="nofollow">Privacy Policy</a></li>
+                    <li class="footer-list-item"><a class="link-secondary fs-5" href="/imprint" title="Imprint" rel="nofollow">Imprint</a></li>
+                    <li class="footer-list-item"><a class="link-secondary fs-5" href="/privacy" title="Privacy Policy" rel="nofollow">Privacy Policy</a></li>
                 </ul>
             </footer>
         {% endblock %}

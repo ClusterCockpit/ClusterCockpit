@@ -96,20 +96,6 @@ class ConfigViewController extends AbstractController
                         'active' => false
                     ),
                     array(
-                        'label' => 'Cache',
-                        'icon' => 'bi-archive-fill',
-                        'link' => 'cache_options',
-                        'addlink' => false,
-                        'active' => false
-                    ),
-                    array(
-                        'label' => 'Ldap',
-                        'icon' => 'bi-person-fill',
-                        'link' => 'ldap_options',
-                        'addlink' => false,
-                        'active' => false
-                    ),
-                    array(
                         'label' => 'General',
                         'icon' => 'bi-gear-fill',
                         'link' => 'general_options',
@@ -184,37 +170,14 @@ class ConfigViewController extends AbstractController
     /*       ENTRIES           */
     /* ####################### */
 
-    /* public function init() */
-    /* { */
-    /*     $em = $this->getDoctrine()->getManager(); */
-    /*     $config = new Configuration(); */
-    /*     $config->setName('view.roofline'); */
-    /*     $config->setScope('default'); */
-    /*     $config->setValue(array('show' => true)); */
-    /*     $em->persist($config); */
-    /*     $config = new Configuration(); */
-    /*     $config->setName('view.polarplot'); */
-    /*     $config->setScope('default'); */
-    /*     $config->setValue(array('show' => true)); */
-    /*     $em->flush(); */
-
-    /*     return $this->redirectToRoute('config_index'); */
-    /* } */
-
     public function index()
     {
-        return $this->render('config/index.html.twig',
-            array(
-                'sidebar' => $this->_sidebar()
-            ));
+        return $this->redirectToRoute('default_options');
     }
 
     public function config()
     {
-        return $this->render('config/index.html.twig',
-            array(
-                'sidebar' => $this->_userSidebar()
-            ));
+        return $this->redirectToRoute('user_options');
     }
 
     /* ####################### */
@@ -302,38 +265,6 @@ class ConfigViewController extends AbstractController
             ));
     }
 
-    public function cacheOptions(Request $request)
-    {
-        $config = $this->getDoctrine()
-                       ->getRepository(\App\Entity\Configuration::class)
-                       ->findAllDefaultHierarchy();
-
-        return $this->render('config/editConfigOptions.html.twig',
-            array(
-                'configHash' => $config['data'],
-                'defaultmode' => true,
-                'sidebar' => $this->_sidebar(
-                    array('menu'=>1,'item'=>3)
-                )
-            ));
-    }
-
-    public function ldapOptions(Request $request)
-    {
-        $config = $this->getDoctrine()
-                       ->getRepository(\App\Entity\Configuration::class)
-                       ->findAllDefaultHierarchy();
-
-        return $this->render('config/editConfigOptions.html.twig',
-            array(
-                'configHash' => $config['ldap'],
-                'defaultmode' => true,
-                'sidebar' => $this->_sidebar(
-                    array('menu'=>1,'item'=>4)
-                )
-            ));
-    }
-
     public function generalOptions(Request $request)
     {
         $config = $this->getDoctrine()
@@ -344,8 +275,9 @@ class ConfigViewController extends AbstractController
             array(
                 'configHash' => $config['general'],
                 'defaultmode' => true,
+                'scope' => 'default',
                 'sidebar' => $this->_sidebar(
-                    array('menu'=>1,'item'=>5)
+                    array('menu'=>1,'item'=>3)
                 )
             ));
     }

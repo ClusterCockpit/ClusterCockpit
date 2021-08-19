@@ -2,7 +2,7 @@
 /*
  *  This file is part of ClusterCockpit.
  *
- *  Copyright (c) 2018 Jan Eitzinger
+ *  Copyright (c) 2021 Jan Eitzinger
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -29,23 +29,22 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 
 class AddUser extends Command
 {
     private $_em;
-    private $_jobData;
+    private $_passwordHasher;
 
     public function __construct(
         EntityManagerInterface $em,
-        UserPasswordEncoderInterface $encoder
+        UserPasswordHasherInterface $hasher
     )
     {
         $this->_em = $em;
-        $this->_encoder = $encoder;
+        $this->_passwordHasher = $hasher;
 
         parent::__construct();
     }
@@ -87,7 +86,7 @@ class AddUser extends Command
         $password = $this->_encoder->encodePassword($user, $plainPassword);
 
         $user->setUsername($username);
-        $user->setPassword($password);
+        $user->setPassword($this->_passwordHasher->hashPassword($user, $plainPassword));
         $user->setName('Local account');
         $user->setEmail($email);
 
@@ -100,5 +99,3 @@ class AddUser extends Command
         $this->_em->flush();
     }
 }
-
-

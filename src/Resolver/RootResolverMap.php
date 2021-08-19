@@ -111,6 +111,27 @@ class RootResolverMap extends ResolverMap
         }, $tags);
     }
 
+    /*
+     * Every user can access his/her own jobs.
+     * Every user can add/remove tags to his/her own jobs.
+     * Admins can add/remove tags to every job.
+     * If no job is provided, the user has to be admin.
+     */
+    private function checkIfActionAllowed($job)
+    {
+        $user = $this->security->getUser();
+        if ($user == null)
+            throw new Error('Unauthorized (login first)');
+
+        if (in_array('ROLE_ADMIN', $user->getRoles()))
+            return true;
+
+        if ($job != null && $job->getUserId() == $user->getUsername())
+            return true;
+
+        throw new Error('Unauthorized');
+    }
+
     public function map()
     {
         return [
@@ -121,6 +142,7 @@ class RootResolverMap extends ResolverMap
                     if (!$job)
                         return null;
 
+                    $this->checkIfActionAllowed($job);
                     return $this->jobEntityToArray($job);
                 },
 
@@ -128,6 +150,14 @@ class RootResolverMap extends ResolverMap
                     $filter = $args['filter'];
                     $page = $args['page'];
                     $orderBy = $args['order'];
+
+                    $user = $this->security->getUser();
+                    if ($user == null)
+                        throw new Error('Unauthorized (login first)');
+
+                    // Non-admins shall only see theire own jobs.
+                    if (!in_array('ROLE_ADMIN', $user->getRoles()))
+                        $filter['list'][] = [ 'userId' => [ 'eq' => $user->getUsername() ] ];
 
                     try {
                         $jobs = $this->jobRepo->findFilteredJobs($page, $filter, $orderBy);
@@ -196,6 +226,8 @@ class RootResolverMap extends ResolverMap
                         throw new Error("No job for '$jobId' (on '$clusterId')");
                     }
 
+                    $this->checkIfActionAllowed($job);
+
                     $data = $this->jobData->getData($job, $metrics);
                     if ($data === false) {
                         throw new Error("No profiling data for this job");
@@ -205,9 +237,17 @@ class RootResolverMap extends ResolverMap
                 },
 
                 'jobsStatistics' => function($value, Argument $args) {
+                    $filter = $args['filter'];
+                    $user = $this->security->getUser();
+                    if ($user == null)
+                        throw new Error('Unauthorized (login first)');
+
+                    // Non-admins shall only see theire own jobs.
+                    if (!in_array('ROLE_ADMIN', $user->getRoles()))
+                        $filter['list'][] = [ 'userId' => [ 'eq' => $user->getUsername() ] ];
+
                     try {
-                        return $this->jobRepo->findFilteredStatistics(
-                            $args['filter'], $this->clusterCfg);
+                        return $this->jobRepo->findFilteredStatistics($filter, $this->clusterCfg);
                     } catch (\Throwable $e) {
                         throw new Error($e->getMessage());
                     }
@@ -248,6 +288,10 @@ class RootResolverMap extends ResolverMap
 
             'Mutation' => [
                 'createTag' => function($value, Argument $args) {
+                    $user = $this->security->getUser();
+                    if ($user == null)
+                        throw new Error('Cannot create tags without beeing logged in');
+
                     $tagType = $args['type'];
                     $tagName = $args['name'];
                     $tag = $this->jobTagRepo->createTag($tagType, $tagName);
@@ -257,6 +301,7 @@ class RootResolverMap extends ResolverMap
                 },
 
                 'deleteTag' => function($value, Argument $args) {
+                    $this->checkIfActionAllowed(null);
                     $tagId = $args['id'];
                     $this->jobTagRepo->deleteTag($tagId);
                     return $tagId;
@@ -265,6 +310,10 @@ class RootResolverMap extends ResolverMap
                 'addTagsToJob' => function($value, Argument $args) {
                     $tagIds = $args['tagIds'];
                     $job = $this->jobRepo->findJobById($args['job']);
+                    if ($job == null)
+                        throw new Error('No jobs found');
+
+                    $this->checkIfActionAllowed($job);
 
                     $tags = $this->jobTagRepo->findTagsByIds($tagIds);
                     foreach ($tags as $tag) {
@@ -278,6 +327,10 @@ class RootResolverMap extends ResolverMap
                 'removeTagsFromJob' => function($value, Argument $args) {
                     $tagIds = $args['tagIds'];
                     $job = $this->jobRepo->findJobById($args['job']);
+                    if ($job == null)
+                        throw new Error('No jobs found');
+
+                    $this->checkIfActionAllowed($job);
 
                     $tags = $job->getTags()->toArray();
                     foreach ($tags as $tag) {

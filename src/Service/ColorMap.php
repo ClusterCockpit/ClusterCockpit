@@ -233,4 +233,3 @@ class ColorMap
         return $this->_colors;
     }
 }
-
