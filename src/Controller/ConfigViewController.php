@@ -189,18 +189,12 @@ class ConfigViewController extends AbstractController
 
     public function index()
     {
-        return $this->render('config/index.html.twig',
-            array(
-                'sidebar' => $this->_sidebar()
-            ));
+        return $this->redirectToRoute('default_options');
     }
 
     public function config()
     {
-        return $this->render('config/index.html.twig',
-            array(
-                'sidebar' => $this->_userSidebar()
-            ));
+        return $this->redirectToRoute('user_options');
     }
 
     /* ####################### */
