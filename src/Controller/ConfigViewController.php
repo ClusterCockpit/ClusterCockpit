@@ -170,23 +170,6 @@ class ConfigViewController extends AbstractController
     /*       ENTRIES           */
     /* ####################### */
 
-    /* public function init() */
-    /* { */
-    /*     $em = $this->getDoctrine()->getManager(); */
-    /*     $config = new Configuration(); */
-    /*     $config->setName('view.roofline'); */
-    /*     $config->setScope('default'); */
-    /*     $config->setValue(array('show' => true)); */
-    /*     $em->persist($config); */
-    /*     $config = new Configuration(); */
-    /*     $config->setName('view.polarplot'); */
-    /*     $config->setScope('default'); */
-    /*     $config->setValue(array('show' => true)); */
-    /*     $em->flush(); */
-
-    /*     return $this->redirectToRoute('config_index'); */
-    /* } */
-
     public function index()
     {
         return $this->redirectToRoute('default_options');

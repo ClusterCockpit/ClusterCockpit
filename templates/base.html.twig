@@ -33,14 +33,6 @@
                             </li>
                             {% endblock %}
                             {% if is_granted('ROLE_ADMIN') %}
-                            {% block navitem_systems %}
-                                <li class="nav-item">
-                                    <a class="nav-link fs-5" href="{{ path('systems') }}">
-                                        <span class="cc-nav-text">Systems</span>
-                                        <i class="bi-hdd-stack-fill"></i>
-                                    </a>
-                                </li>
-                            {% endblock %}
                             {% block navitem_analysis %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('analysis') }}">
@@ -92,9 +84,6 @@
                             {% endblock %}
                             {% endif %}
                         </ul>
-                        <button type="button" class="btn btn-outline-secondary fs-6"  href="#helpmodal"  data-toggle="modal" data-target="#helpmodal">
-                            <i class="bi-question-circle"></i> Help
-                        </button>
                     {% endblock %}
                     {% if is_granted('IS_AUTHENTICATED_FULLY') %}
                         <div class="d-flex align-items-end">
