@@ -399,8 +399,12 @@ class ConfigViewController extends AbstractController
 
             if ( $form->get('save')->isClicked() )  {
                 $user = $form->getData();
-                $password = $passwordEncoder->encodePassword($user, $user->getPlainPassword());
-                $user->setPassword($password);
+                $plainPassword = $user->getPlainPassword();
+
+                if (isset($plainPassword) && $plainPassword !== '') {
+                    $password = $passwordEncoder->encodePassword($user, $plainPassword);
+                    $user->setPassword($password);
+                }
                 $em = $this->getDoctrine()->getManager();
                 $em->persist($user);
                 $em->flush();
