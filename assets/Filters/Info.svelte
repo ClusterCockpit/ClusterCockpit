@@ -71,7 +71,7 @@
 
     {#if appliedFilters.isRunning != null}
         <InfoBox icon="gear">
-            {appliedFilters.isRunning ? "Is running" : "Has stopped"}
+            {appliedFilters.isRunning ? "Running jobs" : "Finished jobs"}
         </InfoBox>
     {/if}
 

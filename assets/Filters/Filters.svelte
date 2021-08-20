@@ -401,7 +401,7 @@
                             <input type="radio" bind:group={filters["isRunning"]} value={true} /> Running
                         </ListGroupItem>
                         <ListGroupItem>
-                            <input type="radio" bind:group={filters["isRunning"]} value={false} /> Stopped
+                            <input type="radio" bind:group={filters["isRunning"]} value={false} /> Finished
                         </ListGroupItem>
                     </ListGroup>
                 </Col>
