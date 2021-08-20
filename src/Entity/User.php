@@ -53,7 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $plainPassword;
 
     /**
-     * @ORM\Column(type="string", length=64, nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      */
     private $password;
 
@@ -63,12 +63,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $name;
 
     /**
-     * @ORM\Column(type="array", nullable=true)
+     * @ORM\Column(type="json", nullable=true)
      */
-    private $roles;
+    private $roles = [];
 
     /**
-     * @ORM\Column(type="string", length=254, nullable=true)
+     * @ORM\Column(type="string", unique=true, nullable=true)
+     * @Assert\Email()
      */
     private $email;
 
@@ -89,7 +90,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return null;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
         if ( empty($this->roles) ){
             return array(
@@ -100,7 +101,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
     }
 
-    public function addRole($role) {
+    public function addRole($role)
+    {
         $this->roles[] = $role;
     }
 
