@@ -20,6 +20,7 @@ services:
         exclude:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
+            - '../src/Migrations/'
             - '../src/Kernel.php'
             - '../src/Tests/'
             - '../src/Colormaps/'
