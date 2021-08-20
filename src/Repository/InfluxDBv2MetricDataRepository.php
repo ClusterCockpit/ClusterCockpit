@@ -50,6 +50,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
             "token" => $influxdbToken,
             "bucket" => "ClusterCockpit/data",
             "org" => "ClusterCockpit",
+            "timeout" => 60,
             "precision" => InfluxDB2\Model\WritePrecision::S
         ]);
 
@@ -178,7 +179,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
 
     public function getMetricData($job, $metrics)
     {
-        #set_time_limit(120); // Debug Long Load Buffer
+        set_time_limit(60); // Long Load Buffer for method directly instead of global php setting
         $nodes = $job->getNodes('|');
         $measurement = $metrics[array_key_first($metrics)]['measurement'];
 
