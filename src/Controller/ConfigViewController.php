@@ -177,7 +177,7 @@ class ConfigViewController extends AbstractController
 
     public function config()
     {
-        return $this->redirectToRoute('user_options');
+        return $this->redirectToRoute('config_plot');
     }
 
     /* ####################### */
