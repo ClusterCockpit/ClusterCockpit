@@ -50,7 +50,7 @@ class TokenAuthenticator extends AbstractAuthenticator
         return $request->headers->has('X-AUTH-TOKEN');
     }
 
-       public function authenticate(Request $request): PassportInterface
+    public function authenticate(Request $request): PassportInterface
     {
         $apiToken = $request->headers->get('X-AUTH-TOKEN');
         if (null === $apiToken) {

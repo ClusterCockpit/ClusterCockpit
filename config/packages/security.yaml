@@ -1,49 +1,53 @@
 security:
-    enable_authenticator_manager: true
-    password_hashers:
-      App\Entity\User: 'auto'
-    providers:
-        db_provider:
-            entity:
-                class: App\Entity\User
-        db_api_provider:
-            entity:
-                class: App\Entity\User
-                property: apiToken
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-        main:
-            pattern: ^/
-            lazy: true
-            form_login:
-                check_path: security_login
-                login_path: security_login
-                enable_csrf: true
-                default_target_path: list_jobs
-            logout:
-                path: security_logout
-                target: index
-            provider: db_provider
-            custom_authenticators:
-                - App\Security\TokenAuthenticator
-            entry_point: form_login
+  enable_authenticator_manager: true
+  password_hashers:
+    App\Entity\User: 'auto'
+  providers:
+    db_provider:
+      entity:
+        class: App\Entity\User
+    db_api_provider:
+      entity:
+        class: App\Entity\User
+        property: apiToken
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+    api:
+      pattern: ^/api/job.*
+      stateless: true
+      provider: db_api_provider
+      custom_authenticators:
+        - App\Security\TokenAuthenticator
+    main:
+      pattern: ^/
+      lazy: true
+      form_login:
+        check_path: security_login
+        login_path: security_login
+        enable_csrf: true
+        default_target_path: list_jobs
+      logout:
+        path: security_logout
+        target: index
+      provider: db_provider
 
-    access_control:
-        - { path: ^/login, roles: PUBLIC_ACCESS }
-        - { path: ^/docs, roles: PUBLIC_ACCESS }
-        - { path: ^/monitoring, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
-        - { path: ^/config, roles: ROLE_USER }
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/api, roles: ROLE_API }
-        - { path: ^/query, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
+  access_control:
+    - { path: ^/login, roles: PUBLIC_ACCESS }
+    - { path: ^/docs, roles: PUBLIC_ACCESS }
+    - { path: ^/monitoring, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
+    - { path: ^/config, roles: ROLE_USER }
+    - { path: ^/admin, roles: ROLE_ADMIN }
+    - { path: ^/api/job.*, roles: ROLE_API }
+    - { path: ^/api/configurations, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
+    - { path: ^/query, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
 
 
 when@test:
-    # this configuration simplifies testing URLs protected by the security mechanism
-    # See https://symfony.com/doc/current/testing/http_authentication.html
-    security:
-        firewalls:
-            main:
-                http_basic: ~
+  # this configuration simplifies testing URLs protected by the security mechanism
+  # See https://symfony.com/doc/current/testing/http_authentication.html
+  security:
+    firewalls:
+      main:
+        http_basic: ~

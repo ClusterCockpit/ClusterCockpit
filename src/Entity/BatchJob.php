@@ -37,7 +37,10 @@ attributes: [
 ],
     collectionOperations: [],
     itemOperations: [
-        'get',
+        'get' => [
+            'path' => '/jobs/batch/{jobId}',
+            'requirements' => ['id' => '\s+'],
+        ],
         'patch' => [
             'path' => '/jobs/stop_job/{jobId}',
             'requirements' => ['id' => '\s+'],
