@@ -103,7 +103,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function addRole($role)
     {
-        $this->roles[] = $role;
+        if (! array_search($role, $this->roles)) {
+            $this->roles[] = $role;
+        }
     }
 
     public function removeRole($role) {
@@ -111,8 +113,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             return;
         }
 
-        if ($this->roles->contains($role)) {
-            $this->roles->removeElement($role);
+        if ($idx = array_search($role, $this->roles)) {
+            array_splice($this->roles, $idx, 1);
         }
     }
 
