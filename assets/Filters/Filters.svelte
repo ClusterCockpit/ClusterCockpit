@@ -62,18 +62,14 @@
             Number.parseInt(dparts[2]),
             Number.parseInt(tparts[0]),
             Number.parseInt(tparts[1]), secs);
-        // console.log(`toRFC3339: ${date} ${time} -> ${d.toISOString()}`);
         return d.toISOString();
     }
 
     function fromRFC3339(rfc3339) {
         const d = new Date(rfc3339);
         const pad = (n) => n.toString().padStart(2, '0');
-
         const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
         const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-
-        // console.log(`fromRFC3339: ${rfc3339} -> ${date} ${time}`);
         return { date, time };
     }
 
@@ -202,42 +198,19 @@
             : globalFilterRanges;
 
         currentRanges.numNodes = ranges.numNodes;
-
-        function clamp(x, { from, to }) {
-            return x < from ? from : (x < to ? x : to);
-        }
-
-        function clampTime(t, { from, to }) {
-            let min = Date.parse(from);
-            let max = Date.parse(to);
-            let x = Date.parse(toRFC3339(t));
-
-            return x < min
-                ? fromRFC3339(from)
-                : (x < max ? t : fromRFC3339(to));
-        }
-
-        function clampDuration(d, { from, to }) {
-            let x = d.hours * 3600 + d.min * 60;
-            return x < from
-                ? secondsToHours(from)
-                : (x < to ? d : secondsToHours(to));
-        }
-
-        filters.numNodes.from = clamp(filters.numNodes.from, ranges.numNodes);
-        filters.numNodes.to = clamp(filters.numNodes.to, ranges.numNodes);
-
-        filters.startTime.from = clampTime(filters.startTime.from, ranges.startTime);
-        filters.startTime.to = clampTime(filters.startTime.to, ranges.startTime);
-
-        filters.duration.from = clampDuration(filters.duration.from, ranges.duration);
-        filters.duration.to = clampDuration(filters.duration.to, ranges.duration);
+        filters.numNodes.from  = ranges.numNodes.from;
+        filters.numNodes.to    = ranges.numNodes.to;
+        filters.startTime.from = fromRFC3339(ranges.startTime.from);
+        filters.startTime.to   = fromRFC3339(ranges.startTime.to);
+        filters.duration.from  = secondsToHours(ranges.duration.from);
+        filters.duration.to    = secondsToHours(ranges.duration.to);
 
         for (let i in filters.statistics) {
             let stat = filters.statistics[i];
             let peak = getPeakValue(stat.metric);
-            stat.from = clamp(stat.from, { from: 0, to: peak });
-            stat.to = clamp(stat.to, { from: 0, to: peak });
+            stat.changed = false;
+            stat.from = 0;
+            stat.to = peak;
             currentRanges.statistics[i].to = peak;
         }
     }
@@ -514,7 +487,7 @@
             <Row style="height: 1rem;"></Row>
             <Row>
                 <Col>
-                    <h5>Clusters</h5>
+                    <h5>Clusters (Changing resets other filters)</h5>
                     <ListGroup>
                         <ListGroupItem>
                             <input type="radio" value={null}
