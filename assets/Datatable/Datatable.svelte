@@ -1,5 +1,5 @@
 <script>
-    import { operationStore, query } from '@urql/svelte';
+    import { operationStore, query, mutation } from '@urql/svelte';
     import { Row, Table, Card, Spinner } from 'sveltestrap';
     import Pagination from './Pagination.svelte';
     import JobMeta from './JobMeta.svelte';
@@ -14,7 +14,7 @@
     export let matchedJobs; /* Used as output variable (So that it can be passed to the FilterConfig) */
     export let selectedMetrics = clusterCockpitConfig['plot_list_selectedMetrics'];
 
-    let itemsPerPage = 10;
+    let itemsPerPage = clusterCockpitConfig.plot_list_jobsPerPage || 10;
     let page = 1;
     let paging = { itemsPerPage: itemsPerPage, page: page };
     let tableWidth, plotWidth;
@@ -52,11 +52,29 @@
     $: matchedJobs = $jobQuery.data != null ? $jobQuery.data.jobs.count : 0;
     $: $jobQuery.variables = { ...$jobQuery.variables, sorting };
 
+    const updateConfiguration = mutation({
+        query: `mutation($name: String!, $value: String!) {
+            updateConfiguration(name: $name, value: $value)
+        }`
+    });
+
+    let prevItemsPerPage = itemsPerPage;
     function handlePaging( event ) {
         itemsPerPage = event.detail.itemsPerPage;
         page = event.detail.page;
         $jobQuery.variables.paging = { itemsPerPage: itemsPerPage, page: page };
         $jobQuery.reexecute();
+
+        if (itemsPerPage != prevItemsPerPage) {
+            prevItemsPerPage = itemsPerPage;
+            updateConfiguration({
+                name: "plot_list_jobsPerPage",
+                value: itemsPerPage.toString()
+            }).then(res => {
+                if (res.error)
+                    console.error(res.error);
+            });
+        }
     }
 
     export function applyFilters(filterItems) {

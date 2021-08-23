@@ -16,7 +16,10 @@
             plot_general_colorscheme: {{ colormap | json_encode | raw }},
             plot_general_lineWidth: {{ config.plot_general_lineWidth.value }},
             plot_general_colorBackground: {{ config.plot_general_colorBackground.value }},
-            plot_list_selectedMetrics: {{ config.plot_list_selectedMetrics.value | raw }}
+            plot_list_selectedMetrics: {{ config.plot_list_selectedMetrics.value | raw }},
+            plot_list_jobsPerPage: {{ (config.plot_list_jobsPerPage is defined)
+                ? config.plot_list_jobsPerPage.value | raw
+                : "null" }}
         });
     </script>
     {{ encore_entry_script_tags('joblist') }}
