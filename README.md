@@ -31,7 +31,8 @@ To install and use ClusterCockpit the following dependencies have to be fulfille
 - [Yarn](https://yarnpkg.com/) - Node package manager
 - [Symfony CLI](https://symfony.com/download) - Symfony command line tool
 - Optional: Apache or Nginx web server
-- Optional: [InfluxDB](https://docs.influxdata.com/influxdb/v1.7/introduction/getting-started/) time series database
+- Optional: InfluxDB time series database (both V1 or V2 are supported)
+- Optional: Redis caching server
 
 We strongly recommend to use this [Docker compose setup](https://github.com/ClusterCockpit/cc-docker) for testing ClusterCockpit or for development.
 This docker setup also includes downloadable monitoring data.
