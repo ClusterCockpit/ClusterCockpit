@@ -1,37 +1,70 @@
 security:
   enable_authenticator_manager: true
+
   password_hashers:
     App\Entity\User: 'auto'
+
   providers:
     db_provider:
       entity:
         class: App\Entity\User
+
     db_api_provider:
       entity:
         class: App\Entity\User
         property: apiToken
+
+    ldap_provider:
+      ldap:
+        service: Symfony\Component\Ldap\Ldap
+        base_dn: ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de
+        search_dn: 'cn=hpcmonitoring,ou=roadm,ou=profile,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de'
+        search_password: ${LDAP_PW}
+        default_roles: ['ROLE_USER']
+        uid_key: uid
+
+    chain_provider:
+        chain:
+          providers: [ 'db_provider', 'ldap_provider' ]
+
   firewalls:
     dev:
       pattern: ^/(_(profiler|wdt)|css|images|js)/
       security: false
+
     api:
       pattern: ^/api/job.*
       stateless: true
       provider: db_api_provider
       custom_authenticators:
         - App\Security\TokenAuthenticator
+
     main:
       pattern: ^/
       lazy: true
+      provider: chain_provider
+
       form_login:
         check_path: security_login
         login_path: security_login
         enable_csrf: true
         default_target_path: list_jobs
+
+      form_login_ldap:
+        login_path: security_login
+        check_path: security_login
+        enable_csrf: true
+        default_target_path: list_jobs
+        service: Symfony\Component\Ldap\Ldap
+        dn_string: 'uid={username},ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de'
+        #query_string: '(&(objectclass=posixAccount)(uid={username}))'
+        #search_dn: 'cn=hpcmonitoring,ou=roadm,ou=profile,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de'
+        #search_password: ${LDAP_PW}
+        #dn_string: 'uid={username},dc=example,dc=com'
+
       logout:
         path: security_logout
         target: index
-      provider: db_provider
 
   access_control:
     - { path: ^/login, roles: PUBLIC_ACCESS }

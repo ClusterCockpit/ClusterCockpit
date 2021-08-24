@@ -34,3 +34,17 @@ services:
     App\Resolver\RootResolverMap:
         tags:
             - { name: overblog_graphql.resolver_map, schema: default }
+
+    Symfony\Component\Ldap\Ldap:
+        arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
+        tags:
+            - ldap
+    Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
+        arguments:
+            - connection_string: 'ldaps://hpcldap.rrze.uni-erlangen.de'
+              #host: 'ldaps://hpcldap.rrze.uni-erlangen.de'
+              #port: 389
+              #encryption: tls
+              options:
+                  protocol_version: 3
+                  referrals: false
