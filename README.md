@@ -22,6 +22,21 @@ the [Symfony 5](https://symfony.com) PHP Framework. The application uses
 [OverblogGraphQLBundle](https://github.com/overblog/GraphQLBundle) for GraphQL APIs,  and
 [Svelte](https://svelte.dev/) for the frontend UI.
 
+## Dependencies
+
+To install and use ClusterCockpit the following dependencies have to be fulfilled:
+- PHP 8.0 or newer
+- MySQL or MariaDB
+- [Composer](https://getcomposer.org) - PHP package manager
+- [Yarn](https://yarnpkg.com/) - Node package manager
+- [Symfony CLI](https://symfony.com/download) - Symfony command line tool
+- Optional: Apache or Nginx web server
+- Optional: [InfluxDB](https://docs.influxdata.com/influxdb/v1.7/introduction/getting-started/) time series database
+
+We strongly recommend to use this [Docker compose setup](https://github.com/ClusterCockpit/cc-docker) for having a look on ClusterCockpit or development.
+This docker setup already includes the option to download fake monitoring data.
+
+Please refer to the [Wiki](https://github.com/ClusterCockpit/ClusterCockpit/wiki) for documentation.
 
 
 The default caching backend is file system based cache. For production the use
