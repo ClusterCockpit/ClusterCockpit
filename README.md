@@ -16,7 +16,7 @@ Introduction
 --------------------------------------------------------------------------------
 
 This is a web frontend for job specific performance monitoring. It is based on
-the [Symfony 5](https://symfony.com) PHP Framework. The application uses
+the [Symfony 5](https://symfony.com) PHP Framework. It uses
 [Bootstrap 5](http://getbootstrap.com) for layout and styling,
 [API Platform](https://api-platform.com/) for REST APIs,
 [OverblogGraphQLBundle](https://github.com/overblog/GraphQLBundle) for GraphQL APIs,  and
