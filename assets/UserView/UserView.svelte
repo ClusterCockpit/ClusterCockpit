@@ -14,6 +14,7 @@
     let datatable;
     let filterItems = [{ userId: { eq: userInfos.userId } }];
     let matchedJobs;
+    let pendingFilters;
     let appliedFilters;
     let selectedMetrics;
 
@@ -64,6 +65,7 @@
 </Row>
 <Row>
     <TableInfo
+        {pendingFilters}
         {appliedFilters}
         {matchedJobs}
         {userInfos} />
@@ -128,6 +130,7 @@
             bind:sorting
             bind:selectedMetrics
             bind:appliedFilters
+            bind:pendingFilters
             limitedToUser=true
             on:update={filtersChanged} />
     </Col>

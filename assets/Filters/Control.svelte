@@ -9,6 +9,7 @@
     const clustersQuery = getContext('clusters-query');
 
     export let sorting;
+    export let pendingFilters;
     export let appliedFilters;
     export let filterPresets = null;
     export let limitedToUser = false;
@@ -131,6 +132,7 @@
 <Filter
     showFilters={filterConfigOpen}
     bind:appliedFilters
+    bind:filters={pendingFilters}
     {filterPresets}
     on:update />
 

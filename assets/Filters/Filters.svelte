@@ -128,7 +128,7 @@
 
 <script>
     import { fuzzySearchTags } from '../Common/utils.js';
-    import { createEventDispatcher, getContext } from "svelte";
+    import { tick, createEventDispatcher, getContext } from "svelte";
     import { Col, Row, FormGroup, Button, Input, InputGroup, InputGroupText,
         TabContent, TabPane, ListGroup, ListGroupItem } from 'sveltestrap';
     import DoubleRangeSlider from './DoubleRangeSlider.svelte';
@@ -154,8 +154,9 @@
         return getFilterItems(filters);
     }
 
-    let filters = deepCopy(defaultFilters);
+    export let filters = deepCopy(defaultFilters);
 
+    let pendingChange = false;
     let globalFilterRanges = null;
     let tagFilterTerm = '';
     let filteredTags = [];
@@ -288,9 +289,18 @@
         }
 
         updateRanges($clustersQuery);
+        tick().then(() => pendingChange = false);
     };
 
     $: init($clustersQuery);
+    $: pendingChange = filters == filters;
+
+    function handleApply( ) {
+        let filterItems = getFilterItems(filters);
+        appliedFilters = deepCopy(filters);
+        dispatch("update", { filterItems: filterItems });
+        tick().then(() => pendingChange = false);
+    }
 
     function handleReset( ) {
         tagFilterTerm = '';
@@ -299,19 +309,19 @@
         handleApply();
     }
 
-    function handleTagSelection(tag) {
-        if (filters["tags"][tag.id])
-            delete filters["tags"][tag.id];
-        else
-            filters["tags"][tag.id] = tag;
-
-        filteredTags = filteredTags;
+    function handleUndo() {
+        filters = deepCopy(appliedFilters);
+        tick().then(() => pendingChange = false);
     }
 
-    function handleApply( ) {
-        let filterItems = getFilterItems(filters);
-        appliedFilters = deepCopy(filters);
-        dispatch("update", { filterItems: filterItems });
+    function handleTagSelection(tag) {
+        if (filters["tags"][tag.id]) {
+            // delete does not trigger reactivity/`$$invalidate`.
+            filters["tags"][tag.id] = undefined;
+            delete filters["tags"][tag.id];
+        } else {
+            filters["tags"][tag.id] = tag;
+        }
     }
 
     function handleNodesSlider({ detail }) {
@@ -323,6 +333,7 @@
         stat.changed = true;
         stat.from = detail[0];
         stat.to = detail[1];
+        filters.statistics = filters.statistics;
     }
 </script>
 
@@ -548,6 +559,9 @@
         </div>
         <div class="p-2">
             <Button color=primary on:click={handleApply}>Apply</Button>
+        </div>
+        <div class="p-2">
+            <Button color=primary on:click={handleUndo} disabled={!pendingChange}>Undo</Button>
         </div>
     </div>
 {/if}
