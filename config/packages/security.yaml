@@ -17,9 +17,9 @@ security:
     ldap_provider:
       ldap:
         service: Symfony\Component\Ldap\Ldap
-        base_dn: ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de
+        base_dn: 'ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de'
         search_dn: 'cn=hpcmonitoring,ou=roadm,ou=profile,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de'
-        search_password: ${LDAP_PW}
+        search_password: '%env(LDAP_PW)%'
         default_roles: ['ROLE_USER']
         uid_key: uid
 
@@ -50,17 +50,17 @@ security:
         enable_csrf: true
         default_target_path: list_jobs
 
-      form_login_ldap:
-        login_path: security_login
-        check_path: security_login
-        enable_csrf: true
-        default_target_path: list_jobs
-        service: Symfony\Component\Ldap\Ldap
-        dn_string: 'uid={username},ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de'
-        #query_string: '(&(objectclass=posixAccount)(uid={username}))'
-        #search_dn: 'cn=hpcmonitoring,ou=roadm,ou=profile,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de'
-        #search_password: ${LDAP_PW}
-        #dn_string: 'uid={username},dc=example,dc=com'
+      #form_login_ldap:
+        #login_path: security_login
+        #check_path: security_login
+        #enable_csrf: true
+        #default_target_path: list_jobs
+        #service: Symfony\Component\Ldap\Ldap
+        #dn_string: 'uid={username},ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de'
+        ##query_string: '(&(objectclass=posixAccount)(uid={username}))'
+        ##search_dn: 'cn=hpcmonitoring,ou=roadm,ou=profile,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de'
+        ##search_password: ${LDAP_PW}
+        ##dn_string: 'uid={username},dc=example,dc=com'
 
       logout:
         path: security_logout
@@ -84,3 +84,5 @@ when@test:
     firewalls:
       main:
         http_basic: ~
+        entry_point: http_basic
+        # entry_point: form_login
