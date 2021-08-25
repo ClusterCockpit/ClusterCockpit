@@ -42,11 +42,11 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
     {
         $this->_timer = new Stopwatch();
         $this->_logger = $logger;
-        $influxdbV2URL = getenv('INFLUXDB_V2_URL');
+        $influxdbURL = getenv('INFLUXDB_URL');
         $influxdbToken = getenv('INFLUXDB_TOKEN');
-        #$this->_logger->info("Scheme: $influxdbURL");
+        $this->_logger->info("Scheme: $influxdbURL");
         $this->_client  = new InfluxDB2\Client([
-            "url" => $influxdbV2URL,
+            "url" => $influxdbURL,
             "token" => $influxdbToken,
             "bucket" => "ClusterCockpit/data",
             "org" => "ClusterCockpit",
@@ -72,9 +72,9 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
         $query = "from(bucket:\"ClusterCockpit/data\")
             |> range(start: {$startTime}, stop: {$stopTime})
             |> filter(fn: (r) =>
-                          r._measurement == \"{$metric['measurement']}\" and
-                          r._field == \"{$metric['name']}\" and
-                          r.host == \"{$nodes[0]}\")
+            r._measurement == \"{$metric['measurement']}\" and
+            r._field == \"{$metric['name']}\" and
+            r.host == \"{$nodes[0]}\")
             |> count()";
 
         $result = $this->_queryApi->query($query);
@@ -113,19 +113,19 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
             $query = "data = from(bucket:\"ClusterCockpit/data\")
                 |> range(start: {$startTime}, stop: {$stopTime})
                 |> filter(fn: (r) =>
-                  r._measurement == \"{$metric['measurement']}\" and
-                  r._field == \"{$name}\" and
-                  r.host =~ /{$nodes}/
+                r._measurement == \"{$metric['measurement']}\" and
+                r._field == \"{$name}\" and
+                r.host =~ /{$nodes}/
                 )
 
-                {$name}_avg = data |> mean(column: \"_value\") |> set(key: \"_field\", value: \"{$name}_avg\")
-                {$name}_min = data |> min(column:  \"_value\") |> set(key: \"_field\", value: \"{$name}_min\")
-                {$name}_max = data |> max(column:  \"_value\") |> set(key: \"_field\", value: \"{$name}_max\")
+            {$name}_avg = data |> mean(column: \"_value\") |> set(key: \"_field\", value: \"{$name}_avg\")
+            {$name}_min = data |> min(column:  \"_value\") |> set(key: \"_field\", value: \"{$name}_min\")
+            {$name}_max = data |> max(column:  \"_value\") |> set(key: \"_field\", value: \"{$name}_max\")
 
-                union(tables: [{$name}_avg, {$name}_min, {$name}_max])
-                |> pivot(rowKey:[\"host\"], columnKey: [\"_field\"], valueColumn: \"_value\")
-                |> group()
-            ";
+            union(tables: [{$name}_avg, {$name}_min, {$name}_max])
+            |> pivot(rowKey:[\"host\"], columnKey: [\"_field\"], valueColumn: \"_value\")
+            |> group()
+";
 
             $this->_timer->start( 'InfluxDBv2');
             $result = $this->_queryApi->query($query);
@@ -152,23 +152,23 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
 
         // Find JobStats from Node-Value-Arrays //
         foreach ($jobStats as $type => $stat) {
-          switch ($type) {
+            switch ($type) {
             case 'avg':
-              foreach ($stat as $name => $values) {
-                $stats[$name] = round((array_sum($values) / $recordsCount), 2);
-              }
-              break;
+                foreach ($stat as $name => $values) {
+                    $stats[$name] = round((array_sum($values) / $recordsCount), 2);
+                }
+                break;
             case 'min':
-              foreach ($stat as $name => $values) {
-                $stats[$name] = round(min($values), 2);
-              }
-              break;
+                foreach ($stat as $name => $values) {
+                    $stats[$name] = round(min($values), 2);
+                }
+                break;
             case 'max':
-              foreach ($stat as $name => $values) {
-                $stats[$name] = round(max($values), 2);
-              }
-              break;
-          }
+                foreach ($stat as $name => $values) {
+                    $stats[$name] = round(max($values), 2);
+                }
+                break;
+            }
         }
 
         #$statsJson = json_encode($stats);
@@ -189,11 +189,11 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
         $query = "from(bucket:\"ClusterCockpit/data\")
             |> range(start: {$startTime}, stop: {$stopTime})
             |> filter(fn: (r) =>
-                r._measurement == \"{$measurement}\" and
-                r.host =~ /{$nodes}/
+            r._measurement == \"{$measurement}\" and
+            r.host =~ /{$nodes}/
             )
             |> truncateTimeColumn(unit: 1m)
-        ";
+";
 
         #$this->_logger->info(">>>> QUERY:  $query");
 
@@ -204,13 +204,13 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
         $data = array();
 
         foreach ( $result as $table ){
-          $tableRecords = $table->records;
-          $nodeId = $tableRecords[0]->values["host"];
-          $metric = $tableRecords[0]->values["_field"];
+            $tableRecords = $table->records;
+            $nodeId = $tableRecords[0]->values["host"];
+            $metric = $tableRecords[0]->values["_field"];
 
-          foreach ( $tableRecords as $record) {
-              $data[$metric][$nodeId][] = $record->values["_value"];
-          }
+            foreach ( $tableRecords as $record) {
+                $data[$metric][$nodeId][] = $record->values["_value"];
+            }
         }
 
         #$dataJson  = json_encode($data);

@@ -32,17 +32,17 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
 {
     private $_timing;
     private $_database;
-    /* private $_logger; */
+    private $_logger;
 
     public function __construct(
-        /* LoggerInterface $logger */
+        LoggerInterface $logger
     )
     {
         $this->_timer = new Stopwatch();
-        /* $this->_logger = $logger; */
+        $this->_logger = $logger;
         $influxdbURL = getenv('INFLUXDB_URL');
-	    /* $this->_logger->info("Scheme: $influxdbURL"); */
-        $this->_database = \InfluxDB\Client::fromDSN("influxdb://symfony:mashup@127.0.0.1:8086/ClusterCockpit");
+	    $this->_logger->info("Scheme: $influxdbURL");
+        $this->_database = \InfluxDB\Client::fromDSN($influxdbURL);
     }
 
     public function hasProfile($job, $metric)
