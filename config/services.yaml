@@ -27,6 +27,7 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
     # configure which implementation of MetricDataRepository
     # to inject in other services such as JobData and JobStats
     App\Repository\MetricDataRepository: '@App\Repository\InfluxDBv2MetricDataRepository'
@@ -39,6 +40,7 @@ services:
         arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
         tags:
             - ldap
+
     Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
         arguments:
             - connection_string: 'ldaps://hpcldap.rrze.uni-erlangen.de'
