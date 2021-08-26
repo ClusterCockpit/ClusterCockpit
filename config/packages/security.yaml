@@ -18,7 +18,7 @@ security:
     #   ldap:
     #     service: Symfony\Component\Ldap\Ldap
     #     base_dn: ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de
-    #     search_dn: cn=hpcmonitoring,ou=roadm,ou=profile,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de
+    #     search_dn: '%env(LDAP_DN)%'
     #     search_password: '%env(LDAP_PW)%'
     #     default_roles: ['ROLE_USER']
     #     uid_key: uid
@@ -60,7 +60,7 @@ security:
       #   service: Symfony\Component\Ldap\Ldap
       #   dn_string: ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de
       #   query_string: (&(objectclass=posixAccount)(uid={username}))
-      #   search_dn: cn=hpcmonitoring,ou=roadm,ou=profile,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de
+      #   search_dn: '%env(LDAP_DN)%'
       #   search_password: '%env(LDAP_PW)%'
       #
       # entry_point: form_login_ldap
