@@ -7,26 +7,12 @@ security:
   providers:
     db_provider:
       entity:
-        class: App\Entity\User
+        class: 'App\Entity\User'
 
     db_api_provider:
       entity:
-        class: App\Entity\User
-        property: apiToken
-
-    # ldap_provider:
-    #   ldap:
-    #     service: Symfony\Component\Ldap\Ldap
-    #     base_dn: ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de
-    #     search_dn: '%env(LDAP_DN)%'
-    #     search_password: '%env(LDAP_PW)%'
-    #     default_roles: ['ROLE_USER']
-    #     uid_key: uid
-    #     filter: (&(objectclass=posixAccount)({uid_key}={username}))
-    #
-    # chain_provider:
-    #     chain:
-    #       providers: [ 'ldap_provider', 'db_provider' ]
+        class: 'App\Entity\User'
+        property: 'apiToken'
 
   firewalls:
     dev:
@@ -44,29 +30,10 @@ security:
       pattern: ^/
       lazy: true
       provider: db_provider
-      # provider: chain_provider
-
-      form_login:
-        check_path: security_login
-        login_path: security_login
-        enable_csrf: true
-        default_target_path: list_jobs
-
-      # form_login_ldap:
-      #   login_path: security_login
-      #   check_path: security_login
-      #   enable_csrf: true
-      #   default_target_path: list_jobs
-      #   service: Symfony\Component\Ldap\Ldap
-      #   dn_string: ou=people,ou=hpc,dc=rrze,dc=uni-erlangen,dc=de
-      #   query_string: (&(objectclass=posixAccount)(uid={username}))
-      #   search_dn: '%env(LDAP_DN)%'
-      #   search_password: '%env(LDAP_PW)%'
-      #
-      # entry_point: form_login_ldap
-
+      custom_authenticators:
+        - App\Security\LoginFormAuthenticator
       logout:
-        path: security_logout
+        path:   security_logout
         target: security_login
 
   access_control:

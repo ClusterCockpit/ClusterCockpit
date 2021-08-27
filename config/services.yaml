@@ -36,6 +36,9 @@ services:
         tags:
             - { name: overblog_graphql.resolver_map, schema: default }
 
+    App\Security\LoginFormAuthenticator:
+        $userProvider: '@security.user.provider.concrete.db_provider'
+
     Symfony\Component\Ldap\Ldap:
         arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
         tags:

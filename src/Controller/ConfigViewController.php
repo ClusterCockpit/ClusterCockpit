@@ -96,6 +96,13 @@ class ConfigViewController extends AbstractController
                         'active' => false
                     ),
                     array(
+                        'label' => 'Ldap',
+                        'icon' => 'bi-diagram-2',
+                        'link' => 'ldap_options',
+                        'addlink' => false,
+                        'active' => false
+                    ),
+                    array(
                         'label' => 'General',
                         'icon' => 'bi-gear-fill',
                         'link' => 'general_options',
