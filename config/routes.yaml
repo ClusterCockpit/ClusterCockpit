@@ -64,6 +64,9 @@ default_options:
 general_options:
     path: /admin/general
     controller:  App\Controller\ConfigViewController::generalOptions
+ldap_options:
+    path: /admin/ldap
+    controller:  App\Controller\ConfigViewController::ldapOptions
 list_api_keys:
     path: /admin/apiKeys/
     controller:  App\Controller\ConfigViewController::listApiKeys

@@ -96,16 +96,16 @@ class ConfigViewController extends AbstractController
                         'active' => false
                     ),
                     array(
-                        'label' => 'Ldap',
-                        'icon' => 'bi-diagram-2',
-                        'link' => 'ldap_options',
+                        'label' => 'General',
+                        'icon' => 'bi-gear-fill',
+                        'link' => 'general_options',
                         'addlink' => false,
                         'active' => false
                     ),
                     array(
-                        'label' => 'General',
-                        'icon' => 'bi-gear-fill',
-                        'link' => 'general_options',
+                        'label' => 'Ldap',
+                        'icon' => 'bi-diagram-2-fill',
+                        'link' => 'ldap_options',
                         'addlink' => false,
                         'active' => false
                     ),
@@ -285,6 +285,23 @@ class ConfigViewController extends AbstractController
                 'scope' => 'default',
                 'sidebar' => $this->_sidebar(
                     array('menu'=>1,'item'=>3)
+                )
+            ));
+    }
+
+    public function ldapOptions(Request $request)
+    {
+        $config = $this->getDoctrine()
+                       ->getRepository(\App\Entity\Configuration::class)
+                       ->findAllDefaultHierarchy();
+
+        return $this->render('config/editConfigOptions.html.twig',
+            array(
+                'configHash' => $config['ldap'],
+                'defaultmode' => true,
+                'scope' => 'default',
+                'sidebar' => $this->_sidebar(
+                    array('menu'=>1,'item'=>4)
                 )
             ));
     }
