@@ -40,16 +40,18 @@ services:
         $userProvider: '@security.user.provider.concrete.db_provider'
 
     Symfony\Component\Ldap\Ldap:
-        arguments: ['@Symfony\Component\Ldap\Adapter\ExtLdap\Adapter']
+        arguments:
+            - adapter: 'Symfony\Component\Ldap\Adapter\ExtLdap\Adapter'
         tags:
-            - ldap
+          - 'ldap'
+
+    Symfony\Component\Ldap\Security\CheckLdapCredentialsListener:
+        tags:
+            - { name: kernel.event_listener, event: Symfony\Component\Security\Http\Event\CheckPassportEvent }
 
     Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
         arguments:
-            - connection_string: 'ldaps://hpcldap.rrze.uni-erlangen.de'
-              #host: 'ldaps://hpcldap.rrze.uni-erlangen.de'
-              #port: 389
-              #encryption: tls
+            - connection_string: 'ldap://cc-ldap'
               options:
                   protocol_version: 3
                   referrals: false

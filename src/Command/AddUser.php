@@ -49,7 +49,7 @@ class AddUser extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure() : void
     {
         $this
             ->setName('app:user')
@@ -62,7 +62,7 @@ class AddUser extends Command
             ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $username = $input->getArgument('username');
         $plainPassword = $input->getArgument('password');
@@ -97,5 +97,6 @@ class AddUser extends Command
         $user->setIsActive(true);
         $this->_em->persist($user);
         $this->_em->flush();
+        return Command::SUCCESS;
     }
 }

@@ -42,8 +42,8 @@ security:
     - { path: ^/monitoring, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
     - { path: ^/config, roles: ROLE_USER }
     - { path: ^/admin, roles: ROLE_ADMIN }
-    - { path: ^/api/job.*, roles: ROLE_API }
     - { path: ^/api/configurations, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
+    - { path: ^/api/job.*, roles: ROLE_API }
     - { path: ^/query, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
 
 

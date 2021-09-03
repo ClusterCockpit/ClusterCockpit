@@ -4,22 +4,35 @@
     </div>
     <div class="col">
         <div class="form-group">
-            <input type="text" class="form-control" id="{{ config.name }}" value="{{ config.value }}" data-validation="{{ config.validation }}" required>
+            <input type="text" class="form-control" id="{{ config.name }}"
+            value="{{ config.value }}"
+            data-validation="{{ config.validation }}" required>
             <div class="invalid-feedback">{{ config.feedback }}</div>
             <small id="{{ config.name }}-help" class="invisible form-text text-muted"></small>
         </div>
         </div>
         <div class="col-2">
             {% if defaultmode  %}
-                <button type="button" id="{{ config.id }}" name="update" value="{{ config.name }}" class="btn btn-success ml-2">Save</button>
+                <button type="button" id="{{ config.id }}"
+                    name="update"
+                    value="{{ config.name }}"
+                    class="btn btn-success ml-2">Save</button>
             {% else %}
             {% if config.scope == 'default' %}
-                <button type="button" id="{{ config.id }}" name="replace" value="{{ config.name }}" class="btn btn-warning ml-2" data-toggle="tooltip" data-placement="top" title="Overwrite default with user specific setting" >Overwrite</button>
+                <button type="button" id="{{ config.id }}"
+                    name="replace"
+                    value="{{ config.name }}"
+                    class="btn btn-warning ml-2"
+                    data-toggle="tooltip" data-placement="top"
+                    title="Overwrite default with user specific setting" >Overwrite</button>
             {% else %}
                 <button type="button" id="{{ config.id }}" name="update" value="{{ config.name }}" class="btn btn-success ml-2">Save</button>
-                <button type="button" id="{{ config.id }}" name="reset" value="{{ config.name }}" class="btn btn-primary ml-2" data-toggle="tooltip" data-placement="top" title="Reset to default setting" >Default</button>
+                <button type="button" id="{{ config.id }}"
+                    name="reset" value="{{ config.name }}"
+                    class="btn btn-primary ml-2"
+                    data-toggle="tooltip" data-placement="top"
+                    title="Reset to default setting" >Default</button>
             {% endif %}
             {% endif %}
         </div>
 </div>
-

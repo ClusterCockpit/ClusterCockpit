@@ -36,7 +36,7 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
-use Symfony\Ldap\Security\LdapBadge;
+use Symfony\Component\Ldap\Security\LdapBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
@@ -44,6 +44,8 @@ use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator
 use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Service\Configuration;
+use App\Adapter\LdapAdapter;
 
 class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -60,6 +62,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     {
         $this->httpUtils = $httpUtils;
         $this->userProvider = $userProvider;
+        $this->_em = $em;
     }
 
     private function getCredentials(Request $request): array
@@ -113,9 +116,9 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
             $searchDn = $configuration->getValue('ldap_search_dn');
             $searchPassword = getenv('LDAP_PW');
             $queryString = $configuration->getValue('ldap_user_filter');
-            $ldapServiceId = 'Symfony\Component\Ldap\Ldap';
-
-            $passport->addBadge(new LdapBadge($ldapServiceId, $dnString, $searchDn, $searchPassword, $queryString));
+            /* I tried many things as service Id, but I think it cannot work as there is no Factory for it */
+            $passport->addBadge(new LdapBadge('ldap', $dnString));
+            /* $passport->addBadge(new LdapBadge('ldap', $dnString, $searchDn, $searchPassword, $queryString)); */
         }
         $passport->addBadge(new CsrfTokenBadge('authenticate', $credentials['csrf_token']));
 
@@ -129,5 +132,4 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     {
         return new RedirectResponse($this->httpUtils->generateUri($request, 'list_jobs'));
     }
-
 }

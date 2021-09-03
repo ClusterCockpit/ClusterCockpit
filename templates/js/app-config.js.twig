@@ -6,13 +6,13 @@ document.querySelectorAll("button").forEach( button => {
           id = "#"+ e.target.getAttribute("value");
           action = e.target.getAttribute("name");
           value = document.querySelector(id).value;
-          validation = document.querySelector(id).getAttribute("data-validation");
-          re = new RegExp(validation);
+          // validation = document.querySelector(id).getAttribute("data-validation");
+          // re = new RegExp(validation);
 
-          if ( ! re.test(value) ) {
-              document.querySelector(id).addClass('is-invalid');
-              return;
-          }
+          // if ( ! re.test(value) ) {
+          //     document.querySelector(id).addClass('is-invalid');
+          //     return;
+          // }
 
           let payload = {
               name: document.querySelector(id).getAttribute("id"),
@@ -71,6 +71,7 @@ document.querySelectorAll("button").forEach( button => {
           document.querySelector(id+"-help").textContent = "Success!";
           document.querySelector(id+"-help").classList.remove("invisible");
         } catch (e) {
+          console.log(e);
           document.querySelector(id+"-help").textContent = "Error!";
           document.querySelector(id+"-help").classList.remove("invisible");
         }
