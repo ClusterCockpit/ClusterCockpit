@@ -45,9 +45,9 @@ services:
         tags:
           - 'ldap'
 
-    Symfony\Component\Ldap\Security\CheckLdapCredentialsListener:
-        tags:
-            - { name: kernel.event_listener, event: Symfony\Component\Security\Http\Event\CheckPassportEvent }
+    # Symfony\Component\Ldap\Security\CheckLdapCredentialsListener:
+    #     tags:
+    #         - { name: kernel.event_listener, event: Symfony\Component\Security\Http\Event\CheckPassportEvent }
 
     Symfony\Component\Ldap\Adapter\ExtLdap\Adapter:
         arguments:
