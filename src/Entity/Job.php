@@ -140,7 +140,7 @@ class Job
      *
      *  @ORM\Column(type="boolean")
      *  @Groups({"write"})
-     *  @Assert\NotBlank
+     *  @Assert\NotNull
      */
     public $isRunning;
 
