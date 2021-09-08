@@ -47,8 +47,8 @@ services:
     app.ldap_adapter:
         class: 'Symfony\Component\Ldap\Adapter\ExtLdap\Adapter'
         arguments:
-          - host: 'ldap://cc-ldap'
-            encryption: tls
+          - connection_string: 'ldap://cc-ldap'
+            # encryption: tls
             options:
               protocol_version: 3
               referrals: false

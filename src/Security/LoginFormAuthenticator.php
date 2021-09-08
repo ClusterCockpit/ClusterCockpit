@@ -112,13 +112,8 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 
         if ( empty($dbPassword) ) {
             $configuration = new Configuration($this->_em);
-            $dnString = $configuration->getValue('ldap_user_base');
-            $searchDn = $configuration->getValue('ldap_user_bind');
-            $searchPassword = getenv('LDAP_PW');
-            $queryString = $configuration->getValue('ldap_user_filter');
-            /* I tried many things as service Id, but I think it cannot work as there is no Factory for it */
+            $dnString = $configuration->getValue('ldap_user_bind');
             $passport->addBadge(new LdapBadge('app.ldap', $dnString));
-            /* $passport->addBadge(new LdapBadge('ldap', $dnString, $searchDn, $searchPassword, $queryString)); */
         }
         $passport->addBadge(new CsrfTokenBadge('authenticate', $credentials['csrf_token']));
 
