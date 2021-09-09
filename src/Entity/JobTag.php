@@ -36,6 +36,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity
  */
 #[ApiResource(
+    attributes: {"pagination_enabled"=false},
     collectionOperations: ['get','post'],
     itemOperations: ['get','patch'],
 )]
