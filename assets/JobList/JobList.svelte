@@ -16,6 +16,7 @@
     let datatable;
     let filterItems = [];
     let matchedJobs;
+    let pendingFilters;
     let appliedFilters;
     let selectedMetrics;
 
@@ -44,11 +45,13 @@
 </script>
 
 <TableInfo
+    {pendingFilters}
     {appliedFilters}
     {matchedJobs}/>
 
 <TableControl
     {filterPresets}
+    bind:pendingFilters
     bind:appliedFilters
     bind:sorting
     bind:selectedMetrics

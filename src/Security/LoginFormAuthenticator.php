@@ -25,105 +25,106 @@
 
 namespace App\Security;
 
-use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
-use Symfony\Component\Security\Core\Exception\InvalidCsrfTokenException;
+use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\UserProviderInterface;
-use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Security\Guard\Authenticator\AbstractFormLoginAuthenticator;
-use Symfony\Component\Security\Guard\PasswordAuthenticatedInterface;
-use Symfony\Component\Security\Http\Util\TargetPathTrait;
+use Symfony\Bridge\Doctrine\Security\User\EntityUserProvider;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Ldap\Security\LdapBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
+use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
+use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
+use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
+use Symfony\Component\Security\Http\HttpUtils;
+use Symfony\Component\Security\Http\ParameterBagUtils;
+use Doctrine\ORM\EntityManagerInterface;
+use App\Service\Configuration;
+use App\Adapter\LdapAdapter;
 
-class LoginFormAuthenticator extends AbstractFormLoginAuthenticator implements PasswordAuthenticatedInterface
+class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
-    use TargetPathTrait;
 
-    public const LOGIN_ROUTE = 'security_login';
+    private $_em;
+    private $httpUtils;
+    private $userProvider;
+    private $httpKernel;
 
-    private $entityManager;
-    private $urlGenerator;
-    private $csrfTokenManager;
-    private $passwordEncoder;
-
-    public function __construct(EntityManagerInterface $entityManager, UrlGeneratorInterface $urlGenerator, CsrfTokenManagerInterface $csrfTokenManager, UserPasswordEncoderInterface $passwordEncoder)
+    public function __construct(
+        HttpUtils $httpUtils,
+        EntityManagerInterface $em,
+        EntityUserProvider $userProvider)
     {
-        $this->entityManager = $entityManager;
-        $this->urlGenerator = $urlGenerator;
-        $this->csrfTokenManager = $csrfTokenManager;
-        $this->passwordEncoder = $passwordEncoder;
+        $this->httpUtils = $httpUtils;
+        $this->userProvider = $userProvider;
+        $this->_em = $em;
     }
 
-    public function supports(Request $request)
+    private function getCredentials(Request $request): array
     {
-        return self::LOGIN_ROUTE === $request->attributes->get('_route')
-            && $request->isMethod('POST');
-    }
+        $credentials = [];
+        $credentials['csrf_token'] = ParameterBagUtils::getRequestParameterValue($request, '_csrf_token');
+        $credentials['username'] = ParameterBagUtils::getParameterBagValue($request->request, '_username');
+        $credentials['password'] = ParameterBagUtils::getParameterBagValue($request->request, '_password') ?? '';
 
-    public function getCredentials(Request $request)
-    {
-        $credentials = [
-            'username' => $request->request->get('username'),
-            'password' => $request->request->get('password'),
-            'csrf_token' => $request->request->get('_csrf_token'),
-        ];
-        $request->getSession()->set(
-            Security::LAST_USERNAME,
-            $credentials['username']
-        );
+        if (!\is_string($credentials['username']) && (!\is_object($credentials['username']) || !method_exists($credentials['username'], '__toString'))) {
+            throw new BadRequestHttpException(sprintf('The key "%s" must be a string, "%s" given.', '_username',
+                \gettype($credentials['username'])));
+        }
+
+        $credentials['username'] = trim($credentials['username']);
+
+        if (\strlen($credentials['username']) > Security::MAX_USERNAME_LENGTH) {
+            throw new BadCredentialsException('Invalid username.');
+        }
+
+        $request->getSession()->set(Security::LAST_USERNAME, $credentials['username']);
 
         return $credentials;
     }
 
-    public function getUser($credentials, UserProviderInterface $userProvider)
+    protected function getLoginUrl(Request $request): string
     {
-        $token = new CsrfToken('authenticate', $credentials['csrf_token']);
-        if (!$this->csrfTokenManager->isTokenValid($token)) {
-            throw new InvalidCsrfTokenException();
+        return $this->httpUtils->generateUri($request, 'security_login');
+    }
+
+    public function supports(Request $request): bool
+    {
+        return $request->isMethod('POST')
+            && $this->httpUtils->checkRequestPath($request, 'security_login');
+    }
+
+    public function authenticate(Request $request): PassportInterface
+    {
+        $credentials = $this->getCredentials($request);
+
+        $user = $this->userProvider->loadUserByIdentifier($credentials['username']);
+        $dbPassword = $user->getPassword();
+        $passport = new Passport(
+            new UserBadge($credentials['username'], [$this->userProvider, 'loadUserByIdentifier']),
+            new PasswordCredentials($credentials['password'])
+        );
+
+        if ( empty($dbPassword) ) {
+            $configuration = new Configuration($this->_em);
+            $dnString = $configuration->getValue('ldap_user_bind');
+            $passport->addBadge(new LdapBadge('app.ldap', $dnString));
         }
+        $passport->addBadge(new CsrfTokenBadge('authenticate', $credentials['csrf_token']));
 
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $credentials['username']]);
-
-        if (!$user) {
-            // fail authentication with a custom error
-            throw new CustomUserMessageAuthenticationException('Username could not be found.');
-        }
-
-        return $user;
+        return $passport;
     }
 
-    public function checkCredentials($credentials, UserInterface $user)
+    public function onAuthenticationSuccess(
+        Request $request,
+        TokenInterface $token,
+        string $firewallName): ?Response
     {
-        return $this->passwordEncoder->isPasswordValid($user, $credentials['password']);
-    }
-
-    /**
-     * Used to upgrade (rehash) the user's password automatically over time.
-     */
-    public function getPassword($credentials): ?string
-    {
-        return $credentials['password'];
-    }
-
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
-    {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $providerKey)) {
-            return new RedirectResponse($targetPath);
-        }
-
-        return new RedirectResponse($this->urlGenerator->generate('list_jobs'));
-    }
-
-    protected function getLoginUrl()
-    {
-        return $this->urlGenerator->generate(self::LOGIN_ROUTE);
+        return new RedirectResponse($this->httpUtils->generateUri($request, 'list_jobs'));
     }
 }

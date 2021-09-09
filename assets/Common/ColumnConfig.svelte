@@ -44,7 +44,6 @@
             newMetricsOrder.splice(start + 1, 1);
         }
         columnHovering = null;
-        newMetricsOrder = newMetricsOrder;
     }
 
     function closeAndApply() {

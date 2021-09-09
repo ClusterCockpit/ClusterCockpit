@@ -1,10 +1,10 @@
 <script>
-    import { operationStore, query } from '@urql/svelte';
+    import { operationStore, query, mutation } from '@urql/svelte';
     import { Row, Table, Card, Spinner } from 'sveltestrap';
     import Pagination from './Pagination.svelte';
     import JobMeta from './JobMeta.svelte';
     import RowOfPlots from './Row.svelte';
-    import { getContext } from 'svelte';
+    import { getContext, onDestroy } from 'svelte';
 
     const clusterCockpitConfig = getContext('cc-config');
     const clustersQuery = getContext('clusters-query');
@@ -14,7 +14,7 @@
     export let matchedJobs; /* Used as output variable (So that it can be passed to the FilterConfig) */
     export let selectedMetrics = clusterCockpitConfig['plot_list_selectedMetrics'];
 
-    let itemsPerPage = 10;
+    let itemsPerPage = clusterCockpitConfig.plot_list_jobsPerPage || 10;
     let page = 1;
     let paging = { itemsPerPage: itemsPerPage, page: page };
     let tableWidth, plotWidth;
@@ -30,38 +30,90 @@
 
     const jobQuery = operationStore(`
     query($filter: JobFilterList!, $sorting: OrderByInput!, $paging: PageRequest! ){
-       jobs(filter: $filter, order: $sorting, page: $paging) {
-           items {
-             id
-             jobId
-             userId
-             projectId
-             clusterId
-             startTime
-             duration
-             numNodes
-             hasProfile
-             tags { id, tagType, tagName }
-           }
-           count
-         }
+        jobs(filter: $filter, order: $sorting, page: $paging) {
+            items {
+                id
+                jobId
+                userId
+                projectId
+                clusterId
+                startTime
+                duration
+                numNodes
+                hasProfile
+                tags { id, tagType, tagName }
+            }
+            count
+        }
     }
     `, {filter: { list: initialFilterItems }, sorting, paging});
 
     query(jobQuery);
     $: matchedJobs = $jobQuery.data != null ? $jobQuery.data.jobs.count : 0;
-    $: $jobQuery.variables.sorting = sorting;
+    $: $jobQuery.variables = { ...$jobQuery.variables, sorting };
 
+    const updateConfiguration = mutation({
+        query: `mutation($name: String!, $value: String!) {
+            updateConfiguration(name: $name, value: $value)
+        }`
+    });
+
+    let prevItemsPerPage = itemsPerPage;
     function handlePaging( event ) {
         itemsPerPage = event.detail.itemsPerPage;
         page = event.detail.page;
-        $jobQuery.variables.paging = {itemsPerPage: itemsPerPage, page: page };
+        $jobQuery.variables.paging = { itemsPerPage: itemsPerPage, page: page };
+        $jobQuery.reexecute();
+
+        if (itemsPerPage != prevItemsPerPage) {
+            prevItemsPerPage = itemsPerPage;
+            updateConfiguration({
+                name: "plot_list_jobsPerPage",
+                value: itemsPerPage.toString()
+            }).then(res => {
+                if (res.error)
+                    console.error(res.error);
+            });
+        }
     }
 
     export function applyFilters(filterItems) {
         console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
         $jobQuery.variables.filter = { "list": filterItems };
+        $jobQuery.reexecute();
     }
+
+    // Make datatable header stick below the app header:
+    let headerPaddingTop = 10;
+    const header = document.querySelector('header > nav.navbar');
+    if (header) {
+        // This will only really work if there is only one Datatable per page!
+        // Read [this](https://developer.mozilla.org/en-US/docs/Web/API/Document/scroll_event)
+        // about why there is this ticking stuff...
+        let ticking = false;
+        let tableHeader = null;
+        const onScroll = (event) => {
+            if (ticking)
+                return;
+
+            ticking = true;
+            window.requestAnimationFrame(() => {
+                if (!tableHeader)
+                    tableHeader = document
+                        .querySelector('table.table > thead > tr > th.position-sticky:nth-child(1)');
+
+                const refPos = tableHeader.getBoundingClientRect().top;
+                headerPaddingTop = refPos < header.clientHeight
+                    ? (header.clientHeight - refPos) + 10
+                    : 10;
+
+                ticking = false;
+            });
+        };
+        document.addEventListener('scroll', onScroll);
+        onDestroy(() => document.removeEventListener('scroll', onScroll));
+    }
+
 </script>
 
 <style>
@@ -104,12 +156,13 @@
             <Table cellspacing="0px" cellpadding="0px">
                 <thead>
                     <tr>
-                        <th class="position-sticky top-0" scope="col" style="width: {jobMetaWidth}px">
+                        <th class="position-sticky top-0" scope="col"
+                            style="width: {jobMetaWidth}px; padding-top: {headerPaddingTop}px">
                             Job Info
                         </th>
                         {#each selectedMetrics as metric}
                             <th class="position-sticky top-0 text-center" scope="col"
-                                                                          style="width: {plotWidth}px">
+                                style="width: {plotWidth}px; padding-top: {headerPaddingTop}px">
                                 {metric}
                                 {#if $clustersQuery.metricUnits && $clustersQuery.metricUnits[metric]}
                                     [{$clustersQuery.metricUnits[metric]}]

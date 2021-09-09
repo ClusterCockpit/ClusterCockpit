@@ -1,3 +1,6 @@
+swagger_ui:
+    path: /docs
+    controller: api_platform.swagger.action.ui
 index:
     path: /
     controller:  Symfony\Bundle\FrameworkBundle\Controller\RedirectController
@@ -64,9 +67,6 @@ general_options:
 ldap_options:
     path: /admin/ldap
     controller:  App\Controller\ConfigViewController::ldapOptions
-cache_options:
-    path: /admin/cache
-    controller:  App\Controller\ConfigViewController::cacheOptions
 list_api_keys:
     path: /admin/apiKeys/
     controller:  App\Controller\ConfigViewController::listApiKeys

@@ -14,19 +14,20 @@
     let datatable;
     let filterItems = [{ userId: { eq: userInfos.userId } }];
     let matchedJobs;
+    let pendingFilters;
     let appliedFilters;
     let selectedMetrics;
 
     const statsQuery = operationStore(`
     query($filter: JobFilterList!) {
-       jobsStatistics(filter: $filter) {
-           totalJobs
-           shortJobs
-           totalWalltime
-           totalCoreHours
-           histWalltime { count, value }
-           histNumNodes { count, value }
-       }
+        jobsStatistics(filter: $filter) {
+            totalJobs
+            shortJobs
+            totalWalltime
+            totalCoreHours
+            histWalltime { count, value }
+            histNumNodes { count, value }
+        }
     }
     `, { filter: { list: [ { userId: { eq: userInfos.userId } } ] } });
 
@@ -41,6 +42,7 @@
         filterItems.push({ userId: { eq: userInfos.userId }});
 
         $statsQuery.variables.filter = { list: filterItems };
+        $statsQuery.reexecute();
         datatable.applyFilters(filterItems);
     }
 
@@ -63,6 +65,7 @@
 </Row>
 <Row>
     <TableInfo
+        {pendingFilters}
         {appliedFilters}
         {matchedJobs}
         {userInfos} />
@@ -127,6 +130,7 @@
             bind:sorting
             bind:selectedMetrics
             bind:appliedFilters
+            bind:pendingFilters
             limitedToUser=true
             on:update={filtersChanged} />
     </Col>

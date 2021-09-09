@@ -1,0 +1,58 @@
+security:
+  enable_authenticator_manager: true
+
+  password_hashers:
+    App\Entity\User: 'auto'
+
+  providers:
+    db_provider:
+      entity:
+        class: 'App\Entity\User'
+
+    db_api_provider:
+      entity:
+        class: 'App\Entity\User'
+        property: 'apiToken'
+
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+
+    api:
+      pattern: ^/api/job.*
+      stateless: true
+      provider: db_api_provider
+      custom_authenticators:
+        - App\Security\TokenAuthenticator
+
+    main:
+      pattern: ^/
+      lazy: true
+      provider: db_provider
+      custom_authenticators:
+        - App\Security\LoginFormAuthenticator
+      logout:
+        path:   security_logout
+        target: security_login
+
+  access_control:
+    - { path: ^/login, roles: PUBLIC_ACCESS }
+    - { path: ^/docs, roles: PUBLIC_ACCESS }
+    - { path: ^/monitoring, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
+    - { path: ^/config, roles: ROLE_USER }
+    - { path: ^/admin, roles: ROLE_ADMIN }
+    - { path: ^/api/configurations, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
+    - { path: ^/api/job.*, roles: ROLE_API }
+    - { path: ^/query, roles: [ROLE_USER, ROLE_ANALYST, ROLE_ADMIN]}
+
+
+when@test:
+  # this configuration simplifies testing URLs protected by the security mechanism
+  # See https://symfony.com/doc/current/testing/http_authentication.html
+  security:
+    firewalls:
+      main:
+        http_basic: ~
+        entry_point: http_basic
+        # entry_point: form_login

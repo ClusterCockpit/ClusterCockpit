@@ -15,6 +15,8 @@
 
     const clusterCockpitConfig = getContext('cc-config');
 
+    export let filterPresets = null;
+
     let plotsPerRow = clusterCockpitConfig.plot_view_plotsPerRow || 3;
     let histogramBins = {};
     let metricsToFetch = [];
@@ -93,6 +95,7 @@
         if (metrics.length != metricsToFetch.length
                 || metrics.reduce((equal, m, i) => equal && metricsToFetch[i] == i)) {
             $statsQuery.variables.metrics = metrics;
+            $statsQuery.reexecute();
             metricsToFetch = metrics;
         }
     }
@@ -120,9 +123,11 @@
 
         $statsQuery.variables.filter = { list: filterItems };
         $statsQuery.context.pause = false;
+        $statsQuery.reexecute();
 
         $metaStatsQuery.variables.filter = { list: filterItems };
         $metaStatsQuery.context.pause = false;
+        $metaStatsQuery.reexecute();
 
         // So that the other two queries to go out before this one.
         // Only needed in dev mode for convenience.
@@ -131,6 +136,7 @@
         $rooflineHeatmapQuery.variables.filter = { list: filterItems };
         $rooflineHeatmapQuery.variables.maxY = selectedCluster.flopRateSimd;
         $rooflineHeatmapQuery.context.pause = false;
+        $rooflineHeatmapQuery.reexecute();
     }
 
     function filtersChanged(event) {
@@ -209,23 +215,9 @@
 <FilterConfig
     bind:this={filterConfig}
     {showFilters}
+    {filterPresets}
     bind:appliedFilters
     availableFilters={{ userId: true }}
-    filterPresets={{
-        startTime: {
-            from: (() => {
-                let d = new Date();
-                d.setHours(0, 0, 0, 0);
-                d.setMonth(d.getMonth() - 1);
-                return d.toISOString();
-            })(),
-            to: (() => {
-                let d = new Date();
-                d.setHours(0, 0, 0, 0);
-                return d.toISOString();
-            })()
-        }
-    }}
     on:update={filtersChanged} />
 
 {#if selectedClusterId == null || $clustersQuery.error}

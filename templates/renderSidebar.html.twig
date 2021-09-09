@@ -1,29 +1,30 @@
 <nav class="col-md-2 d-none d-md-block bg-light sidebar">
     <div class="sidebar-sticky">
         {% for submenu in sidebar %}
-        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
-            <span>{{ submenu.label }}</span>
-        </h6>
+            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                <span>{{ submenu.label }}</span>
+            </h6>
 
-        <ul class="nav flex-column">
-            {% for item in submenu.items %}
-                <li class="nav-item d-flex justify-content-between  align-items-center px-3 ">
-                    {% if item.active %}
-                        <a class="nav-link active" href="{{ path((item.link)) }}">
-                    {% else %}
-                        <a class="nav-link" href="{{ path((item.link)) }}">
-                    {% endif %}
-                    <i class="{{ item.icon }}"></i>
-                           {{ item.label }}
-                        </a>
-                        {% if item.addlink %}
-                            <a class="d-flex align-items-center text-muted" href="{{ path(item.addlink) }}">
-                                <i class="bi-plus-circle"></i>
-                        </a>
+            <ul class="nav nav-pills flex-column">
+                {% for item in submenu.items %}
+                    <li class="nav-item">
+                        <div class="d-flex flex-row justify-content-between">
+                        {% if item.active %}
+                            <a class="nav-link active flex-fill" href="{{ path((item.link)) }}">
+                        {% else %}
+                            <a class="nav-link flex-fill" href="{{ path((item.link)) }}">
                         {% endif %}
-                </li>
-            {% endfor %}
-        </ul>
+                        <i class="{{ item.icon }}"></i>
+                        {{ item.label }}
+                            </a>
+                            {% if item.addlink %}
+                                <a class="text-muted align-self-center ms-2" href="{{ path(item.addlink) }}">
+                                    <i class="bi-plus-circle"></i> </a>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
         {% endfor %}
     </div>
 </nav>

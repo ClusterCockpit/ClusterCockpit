@@ -149,7 +149,7 @@ class Cron extends Command
         $this->_logger->info("CRON:syncUsers  $seconds s");
     }
 
-    protected function configure()
+    protected function configure() : void
     {
         $this
             ->setName('app:cron')
@@ -169,7 +169,7 @@ class Cron extends Command
 
     protected function execute(
         InputInterface $input,
-        OutputInterface $output)
+        OutputInterface $output) : int
     {
         $d = new DateTime('NOW', new DateTimeZone('Europe/Berlin'));
         $this->_configuration = new Configuration($this->_em);
@@ -189,8 +189,8 @@ class Cron extends Command
             }
         } else {
             $output->writeln("CRON Error: Unknown command $task!");
-            return 1;
+            Command::FAILURE;
         }
-        return 0;
+        return Command::SUCCESS;
     }
 }

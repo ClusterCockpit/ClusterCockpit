@@ -59,7 +59,7 @@ class QueryLdap extends Command
         ;
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output) :int
     {
         $this->_configuration = new Configuration($this->_em);
         $config['ldap_connection_url'] = $this->_configuration->getValue('ldap_connection_url');
@@ -69,5 +69,6 @@ class QueryLdap extends Command
 
         $results = $this->_ldap->queryUsers($config);
         var_dump($results);
+        return  Command::SUCCESS;
     }
 }

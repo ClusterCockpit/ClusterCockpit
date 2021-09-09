@@ -29,6 +29,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
@@ -36,7 +37,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 * @UniqueEntity(fields="email", message="Email already taken")
 * @UniqueEntity(fields="username", message="Username already taken")
 */
-class User implements UserInterface, \Serializable
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     /**
      * @ORM\Id
@@ -52,7 +53,7 @@ class User implements UserInterface, \Serializable
     private $plainPassword;
 
     /**
-     * @ORM\Column(type="string", length=64, nullable=true)
+     * @ORM\Column(type="string", nullable=true)
      */
     private $password;
 
@@ -62,12 +63,13 @@ class User implements UserInterface, \Serializable
     private $name;
 
     /**
-     * @ORM\Column(type="array", nullable=true)
+     * @ORM\Column(type="json", nullable=true)
      */
-    private $roles;
+    private $roles = [];
 
     /**
-     * @ORM\Column(type="string", length=254, nullable=true)
+     * @ORM\Column(type="string", unique=true, nullable=true)
+     * @Assert\Email()
      */
     private $email;
 
@@ -81,14 +83,14 @@ class User implements UserInterface, \Serializable
      */
     private $apiToken;
 
-    public function getSalt()
+    public function getSalt(): ?string
     {
         // you *may* need a real salt depending on your encoder
         // see section on salt below
         return null;
     }
 
-    public function getRoles()
+    public function getRoles(): array
     {
         if ( empty($this->roles) ){
             return array(
@@ -99,8 +101,11 @@ class User implements UserInterface, \Serializable
         }
     }
 
-    public function addRole($role) {
-        $this->roles[] = $role;
+    public function addRole($role)
+    {
+        if (! array_search($role, $this->roles)) {
+            $this->roles[] = $role;
+        }
     }
 
     public function removeRole($role) {
@@ -108,32 +113,9 @@ class User implements UserInterface, \Serializable
             return;
         }
 
-        if ($this->roles->contains($role)) {
-            $this->roles->removeElement($role);
+        if ($idx = array_search($role, $this->roles)) {
+            array_splice($this->roles, $idx, 1);
         }
-    }
-
-    public function eraseCredentials()
-    {
-
-    }
-
-    /** @see \Serializable::serialize() */
-    public function serialize()
-    {
-        return serialize(array(
-            $this->username,
-            $this->password,
-        ));
-    }
-
-    /** @see \Serializable::unserialize() */
-    public function unserialize($serialized)
-    {
-        list (
-            $this->username,
-            $this->password,
-        ) = unserialize($serialized, ['allowed_classes' => false]);
     }
 
     public function setUsername(string $username): self
@@ -237,5 +219,32 @@ class User implements UserInterface, \Serializable
         $this->apiToken = null;
 
         return $this;
+    }
+
+     public function getUserIdentifier(): string
+    {
+        return $this->username;
+    }
+
+        /**
+     * Removes sensitive data from the user.
+     *
+     */
+    public function eraseCredentials(): void
+    {
+        // if you had a plainPassword property, you'd nullify it here
+        // $this->plainPassword = null;
+    }
+
+    public function __serialize(): array
+    {
+        // add $this->salt too if you don't use Bcrypt or Argon2i
+        return [$this->username, $this->username, $this->password];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        // add $this->salt too if you don't use Bcrypt or Argon2i
+        [$this->username, $this->username, $this->password] = $data;
     }
 }

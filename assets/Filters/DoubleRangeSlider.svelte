@@ -24,17 +24,28 @@ Changes: remove dependency, text inputs, configurable value ranges, on:change ev
 	let body;
 	let slider;
 
+	let timeoutId = null;
+	function queueChangeEvent() {
+		if (timeoutId !== null) {
+			clearTimeout(timeoutId);
+		}
+
+		timeoutId = setTimeout(() => {
+			timeoutId = null;
+			dispatch('change', values);
+		}, 250);
+	}
+
 	function update() {
 		values = [
 			Math.floor(min + start  * (max - min)),
 			Math.floor(min + end * (max - min))
 		];
-		dispatch('change', values);
+		queueChangeEvent();
 	}
 
 	function inputChanged(idx, event) {
 		let val = Number.parseInt(event.target.value);
-		console.log(val, min, max);
 		if (Number.isNaN(val) || val < min) {
 			event.target.classList.add('bad');
 			return;
@@ -47,7 +58,7 @@ Changes: remove dependency, text inputs, configurable value ranges, on:change ev
 		else
 			end = clamp((val - min) / (max - min), 0., 1.);
 
-		dispatch('change', values);
+		queueChangeEvent();
 	}
 
 	function clamp(x, min, max) {

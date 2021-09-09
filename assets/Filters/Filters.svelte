@@ -53,8 +53,24 @@
         tags: {}
     };
 
-    function toRFC3339({ date, time }, secs = '00') {
-        return `${date}T${time}:${secs}Z`;
+    function toRFC3339({ date, time }, secs = 0) {
+        const dparts = date.split('-');
+        const tparts = time.split(':');
+        const d = new Date(
+            Number.parseInt(dparts[0]),
+            Number.parseInt(dparts[1]) - 1,
+            Number.parseInt(dparts[2]),
+            Number.parseInt(tparts[0]),
+            Number.parseInt(tparts[1]), secs);
+        return d.toISOString();
+    }
+
+    function fromRFC3339(rfc3339) {
+        const d = new Date(rfc3339);
+        const pad = (n) => n.toString().padStart(2, '0');
+        const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+        const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        return { date, time };
     }
 
     function getFilterItems(filters) {
@@ -67,7 +83,7 @@
 
         filterItems.push({ startTime: {
             from: toRFC3339(filters["startTime"]["from"]),
-            to:   toRFC3339(filters["startTime"]["to"], '59')
+            to:   toRFC3339(filters["startTime"]["to"], 59)
         }});
 
         let from = filters["duration"]["from"]["hours"] * 3600
@@ -112,7 +128,7 @@
 
 <script>
     import { fuzzySearchTags } from '../Common/utils.js';
-    import { createEventDispatcher, getContext } from "svelte";
+    import { tick, createEventDispatcher, getContext } from "svelte";
     import { Col, Row, FormGroup, Button, Input, InputGroup, InputGroupText,
         TabContent, TabPane, ListGroup, ListGroupItem } from 'sveltestrap';
     import DoubleRangeSlider from './DoubleRangeSlider.svelte';
@@ -138,8 +154,9 @@
         return getFilterItems(filters);
     }
 
-    let filters = deepCopy(defaultFilters);
+    export let filters = deepCopy(defaultFilters);
 
+    let pendingChange = false;
     let globalFilterRanges = null;
     let tagFilterTerm = '';
     let filteredTags = [];
@@ -154,14 +171,6 @@
     };
 
     $: filteredTags = fuzzySearchTags(tagFilterTerm, $clustersQuery && $clustersQuery.tags);
-
-    function fromRFC3339(rfc3339) {
-        let parts = rfc3339.split('T');
-        return {
-            date: parts[0],
-            time: parts[1].split(':', 2).join(':')
-        };
-    }
 
     function secondsToHours(duration) {
         const hours = Math.floor(duration / 3600);
@@ -190,42 +199,19 @@
             : globalFilterRanges;
 
         currentRanges.numNodes = ranges.numNodes;
-
-        function clamp(x, { from, to }) {
-            return x < from ? from : (x < to ? x : to);
-        }
-
-        function clampTime(t, { from, to }) {
-            let min = Date.parse(from);
-            let max = Date.parse(to);
-            let x = Date.parse(toRFC3339(t));
-
-            return x < min
-                ? fromRFC3339(from)
-                : (x < max ? t : fromRFC3339(to));
-        }
-
-        function clampDuration(d, { from, to }) {
-            let x = d.hours * 3600 + d.min * 60;
-            return x < from
-                ? secondsToHours(from)
-                : (x < to ? d : secondsToHours(to));
-        }
-
-        filters.numNodes.from = clamp(filters.numNodes.from, ranges.numNodes);
-        filters.numNodes.to = clamp(filters.numNodes.to, ranges.numNodes);
-
-        filters.startTime.from = clampTime(filters.startTime.from, ranges.startTime);
-        filters.startTime.to = clampTime(filters.startTime.to, ranges.startTime);
-
-        filters.duration.from = clampDuration(filters.duration.from, ranges.duration);
-        filters.duration.to = clampDuration(filters.duration.to, ranges.duration);
+        filters.numNodes.from  = ranges.numNodes.from;
+        filters.numNodes.to    = ranges.numNodes.to;
+        filters.startTime.from = fromRFC3339(ranges.startTime.from);
+        filters.startTime.to   = fromRFC3339(ranges.startTime.to);
+        filters.duration.from  = secondsToHours(ranges.duration.from);
+        filters.duration.to    = secondsToHours(ranges.duration.to);
 
         for (let i in filters.statistics) {
             let stat = filters.statistics[i];
             let peak = getPeakValue(stat.metric);
-            stat.from = clamp(stat.from, { from: 0, to: peak });
-            stat.to = clamp(stat.to, { from: 0, to: peak });
+            stat.changed = false;
+            stat.from = 0;
+            stat.to = peak;
             currentRanges.statistics[i].to = peak;
         }
     }
@@ -303,9 +289,18 @@
         }
 
         updateRanges($clustersQuery);
+        tick().then(() => pendingChange = false);
     };
 
     $: init($clustersQuery);
+    $: pendingChange = filters == filters;
+
+    function handleApply( ) {
+        let filterItems = getFilterItems(filters);
+        appliedFilters = deepCopy(filters);
+        dispatch("update", { filterItems: filterItems });
+        tick().then(() => pendingChange = false);
+    }
 
     function handleReset( ) {
         tagFilterTerm = '';
@@ -314,19 +309,19 @@
         handleApply();
     }
 
-    function handleTagSelection(tag) {
-        if (filters["tags"][tag.id])
-            delete filters["tags"][tag.id];
-        else
-            filters["tags"][tag.id] = tag;
-
-        filteredTags = filteredTags;
+    function handleUndo() {
+        filters = deepCopy(appliedFilters);
+        tick().then(() => pendingChange = false);
     }
 
-    function handleApply( ) {
-        let filterItems = getFilterItems(filters);
-        appliedFilters = deepCopy(filters);
-        dispatch("update", { filterItems: filterItems });
+    function handleTagSelection(tag) {
+        if (filters["tags"][tag.id]) {
+            // delete does not trigger reactivity/`$$invalidate`.
+            filters["tags"][tag.id] = undefined;
+            delete filters["tags"][tag.id];
+        } else {
+            filters["tags"][tag.id] = tag;
+        }
     }
 
     function handleNodesSlider({ detail }) {
@@ -338,6 +333,7 @@
         stat.changed = true;
         stat.from = detail[0];
         stat.to = detail[1];
+        filters.statistics = filters.statistics;
     }
 </script>
 
@@ -364,6 +360,10 @@
     table tbody tr td:nth-child(1) {
         vertical-align: middle;
     }
+
+    :global(.tab-content > .nav-tabs > .nav-item > a:not(.active)) {
+        color: #848484;
+    }
 </style>
 
 {#if showFilters}
@@ -385,7 +385,7 @@
                             <input type="radio" bind:group={filters["isRunning"]} value={true} /> Running
                         </ListGroupItem>
                         <ListGroupItem>
-                            <input type="radio" bind:group={filters["isRunning"]} value={false} /> Stopped
+                            <input type="radio" bind:group={filters["isRunning"]} value={false} /> Finished
                         </ListGroupItem>
                     </ListGroup>
                 </Col>
@@ -498,7 +498,7 @@
             <Row style="height: 1rem;"></Row>
             <Row>
                 <Col>
-                    <h5>Clusters</h5>
+                    <h5>Clusters (Changing resets other filters)</h5>
                     <ListGroup>
                         <ListGroupItem>
                             <input type="radio" value={null}
@@ -559,6 +559,9 @@
         </div>
         <div class="p-2">
             <Button color=primary on:click={handleApply}>Apply</Button>
+        </div>
+        <div class="p-2">
+            <Button color=primary on:click={handleUndo} disabled={!pendingChange}>Undo</Button>
         </div>
     </div>
 {/if}

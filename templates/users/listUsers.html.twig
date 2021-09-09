@@ -12,7 +12,7 @@
 {% block navitem_users %}
     <li class="nav-item">
         <a class="nav-link active fs-5" style="color: {{ active_link_color }};" aria-current="page" href="{{ path('user_stat') }}">
-            Users
+            <span class="cc-nav-text">Users</span>
             <i class="bi-people-fill"></i>
         </a>
     </li>
@@ -20,6 +20,9 @@
 
 {% block javascript %}
     <script type="text/javascript">
+        const filterPresets = {{ (filterPresets is defined)
+                ? filterPresets | json_encode | raw
+                : "null" }};
         const clusterCockpitConfigPromise = Promise.resolve({});
     </script>
     {{ encore_entry_script_tags('userlist') }}

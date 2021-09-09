@@ -60,8 +60,9 @@
                     throw res.error;
 
                 pendingChange = false;
-                allTags.push(res.data.createTag);
-                allTags = allTags; // Let Svelte do its magic...
+                allTags = [...allTags, res.data.createTag];
+                newTagType = '';
+                newTagName = '';
                 return res.data.createTag;
             }, err => console.error(err));
     }
@@ -74,7 +75,6 @@
                     throw res.error;
 
                 job.tags = res.data.addTagsToJob;
-                job = job; // Let Svelte do its magic...
                 pendingChange = false;
             })
             .catch(err => console.error(err));
@@ -88,7 +88,6 @@
                     throw res.error;
 
                 job.tags = res.data.removeTagsFromJob;
-                job = job; // Let Svelte do its magic...
                 pendingChange = false;
             })
             .catch(err => console.error(err));
