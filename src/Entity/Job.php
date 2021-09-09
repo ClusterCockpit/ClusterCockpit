@@ -147,10 +147,10 @@ class Job
     /**
      * The job script.
      *
-     *  @ORM\Column(type="text", nullable=true)
+     *  @ORM\Column(type="json", nullable=true)
      *  @Groups({"write"})
      */
-    private $jobScript;
+    private $metaData;
 
     /**
      * The userId for this job.
@@ -302,14 +302,14 @@ class Job
         $this->duration = $duration;
     }
 
-    public function getJobScript()
+    public function getMetaData()
     {
-        return $this->jobScript;
+        return $this->metaData;
     }
 
-    public function setJobScript($jobScript)
+    public function setMetaData($metaData)
     {
-        $this->jobScript = $jobScript;
+        $this->metaData = $metaData;
     }
 
     public function isRunning()
