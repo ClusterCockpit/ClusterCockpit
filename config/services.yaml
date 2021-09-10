@@ -13,8 +13,6 @@ services:
         bind:
             $projectDir: '%kernel.project_dir%'
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
         exclude:
@@ -25,9 +23,6 @@ services:
             - '../src/Tests/'
             - '../src/Colormaps/'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-
     # configure which implementation of MetricDataRepository
     # to inject in other services such as JobData and JobStats
     App\Repository\MetricDataRepository: '@App\Repository\InfluxDBv2MetricDataRepository'
@@ -36,18 +31,21 @@ services:
         tags:
             - { name: overblog_graphql.resolver_map, schema: default }
 
+    # configure Security related services
     App\Security\LoginFormAuthenticator:
         $userProvider: '@security.user.provider.concrete.db_provider'
+
+    Symfony\Component\Ldap\LdapInterface: '@app.ldap'
 
     app.ldap:
         class: 'Symfony\Component\Ldap\Ldap'
         arguments: ['@app.ldap_adapter']
-        tags: [ldap]  # <-- this is important!
+        tags: [ldap]
 
     app.ldap_adapter:
         class: 'Symfony\Component\Ldap\Adapter\ExtLdap\Adapter'
         arguments:
-          - connection_string: 'ldap://cc-ldap'
+          - connection_string: '%env(LDAP_URL)%'
             # encryption: tls
             options:
               protocol_version: 3
@@ -58,7 +56,3 @@ services:
         tags:
           - { name: kernel.event_subscriber, dispatcher: security.event_dispatcher.main }
           - { name: kernel.event_subscriber, dispatcher: security.event_dispatcher.api }
-
-    # Symfony\Component\Ldap\Security\CheckLdapCredentialsListener:
-    #     tags:
-    #         - { name: kernel.event_listener, event: Symfony\Component\Security\Http\Event\CheckPassportEvent }
