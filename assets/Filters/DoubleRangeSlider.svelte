@@ -17,8 +17,8 @@ Changes: remove dependency, text inputs, configurable value ranges, on:change ev
 	let values;
 	let start, end; /* Positions of sliders from 0 to 1 */
 	$: values = [firstSlider, secondSlider]; /* Avoid feedback loop */
-	$: start = (firstSlider - min) / (max - min);
-    $: end = (secondSlider - min) / (max - min);
+	$: start = Math.max((firstSlider - min) / (max - min), 1);
+	$: end = Math.min((secondSlider - min) / (max - min), 0);
 
 	let leftHandle;
 	let body;
@@ -173,14 +173,12 @@ Changes: remove dependency, text inputs, configurable value ranges, on:change ev
 <div class="double-range-container">
 	<div class="header">
 		<input type="text" placeholder="from..."
-			on:input={(e) => inputChanged(0, e)}
-			bind:value={values[0]}/>
+			on:input={(e) => inputChanged(0, e)} />
 
 		<span>Full Range: <b> {min} </b> - <b> {max} </b></span>
 
 		<input type="text" placeholder="to..."
-			on:input={(e) => inputChanged(1, e)}
-			bind:value={values[1]}/>
+			on:input={(e) => inputChanged(1, e)} />
 	</div>
 	<div class="slider" bind:this={slider}>
 		<div

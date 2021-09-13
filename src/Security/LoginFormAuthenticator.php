@@ -45,7 +45,6 @@ use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Service\Configuration;
-use App\Adapter\LdapAdapter;
 
 class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {

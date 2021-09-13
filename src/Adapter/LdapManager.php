@@ -25,49 +25,26 @@
 
 namespace App\Adapter;
 
-use Symfony\Component\Ldap\Ldap;
+use Symfony\Component\Security\Core\Exception\LogicException;
 use Symfony\Component\Ldap\LdapInterface;
 
 class LdapManager
 {
-    public function bindUser($config, $uid, $password)
-    {
-        $ldap = Ldap::create('ext_ldap', array(
-            'connection_string' => $config['ldap_connection_url']
-        ));
-        $base = $config['ldap_user_base'];
-        $key = $config['ldap_user_key'];
-        $dn = $key.'='.$uid.','.$base;
-        /* $username = $this->_ldap->escape($dn, '', LdapInterface::ESCAPE_DN); */
+    private $ldap;
 
-        $ldap->bind($dn, $password);
+    public function __construct(LdapInterface $ldap)
+    {
+        $this->ldap = $ldap;
     }
 
     public function queryUsers($config)
     {
-        $ldap = Ldap::create('ext_ldap', array(
-            'connection_string' => $config['ldap_connection_url']
-        ));
         $password = getenv('LDAP_PW');
         $dn = $config['ldap_search_dn'];
         $baseDn = $config['ldap_user_base'];
         $filter = $config['ldap_user_filter'];
-        $ldap->bind($dn, $password);
+        $this->ldap->bind($dn, $password);
 
-        return $ldap->query($baseDn, $filter)->execute()->toArray();
-    }
-
-    public function queryGroups($config)
-    {
-        $ldap = Ldap::create('ext_ldap', array(
-            'connection_string' => $config['ldap_connection_url']
-        ));
-        $password = getenv('LDAP_PW');
-        $dn = $config['ldap_search_dn'];
-        $baseDn = $config['ldap_group_base'];
-        $filter = $config['ldap_group_filter'];
-        $ldap->bind($dn, $password);
-
-        return $ldap->query($baseDn, $filter)->execute()->toArray();
+        return $this->ldap->query($baseDn, $filter)->execute()->toArray();
     }
 }

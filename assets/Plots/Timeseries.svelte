@@ -29,6 +29,14 @@
         return avg / data.series.length;
     }
 
+    function getTotalMax(data) {
+        let max = Number.NEGATIVE_INFINITY;
+        for (let series of data.series)
+            max = Math.max(max, series.statistics.max);
+
+        return max;
+    }
+
     function getBackgroundColor(data, metricConfig) {
         if (!metricConfig || !metricConfig.alert || !metricConfig.caution)
             return backgroundColors.normal;
@@ -135,7 +143,8 @@
     };
 
     if (metricConfig && metricConfig.peak) {
-        opts.scales.y.range = [0., metricConfig.peak * 1.1];
+        let max = Math.max(metricConfig.peak, getTotalMax(data));
+        opts.scales.y.range = [0., max * 1.1];
 
         opts.hooks.draw = [u => {
             let x0 = u.valToPos(0, 'x', true);

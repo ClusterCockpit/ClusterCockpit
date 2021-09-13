@@ -20,7 +20,7 @@ document.querySelectorAll("button").forEach( button => {
               scope: '{{ scope }}'
           };
 
-          let response = await fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations/"+e.target.getAttribute("id"), {
+          let response = await fetch(`${window.location.origin}/api/configurations/`+e.target.getAttribute("id"), {
               method: 'GET',
               mode: 'cors', // no-cors, *cors, same-origin
               credentials: 'same-origin', // include, *same-origin, omit
