@@ -11,7 +11,7 @@
     import FilterInfo from '../Filters/Info.svelte';
     import Resizable from '../Common/Resizable.svelte';
     import PlotSelection from './PlotSelection.svelte';
-    import { clustersQuery, tilePlots } from '../Common/utils.js';
+    import { clustersQuery, tilePlots, formatNumber } from '../Common/utils.js';
 
     const clusterCockpitConfig = getContext('cc-config');
 
@@ -22,6 +22,7 @@
     let metricsToFetch = [];
     let showFilters = false;
     let filterConfig;
+    let pendingFilters;
     let appliedFilters;
     let matchedJobs = null;
     let selectedCluster = null;
@@ -189,7 +190,7 @@
             label: idx => {
                 let start = min + (idx / numBins) * (max - min);
                 let stop = min + ((idx + 1) / numBins) * (max - min);
-                return `${start.toFixed(2)} - ${stop.toFixed(2)}`;
+                return `${formatNumber(start)} - ${formatNumber(stop)}`;
             },
             bins: bins.map((count, idx) => ({ value: idx, count: count })),
             name: metric,
@@ -217,6 +218,7 @@
     {showFilters}
     {filterPresets}
     bind:appliedFilters
+    bind:filters={pendingFilters}
     availableFilters={{ userId: true }}
     on:update={filtersChanged} />
 
@@ -261,6 +263,7 @@
 <Row>
     <Col>
         <FilterInfo
+            {pendingFilters}
             {appliedFilters}
             {matchedJobs} />
     </Col>

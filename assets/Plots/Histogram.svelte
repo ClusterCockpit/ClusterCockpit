@@ -17,13 +17,14 @@
 
 <script>
     import { onMount } from "svelte";
+    import { formatNumber } from "../Common/utils.js"
 
     export let data;
     export let width;
     export let height;
     export let min = null;
     export let max = null;
-    export let label = (value) => value.toString();
+    export let label = formatNumber;
 
     const fontSize = 12;
     const fontFamily = 'system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"';
@@ -96,7 +97,7 @@
 
             for (let x = startX; x < max; x += stepsizeX) {
                 let px = ((x - min) / (max - min)) * (w - barWidth) + paddingLeft + (barWidth / 2.);
-                ctx.fillText(`${x}`, px, height - paddingBottom + 15);
+                ctx.fillText(`${formatNumber(x)}`, px, height - paddingBottom + 15);
             }
         } else {
             const stepsizeX = getStepSize(maxValue, w, 120);
@@ -113,7 +114,7 @@
         const stepsizeY = getStepSize(maxCount, h, 50);
         for (let y = stepsizeY; y <= maxCount; y += stepsizeY) {
             const py = Math.floor(getCanvasY(y));
-            ctx.fillText(`${y}`, paddingLeft - 5, py);
+            ctx.fillText(`${formatNumber(y)}`, paddingLeft - 5, py);
             ctx.moveTo(paddingLeft, py);
             ctx.lineTo(width, py);
         }
