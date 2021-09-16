@@ -17,12 +17,13 @@ Changes: remove dependency, text inputs, configurable value ranges, on:change ev
 	let values;
 	let start, end; /* Positions of sliders from 0 to 1 */
 	$: values = [firstSlider, secondSlider]; /* Avoid feedback loop */
-	$: start = Math.max((firstSlider - min) / (max - min), 1);
-	$: end = Math.min((secondSlider - min) / (max - min), 0);
+	$: start = Math.max((firstSlider - min) / (max - min), 0);
+	$: end = Math.min((secondSlider - min) / (max - min), 1);
 
 	let leftHandle;
 	let body;
 	let slider;
+	let inputFieldFrom, inputFieldTo;
 
 	let timeoutId = null;
 	function queueChangeEvent() {
@@ -32,6 +33,14 @@ Changes: remove dependency, text inputs, configurable value ranges, on:change ev
 
 		timeoutId = setTimeout(() => {
 			timeoutId = null;
+			console.info(`values: `, values);
+
+			// Show selection but avoid feedback loop
+			if (inputFieldFrom.value != values[0].toString())
+				inputFieldFrom.value = values[0].toString();
+			if (inputFieldTo.value != values[1].toString())
+				inputFieldTo.value = values[1].toString();
+
 			dispatch('change', values);
 		}, 250);
 	}
@@ -172,12 +181,12 @@ Changes: remove dependency, text inputs, configurable value ranges, on:change ev
 
 <div class="double-range-container">
 	<div class="header">
-		<input type="text" placeholder="from..."
+		<input type="text" placeholder="from..." bind:this={inputFieldFrom}
 			on:input={(e) => inputChanged(0, e)} />
 
 		<span>Full Range: <b> {min} </b> - <b> {max} </b></span>
 
-		<input type="text" placeholder="to..."
+		<input type="text" placeholder="to..." bind:this={inputFieldTo}
 			on:input={(e) => inputChanged(1, e)} />
 	</div>
 	<div class="slider" bind:this={slider}>
