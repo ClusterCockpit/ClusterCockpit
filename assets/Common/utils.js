@@ -131,13 +131,13 @@ export function arraysEqual(a, b) {
 
 export function formatNumber(x) {
     let suffix = '';
-    if (x > 1000000000) {
+    if (x >= 1000000000) {
         x /= 1000000;
         suffix = 'G';
-    } else if (x > 1000000) {
+    } else if (x >= 1000000) {
         x /= 1000000;
         suffix = 'M';
-    } else if (x > 1000) {
+    } else if (x >= 1000) {
         x /= 1000;
         suffix = 'k';
     }
