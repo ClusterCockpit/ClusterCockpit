@@ -1,11 +1,13 @@
 <script>
-    import { setContext } from 'svelte';
+    import { getContext, setContext } from 'svelte';
     import Datatable from '../Datatable/Datatable.svelte';
     import TableControl from '../Filters/Control.svelte';
     import TableInfo from '../Filters/Info.svelte';
     import { clustersQuery } from '../Common/utils.js';
 
     export let filterPresets;
+
+    console.log('jwt: ', getContext('cc-config')['jwt']);
 
     const metricConfig = {};
     $: Object.assign(metricConfig, $clustersQuery.metricConfig);

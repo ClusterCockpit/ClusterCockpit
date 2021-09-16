@@ -89,6 +89,7 @@ class JobViewController extends AbstractController
     }
 
     public function list(
+        Request $request,
         Configuration $configuration,
         ColorMap $colorMaps,
         $projectDir
@@ -97,9 +98,11 @@ class JobViewController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         $config = $configuration->getUserConfig($this->getUser());
         $colorMaps->setColormap($config['plot_general_colorscheme']->value, $projectDir);
+        $jwt = $request->getSession()->get('jwt');
 
         return $this->render('jobViews/listJobs.html.twig',
             array(
+                'jwt' => $request->getSession()->get('jwt'),
                 'config' => $config,
                 'colormap' => $colorMaps->getColorMap()
             ));
