@@ -38,7 +38,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\PassportInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 
-class TokenAuthenticator extends AbstractAuthenticator
+class ApiTokenAuthenticator extends AbstractAuthenticator
 {
     /**
      * Called on every request to decide if this authenticator should be

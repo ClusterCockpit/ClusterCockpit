@@ -36,11 +36,12 @@ export function fuzzySearchTags(term, tags) {
 }
 
 export const clustersQuery = readable({ fetching: true }, (set) => {
-    initClient({
-        url: typeof GRAPHQL_BACKEND !== 'undefined'
-        ? GRAPHQL_BACKEND
-        : `${window.location.origin}/query`
-    });
+    if (getClient() == null)
+        initClient({
+            url: typeof GRAPHQL_BACKEND !== 'undefined'
+                ? GRAPHQL_BACKEND
+                : `${window.location.origin}/query`
+        });
 
     const query = `
     query {

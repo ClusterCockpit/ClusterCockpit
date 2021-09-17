@@ -1,13 +1,15 @@
 <script>
+    import { initGraphQL } from '../Common/gqlclient.js';
     import { getContext, setContext } from 'svelte';
+
+    initGraphQL(getContext('cc-config'));
+
     import Datatable from '../Datatable/Datatable.svelte';
     import TableControl from '../Filters/Control.svelte';
     import TableInfo from '../Filters/Info.svelte';
     import { clustersQuery } from '../Common/utils.js';
 
     export let filterPresets;
-
-    console.log('jwt: ', getContext('cc-config')['jwt']);
 
     const metricConfig = {};
     $: Object.assign(metricConfig, $clustersQuery.metricConfig);
