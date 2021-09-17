@@ -24,14 +24,7 @@ security:
       stateless: true
       provider: db_api_provider
       custom_authenticators:
-        - App\Security\ApiTokenAuthenticator
-
-    webapi:
-      pattern: ^/(api|query)/
-      stateless: true
-      provider: db_provider
-      custom_authenticators:
-        - App\Security\JwtTokenAuthenticator
+        - App\Security\TokenAuthenticator
 
     main:
       pattern: ^/
