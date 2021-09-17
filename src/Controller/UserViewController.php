@@ -50,6 +50,7 @@ class UserViewController extends AbstractController
         $lastMonth->modify('-1 month');
         return $this->render('users/listUsers.html.twig',
             array(
+                'jwt' => $request->getSession()->get('jwt'),
                 'filterPresets' => [
                     'startTime' => [
                         'from' => $lastMonth->format(\DateTime::RFC3339),
@@ -61,6 +62,7 @@ class UserViewController extends AbstractController
 
     public function show(
         User $user,
+        Request $request,
         Configuration $configuration,
         ColorMap $colorMaps,
         $projectDir
@@ -71,6 +73,7 @@ class UserViewController extends AbstractController
 
         return $this->render('users/showUser.html.twig',
             array(
+                'jwt' => $request->getSession()->get('jwt'),
                 'user' => $user,
                 'config' => $config,
                 'colormap' => $colorMaps->getColorMap()

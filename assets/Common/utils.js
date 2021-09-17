@@ -1,4 +1,5 @@
-import { initClient, getClient } from '@urql/svelte';
+import { waitForClientInit } from './gqlclient.js';
+import { getClient } from '@urql/svelte';
 import { readable } from 'svelte/store';
 
 function fuzzyMatch(term, string) {
@@ -36,13 +37,6 @@ export function fuzzySearchTags(term, tags) {
 }
 
 export const clustersQuery = readable({ fetching: true }, (set) => {
-    if (getClient() == null)
-        initClient({
-            url: typeof GRAPHQL_BACKEND !== 'undefined'
-                ? GRAPHQL_BACKEND
-                : `${window.location.origin}/query`
-        });
-
     const query = `
     query {
         clusters {
@@ -63,7 +57,7 @@ export const clustersQuery = readable({ fetching: true }, (set) => {
         tags { id, tagName, tagType }
     }`;
 
-    getClient().query(query).toPromise().then(({ error, data }) => {
+    waitForClientInit.then(client => client.query(query).toPromise()).then(({ error, data }) => {
         if (error) {
             console.error(error);
             return set({ error });

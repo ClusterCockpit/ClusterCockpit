@@ -1,5 +1,9 @@
 <script>
-    import { setContext, getContext, tick } from 'svelte';
+    import { initGraphQL } from '../Common/gqlclient.js';
+    import { getContext, setContext, tick } from 'svelte';
+
+    initGraphQL(getContext('cc-config'));
+
     import { operationStore, query } from '@urql/svelte';
     import { Spinner, Row, Col, Card, Button, Icon,
              ListGroup, ListGroupItem,

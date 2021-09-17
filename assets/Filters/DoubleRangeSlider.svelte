@@ -33,7 +33,6 @@ Changes: remove dependency, text inputs, configurable value ranges, on:change ev
 
 		timeoutId = setTimeout(() => {
 			timeoutId = null;
-			console.info(`values: `, values);
 
 			// Show selection but avoid feedback loop
 			if (inputFieldFrom.value != values[0].toString())

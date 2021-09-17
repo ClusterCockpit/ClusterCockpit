@@ -1,8 +1,13 @@
 import { initClient } from '@urql/svelte';
 
+let clientInitialized = null;
+export const waitForClientInit = new Promise((resolve) => {
+    clientInitialized = resolve;
+});
+
 export function initGraphQL(ccconfig) {
     const jwt = ccconfig['jwt'];
-    return initClient({
+    let client = initClient({
         url: typeof GRAPHQL_BACKEND !== 'undefined'
             ? GRAPHQL_BACKEND
             : `${window.location.origin}/query`,
@@ -12,5 +17,5 @@ export function initGraphQL(ccconfig) {
             }
         })
     });
+    clientInitialized(client);
 }
-

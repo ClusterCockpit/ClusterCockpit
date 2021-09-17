@@ -1,8 +1,12 @@
 <script>
-    import { setContext, getContext } from 'svelte';
+    import { initGraphQL } from '../Common/gqlclient.js';
+    import { getContext, setContext } from 'svelte';
+
+    initGraphQL(getContext('cc-config'));
+
     import { Col, Row, Card, Spinner, Button, Icon } from 'sveltestrap';
     import { tilePlots } from '../Common/utils.js';
-    import { initClient, getClient } from '@urql/svelte';
+    import { getClient } from '@urql/svelte';
     import Plot from '../Plots/Timeseries.svelte';
     import RooflinePlot from '../Plots/Roofline.svelte';
     import JobMeta from '../Datatable/JobMeta.svelte';
@@ -33,12 +37,6 @@
 
     const metricConfig = {};
     setContext('metric-config', metricConfig);
-
-    initClient({
-        url: typeof GRAPHQL_BACKEND !== 'undefined'
-            ? GRAPHQL_BACKEND
-            : `${window.location.origin}/query`
-    });
 
     getClient()
         .query(`query {

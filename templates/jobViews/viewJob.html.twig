@@ -19,6 +19,7 @@
         };
 
         const clusterCockpitConfigPromise = Promise.resolve({
+            jwt: "{{ jwt }}",
             plot_general_colorscheme: {{ colormap | json_encode | raw }},
             plot_general_lineWidth: {{ config.plot_general_lineWidth.value }},
             plot_general_colorBackground: {{ config.plot_general_colorBackground.value }},

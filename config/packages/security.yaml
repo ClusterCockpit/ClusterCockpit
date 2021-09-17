@@ -27,7 +27,7 @@ security:
         - App\Security\ApiTokenAuthenticator
 
     webapi:
-      pattern: ^/(api|query)/
+      pattern: ^/query.*
       stateless: true
       provider: db_provider
       custom_authenticators:

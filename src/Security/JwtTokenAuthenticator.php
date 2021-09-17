@@ -62,7 +62,7 @@ class JwtTokenAuthenticator extends AbstractAuthenticator
         $credentials = str_replace('Bearer ', '', $request->headers->get('Authorization'));
         $jwt = null;
         try {
-            $jwt = (array) JWT::decode($credentials, $jwtPublicKey, ['EdDSA']);
+            $jwt = (array) JWT::decode($credentials, $this->jwtPublicKey, ['EdDSA']);
         } catch (\Exception $exception) {
             throw new AuthenticationException($exception->getMessage());
         }

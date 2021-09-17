@@ -1,15 +1,14 @@
 <script>
-    import { initClient, operationStore, query, getClient } from '@urql/svelte';
+    import { initGraphQL } from '../Common/gqlclient.js';
+    import { getContext } from 'svelte';
+
+    initGraphQL(getContext('cc-config'));
+
+    import { operationStore, query, getClient } from '@urql/svelte';
     import { Table, Card, Spinner, Icon, Button, Row, Col, Alert,
              InputGroup, InputGroupText } from 'sveltestrap';
 
     export let filterPresets = null;
-
-    initClient({
-        url: typeof GRAPHQL_BACKEND !== 'undefined'
-            ? GRAPHQL_BACKEND
-            : `${window.location.origin}/query`
-    });
 
     let startTime = null, stopTime = null;
     let rawStartTime = null, rawStopTime = null;
