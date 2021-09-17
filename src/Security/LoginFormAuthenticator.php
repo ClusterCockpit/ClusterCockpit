@@ -45,7 +45,6 @@ use Symfony\Component\Security\Http\HttpUtils;
 use Symfony\Component\Security\Http\ParameterBagUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Service\Configuration;
-use Firebase\JWT\JWT;
 
 class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -54,22 +53,15 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     private $httpUtils;
     private $userProvider;
     private $httpKernel;
-    private $logger;
-    private $security;
-    private $jwtPrivateKey;
 
     public function __construct(
         HttpUtils $httpUtils,
         EntityManagerInterface $em,
-        EntityUserProvider $userProvider,
-        Security $security,
-        $jwtPrivateKey)
+        EntityUserProvider $userProvider)
     {
         $this->httpUtils = $httpUtils;
         $this->userProvider = $userProvider;
         $this->_em = $em;
-        $this->security = $security;
-        $this->jwtPrivateKey = $jwtPrivateKey;
     }
 
     private function getCredentials(Request $request): array
