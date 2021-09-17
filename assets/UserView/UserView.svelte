@@ -1,7 +1,11 @@
 <script>
-    import { initClient, operationStore, query } from '@urql/svelte';
+    import { initGraphQL } from '../Common/gqlclient.js';
+    import { getContext, setContext } from 'svelte';
+
+    initGraphQL(getContext('cc-config'));
+
+    import { operationStore, query } from '@urql/svelte';
     import { Col, Row, Table, Card, Spinner, Button, Icon } from 'sveltestrap';
-    import { setContext } from 'svelte';
     import { clustersQuery } from '../Common/utils.js';
     import Histogram from '../Plots/Histogram.svelte';
     import Datatable from '../Datatable/Datatable.svelte';

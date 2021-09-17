@@ -89,6 +89,7 @@ class JobViewController extends AbstractController
     }
 
     public function list(
+        Request $request,
         Configuration $configuration,
         ColorMap $colorMaps,
         $projectDir
@@ -100,12 +101,14 @@ class JobViewController extends AbstractController
 
         return $this->render('jobViews/listJobs.html.twig',
             array(
+                'jwt' => $request->getSession()->get('jwt'),
                 'config' => $config,
                 'colormap' => $colorMaps->getColorMap()
             ));
     }
 
     public function systems(
+        Request $request,
         Configuration $configuration,
         ColorMap $colorMaps,
         $projectDir
@@ -117,12 +120,14 @@ class JobViewController extends AbstractController
 
         return $this->render('jobViews/listJobs.html.twig',
             array(
+                'jwt' => $request->getSession()->get('jwt'),
                 'config' => $config,
                 'colormap' => $colorMaps->getColorMap()
             ));
     }
 
     public function analysis(
+        Request $request,
         Configuration $configuration,
         $projectDir
     )
@@ -138,6 +143,7 @@ class JobViewController extends AbstractController
 
         return $this->render('jobViews/analysis.html.twig',
             array(
+                'jwt' => $request->getSession()->get('jwt'),
                 'config' => $config,
                 'filterPresets' => [
                     'startTime' => [
@@ -174,6 +180,7 @@ class JobViewController extends AbstractController
 
     public function listTag(
         JobTag $tag,
+        Request $request,
         Configuration $configuration,
         ColorMap $colorMaps,
         $projectDir
@@ -185,6 +192,7 @@ class JobViewController extends AbstractController
 
         return $this->render('jobViews/listJobs.html.twig',
             array(
+                'jwt' => $request->getSession()->get('jwt'),
                 'filterPresets' => array('tagId' => $tag->getId()),
                 'config' => $config,
                 'colormap' => $colorMaps->getColorMap()
@@ -193,6 +201,7 @@ class JobViewController extends AbstractController
 
     public function show(
         Job $job,
+        Request $request,
         Configuration $configuration,
         ColorMap $colorMaps,
         $projectDir
@@ -211,6 +220,7 @@ class JobViewController extends AbstractController
 
         return $this->render('jobViews/viewJob.html.twig',
             array(
+                'jwt' => $request->getSession()->get('jwt'),
                 'job' => $job,
                 'config' => $config,
                 'colormap' => $colorMaps->getColorMap()

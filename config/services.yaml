@@ -4,6 +4,14 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    # Both values need to be Base64-encoded.
+    # TODO: Use environment variable or file instead!
+    # Created using:
+    #    $keyPair = sodium_crypto_sign_keypair();
+    #    echo base64_encode(sodium_crypto_sign_secretkey($keyPair));
+    #    echo base64_encode(sodium_crypto_sign_publickey($keyPair));
+    jwt_private_key: "dtPC/6dWJFKZK7KZ78CvWuynylOmjBFyMsUWArwmodOTN9itjL5POlqdZkcnmpJ0yPm4pRaCrvgFaFAbpyik/Q=="
+    jwt_public_key: "kzfYrYy+TzpanWZHJ5qSdMj5uKUWgq74BWhQG6copP0="
 
 services:
     # default configuration for services in *this* file
@@ -12,6 +20,8 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
             $projectDir: '%kernel.project_dir%'
+            $jwtPrivateKey: '%jwt_private_key%'
+            $jwtPublicKey: '%jwt_public_key%'
 
     App\:
         resource: '../src/'

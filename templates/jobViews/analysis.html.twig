@@ -13,6 +13,7 @@
             : "null" }};
 
         const clusterCockpitConfigPromise = Promise.resolve({
+            jwt: "{{ jwt }}",
             plot_view_plotsPerRow: {{ config.plot_view_plotsPerRow.value }},
             analysis_view_histogramMetrics: {{ (config.analysis_view_histogramMetrics is defined)
                 ? config.analysis_view_histogramMetrics.value | raw

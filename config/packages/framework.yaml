@@ -8,7 +8,7 @@ framework:
     default_locale: 'en'
     # trusted_hosts: ~
     session:
-        handler_id: null
+        handler_id: session.handler.native_file
         cookie_secure: auto
         cookie_samesite: lax
         storage_factory_id: session.storage.factory.native

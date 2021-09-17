@@ -1,5 +1,9 @@
 <script>
-    import { setContext } from 'svelte';
+    import { initGraphQL } from '../Common/gqlclient.js';
+    import { getContext, setContext } from 'svelte';
+
+    initGraphQL(getContext('cc-config'));
+
     import Datatable from '../Datatable/Datatable.svelte';
     import TableControl from '../Filters/Control.svelte';
     import TableInfo from '../Filters/Info.svelte';

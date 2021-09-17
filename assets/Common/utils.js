@@ -1,4 +1,5 @@
-import { initClient, getClient } from '@urql/svelte';
+import { waitForClientInit } from './gqlclient.js';
+import { getClient } from '@urql/svelte';
 import { readable } from 'svelte/store';
 
 function fuzzyMatch(term, string) {
@@ -36,12 +37,6 @@ export function fuzzySearchTags(term, tags) {
 }
 
 export const clustersQuery = readable({ fetching: true }, (set) => {
-    initClient({
-        url: typeof GRAPHQL_BACKEND !== 'undefined'
-        ? GRAPHQL_BACKEND
-        : `${window.location.origin}/query`
-    });
-
     const query = `
     query {
         clusters {
@@ -62,7 +57,7 @@ export const clustersQuery = readable({ fetching: true }, (set) => {
         tags { id, tagName, tagType }
     }`;
 
-    getClient().query(query).toPromise().then(({ error, data }) => {
+    waitForClientInit.then(client => client.query(query).toPromise()).then(({ error, data }) => {
         if (error) {
             console.error(error);
             return set({ error });
@@ -131,13 +126,13 @@ export function arraysEqual(a, b) {
 
 export function formatNumber(x) {
     let suffix = '';
-    if (x > 1000000000) {
+    if (x >= 1000000000) {
         x /= 1000000;
         suffix = 'G';
-    } else if (x > 1000000) {
+    } else if (x >= 1000000) {
         x /= 1000000;
         suffix = 'M';
-    } else if (x > 1000) {
+    } else if (x >= 1000) {
         x /= 1000;
         suffix = 'k';
     }

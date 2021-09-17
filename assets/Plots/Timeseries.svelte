@@ -9,6 +9,7 @@
 
 <script>
     import { onMount, onDestroy, getContext } from "svelte";
+    import { formatNumber } from "../Common/utils.js";
     import uPlot from "uplot";
 
     const clusterCockpitConfig = getContext('cc-config');
@@ -132,7 +133,9 @@
             {
                 scale: 'y',
                 grid: { show: true },
-                labelFont: 'sans-serif'
+                labelFont: 'sans-serif',
+                values: (u, vals) =>
+                    vals.map(v => formatNumber(v))
             }
         ],
         padding: [0, 10, -20, -10],

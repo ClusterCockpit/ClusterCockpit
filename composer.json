@@ -14,6 +14,7 @@
         "influxdb/influxdb-php": "^1.15",
         "nelmio/cors-bundle": "^2.1",
         "overblog/graphql-bundle": "^0.13.6",
+        "firebase/php-jwt": "5.4.*",
         "phpdocumentor/reflection-docblock": "^5.2",
         "predis/predis": "^1.1",
         "sensio/framework-extra-bundle": "^5.6",

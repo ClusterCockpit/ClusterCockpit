@@ -46,6 +46,8 @@ use Symfony\Component\Security\Http\ParameterBagUtils;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Service\Configuration;
 
+use Firebase\JWT\JWT;
+
 class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
 
@@ -53,15 +55,21 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     private $httpUtils;
     private $userProvider;
     private $httpKernel;
+    private $jwtPrivateKey;
+    private $security;
 
     public function __construct(
         HttpUtils $httpUtils,
         EntityManagerInterface $em,
-        EntityUserProvider $userProvider)
+        EntityUserProvider $userProvider,
+        Security $security,
+        $jwtPrivateKey)
     {
         $this->httpUtils = $httpUtils;
         $this->userProvider = $userProvider;
         $this->_em = $em;
+        $this->jwtPrivateKey = $jwtPrivateKey;
+        $this->security = $security;
     }
 
     private function getCredentials(Request $request): array
@@ -124,6 +132,13 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         TokenInterface $token,
         string $firewallName): ?Response
     {
+        $user = $this->security->getUser();
+        $payload = [
+            'user' => $user->getUsername(),
+            'roles' => $user->getRoles()
+        ];
+        $request->getSession()->set('jwt', JWT::encode($payload, $this->jwtPrivateKey, 'EdDSA'));
+
         return new RedirectResponse($this->httpUtils->generateUri($request, 'list_jobs'));
     }
 }
