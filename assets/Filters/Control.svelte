@@ -136,7 +136,7 @@
     {filterPresets}
     on:update />
 
-<div class="d-flex flex-row">
+<div class="d-flex flex-row mb-2">
     <div class="me-2">
         <Button outline color=success on:click={toggleFilterConfig}><Icon name="filter" /></Button>
     </div>
