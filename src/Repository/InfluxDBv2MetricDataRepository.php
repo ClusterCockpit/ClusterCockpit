@@ -52,6 +52,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
             "token" => $influxdbToken,
             "bucket" => $influxdbBucket,
             "org" => $influxdbOrg,
+            "verifySSL" => false,
             "timeout" => 60,
             "precision" => InfluxDB2\Model\WritePrecision::S
         ]);
