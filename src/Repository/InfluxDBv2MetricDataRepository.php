@@ -48,7 +48,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
         $this->_client  = new InfluxDB2\Client([
             "url" => $influxdbURL,
             "token" => $influxdbToken,
-            "bucket" => "ClusterCockpit/data",
+            "bucket" => "ClusterCockpit",
             "org" => "ClusterCockpit",
             "timeout" => 60,
             "precision" => InfluxDB2\Model\WritePrecision::S
