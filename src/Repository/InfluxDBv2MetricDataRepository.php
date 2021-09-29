@@ -68,6 +68,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
             return false;
         }
 
+        $influxdbBucket = getenv('INFLUXDB_BUCKET');
         $startTime = date("Y-m-d\TH:i:s\Z",$job->startTime);
         $stopTime = date("Y-m-d\TH:i:s\Z",$job->startTime + $job->duration);
 
@@ -105,6 +106,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
     {
         $nodes = $job->getNodes('|');
 
+        $influxdbBucket = getenv('INFLUXDB_BUCKET');
         $startTime = date("Y-m-d\TH:i:s\Z",$job->startTime);
         $stopTime = date("Y-m-d\TH:i:s\Z",$job->startTime + $job->duration);
 
@@ -126,8 +128,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
 
             union(tables: [{$name}_avg, {$name}_min, {$name}_max])
             |> pivot(rowKey:[\"host\"], columnKey: [\"_field\"], valueColumn: \"_value\")
-            |> group()
-";
+            |> group()";
 
             $this->_timer->start( 'InfluxDBv2');
             $result = $this->_queryApi->query($query);
@@ -185,6 +186,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
         $nodes = $job->getNodes('|');
         $measurement = $metrics[array_key_first($metrics)]['measurement'];
 
+        $influxdbBucket = getenv('INFLUXDB_BUCKET');
         $startTime = date("Y-m-d\TH:i:s\Z",$job->startTime);
         $stopTime  = date("Y-m-d\TH:i:s\Z",$job->startTime + $job->duration);
 
