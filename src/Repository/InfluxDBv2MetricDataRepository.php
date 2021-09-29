@@ -71,7 +71,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
         $startTime = date("Y-m-d\TH:i:s\Z",$job->startTime);
         $stopTime = date("Y-m-d\TH:i:s\Z",$job->startTime + $job->duration);
 
-        $query = "from(bucket:\"ClusterCockpit/data\")
+        $query = "from(bucket:\"{$influxdbBucket}\")
             |> range(start: {$startTime}, stop: {$stopTime})
             |> filter(fn: (r) =>
             r._measurement == \"{$metric['measurement']}\" and
@@ -112,7 +112,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
 
             $name = $metric['name'];
 
-            $query = "data = from(bucket:\"ClusterCockpit/data\")
+            $query = "data = from(bucket:\"{$influxdbBucket}\")
                 |> range(start: {$startTime}, stop: {$stopTime})
                 |> filter(fn: (r) =>
                 r._measurement == \"{$metric['measurement']}\" and
@@ -188,7 +188,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
         $startTime = date("Y-m-d\TH:i:s\Z",$job->startTime);
         $stopTime  = date("Y-m-d\TH:i:s\Z",$job->startTime + $job->duration);
 
-        $query = "from(bucket:\"ClusterCockpit/data\")
+        $query = "from(bucket:\"{$influxdbBucket}\")
             |> range(start: {$startTime}, stop: {$stopTime})
             |> filter(fn: (r) =>
             r._measurement == \"{$measurement}\" and
