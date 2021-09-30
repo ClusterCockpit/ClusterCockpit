@@ -38,7 +38,7 @@ document.querySelectorAll("button").forEach( button => {
           payload.feedback = data.feedback;
 
           if ( action == 'update' ) {
-               response = await fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations/"+e.target.getAttribute("id"), {
+               response = await fetch(`${window.location.origin}/api/configurations/`+e.target.getAttribute("id"), {
                    method: 'PATCH',
                    mode: 'cors', // no-cors, *cors, same-origin
                    credentials: 'same-origin', // include, *same-origin, omit
@@ -48,13 +48,13 @@ document.querySelectorAll("button").forEach( button => {
                    body: JSON.stringify(payload) // body data type must match "Content-Type" header
                })
           } else if ( action == 'reset' ) {
-               response = await fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations/"+e.target.getAttribute("id"), {
+               response = await fetch(`${window.location.origin}/api/configurations/`+e.target.getAttribute("id"), {
                    method: 'DELETE',
                    mode: 'cors', // no-cors, *cors, same-origin
                    credentials: 'same-origin', // include, *same-origin, omit
                })
           } else if ( action == 'replace' ) {
-               response = await fetch("{{ app.request.schemeAndHttpHost ~ app.request.baseUrl }}/api/configurations", {
+               response = await fetch(`${window.location.origin}/api/configurations/`, {
                    method: 'POST',
                    mode: 'cors', // no-cors, *cors, same-origin
                    credentials: 'same-origin', // include, *same-origin, omit
