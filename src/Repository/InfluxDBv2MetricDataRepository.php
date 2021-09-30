@@ -43,7 +43,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
         $this->_timer = new Stopwatch();
         $this->_logger = $logger;
         $influxdbURL = getenv('INFLUXDB_URL');
-        $influxdbSsl = getenv('INFLUXDB_SSL');
+        $influxdbSsl = filter_var(getenv('INFLUXDB_SSL'), FILTER_VALIDATE_BOOLEAN); # make env string boolean
         $influxdbToken = getenv('INFLUXDB_TOKEN');
         $influxdbBucket = getenv('INFLUXDB_BUCKET');
         $influxdbOrg = getenv('INFLUXDB_ORG');
