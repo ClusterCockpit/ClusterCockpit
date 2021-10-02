@@ -52,12 +52,7 @@ attributes: [
             'path' => '/jobs/start_job/',
         ],
     ],
-    itemOperations: ['get','patch'],
 )]
-#[ApiFilter(SearchFilter::class, properties: ['user' => 'partial', 'jobId' => 'start', 'tags.name' => 'exact'])]
-#[ApiFilter(RangeFilter::class, properties: ['startTime','numNodes','duration'])]
-#[ApiFilter(OrderFilter::class, properties: ['startTime','duration','numNodes'])]
-#[ApiFilter(BooleanFilter::class, properties: ['isRunning'])]
 class Job
 {
     /**
@@ -102,9 +97,7 @@ class Job
      * The number of nodes used by the job.
      *
      *  @ORM\Column(type="integer")
-     *  @Groups({"read","write"})
-     *  @Assert\Positive
-     *  @Assert\NotBlank
+     *  @Groups({"read"})
      */
     public $numNodes;
 
@@ -122,7 +115,7 @@ class Job
      * The duration of the job in seconds.
      *
      *  @ORM\Column(type="integer")
-     *  @Groups({"read","write"})
+     *  @Groups({"read"})
      */
     public $duration = 0;
 
@@ -138,9 +131,7 @@ class Job
     /**
      * Boolean flag if job is still running.
      *
-     *  @ORM\Column(type="boolean")
-     *  @Groups({"write"})
-     *  @Assert\NotNull
+     *  @ORM\Column(type="boolean", options={"default":1})
      */
     public $isRunning;
 
@@ -156,7 +147,6 @@ class Job
      * The userId for this job.
      *
      *  @ORM\Column(type="text", options={"default":"noProject"})
-     *  @Groups({"write"})
      */
     private $projectId;
 
