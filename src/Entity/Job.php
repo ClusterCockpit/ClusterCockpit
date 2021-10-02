@@ -52,6 +52,17 @@ attributes: [
             'path' => '/jobs/start_job/',
         ],
     ],
+    itemOperations: [
+        'get' => [
+            'path' => '/jobs/{jobId}',
+        ],
+        'put' => [
+            'path' => '/jobs/stop_job/{jobId}',
+        ],
+        'patch' => [
+            'path' => '/jobs/tag_job/{jobId}',
+        ],
+    ],
 )]
 class Job
 {
