@@ -6,7 +6,7 @@ framework:
         # https://symfony.com/doc/current/components/cache/adapters/array_cache_adapter.html.
         default_redis_provider: '%env(REDIS_URL)%'
 
-        system: cache.adapter.redis
+        # system: cache.adapter.redis
         app: cache.adapter.redis
         pools:
             doctrine.result_cache_pool:
