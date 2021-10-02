@@ -42,27 +42,17 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 *  @ORM\Table(name="job",indexes={@ORM\Index(name="search_idx", columns={"is_running","cluster_id"})})
 */
 #[ApiResource(
-attributes: [
-    'pagination_type' => 'page',
-    'normalization_context' => ['groups' => ['read']],
-    'denormalization_context' => ['groups' => ['write']],
-],
+    attributes: [
+        'pagination_type' => 'page',
+        'normalization_context' => ['groups' => ['read']],
+        'denormalization_context' => ['groups' => ['write']],
+    ],
     collectionOperations: [
         'post' => [
             'path' => '/jobs/start_job/',
         ],
     ],
-    itemOperations: [
-        'get' => [
-            'path' => '/jobs/{jobId}',
-        ],
-        'put' => [
-            'path' => '/jobs/stop_job/{jobId}',
-        ],
-        'patch' => [
-            'path' => '/jobs/tag_job/{jobId}',
-        ],
-    ],
+    itemOperations: ['get'],
 )]
 class Job
 {
