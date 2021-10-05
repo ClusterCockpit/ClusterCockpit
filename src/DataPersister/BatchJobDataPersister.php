@@ -112,12 +112,12 @@ final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
     private function writeToArchive($job)
     {
         if ($this->_jobArchive->isArchived($job)) {
-            throw new HttpException(500, "Job already archived");
+            throw new HttpException(400, "Job already archived");
         }
 
         $jobData = $this->_jobData->getData($job, null);
         if ($jobData === false) {
-            throw new HttpException(500, "Job has no data (MetricRepository failure?)");
+            throw new HttpException(400, "Job has no data (MetricRepository failure?)");
         }
 
         try {

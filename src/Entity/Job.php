@@ -120,16 +120,16 @@ class Job
      *  @Assert\Positive
      *  @Assert\NotBlank(groups={"start_validation"})
      */
-    public int $startTime;
+    public int $startTime = 0;
 
     /**
-     * When the job was started in unxi epoch time seconds.
+     * When the job was started in unix epoch time seconds.
      *
      *  @Groups({"stop"})
      *  @Assert\Positive
      *  @Assert\NotBlank(groups={"stop_validation"})
      */
-    public int $stopTime;
+    public int $stopTime = 0;
 
     /**
      * The duration of the job in seconds.
@@ -301,6 +301,16 @@ class Job
     public function setStartTime($startTime)
     {
         $this->startTime = $startTime;
+    }
+
+    public function getStopTime(): int
+    {
+        return $this->stopTime;
+    }
+
+    public function setStopTime($stopTime)
+    {
+        $this->stopTime = $stopTime;
     }
 
     public function getDuration()
