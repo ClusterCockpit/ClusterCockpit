@@ -44,6 +44,7 @@ final class JobDataPersister implements ContextAwareDataPersisterInterface
 
     public function __construct(
         EntityManagerInterface $em,
+        ContextAwareDataPersisterInterface $decorated,
         LoggerInterface $logger,
         JobRepository $repository,
         JobArchive $jobArchive,
@@ -51,6 +52,7 @@ final class JobDataPersister implements ContextAwareDataPersisterInterface
     )
     {
         $this->_em = $em;
+        $this->_decorated = $decorated;
         $this->_repository = $repository;
         $this->_jobArchive = $jobArchive;
         $this->_jobData = $jobData;
@@ -59,54 +61,35 @@ final class JobDataPersister implements ContextAwareDataPersisterInterface
 
     public function supports($data, array $context = []): bool
     {
-        return $data instanceof BatchJob;
+        return $this->_decorated->supports($data, $context);
     }
 
     public function persist($data, array $context = [])
     {
-	    $this->_logger->info("DataPersister persist: {$data->jobId}");
+        if ( $data instanceof Job ) {
 
-        $id = $data->jobId;
-        $stopTime = $data->stopTime;
+            if ( ($context['collection_operation_name'] ?? null) === 'post') {
+                $nodes = explode('|', $data->nodeList);
+                $data->numNodes = count($nodes);
+                $data->isRunning = true;
 
-        if (!is_string($id)) {
-            throw new InvalidIdentifierException('Invalid id key type.');
+            } else if ( ($context['item_operation_name'] ?? null) === 'put') {
+
+                if ( $data->stopTime < $data->startTime  ) {
+                    throw new HttpException(400, "Stop time earlier than start time");
+                }
+
+                if (! $data->isRunning ) {
+                    throw new HttpException(400, "Job already finished");
+                }
+
+                $data->duration = $data->stopTime - $data->startTime;
+                $data->isRunning = false;
+                $this->writeToArchive($data);
+            }
         }
 
-        $conditions = explode("-", $id);
-        $numConditions = count($conditions);
-
-        if ( $numConditions == 1 ) {
-            $job = $this->_repository->findBatchJob($conditions[0], null, null);
-        } else if ( $numConditions == 2 ) {
-            $job = $this->_repository->findBatchJob($conditions[1], $conditions[0], null);
-        } else if ( $numConditions == 3 ) {
-            $job = $this->_repository->findBatchJob($conditions[1], $conditions[0], $conditions[2]);
-        } else {
-            throw new InvalidIdentifierException('Invalid job id key format.');
-        }
-
-        if ( is_null($job) ) {
-            throw new HttpException(400, "No such job: ".$jobId);
-        }
-
-        if ( $stopTime < $job->startTime  ) {
-            throw new HttpException(400, "Stop time earlier than start time");
-        }
-
-        if (! $job->isRunning ) {
-            throw new HttpException(400, "Job already finished");
-        }
-
-        $job->duration = $stopTime - $job->startTime;
-        $this->writeToArchive($job);
-
-        $job->isRunning = false;
-        $this->_em->persist($job);
-        $this->_em->flush();
-        $data->job = $job;
-
-        return $data;
+        return $this->_decorated->persist($data, $context);
     }
 
     private function writeToArchive($job)
@@ -130,6 +113,6 @@ final class JobDataPersister implements ContextAwareDataPersisterInterface
     public function remove($data, array $context = [])
     {
 	    $this->_logger->info("DataPersister remove: {$data->jobId}");
-        // call your persistence layer to delete $data
+        return $this->_decorated->remove($data, $context);
     }
 }

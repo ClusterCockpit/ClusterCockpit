@@ -64,10 +64,9 @@ final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
 
     public function persist($data, array $context = [])
     {
-	    $this->_logger->info("DataPersister persist: {$data->jobId}");
+        $this->_logger->info("DataPersister persist: {$data->jobId}");
 
         $id = $data->jobId;
-        $stopTime = $data->stopTime;
 
         if (!is_string($id)) {
             throw new InvalidIdentifierException('Invalid id key type.');
@@ -90,7 +89,8 @@ final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
             throw new HttpException(400, "No such job: ".$jobId);
         }
 
-        if ( $stopTime < $job->startTime  ) {
+
+        if ( $data->stopTime < $job->startTime  ) {
             throw new HttpException(400, "Stop time earlier than start time");
         }
 
@@ -98,10 +98,10 @@ final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
             throw new HttpException(400, "Job already finished");
         }
 
-        $job->duration = $stopTime - $job->startTime;
-        $this->writeToArchive($job);
-
+        $job->duration = $data->stopTime - $job->startTime;
         $job->isRunning = false;
+        /* $this->writeToArchive($job); */
+
         $this->_em->persist($job);
         $this->_em->flush();
         $data->job = $job;

@@ -33,6 +33,9 @@ services:
         tags:
             - { name: overblog_graphql.resolver_map, schema: default }
 
+    App\DataPersister\JobDataPersister:
+        decorates: 'api_platform.doctrine.orm.data_persister'
+
     # configure Security related services
     App\Security\LoginFormAuthenticator:
         $userProvider: '@security.user.provider.concrete.db_provider'

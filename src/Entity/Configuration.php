@@ -9,7 +9,9 @@ use ApiPlatform\Core\Annotation\ApiResource;
 /**
  * @ORM\Entity(repositoryClass="App\Repository\ConfigurationRepository")
  */
-#[ApiResource]
+#[ApiResource(
+    itemOperations: ['delete','patch'],
+)]
 class Configuration
 {
     /**
