@@ -99,8 +99,8 @@ final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
         }
 
         $job->duration = $data->stopTime - $job->startTime;
+        $this->writeToArchive($job);
         $job->isRunning = false;
-        /* $this->writeToArchive($job); */
 
         $this->_em->persist($job);
         $this->_em->flush();

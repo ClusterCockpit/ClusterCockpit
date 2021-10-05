@@ -84,8 +84,8 @@ final class JobDataPersister implements ContextAwareDataPersisterInterface
                 }
 
                 $data->duration = $data->stopTime - $data->startTime;
-                $data->isRunning = false;
                 $this->writeToArchive($data);
+                $data->isRunning = false;
             }
         }
 
