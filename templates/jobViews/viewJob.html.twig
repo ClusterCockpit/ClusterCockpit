@@ -33,6 +33,9 @@
             job_view_nodestats_selectedMetrics: {{ (config.job_view_nodestats_selectedMetrics is defined)
                 ? config.job_view_nodestats_selectedMetrics.value | raw
                 : "null" }},
+            job_view_polarPlotMetrics: {{ (config.job_view_polarPlotMetrics is defined)
+                ? config.job_view_polarPlotMetrics.value | raw
+                : "null" }},
         });
     </script>
     {{ encore_entry_script_tags('jobview') }}

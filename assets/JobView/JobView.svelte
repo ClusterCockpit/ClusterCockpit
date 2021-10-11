@@ -30,9 +30,12 @@
     let queryError = null;
     let plotHeight = 400;
     let metricSelectionOpen = false;
-    let selectedMetrics = clusterCockpitConfig.job_view_selectedMetrics
-        ? clusterCockpitConfig['job_view_selectedMetrics']
+    let selectedMetrics = clusterCockpitConfig.job_view_selectedMetrics != null
+        ? clusterCockpitConfig.job_view_selectedMetrics
         : ['flops_any', 'mem_bw', 'mem_used'];
+    const polarPlotMetrics = clusterCockpitConfig.job_view_polarPlotMetrics != null
+        ? clusterCockpitConfig.job_view_polarPlotMetrics
+        : [ 'flops_any',  'mem_bw', 'mem_used', 'net_bw', 'file_bw' ];
     const plotsPerRow = clusterCockpitConfig.plot_view_plotsPerRow;
 
     const metricConfig = {};
@@ -160,7 +163,7 @@
             {#if clusterCockpitConfig.plot_view_showPolarplot}
                 <Resizable let:width>
                 <PolarPlot
-                    metrics={[ 'flops_any',  'mem_bw', 'mem_used', 'net_bw', 'file_bw' ]}
+                    metrics={polarPlotMetrics}
                     cluster={cluster} jobMetrics={jobMetrics}
                     width={width} height={plotHeight} />
                 </Resizable>

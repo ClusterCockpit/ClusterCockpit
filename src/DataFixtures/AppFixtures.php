@@ -26,6 +26,7 @@ class AppFixtures extends Fixture
         array('analysis_view_scatterPlotMetrics', '[["flops_any", "mem_bw"], ["flops_any", "cpu_load"], ["cpu_load", "mem_bw"]]', 'default', 'Pairs of metrics to show in scatter plots', '', 'Enter a JSON list of metric pairs'),
         array('job_view_selectedMetrics', '["flops_any","mem_bw","mem_used"]', 'default', 'Plots of metrics to show in job view', '', 'Enter a JSON list of metrics'),
         array('job_view_nodestats_selectedMetrics', '["flops_any","mem_bw","mem_used"]', 'default', 'Metrics to show in node statistics table', '', 'Enter a JSON list of metrics'),
+        array('job_view_polarPlotMetrics', '["flops_any","mem_bw","mem_used","net_bw","file_bw"]', 'default', 'Metrics to show in polar plot', '', 'Enter a JSON list of metrics'),
         array('ldap_user_base',   'ou=hpc,dc=rrze,dc=uni-erlangen,dc=de',  'default', 'Base DN users',  '\s+',     'Enter a ldif expression'),
         array('ldap_user_filter', '(&(objectclass=posixAccount)(uid=*))',  'default', 'User query filter',                '\s+',     'Enter a ldif expression'),
         array('ldap_user_bind',   'uid={username},ou=hpc,dc=rrze,dc=uni-erlangen,dc=de',  'default', 'User bind DN string',                '\s+',     'Enter a ldif expression'),
