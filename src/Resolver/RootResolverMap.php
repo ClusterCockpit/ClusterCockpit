@@ -33,6 +33,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Resolver\ResolverMap;
 
+use App\Entity\User;
 use App\Service\JobData;
 use App\Service\JobStats;
 use App\Service\Configuration;
@@ -53,6 +54,7 @@ class RootResolverMap extends ResolverMap
     private $configuration;
     private $security;
     private $projectDir;
+    private $scrambleNames;
 
     public function __construct(
         JobRepository $jobRepo,
@@ -75,6 +77,7 @@ class RootResolverMap extends ResolverMap
         $this->configuration = $configuration;
         $this->security = $security;
         $this->projectDir = $projectDir;
+        $this->scrambleNames = filter_var($this->configuration->getValue("general_user_scramble"), FILTER_VALIDATE_BOOLEAN);
     }
 
     private function jobEntityToArray($job)
@@ -82,7 +85,9 @@ class RootResolverMap extends ResolverMap
         return [
             'id' => $job->id,
             'jobId' => $job->getJobId(),
-            'userId' => $job->getUserId(),
+            'userId' => $this->scrambleNames
+                ? User::hideName($job->getUserId())
+                : $job->getUserId(),
             'clusterId' => $job->getClusterId(),
             'startTime' => $job->getStartTime(),
             'duration' => $job->getDuration(),
@@ -282,7 +287,7 @@ class RootResolverMap extends ResolverMap
                 'userStats' => function($value, Argument $args) {
                     $users = $this->jobRepo->statUsers(
                         $args['startTime'], $args['stopTime'], $args['clusterId'],
-                        $this->clusterCfg->getConfigurations());
+                        $this->clusterCfg->getConfigurations(), $this->scrambleNames);
                     return $users;
                 }
             ],

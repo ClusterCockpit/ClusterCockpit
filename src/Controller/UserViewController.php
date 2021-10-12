@@ -71,6 +71,15 @@ class UserViewController extends AbstractController
         $config = $configuration->getUserConfig($this->getUser());
         $colorMaps->setColormap($config['plot_general_colorscheme']->value, $projectDir);
 
+        $scrambleNames = filter_var($configuration->getValue("general_user_scramble"), FILTER_VALIDATE_BOOLEAN);
+        if ($scrambleNames == true) {
+            $user = [
+                'username' => $user->getUserId(true),
+                'name' => 'Anonymized',
+                'email' => ''
+            ];
+        }
+
         return $this->render('users/showUser.html.twig',
             array(
                 'jwt' => $request->getSession()->get('jwt'),

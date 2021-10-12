@@ -269,7 +269,7 @@ class JobRepository extends ServiceEntityRepository
         ];
     }
 
-    public function statUsers($startTime, $stopTime, $clusterId, $clusters)
+    public function statUsers($startTime, $stopTime, $clusterId, $clusters, $scrambleName)
     {
         $users = array();
 
@@ -303,7 +303,7 @@ class JobRepository extends ServiceEntityRepository
         foreach ($rows as $row) {
             if (isset($users[$row['user_id']])) {
                 $user = &$users[$row['user_id']];
-                $user['userId'] = $row['user_id'];
+                $user['userId'] = $scrambleName ? User::hideName($row['user_id']) : $row['user_id'];
                 $user['totalWalltime'] = 0;
                 $user['totalJobs'] = 0;
                 $user['totalCoreHours'] = 0;
@@ -317,7 +317,7 @@ class JobRepository extends ServiceEntityRepository
                 }
             } else {
                 $users[$row['user_id']] = [
-                    'userId' => $row['user_id'],
+                    'userId' => $scrambleName ? User::hideName($row['user_id']) : $row['user_id'],
                     'totalWalltime' => 0, 'totalJobs' => 0, 'totalCoreHours' => 0
                 ];
             }
