@@ -89,6 +89,7 @@ class RootResolverMap extends ResolverMap
             'numNodes' => $job->getNumNodes(),
             'tags' => $this->getTagsArray($job->tags->getValues()),
             'hasProfile' => $this->jobData->hasData($job),
+            'state' => $job->isRunning ? 'running' : 'completed',
             'projectId' => $job->getProjectId(),
 
             'loadAvg' => $job->loadAvg,

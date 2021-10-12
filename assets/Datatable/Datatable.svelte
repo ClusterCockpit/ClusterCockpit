@@ -41,6 +41,7 @@
                 duration
                 numNodes
                 hasProfile
+                state
                 tags { id, tagType, tagName }
             }
             count

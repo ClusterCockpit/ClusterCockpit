@@ -8,6 +8,7 @@ type Job {
   duration: Int!
   numNodes: Int!
   hasProfile: Boolean!
+  state: JobState!
   tags: [JobTag!]!
 
   loadAvg: Float
@@ -16,6 +17,11 @@ type Job {
   memBwAvg: Float
   netBwAvg: Float
   fileBwAvg: Float
+}
+
+enum JobState {
+  running
+  completed
 }
 
 type JobTag {
