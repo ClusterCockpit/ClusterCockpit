@@ -12,6 +12,7 @@
     import JobMeta from '../Datatable/JobMeta.svelte';
     import NodeStats from './NodeStats.svelte';
     import TagControl from './TagControl.svelte';
+    import Zoom from './Zoom.svelte';
     import PolarPlot from '../Plots/Polar.svelte';
     import Resizable from '../Common/Resizable.svelte';
     import ColumnConfig from '../Common/ColumnConfig.svelte';
@@ -41,6 +42,8 @@
     const metricConfig = {};
     setContext('metric-config', metricConfig);
 
+    let timeseriesPlots = {};
+
     getClient()
         .query(`query {
             clusters {
@@ -68,6 +71,7 @@
                 duration
                 numNodes
                 hasProfile
+                state
                 tags { id, tagType, tagName }
             }
 
@@ -180,6 +184,11 @@
             {/if}
         </Col>
     </Row>
+    <Row>
+        <Col>
+            <Zoom timeseriesPlots={timeseriesPlots} />
+        </Col>
+    </Row>
     <br/>
     <table style="width: 100%; table-layout: fixed;">
     {#each tilePlots(plotsPerRow, selectedMetrics.map(metric =>
@@ -199,6 +208,7 @@
                     </span>
                     <Resizable let:width>
                     <Plot
+                        bind:this={timeseriesPlots[metric.name]}
                         metric={metric.name}
                         clusterId={clusterId}
                         data={metric.metric}
