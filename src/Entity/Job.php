@@ -315,6 +315,10 @@ class Job
 
     public function getDuration()
     {
+        if ($this->isRunning() && $this->duration == 0) {
+            $this->duration = time() - $this->startTime;
+        }
+
         return $this->duration;
     }
 

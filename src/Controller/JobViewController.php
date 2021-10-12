@@ -211,10 +211,6 @@ class JobViewController extends AbstractController
         $config = $configuration->getUserConfig($this->getUser());
         $colorMaps->setColormap($config['plot_general_colorscheme']->value, $projectDir);
 
-        if ( $job->isRunning() ) {
-            $job->duration = time() - $job->startTime;
-        }
-
         return $this->render('jobViews/viewJob.html.twig',
             array(
                 'jwt' => $request->getSession()->get('jwt'),
