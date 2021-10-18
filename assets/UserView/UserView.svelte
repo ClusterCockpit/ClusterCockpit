@@ -136,7 +136,8 @@
             bind:appliedFilters
             bind:pendingFilters
             limitedToUser=true
-            on:update={filtersChanged} />
+            on:update={filtersChanged}
+            on:reload={() => datatable.reload()} />
     </Col>
 </Row>
 <Row>

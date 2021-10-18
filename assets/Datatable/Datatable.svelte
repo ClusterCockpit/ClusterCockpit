@@ -84,6 +84,10 @@
         $jobQuery.reexecute();
     }
 
+    export function reload() {
+        $jobQuery.reexecute({ requestPolicy: 'network-only' });
+    }
+
     // Make datatable header stick below the app header:
     let headerPaddingTop = 10;
     const header = document.querySelector('header > nav.navbar');
