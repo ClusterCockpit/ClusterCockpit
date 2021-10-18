@@ -73,10 +73,9 @@ class JobRepository extends ServiceEntityRepository
                ->setParameter("{$field}_ew_$i", '%'.$cond['endsWith']);
     }
 
-    private function buildJobFilter($qb, $filter, $sorting)
+    private function buildJobFilter($qb, $filterList, $sorting)
     {
-        if ($filter && isset($filter['list'])) {
-            $filterList = $filter['list'];
+        if ($filterList) {
             foreach ($filterList as $i => $filter) {
                 if (isset($filter['jobId']))
                     $this->addStringCondition($qb, 'jobId', $i, $filter['jobId']);
@@ -164,7 +163,7 @@ class JobRepository extends ServiceEntityRepository
     private function filteredStatisticsPerCluster($filter, $cluster)
     {
         $coresPerNode = $cluster['socketsPerNode'] * $cluster['coresPerSocket'];
-        $filter['list'][] = ['clusterId' => ['eq' => $cluster['clusterID']]];
+        $filter[] = ['clusterId' => ['eq' => $cluster['clusterID']]];
         $qb = $this->createQueryBuilder('j');
         $qb->select([
             'COUNT(j.id)',
@@ -182,7 +181,7 @@ class JobRepository extends ServiceEntityRepository
 
     private function getSelectedCluster($filter)
     {
-        foreach ($filter['list'] as $filterItem) {
+        foreach ($filter as $filterItem) {
             if (isset($filterItem['clusterId'])) {
                 return $filterItem['clusterId']['eq'];
             }
@@ -193,7 +192,7 @@ class JobRepository extends ServiceEntityRepository
     /*
      * Filters are expected in the same format as for
      * findFilteredJobs() and countJobs() (therefore,
-     * the GraphQL JobFilterList type).
+     * the GraphQL [JobFilter!] type).
      */
     public function findFilteredStatistics($filter, $clusterCfg)
     {

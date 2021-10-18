@@ -163,7 +163,7 @@ class RootResolverMap extends ResolverMap
 
                     // Non-admins shall only see theire own jobs.
                     if (!in_array('ROLE_ADMIN', $user->getRoles()))
-                        $filter['list'][] = [ 'userId' => [ 'eq' => $user->getUsername() ] ];
+                        $filter[] = [ 'userId' => [ 'eq' => $user->getUsername() ] ];
 
                     try {
                         $jobs = $this->jobRepo->findFilteredJobs($page, $filter, $orderBy);
@@ -193,8 +193,9 @@ class RootResolverMap extends ResolverMap
                             if (isset($cluster['filterRanges'])) {
                                 // This startTime of the last job on that cluster is a special
                                 // case, let's simply use now as the upper bound.
-                                if ($cluster['filterRanges']['startTime']['to'] == null)
-                                    $cluster['filterRanges']['startTime']['to'] = time();
+                                if ($cluster['filterRanges']['startTime']['to'] == null) {
+                                    $cluster['filterRanges']['startTime']['to'] = strtotime("1.1.".(intval(date("Y")) + 1));
+                                }
                                 continue;
                             }
 
@@ -250,7 +251,7 @@ class RootResolverMap extends ResolverMap
 
                     // Non-admins shall only see theire own jobs.
                     if (!in_array('ROLE_ADMIN', $user->getRoles()))
-                        $filter['list'][] = [ 'userId' => [ 'eq' => $user->getUsername() ] ];
+                        $filter[] = [ 'userId' => [ 'eq' => $user->getUsername() ] ];
 
                     try {
                         return $this->jobRepo->findFilteredStatistics($filter, $this->clusterCfg);

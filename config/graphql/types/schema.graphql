@@ -86,11 +86,11 @@ type JobMetricWithName {
 type Query {
   clusters: [Cluster!]!
   jobById(id: ID!): Job
-  jobs(filter: JobFilterList, page: PageRequest, order: OrderByInput): JobResultList!
-  jobsStatistics(filter: JobFilterList): JobsStatistics!
+  jobs(filter: [JobFilter!]!, page: PageRequest, order: OrderByInput): JobResultList!
+  jobsStatistics(filter: [JobFilter!]!): JobsStatistics!
   jobMetrics(jobId: String!, clusterId: String, metrics: [String]): [JobMetricWithName]!
-  jobMetricAverages(filter: JobFilterList!, metrics: [String]!): [[Float]]!
-  rooflineHeatmap(filter: JobFilterList!, rows: Int!, cols: Int!, minX: Float!, minY: Float!, maxX: Float!, maxY: Float!): [[Float!]]!
+  jobMetricAverages(filter: [JobFilter!]!, metrics: [String]!): [[Float]]!
+  rooflineHeatmap(filter: [JobFilter!]!, rows: Int!, cols: Int!, minX: Float!, minY: Float!, maxX: Float!, maxY: Float!): [[Float!]]!
   tags: [JobTag!]!
   filterRanges: FilterRanges!
   userStats(startTime: Time, stopTime: Time, clusterId: String): [UserStats!]!
@@ -119,10 +119,6 @@ type FilterRanges {
   duration: IntRangeOutput!
   numNodes: IntRangeOutput!
   startTime: TimeRangeOutput!
-}
-
-input JobFilterList {
-  list: [JobFilter]
 }
 
 input JobFilter {

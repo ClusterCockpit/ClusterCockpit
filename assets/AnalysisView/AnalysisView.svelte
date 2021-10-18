@@ -45,23 +45,23 @@
     setContext('clusters-query', clustersQuery);
 
     const statsQuery = operationStore(`
-        query($filter: JobFilterList!, $metrics: [String!]!) {
+        query($filter: [JobFilter!]!, $metrics: [String!]!) {
             jobMetricAverages(filter: $filter, metrics: $metrics)
         }
     `, {
-        filter: { list: [] }, metrics: []
+        filter: [], metrics: []
     }, { pause: true });
 
     query(statsQuery);
 
     const rooflineHeatmapQuery = operationStore(`
-        query($filter: JobFilterList!, $rows: Int!, $cols: Int!,
+        query($filter: [JobFilter!]!, $rows: Int!, $cols: Int!,
                 $minX: Float!, $minY: Float!, $maxX: Float!, $maxY: Float!) {
             rooflineHeatmap(filter: $filter, rows: $rows, cols: $cols,
                     minX: $minX, minY: $minY, maxX: $maxX, maxY: $maxY)
         }
     `, {
-        filter: { list: [] },
+        filter: [],
         rows: 50, cols: 50,
         minX: 0.01, minY: 1., maxX: 1000., maxY: -1
     }, { pause: true });
@@ -69,7 +69,7 @@
     query(rooflineHeatmapQuery);
 
     const metaStatsQuery = operationStore(`
-    query($filter: JobFilterList!) {
+    query($filter: [JobFilter!]!) {
        jobsStatistics(filter: $filter) {
            totalJobs
            shortJobs
@@ -80,7 +80,7 @@
        }
     }
     `, {
-        filter: { list: [] }
+        filter: []
     }, { pause: true });
 
     query(metaStatsQuery);
@@ -126,11 +126,11 @@
     async function updateQueries(filterItems) {
         console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
 
-        $statsQuery.variables.filter = { list: filterItems };
+        $statsQuery.variables.filter = filterItems;
         $statsQuery.context.pause = false;
         $statsQuery.reexecute();
 
-        $metaStatsQuery.variables.filter = { list: filterItems };
+        $metaStatsQuery.variables.filter = filterItems;
         $metaStatsQuery.context.pause = false;
         $metaStatsQuery.reexecute();
 
@@ -138,7 +138,7 @@
         // Only needed in dev mode for convenience.
         await tick();
 
-        $rooflineHeatmapQuery.variables.filter = { list: filterItems };
+        $rooflineHeatmapQuery.variables.filter = filterItems;
         $rooflineHeatmapQuery.variables.maxY = selectedCluster.flopRateSimd;
         $rooflineHeatmapQuery.context.pause = false;
         $rooflineHeatmapQuery.reexecute();
