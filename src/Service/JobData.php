@@ -110,6 +110,9 @@ class JobData
             $res = [];
 
             foreach ( $metricConfig as $metricName => $metric) {
+                if (!isset($data[$metricName]))
+                    continue;
+
                 $series = [];
                 foreach ( $data[$metricName] as $nodeId => $nodedata) {
                     $series[] = [
