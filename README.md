@@ -1,17 +1,6 @@
 ![ClusterCockpit banner](https://github.com/ClusterCockpit/ClusterCockpit/wiki/img/ClusterCockpit-banner-small.png)
 
 --------------------------------------------------------------------------------
-NOTICE
---------------------------------------------------------------------------------
-
-ClusterCockpit is still in testing phase. We are working hard to get an BETA release soon.
-If you want to help develop ClusterCockpit you may want to take a look at [open issues](https://github.com/ClusterCockpit/ClusterCockpit/issues?q=is%3Aopen+is%3Aissue).
-A good starting point about the software design of ClusterCockpit are the Wiki
-pages about the [overall structure](https://github.com/ClusterCockpit/ClusterCockpit/wiki/DEV-Software-structure)
-and [naming conventions](https://github.com/ClusterCockpit/ClusterCockpit/wiki/DEV-Conventions)
-used.
-
---------------------------------------------------------------------------------
 Introduction
 --------------------------------------------------------------------------------
 
