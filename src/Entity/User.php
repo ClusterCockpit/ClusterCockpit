@@ -153,10 +153,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->username;
     }
 
+    public static function hideName($name)
+    {
+        return substr(md5($name), 0, 8);
+    }
+
     public function getUserId($hide=false)
     {
         if( $hide === true ) {
-            return substr(md5($this->username), 0, 8);
+            return self::hideName($this->username);
         } else {
             return $this->username;
         }

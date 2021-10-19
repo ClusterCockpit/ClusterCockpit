@@ -29,7 +29,7 @@
     }
 
     const jobQuery = operationStore(`
-    query($filter: JobFilterList!, $sorting: OrderByInput!, $paging: PageRequest! ){
+    query($filter: [JobFilter!]!, $sorting: OrderByInput!, $paging: PageRequest! ){
         jobs(filter: $filter, order: $sorting, page: $paging) {
             items {
                 id
@@ -41,12 +41,13 @@
                 duration
                 numNodes
                 hasProfile
+                state
                 tags { id, tagType, tagName }
             }
             count
         }
     }
-    `, {filter: { list: initialFilterItems }, sorting, paging});
+    `, {filter: initialFilterItems, sorting, paging});
 
     query(jobQuery);
     $: matchedJobs = $jobQuery.data != null ? $jobQuery.data.jobs.count : 0;
@@ -79,8 +80,12 @@
 
     export function applyFilters(filterItems) {
         console.info('filters:', ...filterItems.map(f => Object.entries(f).flat()).flat());
-        $jobQuery.variables.filter = { "list": filterItems };
+        $jobQuery.variables.filter = filterItems;
         $jobQuery.reexecute();
+    }
+
+    export function reload() {
+        $jobQuery.reexecute({ requestPolicy: 'network-only' });
     }
 
     // Make datatable header stick below the app header:

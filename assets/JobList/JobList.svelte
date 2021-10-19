@@ -59,7 +59,8 @@
     bind:appliedFilters
     bind:sorting
     bind:selectedMetrics
-    on:update={filtersChanged} />
+    on:update={filtersChanged}
+    on:reload={() => datatable.reload()} />
 
 <Datatable
     bind:this={datatable}

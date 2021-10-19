@@ -14,6 +14,7 @@ class AppFixtures extends Fixture
         array('plot_view_showPolarplot',      'true',   'default', 'Show polar plot',                     'true|false', 'Enter true or false'),
         array('plot_view_showStatTable',      'true',   'default', 'Show stat table',                     'true|false', 'Enter true or false'),
         array('plot_view_plotsPerRow',        '3',      'default', 'Plots per row in job view',           '[0-9]+',     'Enter a positive integer'),
+        array('plot_view_polarPlotMetrics', '["flops_any","mem_bw","mem_used","net_bw","file_bw"]', 'default', 'Metrics to show in polar plot of job view', '', 'Enter a JSON list of metrics'),
         array('plot_general_colorscheme',     'Accent', 'default', 'Plot color scheme',                   '',           ''),
         array('plot_general_interactive',     'false',  'default', 'Interactive plots in job view',       'true|false', 'Enter true or false'),
         array('plot_general_lineWidth',       '2',      'default', 'Line width for plots',                '[0-9]+',     'Enter a positive integer'),

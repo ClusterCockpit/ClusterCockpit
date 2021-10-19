@@ -23,7 +23,7 @@
     let selectedMetrics;
 
     const statsQuery = operationStore(`
-    query($filter: JobFilterList!) {
+    query($filter: [JobFilter!]!) {
         jobsStatistics(filter: $filter) {
             totalJobs
             shortJobs
@@ -33,7 +33,7 @@
             histNumNodes { count, value }
         }
     }
-    `, { filter: { list: [ { userId: { eq: userInfos.userId } } ] } });
+    `, { filter: [ { userId: { eq: userInfos.userId } } ] });
 
     query(statsQuery);
 
@@ -45,7 +45,7 @@
         filterItems = event.detail.filterItems;
         filterItems.push({ userId: { eq: userInfos.userId }});
 
-        $statsQuery.variables.filter = { list: filterItems };
+        $statsQuery.variables.filter = filterItems;
         $statsQuery.reexecute();
         datatable.applyFilters(filterItems);
     }
@@ -136,7 +136,8 @@
             bind:appliedFilters
             bind:pendingFilters
             limitedToUser=true
-            on:update={filtersChanged} />
+            on:update={filtersChanged}
+            on:reload={() => datatable.reload()} />
     </Col>
 </Row>
 <Row>

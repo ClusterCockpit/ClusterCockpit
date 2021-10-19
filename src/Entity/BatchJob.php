@@ -32,6 +32,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
 attributes: [
+    'validation_groups' => ['stop_validation'],
     'normalization_context' => ['groups' => ['read']],
     'denormalization_context' => ['groups' => ['write']],
 ],
@@ -42,7 +43,7 @@ attributes: [
             'requirements' => ['id' => '\s+'],
         ],
         'patch' => [
-            'path' => '/jobs/stop_job/{jobId}',
+            'path' => '/jobs/batch/stop_job/{jobId}',
             'requirements' => ['id' => '\s+'],
         ],
     ],
@@ -66,7 +67,7 @@ class BatchJob
      *
      * @Groups({"read","write"})
      * @Assert\Positive
-     * @Assert\NotBlank
+     * @Assert\NotBlank(groups={"stop_validation"})
      *
      */
     public int $stopTime;

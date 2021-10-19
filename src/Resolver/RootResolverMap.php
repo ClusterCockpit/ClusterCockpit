@@ -33,6 +33,7 @@ use GraphQL\Type\Definition\ResolveInfo;
 use Overblog\GraphQLBundle\Definition\Argument;
 use Overblog\GraphQLBundle\Resolver\ResolverMap;
 
+use App\Entity\User;
 use App\Service\JobData;
 use App\Service\JobStats;
 use App\Service\Configuration;
@@ -53,6 +54,7 @@ class RootResolverMap extends ResolverMap
     private $configuration;
     private $security;
     private $projectDir;
+    private $scrambleNames;
 
     public function __construct(
         JobRepository $jobRepo,
@@ -75,6 +77,7 @@ class RootResolverMap extends ResolverMap
         $this->configuration = $configuration;
         $this->security = $security;
         $this->projectDir = $projectDir;
+        $this->scrambleNames = filter_var($this->configuration->getValue("general_user_scramble"), FILTER_VALIDATE_BOOLEAN);
     }
 
     private function jobEntityToArray($job)
@@ -82,13 +85,16 @@ class RootResolverMap extends ResolverMap
         return [
             'id' => $job->id,
             'jobId' => $job->getJobId(),
-            'userId' => $job->getUserId(),
+            'userId' => $this->scrambleNames
+                ? User::hideName($job->getUserId())
+                : $job->getUserId(),
             'clusterId' => $job->getClusterId(),
             'startTime' => $job->getStartTime(),
             'duration' => $job->getDuration(),
             'numNodes' => $job->getNumNodes(),
             'tags' => $this->getTagsArray($job->tags->getValues()),
             'hasProfile' => $this->jobData->hasData($job),
+            'state' => $job->isRunning ? 'running' : 'completed',
             'projectId' => $job->getProjectId(),
 
             'loadAvg' => $job->loadAvg,
@@ -157,7 +163,7 @@ class RootResolverMap extends ResolverMap
 
                     // Non-admins shall only see theire own jobs.
                     if (!in_array('ROLE_ADMIN', $user->getRoles()))
-                        $filter['list'][] = [ 'userId' => [ 'eq' => $user->getUsername() ] ];
+                        $filter[] = [ 'userId' => [ 'eq' => $user->getUsername() ] ];
 
                     try {
                         $jobs = $this->jobRepo->findFilteredJobs($page, $filter, $orderBy);
@@ -187,8 +193,9 @@ class RootResolverMap extends ResolverMap
                             if (isset($cluster['filterRanges'])) {
                                 // This startTime of the last job on that cluster is a special
                                 // case, let's simply use now as the upper bound.
-                                if ($cluster['filterRanges']['startTime']['to'] == null)
-                                    $cluster['filterRanges']['startTime']['to'] = time();
+                                if ($cluster['filterRanges']['startTime']['to'] == null) {
+                                    $cluster['filterRanges']['startTime']['to'] = strtotime("1.1.".(intval(date("Y")) + 1));
+                                }
                                 continue;
                             }
 
@@ -244,7 +251,7 @@ class RootResolverMap extends ResolverMap
 
                     // Non-admins shall only see theire own jobs.
                     if (!in_array('ROLE_ADMIN', $user->getRoles()))
-                        $filter['list'][] = [ 'userId' => [ 'eq' => $user->getUsername() ] ];
+                        $filter[] = [ 'userId' => [ 'eq' => $user->getUsername() ] ];
 
                     try {
                         return $this->jobRepo->findFilteredStatistics($filter, $this->clusterCfg);
@@ -281,7 +288,7 @@ class RootResolverMap extends ResolverMap
                 'userStats' => function($value, Argument $args) {
                     $users = $this->jobRepo->statUsers(
                         $args['startTime'], $args['stopTime'], $args['clusterId'],
-                        $this->clusterCfg->getConfigurations());
+                        $this->clusterCfg->getConfigurations(), $this->scrambleNames);
                     return $users;
                 }
             ],

@@ -12,6 +12,7 @@
     import JobMeta from '../Datatable/JobMeta.svelte';
     import NodeStats from './NodeStats.svelte';
     import TagControl from './TagControl.svelte';
+    import Zoom from './Zoom.svelte';
     import PolarPlot from '../Plots/Polar.svelte';
     import Resizable from '../Common/Resizable.svelte';
     import ColumnConfig from '../Common/ColumnConfig.svelte';
@@ -30,13 +31,18 @@
     let queryError = null;
     let plotHeight = 400;
     let metricSelectionOpen = false;
-    let selectedMetrics = clusterCockpitConfig.job_view_selectedMetrics
-        ? clusterCockpitConfig['job_view_selectedMetrics']
+    let selectedMetrics = clusterCockpitConfig.job_view_selectedMetrics != null
+        ? clusterCockpitConfig.job_view_selectedMetrics
         : ['flops_any', 'mem_bw', 'mem_used'];
+    const polarPlotMetrics = clusterCockpitConfig.job_view_polarPlotMetrics != null
+        ? clusterCockpitConfig.job_view_polarPlotMetrics
+        : [ 'flops_any',  'mem_bw', 'mem_used', 'net_bw', 'file_bw' ];
     const plotsPerRow = clusterCockpitConfig.plot_view_plotsPerRow;
 
     const metricConfig = {};
     setContext('metric-config', metricConfig);
+
+    let timeseriesPlots = {};
 
     getClient()
         .query(`query {
@@ -65,6 +71,7 @@
                 duration
                 numNodes
                 hasProfile
+                state
                 tags { id, tagType, tagName }
             }
 
@@ -160,7 +167,7 @@
             {#if clusterCockpitConfig.plot_view_showPolarplot}
                 <Resizable let:width>
                 <PolarPlot
-                    metrics={[ 'flops_any',  'mem_bw', 'mem_used', 'net_bw', 'file_bw' ]}
+                    metrics={polarPlotMetrics}
                     cluster={cluster} jobMetrics={jobMetrics}
                     width={width} height={plotHeight} />
                 </Resizable>
@@ -175,6 +182,11 @@
                     cluster={cluster} width={width} height={plotHeight} />
                 </Resizable>
             {/if}
+        </Col>
+    </Row>
+    <Row>
+        <Col>
+            <Zoom timeseriesPlots={timeseriesPlots} />
         </Col>
     </Row>
     <br/>
@@ -196,6 +208,7 @@
                     </span>
                     <Resizable let:width>
                     <Plot
+                        bind:this={timeseriesPlots[metric.name]}
                         metric={metric.name}
                         clusterId={clusterId}
                         data={metric.metric}

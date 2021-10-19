@@ -124,6 +124,7 @@
         series: plotSeries,
         axes: [
             {
+                scale: 'x',
                 space: 35,
                 incrs: getTimeIncrs(data.timestep, maxX),
                 values: (u, vals) =>
@@ -150,16 +151,13 @@
         opts.scales.y.range = [0., max * 1.1];
 
         opts.hooks.draw = [u => {
-            let x0 = u.valToPos(0, 'x', true);
-            let x1 = u.valToPos(maxX, 'x', true);
             let y = u.valToPos(metricConfig.peak, 'y', true);
-
             u.ctx.lineWidth = lineWidth;
             u.ctx.strokeStyle = peakLineColor;
             u.ctx.setLineDash([5, 5]);
             u.ctx.beginPath();
-            u.ctx.moveTo(x0, y);
-            u.ctx.lineTo(x1, y);
+            u.ctx.moveTo(u.bbox.left, y);
+            u.ctx.lineTo(u.bbox.left + u.bbox.width, y);
             u.ctx.stroke();
         }];
     }
@@ -217,5 +215,16 @@
     }
 
     $: onSizeChange(width, height);
+
+    // `from` and `to` must be numbers between 0 and 1.
+    export function setTimeRange(from, to) {
+        if (!mounted || !uplot || from > to)
+            return false;
+
+        uplot.setScale('x', {
+            min: from * maxX,
+            max: to * maxX
+        });
+    }
 
 </script>

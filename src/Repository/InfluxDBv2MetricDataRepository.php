@@ -43,13 +43,17 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
         $this->_timer = new Stopwatch();
         $this->_logger = $logger;
         $influxdbURL = getenv('INFLUXDB_URL');
+        $influxdbSsl = filter_var(getenv('INFLUXDB_SSL'), FILTER_VALIDATE_BOOLEAN); # make env string boolean
         $influxdbToken = getenv('INFLUXDB_TOKEN');
+        $influxdbBucket = getenv('INFLUXDB_BUCKET');
+        $influxdbOrg = getenv('INFLUXDB_ORG');
         $this->_logger->info("Scheme: $influxdbURL");
         $this->_client  = new InfluxDB2\Client([
             "url" => $influxdbURL,
             "token" => $influxdbToken,
-            "bucket" => "ClusterCockpit/data",
-            "org" => "ClusterCockpit",
+            "bucket" => $influxdbBucket,
+            "org" => $influxdbOrg,
+            "verifySSL" => $influxdbSsl,
             "timeout" => 60,
             "precision" => InfluxDB2\Model\WritePrecision::S
         ]);
@@ -66,10 +70,11 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
             return false;
         }
 
+        $influxdbBucket = getenv('INFLUXDB_BUCKET');
         $startTime = date("Y-m-d\TH:i:s\Z",$job->startTime);
         $stopTime = date("Y-m-d\TH:i:s\Z",$job->startTime + $job->duration);
 
-        $query = "from(bucket:\"ClusterCockpit/data\")
+        $query = "from(bucket:\"{$influxdbBucket}\")
             |> range(start: {$startTime}, stop: {$stopTime})
             |> filter(fn: (r) =>
             r._measurement == \"{$metric['measurement']}\" and
@@ -103,6 +108,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
     {
         $nodes = $job->getNodes('|');
 
+        $influxdbBucket = getenv('INFLUXDB_BUCKET');
         $startTime = date("Y-m-d\TH:i:s\Z",$job->startTime);
         $stopTime = date("Y-m-d\TH:i:s\Z",$job->startTime + $job->duration);
 
@@ -110,7 +116,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
 
             $name = $metric['name'];
 
-            $query = "data = from(bucket:\"ClusterCockpit/data\")
+            $query = "data = from(bucket:\"{$influxdbBucket}\")
                 |> range(start: {$startTime}, stop: {$stopTime})
                 |> filter(fn: (r) =>
                 r._measurement == \"{$metric['measurement']}\" and
@@ -124,8 +130,7 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
 
             union(tables: [{$name}_avg, {$name}_min, {$name}_max])
             |> pivot(rowKey:[\"host\"], columnKey: [\"_field\"], valueColumn: \"_value\")
-            |> group()
-";
+            |> group()";
 
             $this->_timer->start( 'InfluxDBv2');
             $result = $this->_queryApi->query($query);
@@ -183,10 +188,11 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
         $nodes = $job->getNodes('|');
         $measurement = $metrics[array_key_first($metrics)]['measurement'];
 
+        $influxdbBucket = getenv('INFLUXDB_BUCKET');
         $startTime = date("Y-m-d\TH:i:s\Z",$job->startTime);
         $stopTime  = date("Y-m-d\TH:i:s\Z",$job->startTime + $job->duration);
 
-        $query = "from(bucket:\"ClusterCockpit/data\")
+        $query = "from(bucket:\"{$influxdbBucket}\")
             |> range(start: {$startTime}, stop: {$stopTime})
             |> filter(fn: (r) =>
             r._measurement == \"{$measurement}\" and

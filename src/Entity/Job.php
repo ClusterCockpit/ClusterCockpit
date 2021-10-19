@@ -31,33 +31,39 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Annotation\ApiResource;
-use ApiPlatform\Core\Annotation\ApiFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\RangeFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\BooleanFilter;
-use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 
 /**
 *  @ORM\Entity(repositoryClass="App\Repository\JobRepository")
 *  @ORM\Table(name="job",indexes={@ORM\Index(name="search_idx", columns={"is_running","cluster_id"})})
 */
 #[ApiResource(
-attributes: [
-    'pagination_type' => 'page',
-    'normalization_context' => ['groups' => ['read']],
-    'denormalization_context' => ['groups' => ['write']],
-],
+    attributes: [
+        'validation_groups' => ['start_validation', 'stop_validation']
+    ],
     collectionOperations: [
         'post' => [
             'path' => '/jobs/start_job/',
+            'denormalization_context' => ['groups' => ['start']],
+            'validation_groups' => ['start_validation']
         ],
     ],
-    itemOperations: ['get','patch'],
+    itemOperations: [
+        'get' => [
+            'path' => '/jobs/{id}',
+            'normalization_context' => ['groups' => ['read']],
+        ],
+        'put' => [
+            'path' => '/jobs/stop_job/{id}',
+            'denormalization_context' => ['groups' => ['stop']],
+            'validation_groups' => ['stop_validation']
+        ],
+        'patch' => [
+            'path' => '/jobs/tag_job/{id}',
+            'denormalization_context' => ['groups' => ['tag']],
+            'validation_groups' => []
+        ],
+    ],
 )]
-#[ApiFilter(SearchFilter::class, properties: ['user' => 'partial', 'jobId' => 'start', 'tags.name' => 'exact'])]
-#[ApiFilter(RangeFilter::class, properties: ['startTime','numNodes','duration'])]
-#[ApiFilter(OrderFilter::class, properties: ['startTime','duration','numNodes'])]
-#[ApiFilter(BooleanFilter::class, properties: ['isRunning'])]
 class Job
 {
     /**
@@ -68,97 +74,102 @@ class Job
      *  @ORM\GeneratedValue(strategy="AUTO")
      *  @Groups({"read"})
      */
-    public $id;
+    public int $id;
 
     /**
      *  The jobId of this job.
      *
      *  @ORM\Column(type="integer")
-     *  @Groups({"read","write"})
+     *  @Groups({"read","start"})
      *  @Assert\Positive
-     *  @Assert\NotBlank
+     *  @Assert\NotBlank(groups={"start_validation"})
      */
-    private $jobId;
+    private int $jobId;
 
     /**
      * The userId for this job.
      *
      *  @ORM\Column(type="string")
-     *  @Groups({"read","write"})
-     *  @Assert\NotBlank
+     *  @Groups({"read","start"})
+     *  @Assert\NotBlank(groups={"start_validation"})
      */
-    private $userId;
+    private string $userId;
 
     /**
      * The cluster on which the job was executed.
      *
      *  @ORM\Column(type="string")
-     *  @Groups({"read","write"})
-     *  @Assert\NotBlank
+     *  @Groups({"read","start"})
+     *  @Assert\NotBlank(groups={"start_validation"})
      */
-    private $clusterId;
+    private string $clusterId;
 
     /**
      * The number of nodes used by the job.
      *
      *  @ORM\Column(type="integer")
-     *  @Groups({"read","write"})
-     *  @Assert\Positive
-     *  @Assert\NotBlank
+     *  @Groups({"read"})
      */
-    public $numNodes;
+    public int $numNodes = 0;
 
     /**
      * When the job was started in unxi epoch time seconds.
      *
      *  @ORM\Column(type="integer")
-     *  @Groups({"read","write"})
+     *  @Groups({"read","start"})
      *  @Assert\Positive
-     *  @Assert\NotBlank
+     *  @Assert\NotBlank(groups={"start_validation"})
      */
-    public $startTime;
+    public int $startTime = 0;
+
+    /**
+     * When the job was started in unix epoch time seconds.
+     *
+     *  @Groups({"stop"})
+     *  @Assert\Positive
+     *  @Assert\NotBlank(groups={"stop_validation"})
+     */
+    public int $stopTime = 0;
 
     /**
      * The duration of the job in seconds.
      *
      *  @ORM\Column(type="integer")
-     *  @Groups({"read","write"})
+     *  @Groups({"read"})
      */
-    public $duration = 0;
+    public int $duration = 0;
 
     /**
      * The node list of the job as string list separated by | character.
      *
      *  @ORM\Column(type="text")
-     *  @Groups({"read","write"})
-     *  @Assert\NotBlank
+     *  @Groups({"read","start"})
+     *  @Assert\NotBlank(groups={"start_validation"})
      */
-    public $nodeList;
+    public string $nodeList;
 
     /**
      * Boolean flag if job is still running.
      *
      *  @ORM\Column(type="boolean")
-     *  @Groups({"write"})
-     *  @Assert\NotNull
      */
-    public $isRunning;
+    public $isRunning = true;
 
     /**
      * The job script.
      *
      *  @ORM\Column(type="json", nullable=true)
-     *  @Groups({"write"})
+     *  @Groups({"start"})
      */
-    private $metaData;
+    private $metaData = null;
 
     /**
-     * The userId for this job.
+     * The project Id for this job.
      *
-     *  @ORM\Column(type="text", options={"default":"noProject"})
-     *  @Groups({"write"})
+     *  @ORM\Column(type="text")
+     *  @Groups({"start"})
      */
-    private $projectId;
+    private string $projectId= "noProject";
 
     /**
      * The maximum memory capacity used by the job.
@@ -208,7 +219,7 @@ class Job
      * Tags of the job.
      *
      * @ORM\ManyToMany(targetEntity="App\Entity\JobTag", inversedBy="jobs")
-     * @Groups({"read","write"})
+     * @Groups({"read","tag"})
      */
     public $tags;
 
@@ -292,8 +303,22 @@ class Job
         $this->startTime = $startTime;
     }
 
+    public function getStopTime(): int
+    {
+        return $this->stopTime;
+    }
+
+    public function setStopTime($stopTime)
+    {
+        $this->stopTime = $stopTime;
+    }
+
     public function getDuration()
     {
+        if ($this->isRunning() && $this->duration == 0) {
+            $this->duration = time() - $this->startTime;
+        }
+
         return $this->duration;
     }
 

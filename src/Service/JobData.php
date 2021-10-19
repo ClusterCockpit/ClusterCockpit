@@ -61,12 +61,8 @@ class JobData
 
     public function hasData($job)
     {
-        // For actually running jobs, resetting the duration here is fine.
-        // For jobs from the development testing data where 'duration' and 'isRunning'
-        // can both be > 0, this messes things up.
-        if ($job->isRunning && ($job->duration == null || $job->duration == 0)) {
-            $job->duration = time() - $job->startTime;
-        }
+        // This will set $job->duration in case the job is still running.
+        $job->getDuration();
 
         $job->hasProfile = $this->_jobArchive->isArchived($job);
 
@@ -80,6 +76,9 @@ class JobData
 
     public function getData($job, $metrics)
     {
+        // This will set $job->duration in case the job is still running.
+        $job->getDuration();
+
         $key = $job->getClusterId()."-".$job->getJobId()."-".$job->getStartTime()."-".md5(serialize($metrics));
         return $this->_cache->get($key, function (ItemInterface $item) use ($job, $metrics) {
             if ($job->isRunning)

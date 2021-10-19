@@ -77,6 +77,18 @@
             }
         });
     }
+
+    let refreshInterval = null;
+    let refreshIntervalId = null;
+    function refreshIntervalChanged() {
+        if (refreshIntervalId != null)
+            clearInterval(refreshIntervalId);
+
+        if (refreshInterval == null)
+            return;
+
+        refreshIntervalId = setInterval(() => dispatch("reload"), refreshInterval);
+    }
 </script>
 
 <style>
@@ -136,7 +148,7 @@
     {filterPresets}
     on:update />
 
-<div class="d-flex flex-row">
+<div class="d-flex flex-row mb-2">
     <div class="me-2">
         <Button outline color=success on:click={toggleFilterConfig}><Icon name="filter" /></Button>
     </div>
@@ -161,6 +173,18 @@
             {sorting.field}
         </Button>
     </div>
+    <div class="me-2" style="margin-left: auto">
+        <Button outline on:click={() => dispatch("reload")} disabled={refreshInterval != null}>
+            <Icon name="arrow-clockwise" /> Reload
+        </Button>
+    </div>
+    <div class="me-2">
+        <select class="form-select" bind:value={refreshInterval} on:change={refreshIntervalChanged}>
+            <option value={null}>No periodic reload</option>
+            <option value={10 * 1000}>Reload every 10 seconds</option>
+            <option value={30 * 1000}>Reload every 30 seconds</option>
+            <option value={60 * 1000}>Reload every minute</option>
+            <option value={5 * 60 * 1000}>Reload every 5 minutes</option>
+        </select>
+    </div>
 </div>
-
-
