@@ -36,9 +36,9 @@
     <p class="fw-bold">
         {formatDuration(job["duration"])}
         {#if job.state == 'running'}
-            <Badge color="info" style="float: right;">Running</Badge>
+            <Badge color="success">Running</Badge>
         {:else if job.state != 'completed'}
-            <Badge color="danger" style="float: right;">{job.state}</Badge>
+            <Badge color="danger">{job.state}</Badge>
         {/if}
     </p>
     <p>
