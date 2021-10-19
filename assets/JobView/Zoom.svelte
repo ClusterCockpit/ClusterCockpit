@@ -25,7 +25,7 @@
 
         timeoutId = window.requestAnimationFrame(() => {
             updatePlots();
-            timeoutId = null;   
+            timeoutId = null;
         }, 100);
     }
 
@@ -36,6 +36,7 @@
     <InputGroup>
         <InputGroupText>
             <Icon name="zoom-in"/>
+            Zoom plots
         </InputGroupText>
         <InputGroupText>
             Window Size:
