@@ -91,19 +91,19 @@
                 <tbody>
                     <tr>
                         <th scope="row">Total Jobs</th>
-                        <td>{$statsQuery.data.jobsStatistics.totalJobs}</td>
+                        <td>{$statsQuery.data.jobsStatistics[0].totalJobs}</td>
                     </tr>
                     <tr>
                         <th scope="row">Short Jobs</th>
-                        <td>{$statsQuery.data.jobsStatistics.shortJobs}</td>
+                        <td>{$statsQuery.data.jobsStatistics[0].shortJobs}</td>
                     </tr>
                     <tr>
                         <th scope="row">Total Walltime</th>
-                        <td>{$statsQuery.data.jobsStatistics.totalWalltime}</td>
+                        <td>{$statsQuery.data.jobsStatistics[0].totalWalltime}</td>
                     </tr>
                     <tr>
                         <th scope="row">Total Core Hours</th>
-                        <td>{$statsQuery.data.jobsStatistics.totalCoreHours}</td>
+                        <td>{$statsQuery.data.jobsStatistics[0].totalCoreHours}</td>
                     </tr>
                 </tbody>
             </Table>
@@ -112,18 +112,18 @@
             <h5>
                 Walltime Histogram (Hours)
             </h5>
-            {#key $statsQuery.data.jobsStatistics.histWalltime}
+            {#key $statsQuery.data.jobsStatistics[0].histWalltime}
                 <Histogram width={histogramWidth} height={200}
-                    data={$statsQuery.data.jobsStatistics.histWalltime} />
+                    data={$statsQuery.data.jobsStatistics[0].histWalltime} />
             {/key}
         </Col>
         <Col>
             <h5>
                 Number of Nodes
             </h5>
-            {#key $statsQuery.data.jobsStatistics.histNumNodes}
+            {#key $statsQuery.data.jobsStatistics[0].histNumNodes}
                 <Histogram width={histogramWidth} height={200}
-                    data={$statsQuery.data.jobsStatistics.histNumNodes} />
+                    data={$statsQuery.data.jobsStatistics[0].histNumNodes} />
             {/key}
         </Col>
     {/if}

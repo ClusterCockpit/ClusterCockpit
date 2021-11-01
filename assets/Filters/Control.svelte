@@ -9,8 +9,8 @@
     const clustersQuery = getContext('clusters-query');
 
     export let sorting;
-    export let pendingFilters;
-    export let appliedFilters;
+    export let pendingFilters = undefined;
+    export let appliedFilters = undefined;
     export let filterPresets = null;
     export let limitedToUser = false;
     export let selectedMetrics = clusterCockpitConfig['plot_list_selectedMetrics'];

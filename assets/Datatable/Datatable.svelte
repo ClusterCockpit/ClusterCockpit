@@ -184,8 +184,7 @@
                             </td>
                             {#if row["hasProfile"]}
                                 <RowOfPlots
-                                    jobId={row["jobId"]}
-                                    clusterId={row["clusterId"]}
+                                    job={row}
                                     width={plotWidth}
                                     height={rowHeight}
                                     selectedMetrics={selectedMetrics} />

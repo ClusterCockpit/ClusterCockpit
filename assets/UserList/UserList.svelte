@@ -38,10 +38,10 @@
     }
 
     function sortUsers(users, sorting, hideUsersWithNoJobs, usernameFilter) {
-        let cmp = sorting.field == 'userId'
+        let cmp = sorting.field == 'id'
             ? (sorting.direction == 'up'
-                ? (a, b) => a.userId < b.userId
-                : (a, b) => a.userId > b.userId)
+                ? (a, b) => a.id < b.id
+                : (a, b) => a.id > b.id)
             : (sorting.direction == 'up'
                 ? (a, b) => a[sorting.field] - b[sorting.field]
                 : (a, b) => b[sorting.field] - a[sorting.field]);
@@ -50,23 +50,21 @@
             users = users.filter(u => u.totalJobs > 0);
 
         if (usernameFilter)
-            users = users.filter(u => u.userId.includes(usernameFilter));
+            users = users.filter(u => u.id.includes(usernameFilter));
 
         return users.sort(cmp);
     }
 
     const usersQuery = operationStore(`
-    query($startTime: Time, $stopTime: Time, $clusterId: String) {
-        userStats(startTime: $startTime, stopTime: $stopTime, clusterId: $clusterId) {
-            userId
+    query($filter: [JobFilter!]!) {
+        jobsStatistics(filter: $filter, groupBy: USER) {
+            id
             totalJobs
             totalWalltime
             totalCoreHours
         }
     }
-    `, { startTime, stopTime, clusterId });
-
-    $: $usersQuery.variables = { ...$usersQuery.variables, clusterId };
+    `, { filter: [] });
 
     let clusters = [];
     let errorMessage = null;
@@ -85,21 +83,29 @@
             clusters = res.data.clusters.map(c => c.clusterID);
         });
 
+    function updateFilters() {
+        let filters = [];
+        if (clusterId != null)
+            filters.push({ clusterId: { eq: clusterId } });
+        if (startTime != null)
+            filters.push({ startTime: { from: startTime.toISOString(), to: null } });
+        if (stopTime != null)
+            filters.push({ startTime: { from: null, to: stopTime.toISOString() } });
+
+        $usersQuery.variables = { filter: filters };
+    }
 
     function dateSelected() {
         startTime = new Date(rawStartTime || 0);
         stopTime = new Date(rawStopTime || Date.now());
-
-        const padNum = (n, len = 2) => n.toString().padStart(len, '0');
-        startTime = `${startTime.getFullYear()}-${padNum(startTime.getMonth() + 1)}-01T00:00:00+00:00`;
-        stopTime = `${stopTime.getFullYear()}-${padNum(stopTime.getMonth() + 1)}-${padNum(stopTime.getDate() + 1)}T23:59:59+00:00`;
-
-        $usersQuery.variables.startTime = startTime;
-        $usersQuery.variables.stopTime = stopTime;
-        $usersQuery.reexecute();
+        updateFilters();    
     }
 
     $: dateSelected(rawStartTime, rawStopTime);
+
+    const getUserUrl = typeof USERVIEW_URL !== 'undefined'
+        ? USERVIEW_URL
+        : userId => `/monitoring/user/${userId}`;
 
     query(usersQuery);
 </script>
@@ -136,7 +142,7 @@
             <InputGroupText>
                 Cluster
             </InputGroupText>
-            <select class="form-select" bind:value={clusterId}>
+            <select class="form-select" bind:value={clusterId} on:change={updateFilters}>
                 <option value={null}>Any</option>
                 {#each clusters as cluster}
                     <option value={cluster}>{cluster}</option>
@@ -161,8 +167,8 @@
         <tr>
             <th scope="col">
                 Username
-                <Button color="{sorting.field == 'userId' ? 'primary' : 'light'}"
-                    size="sm" on:click={e => changeSorting(e, 'userId')}>
+                <Button color="{sorting.field == 'id' ? 'primary' : 'light'}"
+                    size="sm" on:click={e => changeSorting(e, 'id')}>
                     <Icon name="sort-numeric-down" />
                 </Button>
             </th>
@@ -203,11 +209,11 @@
                 </td>
             </tr>
         {:else}
-            {#each sortUsers($usersQuery.data.userStats, sorting, hideUsersWithNoJobs, usernameFilter) as user (user.userId)}
+            {#each sortUsers($usersQuery.data.jobsStatistics, sorting, hideUsersWithNoJobs, usernameFilter) as user (user.id)}
                 <tr>
                     <td>
-                        <a href="/monitoring/user/{user.userId}" target="_blank">
-                            {user.userId}
+                        <a href="{getUserUrl(user.id)}" target="_blank">
+                            {user.id}
                         </a>
                     </td>
                     <td>{user.totalJobs}</td>

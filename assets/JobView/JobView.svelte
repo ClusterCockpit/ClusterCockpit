@@ -61,7 +61,7 @@
                 }
             }
 
-            jobById(id: "${jobInfos.id}") {
+            job(id: "${jobInfos.id}") {
                 id
                 jobId
                 userId
@@ -75,7 +75,7 @@
                 tags { id, tagType, tagName }
             }
 
-            jobMetrics(jobId: "${jobInfos.jobId}", clusterId: "${jobInfos.clusterId}") {
+            jobMetrics(id: "${jobInfos.id}") {
                 name,
                 metric {
                     unit, scope, timestep,
@@ -99,7 +99,7 @@
             }
 
             allTags = res.data.tags;
-            job = res.data.jobById;
+            job = res.data.job;
             cluster = res.data.clusters
                 .filter(c => c.clusterID === clusterId)[0];
 
