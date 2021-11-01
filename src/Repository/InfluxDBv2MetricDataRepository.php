@@ -47,7 +47,6 @@ class InfluxDBv2MetricDataRepository implements MetricDataRepository
         $influxdbToken = getenv('INFLUXDB_TOKEN');
         $influxdbBucket = getenv('INFLUXDB_BUCKET');
         $influxdbOrg = getenv('INFLUXDB_ORG');
-        $this->_logger->info("Scheme: $influxdbURL");
         $this->_client  = new InfluxDB2\Client([
             "url" => $influxdbURL,
             "token" => $influxdbToken,

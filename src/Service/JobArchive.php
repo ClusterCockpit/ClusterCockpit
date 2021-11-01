@@ -85,7 +85,7 @@ class JobArchive {
         $this->_filesystem->mkdir($destdir);
 
         $jsonMeta = [
-            'job_id' => $job->getJobId(),
+            'job_id' => strval($job->getJobId()),
             'user_id' => $job->getUserId(),
             'project_id' => $job->getProjectId(),
             'cluster_id' => $job->getClusterId(),
