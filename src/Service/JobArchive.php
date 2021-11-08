@@ -47,6 +47,17 @@ class JobArchive {
     public function getJobDirectory($job)
     {
         $jobId = intval(explode('.', $job->getJobId())[0]);
+        $jobStart = intval($job->getStartTime());
+        $lvl1 = intdiv($jobId, 1000);
+        $lvl2 = $jobId % 1000;
+        $path = sprintf('%s/%s/%d/%03d/%d',
+            $this->_rootdir, $job->getClusterId(), $lvl1, $lvl2, $jobStart);
+        return $path;
+    }
+
+    public function getLegacyJobDirectory($job)
+    {
+        $jobId = intval(explode('.', $job->getJobId())[0]);
         $lvl1 = intdiv($jobId, 1000);
         $lvl2 = $jobId % 1000;
         $path = sprintf('%s/%s/%d/%03d/',
@@ -59,10 +70,21 @@ class JobArchive {
         return file_exists($this->getJobDirectory($job).'/data.json');
     }
 
+    public function isLegacyArchived($job)
+    {
+        return file_exists($this->getLegacyJobDirectory($job).'/data.json');
+    }
+
     public function getData($job)
     {
         $path = $this->getJobDirectory($job).'/data.json';
         $data = file_get_contents($path);
+
+        if (!$data) {
+            $legacyPath = $this->getLegacyJobDirectory($job).'/data.json';
+            $data = file_get_contents($legacyPath);
+        }
+
         return json_decode($data, true);
     }
 
@@ -70,6 +92,12 @@ class JobArchive {
     {
         $path = $this->getJobDirectory($job).'/meta.json';
         $data = file_get_contents($path);
+
+        if (!$data) {
+            $legacyPath = $this->getLegacyJobDirectory($job).'/meta.json';
+            $data = file_get_contents($legacyPath);
+        }
+
         return json_decode($data, true);
     }
 

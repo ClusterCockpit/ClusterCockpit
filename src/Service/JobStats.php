@@ -84,7 +84,7 @@ class JobStats
             $res[$idx] = [ 'name' => $metric, 'footprints' => [] ];
 
         foreach ($jobs as $job) {
-            if ($this->_jobArchive->isArchived($job)) {
+            if ($this->_jobArchive->isArchived($job) || $this->_jobArchive->isLegacyArchived($job)) {
                 $stats = $this->_jobArchive->getMeta($job)['statistics'];
                 foreach ($metrics as $idx => $metric) {
                     if (isset($stats[$metric]))
