@@ -78,9 +78,9 @@ class JobArchive {
     public function getData($job)
     {
         $path = $this->getJobDirectory($job).'/data.json';
-        $data = file_get_contents($path);
+        $data = @file_get_contents($path);
 
-        if (!$data) {
+        if ($data === false) {
             $legacyPath = $this->getLegacyJobDirectory($job).'/data.json';
             $data = file_get_contents($legacyPath);
         }
@@ -91,9 +91,9 @@ class JobArchive {
     public function getMeta($job)
     {
         $path = $this->getJobDirectory($job).'/meta.json';
-        $data = file_get_contents($path);
+        $data = @file_get_contents($path);
 
-        if (!$data) {
+        if ($data === false) {
             $legacyPath = $this->getLegacyJobDirectory($job).'/meta.json';
             $data = file_get_contents($legacyPath);
         }
