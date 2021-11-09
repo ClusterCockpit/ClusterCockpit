@@ -34,6 +34,9 @@ use App\Entity\BatchJob;
 use App\Service\JobArchive;
 use App\Service\JobData;
 
+/*
+ * Deprecated? Can be removed?
+ */
 final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
 {
     private $_em;

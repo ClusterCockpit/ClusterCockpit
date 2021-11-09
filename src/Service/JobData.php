@@ -92,23 +92,20 @@ class JobData
 
     private function _getData($job, $metrics)
     {
-        if (! $this->hasData($job) ) {
-            return false;
-        }
-
         if ($metrics == null) {
             $cluster = $this->_clusterCfg->getClusterConfiguration($job->getClusterId());
             $metrics = array_keys($cluster['metricConfig']);
         }
 
-        if ($job->isRunning()) {
+        if (!$this->_jobArchive->isArchived($job)) {
             $metricConfig = $this->_clusterCfg->getMetricConfiguration($job->getClusterId(), $metrics);
 
-            $stats = $this->_metricDataRepository->getJobStats($job, $metricConfig);
             $data = $this->_metricDataRepository->getMetricData($job, $metricConfig);
+            if ($data === false)
+                return false;
 
+            $stats = $this->_metricDataRepository->getJobStats($job, $metricConfig);
             $res = [];
-
             foreach ( $metricConfig as $metricName => $metric) {
                 if (!isset($data[$metricName]))
                     continue;
