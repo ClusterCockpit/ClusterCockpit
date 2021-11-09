@@ -102,7 +102,7 @@ class JobData
             $metrics = array_keys($cluster['metricConfig']);
         }
 
-        if (!$this->_jobArchive->isArchived($job)) {
+        if (!$this->_jobArchive->isArchived($job) && !$this->_jobArchive->isLegacyArchived($job)) {
             $metricConfig = $this->_clusterCfg->getMetricConfiguration($job->getClusterId(), $metrics);
 
             $data = $this->_metricDataRepository->getMetricData($job, $metricConfig);
