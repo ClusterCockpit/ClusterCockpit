@@ -66,6 +66,11 @@ class JobData
 
         $job->hasProfile = $this->_jobArchive->isArchived($job);
 
+        // Backwards compatibility
+        if (!$job->hasProfile){
+            $job->hasProfile = $this->_jobArchive->isLegacyArchived($job);
+        }
+
         if (!$job->hasProfile){
             $this->_metricDataRepository->hasProfile($job,
                 $this->_clusterCfg->getSingleMetric($job->getClusterId()));
