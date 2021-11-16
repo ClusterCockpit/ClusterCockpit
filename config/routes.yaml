@@ -18,7 +18,10 @@ list_jobs:
     controller:  App\Controller\JobViewController::list
 systems:
     path: /monitoring/systems/
-    controller:  App\Controller\JobViewController::systems
+    controller:  App\Controller\SystemViewController::systems
+node:
+    path: /monitoring/node/{cluster}/{node}
+    controller:  App\Controller\SystemViewController::node
 analysis:
     path: /monitoring/analysis/
     controller:  App\Controller\JobViewController::analysis

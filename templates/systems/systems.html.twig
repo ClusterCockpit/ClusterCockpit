@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    <link rel='stylesheet' href='/css/uPlot.min.css'>
+    {{ parent() }}
+    {{ encore_entry_link_tags('systemview') }}
+{% endblock %}
+
+{% block title %}
+    User Overview
+{% endblock %}
+
+{% block javascript %}
+    <script type="text/javascript">
+        const clusterCockpitConfigPromise = Promise.resolve({
+            jwt: "{{ jwt }}",
+            plot_general_colorscheme: {{ colormap | json_encode | raw }},
+            plot_general_lineWidth: {{ config.plot_general_lineWidth.value }},
+            plot_general_colorBackground: {{ config.plot_general_colorBackground.value }},
+        });
+    </script>
+    {{ encore_entry_script_tags('systemview') }}
+{% endblock %}
+
+
+{% block body %}
+    <div id="svelte-app"></div>
+{% endblock %}

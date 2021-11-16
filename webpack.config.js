@@ -30,6 +30,8 @@ Encore
     .addEntry('userlist', './assets/UserList/entrypoint.js')
     .addEntry('userview', './assets/UserView/entrypoint.js')
     .addEntry('analysisview', './assets/AnalysisView/entrypoint.js')
+    .addEntry('systemview', './assets/SystemView/entrypoint.js')
+    .addEntry('nodeview', './assets/NodeView/entrypoint.js')
 
     // When enabled, Webpack "splits" your files into smaller pieces for greater optimization.
     // .splitEntryChunks()
