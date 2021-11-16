@@ -7,11 +7,15 @@
 {% endblock %}
 
 {% block title %}
-    User Overview
+    Cluster {{ clusterId }}
 {% endblock %}
 
 {% block javascript %}
     <script type="text/javascript">
+        const clusterInfos = {
+            clusterId: "{{ clusterId }}"
+        };
+
         const clusterCockpitConfigPromise = Promise.resolve({
             jwt: "{{ jwt }}",
             plot_general_colorscheme: {{ colormap | json_encode | raw }},

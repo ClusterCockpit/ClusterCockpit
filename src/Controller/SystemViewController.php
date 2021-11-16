@@ -33,8 +33,9 @@ use App\Service\ColorMap;
 
 class SystemViewController extends AbstractController
 {
-    public function systems(
+    public function system(
         Request $request,
+        string $clusterId,
         Configuration $configuration,
         ColorMap $colorMaps,
         $projectDir
@@ -48,7 +49,8 @@ class SystemViewController extends AbstractController
             array(
                 'jwt' => $request->getSession()->get('jwt'),
                 'config' => $config,
-                'colormap' => $colorMaps->getColorMap()
+                'colormap' => $colorMaps->getColorMap(),
+                'clusterId' => $clusterId
             ));
     }
 
