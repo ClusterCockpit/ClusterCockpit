@@ -275,6 +275,18 @@ class RootResolverMap extends ResolverMap
                     } catch (\Throwable $e) {
                         throw new Error($e->getMessage());
                     }
+                },
+
+                'nodeMetrics' => function($value, Argument $args) {
+                    $clusterId = $args['cluster'];
+                    $nodes = $args['nodes'];
+                    $metrics = $args['metrics'];
+                    $from = $args['from'];
+                    $to = $args['to'];
+
+                    // TODO: FIXME: How to test this?
+                    // TODO: FIXME: Replace by actual implementation...
+                    return $this->mockingData($metrics);
                 }
             ],
 
@@ -368,5 +380,52 @@ class RootResolverMap extends ResolverMap
                 self::PARSE_LITERAL => function ($valueNode) { return strtotime($valueNode->value); }
             ]
         ];
+    }
+
+    // TODO: FIXME:
+    private function mockingData($metrics) {
+        $data = [
+            [
+                "id" => "host-1",
+                "metrics" => [
+                    ["name" => "cpu_load",  "data" => [ 2.5,  5., 10., 20., 40., 40. ]],
+                    ["name" => "flops_any", "data" => [ 100, 200, 300, 400, 500, 600 ]],
+                    ["name" => "mem_used",  "data" => [ 6, 5, 4, 3, 2, 1 ]],
+                    ["name" => "mem_bw",    "data" => [ 21, 22, 23, 34, 25, 26 ]],
+                ]
+            ],
+            [
+                "id" => "host-2",
+                "metrics" => [
+                    ["name" => "cpu_load",  "data" => [ 20, 20, 20, 20, 20, 20 ]],
+                    ["name" => "flops_any", "data" => [ 100, 200, 300, 200, 100, 0 ]],
+                    ["name" => "mem_used",  "data" => [ 1, 2, 3, 4, 5, 6 ]],
+                    ["name" => "mem_bw",    "data" => [ 21, 22, 23, 34, 25, 26 ]],
+                ]
+            ],
+            [
+                "id" => "host-3",
+                "metrics" => [
+                    ["name" => "cpu_load",  "data" => [ 20, 20, 20, 20, 20, 20 ]],
+                    ["name" => "flops_any", "data" => [ 100, 200, 300, 200, 100, 0 ]],
+                    ["name" => "mem_used",  "data" => [ 5, 4, 5, 4, 5, 4 ]],
+                    ["name" => "mem_bw",    "data" => [ 21, 22, 23, 34, 25, 26 ]],
+                ]
+            ],
+        ];
+
+        if ($metrics != null) {
+            foreach ($data as $key => &$value) {
+                $metricdata = [];
+                foreach ($value["metrics"] as $metric) {
+                    if (in_array($metric["name"], $metrics))
+                        $metricdata[] = $metric;
+                }
+
+                $value["metrics"] = $metricdata;
+            }
+        }
+
+        return $data;
     }
 }

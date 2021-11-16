@@ -94,7 +94,7 @@ class CCMetricStoreDataRepository implements MetricDataRepository
             $this->host.'/api/'.($job->getStartTime()).'/'.($job->getStartTime() + $job->getDuration()).'/stats',
             [
                 'headers' => [ 'Authorization' => 'Bearer '.($this->jwt) ],
-                'json' => $request   
+                'json' => $request
             ]);
 
         if ($res->getStatusCode() != 200)
@@ -151,7 +151,7 @@ class CCMetricStoreDataRepository implements MetricDataRepository
             $this->host.'/api/'.($job->getStartTime()).'/'.($job->getStartTime() + $job->getDuration()).'/timeseries',
             [
                 'headers' => [ 'Authorization' => 'Bearer '.($this->jwt) ],
-                'json' => $request   
+                'json' => $request
             ]);
         
         if ($res->getStatusCode() != 200)
@@ -175,6 +175,41 @@ class CCMetricStoreDataRepository implements MetricDataRepository
 
     public function getNodeMetrics($cluster, $nodes, $metrics, $from, $to)
     {
-        throw new \Exception("TODO");
+        if ($nodes !== null)
+            throw new \Exception("TODO");
+
+        $res = $this->httpClient->request(
+            'POST',
+            $this->host.'/api/'.$cluster["clusterID"].'/'.($job->getStartTime()).'/'.($job->getStartTime() + $job->getDuration()).'/all-nodes',
+            [
+                'headers' => [ 'Authorization' => 'Bearer '.($this->jwt) ],
+                'json' => [ 'metrics' => array_map(function ($m) { return $m["name"]; }, $metrics) ]
+            ]);
+
+        if ($res->getStatusCode() != 200)
+            throw new \Exception("CCMetricStoreDataRepository: HTTP response status code: ".($res->getStatusCode()));
+
+        $res = $res->toArray();
+        $nodes = [];
+        foreach ($res as $host => $metrics) {
+            $nodedata = [
+                'id' => $host,
+                'metrics' => []
+            ];
+
+            foreach ($metrics as $name => $data) {
+                if (isset($data["error"]))
+                    throw new \Exception($data["error"]);
+
+                $nodedata['metrics'][] = [
+                    'name' => $name,
+                    'data' => $data["data"]
+                ];
+            }
+
+            $nodes[] = $nodedata;
+        }
+
+        return $nodes;
     }
 }

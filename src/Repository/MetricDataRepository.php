@@ -50,8 +50,8 @@ interface MetricDataRepository
      *
      * Arguments:
      *   $cluster: parsed cluster.json content
-     *   $nodes: list of hostnames
-     *   $metrics: list of metric names (if null, return data for all available metrics)
+     *   $nodes: list of hostnames (if null, return data for all available metrics)
+     *   $metrics: list of metric names
      *   $from and $to: unix timestamps in seconds
      */
     public function getNodeMetrics($cluster, $nodes, $metrics, $from, $to);
