@@ -24,16 +24,30 @@
 
     function getTotalAvg(data) {
         let avg = 0;
-        for (let series of data.series)
-            avg += series.statistics.avg;
+        for (let series of data.series) {
+            if (series.statistics) {
+                avg += series.statistics.avg;
+            } else {
+                let tmp = 0;
+                for (let x of series.data)
+                    tmp += x;
+
+                avg += (tmp / series.data.length);
+            }
+        }
 
         return avg / data.series.length;
     }
 
     function getTotalMax(data) {
         let max = Number.NEGATIVE_INFINITY;
-        for (let series of data.series)
-            max = Math.max(max, series.statistics.max);
+        for (let series of data.series) {
+            if (series.statistics)
+                max = Math.max(max, series.statistics.max);
+            else
+                for (let x of series.data)
+                    max = Math.max(max, x);
+        }
 
         return max;
     }

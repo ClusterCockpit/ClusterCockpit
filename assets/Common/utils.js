@@ -44,9 +44,10 @@ export const clustersQuery = readable({ fetching: true }, (set) => {
             flopRateScalar,
             flopRateSimd,
             memoryBandwidth,
-           metricConfig {
+            metricConfig {
                 name, unit, peak,
-                normal, caution, alert
+                normal, caution, alert,
+                sampletime
             }
             filterRanges {
                 duration { from, to }
