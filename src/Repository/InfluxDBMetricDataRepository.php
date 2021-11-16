@@ -174,4 +174,9 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
 
         return $data;
     }
+
+    public function getNodeMetrics($cluster, $nodes, $metrics, $from, $to)
+    {
+        throw new \Exception("unimplemented");
+    }
 }

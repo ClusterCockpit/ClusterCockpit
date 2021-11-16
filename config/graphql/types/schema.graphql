@@ -90,6 +90,16 @@ type MetricFootprints {
 
 enum Aggregate { USER, PROJECT, CLUSTER }
 
+type NodeMetric {
+  name: String!
+  data: [Float]!
+}
+
+type NodeMetrics {
+  id:      String!
+  metrics: [NodeMetric!]!
+}
+
 type Query {
   clusters: [Cluster!]!
   tags: [JobTag!]!
@@ -102,6 +112,11 @@ type Query {
   jobsFootprints(filter: [JobFilter!]!, metrics: [String]!): [MetricFootprints]!
 
   rooflineHeatmap(filter: [JobFilter!]!, rows: Int!, cols: Int!, minX: Float!, minY: Float!, maxX: Float!, maxY: Float!): [[Float!]]!
+
+  # Return NodeMetrics with data from `from` to `to`.
+  # If nodes is null, return data for all nodes.
+  # If metrics is null, return data for all metrics.
+  nodeMetrics(cluster: ID!, nodes: [String!], metrics: [String!], from: Time!, to: Time!): [NodeMetrics!]!
 }
 
 type Mutation {

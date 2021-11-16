@@ -30,4 +30,29 @@ interface MetricDataRepository
     public function hasProfile($job, $metric);
     public function getJobStats($job, $metrics);
     public function getMetricData($job, $metrics);
+
+    /*
+     * Provide per-node data for a given time-range.
+     * The returned array looks like the following:
+     *
+     * [
+     *   {
+     *     "id": "host1",
+     *     "metrics:" [
+     *       { "name": "flops_any", "data": [1.0, 2.0, 3.0, ...] },
+     *       ...
+     *     ]
+     *   },
+     *   { "id": "host2", ... },
+     *   ...
+     * ]
+     *
+     *
+     * Arguments:
+     *   $cluster: parsed cluster.json content
+     *   $nodes: list of hostnames
+     *   $metrics: list of metric names (if null, return data for all available metrics)
+     *   $from and $to: unix timestamps in seconds
+     */
+    public function getNodeMetrics($cluster, $nodes, $metrics, $from, $to);
 }

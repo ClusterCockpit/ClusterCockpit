@@ -172,4 +172,9 @@ class CCMetricStoreDataRepository implements MetricDataRepository
         }
         return $data;
     }
+
+    public function getNodeMetrics($cluster, $nodes, $metrics, $from, $to)
+    {
+        throw new \Exception("TODO");
+    }
 }
