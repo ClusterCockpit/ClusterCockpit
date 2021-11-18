@@ -100,7 +100,7 @@
 
                 if (m <= 0 || f == null || m == null)
                     continue;
-                
+
                 let x = Math.log10(f / m), y = Math.log10(f);
                 if (x < lminX || x > lmaxX || y < lminY || y > lmaxY)
                     continue;
@@ -113,6 +113,10 @@
 
         return tiles;
     }
+
+    const getNodeUrl = typeof NODEVIEW_URL !== 'undefined'
+        ? NODEVIEW_URL
+        : (clusterId, nodeId) => `/monitoring/node/${clusterId}/${nodeId}`;
 
 </script>
 
@@ -218,7 +222,7 @@
                         {#each row as node}
                         <td>
                             {#if node && node.data}
-                                <span class="plot-title">{node.id}</span>
+                                <span class="plot-title"><a href={getNodeUrl(clusterId, node.id)}>{node.id}</a></span>
                                 <Resizable let:width>
                                     {#key node}
                                     <TimeseriesPlot
@@ -243,7 +247,7 @@
     </Col>
 </Row>
 
-<Row>
+<!-- <Row>
     <Col>
         {#if $rooflineQuery.fetching}
             <Spinner secondary/>
@@ -292,4 +296,4 @@
         </table>
         {/if}
     </Col>
-</Row>
+</Row> -->

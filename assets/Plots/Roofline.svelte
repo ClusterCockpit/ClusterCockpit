@@ -67,7 +67,7 @@
             return 2;
     }
 
-    function render(ctx, data, cluster, width, height) {
+    function render(ctx, data, cluster, width, height, colorDots) {
         if (width <= 0)
             return;
 
@@ -213,7 +213,7 @@
         }
         ctx.stroke();
 
-        if (data.x && data.y) {
+        if (colorDots && data.x && data.y) {
             // The Color Scale
             ctx.fillStyle = 'black';
             ctx.fillText('Time:', 17, height - 5);
@@ -228,7 +228,7 @@
         }
     }
 
-    function transformData(flopsAny, memBw) {
+    function transformData(flopsAny, memBw, colorDots) {
         const nodes = flopsAny.series.length;
         const timesteps = flopsAny.series[0].data.length;
 
@@ -245,7 +245,7 @@
 
                 x.push(intensity);
                 y.push(f);
-                c.push(j / timesteps);
+                c.push(colorDots ? j / timesteps : 0);
             }
         }
 
@@ -266,14 +266,14 @@
     export let width;
     export let height;
     export let tiles = null;
+    export let colorDots = true;
 
     console.assert(tiles || (flopsAny && memBw), "you must provide flopsAny and memBw or tiles!");
 
     let ctx;
     let canvasElement;
-    let mounted = false;
     const data = flopsAny && memBw
-        ? transformData(flopsAny, memBw)
+        ? transformData(flopsAny, memBw, colorDots)
         : {
             tiles: tiles,
             xLabel: 'Intensity [FLOPS/byte]',
@@ -284,9 +284,7 @@
         canvasElement.width = width;
         canvasElement.height = height;
         ctx = canvasElement.getContext('2d');
-        mounted = true;
-
-        render(ctx, data, cluster, width, height);
+        render(ctx, data, cluster, width, height, colorDots);
     });
 
     let timeoutId = null;
