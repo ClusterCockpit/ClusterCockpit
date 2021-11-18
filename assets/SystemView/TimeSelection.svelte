@@ -1,9 +1,11 @@
 <script>
     import { Icon, Input, InputGroup, InputGroupText } from 'sveltestrap';
+    import { createEventDispatcher } from "svelte";
 
     export let from;
     export let to;
 
+    const dispatch = createEventDispatcher();
     let timeRange = (to.getTime() - from.getTime()) / 1000;
 
     function updateTimeRange(event) {
@@ -20,12 +22,16 @@
         let now = Date.now(), t = timeRange * 1000;
         from = new Date(now - t);
         to = new Date(now);
+        dispatch('change', { from, to });
     }
 
     function updateExplicitTimeRange(type, event) {
         let d = new Date(Date.parse(event.target.value));
         if (type == 'from') from = d;
         else                to = d;
+
+        if (from != null && to != null)
+            dispatch('change', { from, to });
     }
 </script>
 

@@ -286,7 +286,7 @@ class RootResolverMap extends ResolverMap
 
                     // TODO: FIXME: How to test this?
                     // TODO: FIXME: Replace by actual implementation...
-                    return $this->mockingData($metrics);
+                    return $this->mockingData($nodes, $metrics);
                 }
             ],
 
@@ -383,7 +383,7 @@ class RootResolverMap extends ResolverMap
     }
 
     // TODO: FIXME:
-    private function mockingData($metrics) {
+    private function mockingData($nodes, $metrics) {
         $data = [
             [
                 "id" => "host-1",
@@ -424,6 +424,12 @@ class RootResolverMap extends ResolverMap
 
                 $value["metrics"] = $metricdata;
             }
+        }
+
+        if ($nodes != null) {
+            return array_filter($data, function($node) use ($nodes) {
+                return in_array($node["id"], $nodes);
+            });
         }
 
         return $data;

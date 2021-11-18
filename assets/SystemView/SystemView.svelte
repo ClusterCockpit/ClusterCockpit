@@ -150,7 +150,7 @@
     {:else if $clustersQuery.error}
         <Col>
             <Card body color="danger" class="mb-3">
-                <h2>Error: {$nodesQuery.error.message}</h2>
+                <h2>Error: {$clustersQuery.error.message}</h2>
             </Card>
         </Col>
     {:else}
