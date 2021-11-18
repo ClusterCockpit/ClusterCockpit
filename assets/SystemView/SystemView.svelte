@@ -24,6 +24,11 @@
     let plotsPerRow = 2;
     let from = new Date(Date.now() - selectedTimeRange * 1000);
     let to = new Date(Date.now());
+    let cluster = null;
+
+    $: cluster = $clustersQuery.clusters && clusterId
+        ? $clustersQuery.clusters.find(c => c.clusterID == clusterId)
+        : null;
 
     const nodesQuery = operationStore(`
         query($cluster: ID!, $metrics: [String!], $from: Time!, $to: Time!) {
@@ -81,14 +86,13 @@
         for (let i = 0; i < rows; i++)
             tiles.push(new Array(cols).fill(0));
 
-        const [minX, maxX, minY, maxY] = [0.01, 1000, 1.,
-            $clustersQuery.clusters.find(c => c.clusterID == clusterId).flopRateSimd];
+        const [minX, maxX, minY, maxY] = [0.01, 1000, 1., cluster.flopRateSimd];
         const [lminX, lmaxX, lminY, lmaxY] = [minX, maxX, minY, maxY].map(Math.log10);
 
         for (let node of $rooflineQuery.data.nodeMetrics) {
             let flops = node.metrics.find(m => m.name == 'flops_any');
             let membw = node.metrics.find(m => m.name == 'mem_bw');
-            if (flops == null || membw == null || flops.data.length != membw.data.length)
+            if (!flops || !membw || flops.data.length != membw.data.length)
                 throw new Error("TODO: Error handling...");
 
             for (let i = 0; i < flops.data.length; i++) {
@@ -123,6 +127,24 @@
         padding-bottom: 5px;
     }
 </style>
+
+<Row>
+    <Col>
+        {#if $rooflineQuery.fetching}
+            <Spinner secondary/>
+        {:else if $rooflineQuery.error}
+            <Card body color="danger" class="mb-3">
+                <h2>Error: {$rooflineQuery.error.message}</h2>
+            </Card>
+        {:else if !$clustersQuery.fetching}
+            <Resizable let:width>
+                <RooflinePlot width={width} height={300}
+                    cluster={cluster}
+                    tiles={rooflineTiles($rooflineQuery)} />
+            </Resizable>
+        {/if}
+    </Col>
+</Row>
 
 <Row>
     {#if $clustersQuery.fetching}
@@ -197,24 +219,6 @@
 
 <Row>
     <Col>
-        {#if $rooflineQuery.fetching}
-            <Spinner secondary/>
-        {:else if $rooflineQuery.error}
-            <Card body color="danger" class="mb-3">
-                <h2>Error: {$rooflineQuery.error.message}</h2>
-            </Card>
-        {:else if !$clustersQuery.fetching}
-            <Resizable let:width>
-                <RooflinePlot width={width}
-                    height={300} cluster={$clustersQuery.clusters.find(c => c.clusterID == clusterId)}
-                    tiles={rooflineTiles($rooflineQuery)} />
-            </Resizable>
-        {/if}
-    </Col>
-</Row>
-
-<Row>
-    <Col>
         {#if $nodesQuery.fetching}
             <Spinner secondary/>
         {:else if $nodesQuery.error}
@@ -265,6 +269,57 @@
                     {/each}
                 </table>
             </Col></Row>
+        {/if}
+    </Col>
+</Row>
+
+<Row>
+    <Col>
+        {#if $rooflineQuery.fetching}
+            <Spinner secondary/>
+        {:else if $rooflineQuery.error}
+            <Card body color="danger" class="mb-3">
+                <h2>Error: {$rooflineQuery.error.message}</h2>
+            </Card>
+        {:else if !$clustersQuery.fetching}
+        <table style="width: 100%; table-layout: fixed;">
+            {#each tilePlots(plotsPerRow, $rooflineQuery.data.nodeMetrics.map((node) => {
+                let flops = node.metrics.find(m => m.name == 'flops_any');
+                let membw = node.metrics.find(m => m.name == 'mem_bw');
+                if (!flops || !membw)
+                    return { id: node.id, data: null };
+
+                return {
+                    id: node.id,
+                    data: {
+                        flopsAny: { series: [{ data: flops.data }] },
+                        memBw: { series: [{ data: membw.data }] }
+                    }
+                };
+            })) as row}
+            <tr>
+                {#each row as node}
+                <td>
+                    {#if node && node.data}
+                        <span class="plot-title">{node.id}</span>
+                        <Resizable let:width>
+                            {#key node}
+                            <RooflinePlot
+                                width={width} height={300}
+                                cluster={cluster}
+                                flopsAny={node.data.flopsAny}
+                                memBw={node.data.memBw} />
+                            {/key}
+                        </Resizable>
+                    {:else if node}
+                        <span class="plot-title">{node.id}</span>
+                        <Card body color="warning">No Data</Card>
+                    {/if}
+                </td>
+                {/each}
+            </tr>
+            {/each}
+        </table>
         {/if}
     </Col>
 </Row>
