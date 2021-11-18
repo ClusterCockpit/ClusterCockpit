@@ -6,7 +6,8 @@
 
     import { clustersQuery, tilePlots } from '../Common/utils.js';
     import { operationStore, query } from '@urql/svelte';
-    import { Row, Col, Card, Spinner } from 'sveltestrap';
+    import { Row, Col, Card, Spinner, Icon,
+             Input, InputGroup, InputGroupText } from 'sveltestrap';
     import Resizable from '../Common/Resizable.svelte';
     import TimeseriesPlot from '../Plots/Timeseries.svelte';
 
@@ -17,9 +18,10 @@
     setContext('metric-config', metricConfig);
     setContext('clusters-query', clustersQuery);
 
+    let selectedTimeRange = 30 * 60;
+    let selectedMetric = "flops_any";
     let plotsPerRow = 2;
-    let metrics = ["cpu_load"];
-    let from = new Date(Date.now() - 1 * 60 * 1000);
+    let from = new Date(Date.now() - selectedTimeRange * 1000);
     let to = new Date(Date.now());
 
     const nodesQuery = operationStore(`
@@ -31,24 +33,32 @@
         }
     `, {
         cluster: clusterId,
-        metrics: metrics,
+        metrics: [selectedMetric],
         from: from.toISOString(),
         to: to.toISOString()
     });
 
+    function updateFilters() {
+        if (from == null || to == null)
+            return;
+
+        $nodesQuery.variables = {
+            cluster: clusterId, metrics: [selectedMetric],
+            from: from.toISOString(), to: to.toISOString()
+        };
+        console.log('query:', ...Object.entries($nodesQuery.variables).flat());
+    }
+
+    function updateExplicitRimeRange(type, event) {
+        let d = new Date(Date.parse(event.target.value));
+        if (type == 'from') from = d;
+        else                to = d;
+    }
+
     query(nodesQuery);
-    $: $nodesQuery.variables = {
-        cluster: clusterId, metrics: metrics,
-        from: from.toISOString(),
-        to: to.toISOString()
-    };
+    $: updateFilters(clusterId, selectedMetric, from, to);
 
-    $: console.log($clustersQuery);
 </script>
-
-<!-- <h1>
-    TODO (cluster: {clusterId})
-</h1> -->
 
 <style>
     .plot-title {
@@ -61,6 +71,77 @@
 </style>
 
 <Row>
+    {#if $clustersQuery.fetching}
+        <Col><Spinner secondary/></Col>
+    {:else if $clustersQuery.error}
+        <Col>
+            <Card body color="danger" class="mb-3">
+                <h2>Error: {$nodesQuery.error.message}</h2>
+            </Card>
+        </Col>
+    {:else}
+        <Col xs="auto">
+            <InputGroup>
+                <InputGroupText><Icon name="cpu"/></InputGroupText>
+                <InputGroupText>
+                    Cluster
+                </InputGroupText>
+                <select class="form-select" bind:value={clusterId}>
+                    {#each $clustersQuery.clusters as cluster}
+                        <option value={cluster.clusterID}>{cluster.clusterID}</option>
+                    {/each}
+                </select>
+            </InputGroup>
+        </Col>
+        <Col xs="auto">
+            <InputGroup>
+                <InputGroupText><Icon name="clock-history"/></InputGroupText>
+                <InputGroupText>
+                    Time
+                </InputGroupText>
+                <select class="form-select" bind:value={selectedTimeRange} on:change={(event) => {
+                    if (selectedTimeRange == -1) {
+                        from = null;
+                        to = null;
+                        return;
+                    }
+
+                    let now = Date.now(), t = selectedTimeRange * 1000;
+                    from = new Date(now - t);
+                    to = new Date(now);
+                }}>
+                    <option value={-1}>Custom</option>
+                    <option value={30 * 60} selected>Last half hour</option>
+                    <option value={60 * 60}>Last hour</option>
+                    <option value={2 * 60 * 60}>Last 2hrs</option>
+                    <option value={4 * 60 * 60}>Last 4hrs</option>
+                    <option value={24 * 60 * 60}>Last day</option>
+                    <option value={7 * 24 * 60 * 60}>Last week</option>
+                </select>
+                {#if selectedTimeRange == -1}
+                    <InputGroupText>from</InputGroupText>
+                    <Input type="datetime-local" on:change={(event) => updateExplicitRimeRange('from', event)}></Input>
+                    <InputGroupText>to</InputGroupText>
+                    <Input type="datetime-local" on:change={(event) => updateExplicitRimeRange('to', event)}></Input>
+                {/if}
+            </InputGroup>
+        </Col>
+        <Col xs="auto">
+            <InputGroup>
+                <InputGroupText><Icon name="graph-up"/></InputGroupText>
+                <select class="form-select" bind:value={selectedMetric}>
+                    {#each Object.values(metricConfig[clusterId]).map(mc => mc.name) as metric}
+                        <option>{metric}</option>
+                    {/each}
+                </select>
+            </InputGroup>
+        </Col>
+    {/if}
+</Row>
+
+<br/><br/><br/>
+
+<Row>
     <Col>
         {#if $nodesQuery.fetching}
             <Spinner secondary/>
@@ -69,36 +150,47 @@
                 <h2>Error: {$nodesQuery.error.message}</h2>
             </Card>
         {:else if !$clustersQuery.fetching}
-            {#each metrics as metric}
-                <h5>{metric}</h5>
+            <h5>{selectedMetric}</h5>
 
-                <Row><Col>
-                    <table style="width: 100%; table-layout: fixed;">
-                        {#each tilePlots(plotsPerRow, $nodesQuery.data.nodeMetrics) as row}
-                        <tr>
-                            {#each row as node}
-                            <td>
-                            {#if node}
+            <Row><Col>
+                <table style="width: 100%; table-layout: fixed;">
+                    {#each tilePlots(plotsPerRow, $nodesQuery.data.nodeMetrics.map((node) => {
+                        let m = node.metrics.find(m => m.name == selectedMetric);
+                        if (m == null)
+                            return ({ id: node.id, metric: selectedMetric, data: null });
+
+                        return {
+                            id: node.id,
+                            metric: m.name,
+                            data: {
+                                timestep: metricConfig[clusterId][selectedMetric].sampletime,
+                                series: [{ data: m.data }]
+                            }
+                        };
+                    })) as row}
+                    <tr>
+                        {#each row as node}
+                        <td>
+                            {#if node && node.data}
                                 <span class="plot-title">{node.id}</span>
                                 <Resizable let:width>
                                     <TimeseriesPlot
-                                        metric={metric}
+                                        metric={node.metric}
                                         clusterId={clusterId}
-                                        data={{
-                                            timestep: metricConfig[clusterId][metric].sampletime,
-                                            series: [{ data: node.metrics.find(m => m.name == metric).data }]
-                                        }}
+                                        data={node.data}
                                         height={200}
                                         width={width} />
                                 </Resizable>
+                            {:else if node}
+                                <span class="plot-title">{node.id}</span>
+                                <Card body color="warning">No Data</Card>
                             {/if}
-                            </td>
-                            {/each}
-                        </tr>
+                        </td>
                         {/each}
-                    </table>
-                </Col></Row>
-            {/each}
+                    </tr>
+                    {/each}
+                </table>
+            </Col></Row>
         {/if}
     </Col>
 </Row>
