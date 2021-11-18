@@ -7,7 +7,8 @@
     import { clustersQuery, tilePlots } from '../Common/utils.js';
     import { operationStore, query } from '@urql/svelte';
     import { Row, Col, Card, Spinner, Icon,
-             Input, InputGroup, InputGroupText } from 'sveltestrap';
+             InputGroup, InputGroupText } from 'sveltestrap';
+    import TimeSelection from './TimeSelection.svelte';
     import Resizable from '../Common/Resizable.svelte';
     import TimeseriesPlot from '../Plots/Timeseries.svelte';
     import RooflinePlot from '../Plots/Roofline.svelte';
@@ -19,10 +20,9 @@
     setContext('metric-config', metricConfig);
     setContext('clusters-query', clustersQuery);
 
-    let selectedTimeRange = 30 * 60;
     let selectedMetric = "flops_any";
     let plotsPerRow = 2;
-    let from = new Date(Date.now() - selectedTimeRange * 1000);
+    let from = new Date(Date.now() - 30 * 60 * 1000);
     let to = new Date(Date.now());
     let cluster = null;
 
@@ -59,6 +59,12 @@
         if (from == null || to == null)
             return;
 
+        // TODO: This is only a workaround, it should not even be needed.
+        if ($nodesQuery.variables.cluster == clusterId
+            && $nodesQuery.variables.to == to.toISOString()
+            && $nodesQuery.variables.from == from.toISOString())
+            return;
+
         $nodesQuery.variables = {
             cluster: clusterId, metrics: [selectedMetric],
             from: from.toISOString(), to: to.toISOString()
@@ -67,13 +73,7 @@
             cluster: clusterId,
             from: from.toISOString(), to: to.toISOString()
         };
-        // console.log('query:', ...Object.entries($nodesQuery.variables).flat());
-    }
-
-    function updateExplicitRimeRange(type, event) {
-        let d = new Date(Date.parse(event.target.value));
-        if (type == 'from') from = d;
-        else                to = d;
+        console.log('query:', ...Object.entries($nodesQuery.variables).flat());
     }
 
     query(nodesQuery);
@@ -110,8 +110,6 @@
                 tiles[y][x] += 1;
             }
         }
-
-        console.log(tiles);
 
         return tiles;
     }
@@ -170,37 +168,9 @@
             </InputGroup>
         </Col>
         <Col xs="auto">
-            <InputGroup>
-                <InputGroupText><Icon name="clock-history"/></InputGroupText>
-                <InputGroupText>
-                    Time
-                </InputGroupText>
-                <select class="form-select" bind:value={selectedTimeRange} on:change={(event) => {
-                    if (selectedTimeRange == -1) {
-                        from = null;
-                        to = null;
-                        return;
-                    }
-
-                    let now = Date.now(), t = selectedTimeRange * 1000;
-                    from = new Date(now - t);
-                    to = new Date(now);
-                }}>
-                    <option value={-1}>Custom</option>
-                    <option value={30 * 60} selected>Last half hour</option>
-                    <option value={60 * 60}>Last hour</option>
-                    <option value={2 * 60 * 60}>Last 2hrs</option>
-                    <option value={4 * 60 * 60}>Last 4hrs</option>
-                    <option value={24 * 60 * 60}>Last day</option>
-                    <option value={7 * 24 * 60 * 60}>Last week</option>
-                </select>
-                {#if selectedTimeRange == -1}
-                    <InputGroupText>from</InputGroupText>
-                    <Input type="datetime-local" on:change={(event) => updateExplicitRimeRange('from', event)}></Input>
-                    <InputGroupText>to</InputGroupText>
-                    <Input type="datetime-local" on:change={(event) => updateExplicitRimeRange('to', event)}></Input>
-                {/if}
-            </InputGroup>
+            <TimeSelection
+                bind:from={from}
+                bind:to={to} />
         </Col>
         <Col xs="auto">
             <InputGroup>
