@@ -1,5 +1,9 @@
 <script>
     export let tag; /* { id: String, tagType: String, tagName: String } */
+
+    const getTagUrl = typeof TAG_URL !== 'undefined'
+        ? TAG_URL
+        : tag => `/monitoring/user/${tag.id}`;
 </script>
 
 <style>
@@ -12,6 +16,7 @@
     }
 </style>
 
-<a target="_blank" href="{tag.id != null ? "/monitoring/tag/" + tag.id : "#"}">
+<a target="_blank" href="{getTagUrl(tag)}">
     <span class="badge bg-warning text-dark">{tag.tagType}: {tag.tagName}</span>
 </a>
+

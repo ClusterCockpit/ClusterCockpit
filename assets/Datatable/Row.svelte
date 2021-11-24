@@ -3,17 +3,15 @@
     import { operationStore, query, getClient } from '@urql/svelte';
     import Plot from '../Plots/Timeseries.svelte';
 
-    export let jobId;
-    export let clusterId;
+    export let job;
     export let width;
     export let height;
     export let selectedMetrics;
 
     const rawQuery = `
-        query($jobId: String!, $clusterId: String, $metrics: [String]!) {
+        query($id: ID!, $metrics: [String!]!) {
             jobMetrics(
-                jobId: $jobId,
-                clusterId: $clusterId,
+                id: $id,
                 metrics: $metrics
             ) {
                 name,
@@ -34,7 +32,7 @@
     `;
 
     const jobDataQuery = operationStore(rawQuery, {
-        jobId, clusterId,
+        id: job.id,
         metrics: selectedMetrics
     });
 
@@ -106,14 +104,13 @@
     }
 
     function updateQuery() {
-        $jobDataQuery.variables.jobId = jobId;
-        $jobDataQuery.variables.clusterId = clusterId;
+        $jobDataQuery.variables.id = job.id;
         $jobDataQuery.reexecute();
         oldSelectedMetrics = null;
         oldQueryData = null;
     }
 
-    $: updateQuery(jobId, clusterId);
+    $: updateQuery(job);
 
     query(jobDataQuery);
 </script>
@@ -128,11 +125,11 @@
     </td>
 {:else}
     {#each prepareData($jobDataQuery.data.jobMetrics, selectedMetrics, triggerUpdate) as metric (metric.data || metric)}
-        <td class="cc-plot-{jobId.replace('.', '_')}-{metric.name}">
+        <td class="cc-plot-{job.id}-{metric.name}">
             {#if metric.data}
                 <Plot
                     metric={metric.name}
-                    clusterId={clusterId}
+                    clusterId={job.clusterId}
                     data={metric.data}
                     height={height}
                     width={width}/>

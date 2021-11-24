@@ -68,31 +68,29 @@ class JobStats
         return $name."_".md5(serialize($filter));
     }
 
-    public function getAverages($jobs, $filter, $metrics)
+    public function getFootprints($jobs, $filter, $metrics)
     {
         $key = $this->getCacheKey("analysisview-averages", [$filter, $metrics]);
         return $this->_cache->get($key, function (ItemInterface $item) use ($jobs, $metrics) {
             $item->expiresAfter(self::CACHE_EXPIRES_AFTER);
-            $this->_logger->info("Fetching Averages of ".count($jobs)." jobs for AnalysisView...");
-            return $this->_fetchAverages($jobs, $metrics);
+            return $this->_fetchFootprints($jobs, $metrics);
         });
     }
 
-    private function _fetchAverages($jobs, $metrics)
+    private function _fetchFootprints($jobs, $metrics)
     {
         $res = [];
-        foreach ($metrics as $idx => $metric) {
-            $res[$idx] = [];
-        }
+        foreach ($metrics as $idx => $metric)
+            $res[$idx] = [ 'name' => $metric, 'footprints' => [] ];
 
         foreach ($jobs as $job) {
-            if ($this->_jobArchive->isArchived($job)) {
+            if ($this->_jobArchive->isArchived($job) || $this->_jobArchive->isLegacyArchived($job)) {
                 $stats = $this->_jobArchive->getMeta($job)['statistics'];
                 foreach ($metrics as $idx => $metric) {
                     if (isset($stats[$metric]))
-                        $res[$idx][] = $stats[$metric]['avg'];
+                        $res[$idx]['footprints'][] = $stats[$metric]['avg'];
                     else
-                        $res[$idx][] = null;
+                        $res[$idx]['footprints'][] = null;
                 }
                 continue;
             }
@@ -101,9 +99,9 @@ class JobStats
             $stats = $this->_metricDataRepository->getJobStats($job, $metricConfig);
             foreach ($metrics as $idx => $metric) {
                 if (isset($stats[$metric.'_avg']))
-                    $res[$idx][] = $stats[$metric.'_avg'];
+                    $res[$idx]['footprints'][] = $stats[$metric.'_avg'];
                 else
-                    $res[$idx][] = null;
+                    $res[$idx]['footprints'][] = null;
             }
         }
 
@@ -115,7 +113,6 @@ class JobStats
         $key = $this->getCacheKey("analysisview-roofline", [$filter, $rows, $cols, $minX, $minY, $maxX, $maxY]);
         return $this->_cache->get($key, function (ItemInterface $item) use ($jobs, $rows, $cols, $minX, $minY, $maxX, $maxY) {
             $item->expiresAfter(self::CACHE_EXPIRES_AFTER);
-            $this->_logger->info("Building Roofline-Plot from ".count($jobs)." jobs for AnalysisView...");
             return $this->_calcRooflineHeatmap($jobs, $rows, $cols, $minX, $minY, $maxX, $maxY);
         });
     }

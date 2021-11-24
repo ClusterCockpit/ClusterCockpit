@@ -33,17 +33,23 @@ use App\Repository\JobRepository;
 use App\Entity\Job;
 use App\Service\JobArchive;
 use App\Service\JobData;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 final class JobDataPersister implements ContextAwareDataPersisterInterface
 {
-    private $_em;
+    private ParameterBagInterface $_params;
+    private EventDispatcherInterface $_eventDispatcher;
     private JobRepository $_repository;
     private JobArchive $_jobArchive;
     private JobData $_jobData;
-    private $_logger;
+    private LoggerInterface $_logger;
 
     public function __construct(
-        EntityManagerInterface $em,
+        ParameterBagInterface $params,
+        EventDispatcherInterface $eventDispatcher,
         ContextAwareDataPersisterInterface $decorated,
         LoggerInterface $logger,
         JobRepository $repository,
@@ -51,7 +57,8 @@ final class JobDataPersister implements ContextAwareDataPersisterInterface
         JobData $jobData
     )
     {
-        $this->_em = $em;
+        $this->_params = $params;
+        $this->_eventDispatcher = $eventDispatcher;
         $this->_decorated = $decorated;
         $this->_repository = $repository;
         $this->_jobArchive = $jobArchive;
@@ -64,55 +71,66 @@ final class JobDataPersister implements ContextAwareDataPersisterInterface
         return $this->_decorated->supports($data, $context);
     }
 
-    public function persist($data, array $context = [])
+    public function persist($job, array $context = [])
     {
-        if ( $data instanceof Job ) {
+        // Should be impossible if `supports` works as I think it does.
+        if (!($job instanceof Job)) {
+            throw new HttpException(500, "Unsupported job for persister");
+        }
 
-            if ( ($context['collection_operation_name'] ?? null) === 'post') {
-                $nodes = explode('|', $data->nodeList);
-                $data->numNodes = count($nodes);
-                $data->isRunning = true;
+        $nodes = explode('|', $job->nodeList);
+        $job->numNodes = count($nodes);
+        if (($context['item_operation_name'] ?? null) === 'put') {
+            $job->isRunning = false;
+        }
 
-            } else if ( ($context['item_operation_name'] ?? null) === 'put') {
+        if ($job->isRunning == false) {
+            if ($job->stopTime < $job->startTime) {
+                throw new HttpException(400, "Stop time earlier than start time");
+            }
 
-                if ( $data->stopTime < $data->startTime  ) {
-                    throw new HttpException(400, "Stop time earlier than start time");
+            $job->duration = $job->stopTime - $job->startTime;
+            if ($this->_params->get('app.archive_to_disk') === true) {
+                if ($this->_params->get('app.async_archive') === true) {
+                    $this->_eventDispatcher->addListener(KernelEvents::TERMINATE, function ($event) use ($job) {
+                        $this->writeToArchive($job);
+                    });
+                } else {
+                    if ($this->writeToArchive($job) === false)
+                        throw new HttpException(400, "archiving job failed");
                 }
-
-                if (! $data->isRunning ) {
-                    throw new HttpException(400, "Job already finished");
-                }
-
-                $data->duration = $data->stopTime - $data->startTime;
-                $this->writeToArchive($data);
-                $data->isRunning = false;
             }
         }
 
-        return $this->_decorated->persist($data, $context);
+        return $this->_decorated->persist($job, $context);
     }
 
     private function writeToArchive($job)
     {
         if ($this->_jobArchive->isArchived($job)) {
-            throw new HttpException(400, "Job already archived");
+            $this->_logger->warning('Job '.$job->id.' is already archived');
+            return false;
         }
 
         $jobData = $this->_jobData->getData($job, null);
         if ($jobData === false) {
-            throw new HttpException(400, "Job has no data (MetricRepository failure?)");
+            $this->_logger->error('Job '.$job->id.' has no metric');
+            return false;
         }
 
         try {
             $this->_jobArchive->archiveJob($job, $jobData, null);
         } catch (\Throwable $e) {
-            throw new HttpException(500, $e->getMessage());
+            $this->_logger->error('Archiving job '.$job->id.' failed: '.$e->getMessage());
+            return false;
         }
+
+        $this->_logger->debug('Job '.$job->id.' successfully archived');
+        return true;
     }
 
     public function remove($data, array $context = [])
     {
-	    $this->_logger->info("DataPersister remove: {$data->jobId}");
         return $this->_decorated->remove($data, $context);
     }
 }

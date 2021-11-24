@@ -96,10 +96,12 @@ class JobRepository extends ServiceEntityRepository
                        ->setParameter("numNodes_from_$i", $filter['numNodes']['from'])
                        ->setParameter("numNodes_to_$i", $filter['numNodes']['to']);
 
-                if (isset($filter['startTime']))
-                    $qb->andWhere("j.startTime BETWEEN :startTime_from_$i AND :startTime_to_$i")
-                       ->setParameter("startTime_from_$i", $filter['startTime']['from'])
-                       ->setParameter("startTime_to_$i", $filter['startTime']['to']);
+                if (isset($filter['startTime'])) {
+                    if (isset($filter['startTime']['from']))
+                        $qb->andWhere(":starttime_from <= j.startTime")->setParameter("starttime_from", $filter['startTime']['from']);
+                    if (isset($filter['startTime']['to']))
+                        $qb->andWhere("j.startTime <= :starttime_to")->setParameter("starttime_to", $filter['startTime']['to']);
+                }
 
                 if (isset($filter['isRunning']))
                     $qb->andWhere('j.isRunning = '.($filter['isRunning'] ? 'true' : 'false'));
@@ -160,175 +162,90 @@ class JobRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    private function filteredStatisticsPerCluster($filter, $cluster)
+    public function findStatistics($filters, $clusters, $groupBy, $hist1, $hist2)
     {
-        $coresPerNode = $cluster['socketsPerNode'] * $cluster['coresPerSocket'];
-        $filter[] = ['clusterId' => ['eq' => $cluster['clusterID']]];
-        $qb = $this->createQueryBuilder('j');
-        $qb->select([
-            'COUNT(j.id)',
-            'SUM(j.duration) / 3600',
-            'SUM(j.duration * j.numNodes * '.$coresPerNode.') / 3600'
-        ]);
-        $this->buildJobFilter($qb, $filter, null);
-        $res = $qb->getQuery()->getSingleResult();
-        return [
-            'totalJobs' => $res[1],
-            'totalWalltime' => intval($res[2]),
-            'totalCoreHours' => intval($res[3])
-        ];
-    }
+        $stats = [];
+        foreach ($clusters as &$cluster) {
+            $filter = $filters; // PHP is strange
+            $filter[] = ['clusterId' => ['eq' => $cluster['clusterID']]];
+            $coresPerNode = $cluster['socketsPerNode'] * $cluster['coresPerSocket'];
+            $qb = $this->createQueryBuilder('j');
+            $this->buildJobFilter($qb, $filter, null);
+            if ($groupBy == null) {
+                $qb->select([
+                    'COUNT(j.id)', 'SUM(j.duration) / 3600',
+                    'SUM(j.duration * j.numNodes * '.$coresPerNode.') / 3600']);
+                $res = $qb->getQuery()->getSingleResult();
+                if (!isset($stats[0]))
+                    $stats[0] = [ 'totalJobs' => 0, 'totalWalltime' => 0, 'totalCoreHours' => 0 ];
 
-    private function getSelectedCluster($filter)
-    {
-        foreach ($filter as $filterItem) {
-            if (isset($filterItem['clusterId'])) {
-                return $filterItem['clusterId']['eq'];
+                $stats[0]['totalJobs'] += intval($res[1]);
+                $stats[0]['totalWalltime'] += intval($res[2]);
+                $stats[0]['totalCoreHours'] += intval($res[3]);
+            } else {
+                $qb->select([
+                    'j.'.strtolower($groupBy).'Id AS gid', 'COUNT(j.id) AS jobs', 'SUM(j.duration) / 3600 AS walltime',
+                    'SUM(j.duration * j.numNodes * '.$coresPerNode.') / 3600 AS corehours'])->groupBy('gid');
+                
+                $rows = $qb->getQuery()->getResult();
+                foreach ($rows as $row) {
+                    $s = $stats[$row['gid']] ?? [ 'id' => $row['gid'], 'totalJobs' => 0,
+                        'totalWalltime' => 0, 'totalCoreHours' => 0 ];
+                    
+                    $s['totalJobs'] += intval($row['jobs']);
+                    $s['totalWalltime'] += intval($row['walltime']);
+                    $s['totalCoreHours'] += intval($row['corehours']);
+                    $stats[$row['gid']] = $s;
+                }
             }
         }
-        return null;
-    }
 
-    /*
-     * Filters are expected in the same format as for
-     * findFilteredJobs() and countJobs() (therefore,
-     * the GraphQL [JobFilter!] type).
-     */
-    public function findFilteredStatistics($filter, $clusterCfg)
-    {
-        $selectedCluster = $this->getSelectedCluster($filter);
-        $stats = null;
-        if ($selectedCluster != null) {
-            $stats = $this->filteredStatisticsPerCluster($filter,
-                $clusterCfg->getClusterConfiguration($selectedCluster));
+        $qb = $this->createQueryBuilder('j');
+        $this->buildJobFilter($qb, $filter, null);
+        if ($groupBy == null) {
+            $qb->select('COUNT(j.id)')->andWhere('j.duration < 120');
+            $stats[0]['shortJobs'] = $qb->getQuery()->getSingleResult()[1];
         } else {
-            $stats = ['totalJobs' => 0, 'totalWalltime' => 0, 'totalCoreHours' => 0];
-            foreach ($clusterCfg->getConfigurations() as $cluster) {
-                $res = $this->filteredStatisticsPerCluster($filter, $cluster);
-                $stats['totalJobs'] += $res['totalJobs'];
-                $stats['totalWalltime'] += $res['totalWalltime'];
-                $stats['totalCoreHours'] += $res['totalCoreHours'];
+            $qb->select(['j.'.strtolower($groupBy).'Id AS id', 'COUNT(j.'.strtolower($groupBy).'Id) AS count'])
+                ->andWhere('j.duration < 120')->groupBy('id');
+            
+            $rows = $qb->getQuery()->getResult();
+            foreach ($rows as $row) {
+                $stats[$row['id']]['shortJobs'] = $row['count'];
             }
         }
 
-        $qb = $this->createQueryBuilder('j');
-        $qb->select('COUNT(j.id)')
-           ->andWhere('j.duration < 120');
-        $this->buildJobFilter($qb, $filter, null);
-        $stats['shortJobs'] = $qb->getQuery()->getSingleResult()[1];
+        if (!$hist1 && !$hist2)
+            return $stats;
 
-        // histWalltime
-        $histWalltime = [];
-        $qb = $this->createQueryBuilder('j');
-        $qb->select([
-            'ROUND(j.duration / 3600) as value',
-            'count(j.id) as count'
-        ]);
-        $this->buildJobFilter($qb, $filter, null);
-        $qb->groupBy('value')->orderBy('value');
-        $rows = $qb->getQuery()->getResult();
-        foreach ($rows as $row) {
-            $histWalltime[] = $row;
+        if ($groupBy == null) {
+            $stats[0]['histWalltime'] = $this->buildHistogram('ROUND(j.duration / 3600) as value', $filters);
+            $stats[0]['histNumNodes'] = $this->buildHistogram('j.numNodes as value', $filters);
+        } else {
+            foreach ($stats as &$stat) {
+                $stat['histWalltime'] = $this->buildHistogram('ROUND(j.duration / 3600) as value',
+                    $filters, $stat['id'], 'j'.strtolower($groupBy).'Id');
+                $stat['histNumNodes'] = $this->buildHistogram('j.numModes as value',
+                    $filters, $stat['id'], 'j'.strtolower($groupBy).'Id');
+            }
         }
 
-        // histNumNodes
-        $histNumNodes = [];
-        $qb = $this->createQueryBuilder('j');
-        $qb->select(['j.numNodes as value', 'count(j.id) as count']);
-        $this->buildJobFilter($qb, $filter, null);
-        $qb->groupBy('value')->orderBy('value');
-        $rows = $qb->getQuery()->getResult();
-        foreach ($rows as $row) {
-            $histNumNodes[] = $row;
-        }
-
-        $stats['histWalltime'] = $histWalltime;
-        $stats['histNumNodes'] = $histNumNodes;
         return $stats;
     }
 
-    public function getFilterRanges($cluster = null)
+    private function buildHistogram($value, $filters, $id = null, $col = null)
     {
-        $qb = $this->createQueryBuilder('j');
-        $qb->select([
-            'MIN(j.duration)', 'MAX(j.duration)',
-            'MIN(j.numNodes)', 'MAX(j.numNodes)',
-            'MIN(j.startTime)', 'MAX(j.startTime)'
-        ]);
-
-        if ($cluster != null)
-            $qb->where('j.clusterId = :cluster')
-               ->setParameter('cluster', $cluster);
-
-        $res = $qb->getQuery()->getSingleResult();
-        return [
-            'duration' => [ 'from' => $res[1], 'to' => $res[2] ],
-            'numNodes' => [ 'from' => $res[3], 'to' => $res[4] ],
-            'startTime' => [ 'from' => intval($res[5]), 'to' => intval($res[6]) ]
-        ];
-    }
-
-    public function statUsers($startTime, $stopTime, $clusterId, $clusters, $scrambleName)
-    {
-        $users = array();
-
-        foreach ( $clusters as $cluster ){
-            if ($clusterId != null && $cluster['clusterID'] != $clusterId)
-                continue;
-
-            $sql = "
-            SELECT user_id as userId,
-                   SUM(duration)/3600 as totalWalltime,
-                   COUNT(*) as totalJobs,
-                   SUM(duration*num_nodes*".$cluster['socketsPerNode']."*".$cluster['coresPerSocket'].")/3600 as coreHours
-            FROM job
-            WHERE duration>0
-            AND job.cluster_id='".$cluster['clusterID']."'
-            ".($startTime != null && $stopTime != null ? "AND job.start_time BETWEEN $startTime AND $stopTime" : "")."
-            GROUP BY 1
-            ";
-
-            $tmpUsers = $this->_connection->fetchAll($sql);
-
-            foreach ( $tmpUsers as $user ){
-                $users[ $user['userId'] ][ $cluster['clusterID'] ]['totalWalltime'] = $user['totalWalltime'];
-                $users[ $user['userId'] ][ $cluster['clusterID'] ]['totalJobs']     = $user['totalJobs'];
-                $users[ $user['userId'] ][ $cluster['clusterID'] ]['coreHours']     = $user['coreHours'];
-            }
-        }
-
-        $sql = "SELECT username as user_id FROM user;";
-        $rows = $this->_connection->fetchAll($sql);
-        foreach ($rows as $row) {
-            if (isset($users[$row['user_id']])) {
-                $user = &$users[$row['user_id']];
-                $user['userId'] = $scrambleName ? User::hideName($row['user_id']) : $row['user_id'];
-                $user['totalWalltime'] = 0;
-                $user['totalJobs'] = 0;
-                $user['totalCoreHours'] = 0;
-
-                foreach ( $clusters as $cluster ){
-                    if (isset($user[ $cluster['clusterID'] ])) {
-                        $user['totalWalltime'] += $user[ $cluster['clusterID'] ]['totalWalltime'];
-                        $user['totalCoreHours'] += $user[ $cluster['clusterID'] ]['coreHours'];
-                        $user['totalJobs'] += $user[ $cluster['clusterID'] ]['totalJobs'];
-                    }
-                }
-            } else {
-                $users[$row['user_id']] = [
-                    'userId' => $scrambleName ? User::hideName($row['user_id']) : $row['user_id'],
-                    'totalWalltime' => 0, 'totalJobs' => 0, 'totalCoreHours' => 0
-                ];
-            }
-        }
-
-        return $users;
+            $qb = $this->createQueryBuilder('j');
+            $qb->select([$value, 'COUNT(j.id) AS count']);
+            $this->buildJobFilter($qb, $filters, null);
+            if ($id != null && $col != null)
+                $qb->andWhere($col.' = :id')->setParameter('id', $id);
+            $qb->groupBy('value')->orderBy('value');
+            return $qb->getQuery()->getResult();
     }
 
     public function findBatchJob($jobId, $clusterId, $startTime)
     {
-        $this->_logger->info("Find BatchJobs: " . $jobId);
-
         $qb = $this->createQueryBuilder('j');
         $qb->select('j')->where("j.jobId = :jobId");
         $qb->setParameter('jobId', $jobId);
@@ -337,9 +254,9 @@ class JobRepository extends ServiceEntityRepository
             $qb->andWhere("j.clusterId = :clusterId");
             $qb->setParameter('clusterId', $clusterId);
         }
-/*         if ( $startTime ){ */
-/*             $qb->andWhere("j.startTime = $startTime"); */
-/*         } */
+        // if ( $startTime ){
+        //     $qb->andWhere("j.startTime = $startTime");
+        // }
 
         return $qb
             ->getQuery()

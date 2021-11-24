@@ -143,7 +143,7 @@ class RootResolverMap extends ResolverMap
         return [
             // Root
             'Query' => [
-                'jobById' => function($value, Argument $args) {
+                'job' => function($value, Argument $args) {
                     $job = $this->jobRepo->findJobById($args['id']);
                     if (!$job)
                         return null;
@@ -208,42 +208,31 @@ class RootResolverMap extends ResolverMap
                     return $clusters;
                 },
 
-                'filterRanges' => function() {
-                    // TODO: Use filterRanges from cluster.json files?
-                    // This query is not used by the frontend anymore,
-                    // so it could also be removed.
-                    return $this->jobRepo->getFilterRanges(null);
-                },
-
                 'tags' => function($value, Argument $args) {
                     return $this->getTagsArray($this->jobTagRepo->getAllTags());
                 },
 
                 'jobMetrics' => function($value, Argument $args) {
-                    $jobId = $args['jobId'];
-                    $clusterId = $args['clusterId'];
-                    $metrics = $args['metrics'];
-                    if ($metrics == null) {
-                        $clusters = $this->clusterCfg->getClusterConfiguration($clusterId);
-                        $metrics = array_map(function ($metric) { return $metric['name']; }, $clusters['metricConfig']);
-                    }
-
-                    $job = $this->jobRepo->findBatchJob($jobId, $clusterId, null);
-                    if ($job === false) {
-                        throw new Error("No job for '$jobId' (on '$clusterId')");
-                    }
+                    $job = $this->jobRepo->findJobById($args['id']);
+                    if (!$job)
+                        throw new Error("No job for ID '".$args['id']."'");
 
                     $this->checkIfActionAllowed($job);
 
-                    $data = $this->jobData->getData($job, $metrics);
-                    if ($data === false) {
-                        throw new Error("No profiling data for this job");
+                    $metrics = $args['metrics'];
+                    if ($metrics == null) {
+                        $clusters = $this->clusterCfg->getClusterConfiguration($job->getClusterId());
+                        $metrics = array_map(function ($metric) { return $metric['name']; }, $clusters['metricConfig']);
                     }
+
+                    $data = $this->jobData->getData($job, $metrics);
+                    if ($data === false)
+                        throw new Error("No profiling data for this job");
 
                     return $data;
                 },
 
-                'jobsStatistics' => function($value, Argument $args) {
+                'jobsStatistics' => function($value, Argument $args, $context, ResolveInfo $info) {
                     $filter = $args['filter'];
                     $user = $this->security->getUser();
                     if ($user == null)
@@ -254,19 +243,22 @@ class RootResolverMap extends ResolverMap
                         $filter[] = [ 'userId' => [ 'eq' => $user->getUsername() ] ];
 
                     try {
-                        return $this->jobRepo->findFilteredStatistics($filter, $this->clusterCfg);
+                        return $this->jobRepo->findStatistics($filter, $this->clusterCfg->getConfigurations(),
+                            $args['groupBy'] ?? null,
+                            array_key_exists('histWalltime', $info->getFieldSelection()),
+                            array_key_exists('histNumNodes', $info->getFieldSelection()));
                     } catch (\Throwable $e) {
                         throw new Error($e->getMessage());
                     }
                 },
 
-                'jobMetricAverages' => function($value, Argument $args) {
+                'jobsFootprints' => function($value, Argument $args) {
                     try {
                         $jobs = $this->jobRepo->findFilteredJobs(false, $args['filter'], null);
                         if (count($jobs) > RootResolverMap::ANALYSIS_MAX_JOBS)
                             throw new Error("too many jobs matched (".count($jobs).", max: ".RootResolverMap::ANALYSIS_MAX_JOBS.")");
 
-                        return $this->jobStats->getAverages($jobs, $args['filter'], $args['metrics']);
+                        return $this->jobStats->getFootprints($jobs, $args['filter'], $args['metrics']);
                     } catch (\Throwable $e) {
                         throw new Error($e->getMessage());
                     }
@@ -283,13 +275,6 @@ class RootResolverMap extends ResolverMap
                     } catch (\Throwable $e) {
                         throw new Error($e->getMessage());
                     }
-                },
-
-                'userStats' => function($value, Argument $args) {
-                    $users = $this->jobRepo->statUsers(
-                        $args['startTime'], $args['stopTime'], $args['clusterId'],
-                        $this->clusterCfg->getConfigurations(), $this->scrambleNames);
-                    return $users;
                 }
             ],
 

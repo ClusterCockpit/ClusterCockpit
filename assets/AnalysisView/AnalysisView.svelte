@@ -46,7 +46,10 @@
 
     const statsQuery = operationStore(`
         query($filter: [JobFilter!]!, $metrics: [String!]!) {
-            jobMetricAverages(filter: $filter, metrics: $metrics)
+            jobsFootprints(filter: $filter, metrics: $metrics) {
+                name,
+                footprints
+            }
         }
     `, {
         filter: [], metrics: []
@@ -86,7 +89,7 @@
     query(metaStatsQuery);
 
     $: matchedJobs = $metaStatsQuery.data
-        ? $metaStatsQuery.data.jobsStatistics.totalJobs
+        ? $metaStatsQuery.data.jobsStatistics[0].totalJobs
         : null;
 
     $: {
@@ -164,10 +167,8 @@
         updateQueries(filterItems);
     }
 
-    function buildHistogramData(data, metric, numBins) {
-        let idx = metricsToFetch.indexOf(metric);
-        console.assert(idx != -1, "Woops?");
-        let stats = data[idx];
+    function buildHistogramData(stats, metric, numBins) {
+        stats = stats.find(s => s.name == metric).footprints;
 
         let min = Number.MAX_VALUE, max = -min;
         if (stats.length == 0) {
@@ -204,9 +205,7 @@
     }
 
     function buildScatterData(stats, metric) {
-        let idx = $statsQuery.variables.metrics.indexOf(metric);
-        console.assert(idx != -1, "Woops?");
-        return stats[idx];
+        return stats.find(s => s.name == metric).footprints;
     }
 </script>
 
@@ -313,29 +312,29 @@
             <Row>
                 <Col style="text-align: center; font-size: 1.2rem;">
                     <b>Short Jobs:</b>
-                    {$metaStatsQuery.data.jobsStatistics.shortJobs},
+                    {$metaStatsQuery.data.jobsStatistics[0].shortJobs},
                     <b>Total Walltime:</b>
-                    {$metaStatsQuery.data.jobsStatistics.totalWalltime},
+                    {$metaStatsQuery.data.jobsStatistics[0].totalWalltime},
                     <b>Total Core Hours:</b>
-                    {$metaStatsQuery.data.jobsStatistics.totalCoreHours}
+                    {$metaStatsQuery.data.jobsStatistics[0].totalCoreHours}
                 </Col>
             </Row>
             <Row>
                 <Col xs="6">
                     <h5>Walltime Histogram (Hours)</h5>
                     <Resizable let:width>
-                    {#key $metaStatsQuery.data.jobsStatistics.histWalltime}
+                    {#key $metaStatsQuery.data.jobsStatistics[0].histWalltime}
                         <Histogram width={width} height={250}
-                            data={$metaStatsQuery.data.jobsStatistics.histWalltime} />
+                            data={$metaStatsQuery.data.jobsStatistics[0].histWalltime} />
                     {/key}
                     </Resizable>
                 </Col>
                 <Col xs="6">
                     <h5>Number of Nodes</h5>
                     <Resizable let:width>
-                    {#key $metaStatsQuery.data.jobsStatistics.histNumNodes}
+                    {#key $metaStatsQuery.data.jobsStatistics[0].histNumNodes}
                         <Histogram width={width} height={250}
-                            data={$metaStatsQuery.data.jobsStatistics.histNumNodes} />
+                            data={$metaStatsQuery.data.jobsStatistics[0].histNumNodes} />
                     {/key}
                     </Resizable>
                 </Col>
@@ -359,7 +358,7 @@
 {:else if selectedClusterId != null && $statsQuery.data}
     <table style="width: 100%; table-layout: fixed;">
     {#each tilePlots(plotsPerRow, metricsInHistograms.map((metric, idx) =>
-        buildHistogramData($statsQuery.data.jobMetricAverages, metric, histogramBins[metric]))) as row}
+        buildHistogramData($statsQuery.data.jobsFootprints, metric, histogramBins[metric]))) as row}
         <tr>
             {#each row as data}
                 <td>
@@ -401,10 +400,10 @@
                 <td>
                     {#if pair}
                         <Resizable let:width>
-                        {#key $statsQuery.data.jobMetricAverages}
+                        {#key $statsQuery.data.jobsFootprints}
                         <ScatterPlot width={width} height={300}
-                            X={buildScatterData($statsQuery.data.jobMetricAverages, pair[0])}
-                            Y={buildScatterData($statsQuery.data.jobMetricAverages, pair[1])}
+                            X={buildScatterData($statsQuery.data.jobsFootprints, pair[0])}
+                            Y={buildScatterData($statsQuery.data.jobsFootprints, pair[1])}
                             xLabel={`${pair[0]} [${$clustersQuery.metricUnits[pair[0]]}]`}
                             yLabel={`${pair[1]} [${$clustersQuery.metricUnits[pair[1]]}]`} />
                         {/key}

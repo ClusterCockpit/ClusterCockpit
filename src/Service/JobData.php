@@ -66,6 +66,11 @@ class JobData
 
         $job->hasProfile = $this->_jobArchive->isArchived($job);
 
+        // Backwards compatibility
+        if (!$job->hasProfile){
+            $job->hasProfile = $this->_jobArchive->isLegacyArchived($job);
+        }
+
         if (!$job->hasProfile){
             $this->_metricDataRepository->hasProfile($job,
                 $this->_clusterCfg->getSingleMetric($job->getClusterId()));
@@ -92,24 +97,24 @@ class JobData
 
     private function _getData($job, $metrics)
     {
-        if (! $this->hasData($job) ) {
-            return false;
-        }
-
         if ($metrics == null) {
             $cluster = $this->_clusterCfg->getClusterConfiguration($job->getClusterId());
             $metrics = array_keys($cluster['metricConfig']);
         }
 
-        if ($job->isRunning()) {
+        if (!$this->_jobArchive->isArchived($job) && !$this->_jobArchive->isLegacyArchived($job)) {
             $metricConfig = $this->_clusterCfg->getMetricConfiguration($job->getClusterId(), $metrics);
 
-            $stats = $this->_metricDataRepository->getJobStats($job, $metricConfig);
             $data = $this->_metricDataRepository->getMetricData($job, $metricConfig);
+            if ($data === false)
+                return false;
 
+            $stats = $this->_metricDataRepository->getJobStats($job, $metricConfig);
             $res = [];
-
             foreach ( $metricConfig as $metricName => $metric) {
+                if (!isset($data[$metricName]))
+                    continue;
+
                 $series = [];
                 foreach ( $data[$metricName] as $nodeId => $nodedata) {
                     $series[] = [

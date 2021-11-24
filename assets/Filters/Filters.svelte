@@ -229,6 +229,16 @@
 
         console.assert($clustersQuery.clusters.length > 0, 'Whoops');
 
+        // If the startTime upper bound is uninitialized, set one here:
+        for (let i = 0; i < $clustersQuery.clusters.length; i++) {
+            let fr = $clustersQuery.clusters[i].filterRanges;
+            if (fr.startTime.to == null || Date.parse(fr.startTime.to) == 0) {
+                let d = new Date();
+                d.setHours(24, 0, 0, 0);
+                fr.startTime.to = d.toISOString();
+            }
+        }
+
         let fr = $clustersQuery.clusters[0].filterRanges;
         globalFilterRanges = {
             numNodes: { from: fr.numNodes.from, to: fr.numNodes.to },

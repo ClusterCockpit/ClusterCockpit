@@ -44,7 +44,7 @@ class ClusterConfiguration
                     $str = file_get_contents("$rootdir/$entry/cluster.json");
                     $this->_config[$entry] = json_decode($str, true);
 
-                    $metricConfig = [];
+                    $cfg = [];
 
                     foreach ($this->_config[$entry]['metricConfig'] as $metric) {
                         $cfg[$metric['name']] = $metric;

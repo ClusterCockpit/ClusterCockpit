@@ -83,17 +83,25 @@ type JobMetricWithName {
   metric: JobMetric!
 }
 
+type MetricFootprints {
+  name: String!
+  footprints: [Float]!
+}
+
+enum Aggregate { USER, PROJECT, CLUSTER }
+
 type Query {
   clusters: [Cluster!]!
-  jobById(id: ID!): Job
-  jobs(filter: [JobFilter!]!, page: PageRequest, order: OrderByInput): JobResultList!
-  jobsStatistics(filter: [JobFilter!]!): JobsStatistics!
-  jobMetrics(jobId: String!, clusterId: String, metrics: [String]): [JobMetricWithName]!
-  jobMetricAverages(filter: [JobFilter!]!, metrics: [String]!): [[Float]]!
-  rooflineHeatmap(filter: [JobFilter!]!, rows: Int!, cols: Int!, minX: Float!, minY: Float!, maxX: Float!, maxY: Float!): [[Float!]]!
   tags: [JobTag!]!
-  filterRanges: FilterRanges!
-  userStats(startTime: Time, stopTime: Time, clusterId: String): [UserStats!]!
+
+  job(id: ID!): Job
+  jobMetrics(id: ID!, metrics: [String]): [JobMetricWithName]!
+
+  jobs(filter: [JobFilter!]!, page: PageRequest, order: OrderByInput): JobResultList!
+  jobsStatistics(filter: [JobFilter!]!, groupBy: Aggregate): [JobsStatistics!]!
+  jobsFootprints(filter: [JobFilter!]!, metrics: [String]!): [MetricFootprints]!
+
+  rooflineHeatmap(filter: [JobFilter!]!, rows: Int!, cols: Int!, minX: Float!, minY: Float!, maxX: Float!, maxY: Float!): [[Float!]]!
 }
 
 type Mutation {
@@ -165,8 +173,8 @@ input FloatRange {
 }
 
 input TimeRange {
-  from: Time!
-  to: Time!
+  from: Time
+  to: Time
 }
 
 type JobResultList {
@@ -182,19 +190,13 @@ type HistoPoint {
 }
 
 type JobsStatistics  {
+  id: ID!
   totalJobs: Int!
   shortJobs: Int!
   totalWalltime: Int!
   totalCoreHours: Int!
   histWalltime: [HistoPoint]!
   histNumNodes: [HistoPoint]!
-}
-
-type UserStats {
-    userId: ID!
-    totalJobs: Int!
-    totalWalltime: Float!
-    totalCoreHours: Float!
 }
 
 input PageRequest {

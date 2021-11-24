@@ -25,6 +25,10 @@
 
 namespace App\DataPersister;
 
+use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Doctrine\ORM\EntityManagerInterface;
 use ApiPlatform\Core\DataPersister\ContextAwareDataPersisterInterface;
@@ -34,8 +38,13 @@ use App\Entity\BatchJob;
 use App\Service\JobArchive;
 use App\Service\JobData;
 
+/*
+ * Deprecated? Can be removed?
+ */
 final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
 {
+    private ParameterBagInterface $_params;
+    private EventDispatcherInterface $_eventDispatcher;
     private $_em;
     private JobRepository $_repository;
     private JobArchive $_jobArchive;
@@ -43,6 +52,8 @@ final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
     private $_logger;
 
     public function __construct(
+        ParameterBagInterface $params,
+        EventDispatcherInterface $eventDispatcher,
         EntityManagerInterface $em,
         LoggerInterface $logger,
         JobRepository $repository,
@@ -50,6 +61,8 @@ final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
         JobData $jobData
     )
     {
+        $this->_params = $params;
+        $this->_eventDispatcher = $eventDispatcher;
         $this->_em = $em;
         $this->_repository = $repository;
         $this->_jobArchive = $jobArchive;
@@ -98,9 +111,19 @@ final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
             throw new HttpException(400, "Job already finished");
         }
 
-        $job->duration = $data->stopTime - $job->startTime;
-        $this->writeToArchive($job);
         $job->isRunning = false;
+        $job->duration = $data->stopTime - $job->startTime;
+
+        if ($this->_params->get('app.archive_to_disk') === true) {
+            if ($this->_params->get('app.async_archive') === true) {
+                $this->_eventDispatcher->addListener(KernelEvents::TERMINATE, function ($event) use ($job) {
+                    $this->writeToArchive($job);
+                });
+            } else {
+                if ($this->writeToArchive($job) === false)
+                    throw new HttpException(400, "archiving job failed");
+            }
+        }
 
         $this->_em->persist($job);
         $this->_em->flush();
@@ -112,19 +135,25 @@ final class BatchJobDataPersister implements ContextAwareDataPersisterInterface
     private function writeToArchive($job)
     {
         if ($this->_jobArchive->isArchived($job)) {
-            throw new HttpException(400, "Job already archived");
+            $this->_logger->warning('Job '.$job->id.' is already archived');
+            return false;
         }
 
         $jobData = $this->_jobData->getData($job, null);
         if ($jobData === false) {
-            throw new HttpException(400, "Job has no data (MetricRepository failure?)");
+            $this->_logger->error('Job '.$job->id.' has no metric');
+            return false;
         }
 
         try {
             $this->_jobArchive->archiveJob($job, $jobData, null);
         } catch (\Throwable $e) {
-            throw new HttpException(500, $e->getMessage());
+            $this->_logger->error('Archiving job '.$job->id.' failed: '.$e->getMessage());
+            return false;
         }
+
+        $this->_logger->debug('Job '.$job->id.' successfully archived');
+        return true;
     }
 
     public function remove($data, array $context = [])
