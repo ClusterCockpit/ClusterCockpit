@@ -267,18 +267,19 @@
     export let height;
     export let tiles = null;
     export let colorDots = true;
+    export let data;
 
-    console.assert(tiles || (flopsAny && memBw), "you must provide flopsAny and memBw or tiles!");
+    console.assert(data || tiles || (flopsAny && memBw), "you must provide flopsAny and memBw or tiles!");
 
     let ctx;
     let canvasElement;
-    const data = flopsAny && memBw
+    data = data != null ? data : (flopsAny && memBw
         ? transformData(flopsAny, memBw, colorDots)
         : {
             tiles: tiles,
             xLabel: 'Intensity [FLOPS/byte]',
             yLabel: 'Performance [GFLOPS]'
-        };
+        });
 
     onMount(() => {
         canvasElement.width = width;
@@ -300,7 +301,7 @@
             canvasElement.width = width;
             canvasElement.height = height;
             ctx = canvasElement.getContext('2d');
-            render(ctx, data, cluster, width, height);
+            render(ctx, data, cluster, width, height, colorDots);
         }, 250);
     }
 

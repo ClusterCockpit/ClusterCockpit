@@ -80,38 +80,34 @@
     query(rooflineQuery);
     $: updateFilters(clusterId, selectedMetric, from, to);
 
-    function rooflineTiles() {
-        const rows = 15, cols = 30;
-        let tiles = [];
-        for (let i = 0; i < rows; i++)
-            tiles.push(new Array(cols).fill(0));
+    // Only take the newest value for each node for mem_bw and flops_any
+    // and render it to the roofline plot.
+    function rooflineData(nodeMetrics) {
+        let x = new Array(), y = new Array(), c = new Array();
 
-        const [minX, maxX, minY, maxY] = [0.01, 1000, 1., cluster.flopRateSimd];
-        const [lminX, lmaxX, lminY, lmaxY] = [minX, maxX, minY, maxY].map(Math.log10);
+        console.log(nodeMetrics);
 
-        for (let node of $rooflineQuery.data.nodeMetrics) {
-            let flops = node.metrics.find(m => m.name == 'flops_any');
-            let membw = node.metrics.find(m => m.name == 'mem_bw');
-            if (!flops || !membw || flops.data.length != membw.data.length)
-                throw new Error("TODO: Error handling...");
+        for (let node of nodeMetrics) {
+            const memBw = node.metrics.find(m => m.name == 'mem_bw')
+            const flopsAny = node.metrics.find(m => m.name == 'flops_any')
+            if (!memBw || !flopsAny || memBw.data.length < 1 || flopsAny.data.length < 1)
+                continue
 
-            for (let i = 0; i < flops.data.length; i++) {
-                let f = flops.data[i], m = membw.data[i];
+            const f = flopsAny.data[flopsAny.data.length - 1], m = memBw.data[memBw.data.length - 1];
+            const intensity = f / m;
+            if (Number.isNaN(intensity) || !Number.isFinite(intensity))
+                continue;
 
-                if (m <= 0 || f == null || m == null)
-                    continue;
-
-                let x = Math.log10(f / m), y = Math.log10(f);
-                if (x < lminX || x > lmaxX || y < lminY || y > lmaxY)
-                    continue;
-
-                x = Math.floor(((x - lminX) / (lmaxX - lminX)) * cols);
-                y = Math.floor(((y - lminY) / (lmaxY - lminY)) * rows);
-                tiles[y][x] += 1;
-            }
+            x.push(intensity);
+            y.push(f);
+            c.push(0);
         }
 
-        return tiles;
+        return {
+            x, y, c,
+            xLabel: 'Intensity [FLOPS/byte]',
+            yLabel: 'Performance [GFLOPS]'
+        };
     }
 
     const getNodeUrl = typeof NODEVIEW_URL !== 'undefined'
@@ -141,8 +137,8 @@
         {:else if !$clustersQuery.fetching}
             <Resizable let:width>
                 <RooflinePlot width={width} height={300}
-                    cluster={cluster}
-                    tiles={rooflineTiles($rooflineQuery)} />
+                    cluster={cluster} colorDots={false}
+                    data={rooflineData($rooflineQuery.data.nodeMetrics)} />
             </Resizable>
         {/if}
     </Col>
@@ -246,54 +242,3 @@
         {/if}
     </Col>
 </Row>
-
-<!-- <Row>
-    <Col>
-        {#if $rooflineQuery.fetching}
-            <Spinner secondary/>
-        {:else if $rooflineQuery.error}
-            <Card body color="danger" class="mb-3">
-                <h2>Error: {$rooflineQuery.error.message}</h2>
-            </Card>
-        {:else if !$clustersQuery.fetching}
-        <table style="width: 100%; table-layout: fixed;">
-            {#each tilePlots(plotsPerRow, $rooflineQuery.data.nodeMetrics.map((node) => {
-                let flops = node.metrics.find(m => m.name == 'flops_any');
-                let membw = node.metrics.find(m => m.name == 'mem_bw');
-                if (!flops || !membw)
-                    return { id: node.id, data: null };
-
-                return {
-                    id: node.id,
-                    data: {
-                        flopsAny: { series: [{ data: flops.data }] },
-                        memBw: { series: [{ data: membw.data }] }
-                    }
-                };
-            })) as row}
-            <tr>
-                {#each row as node}
-                <td>
-                    {#if node && node.data}
-                        <span class="plot-title">{node.id}</span>
-                        <Resizable let:width>
-                            {#key node}
-                            <RooflinePlot
-                                width={width} height={300}
-                                cluster={cluster}
-                                flopsAny={node.data.flopsAny}
-                                memBw={node.data.memBw} />
-                            {/key}
-                        </Resizable>
-                    {:else if node}
-                        <span class="plot-title">{node.id}</span>
-                        <Card body color="warning">No Data</Card>
-                    {/if}
-                </td>
-                {/each}
-            </tr>
-            {/each}
-        </table>
-        {/if}
-    </Col>
-</Row> -->

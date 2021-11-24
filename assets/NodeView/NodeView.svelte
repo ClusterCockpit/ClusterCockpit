@@ -39,8 +39,6 @@
     `, { from: from.toISOString(), to: to.toISOString() });
     query(metricsQuery);
 
-    $: console.log($metricsQuery);
-
 </script>
 
 <style>
