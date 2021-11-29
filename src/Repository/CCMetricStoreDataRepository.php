@@ -28,26 +28,43 @@ namespace App\Repository;
 use App\Entity\Job;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class CCMetricStoreDataRepository implements MetricDataRepository
 {
     private $logger;
     private $httpClient;
+    private $requestStack;
 
     // TODO: FIXME: Use a generated or store JWT.
     // Actually, even the same JWT as for the GraphQL-API could be used.
     private $jwt = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.eyJ1c2VyIjoiYWRtaW4iLCJyb2xlcyI6WyJST0xFX0FETUlOIiwiUk9MRV9BTkFMWVNUIiwiUk9MRV9VU0VSIl19.d-3_3FZTsadPjDEdsWrrQ7nS0edMAR4zjl-eK7rJU3HziNBfI9PDHDIpJVHTNN5E5SlLGLFXctWyKAkwhXL-Dw";
 
     // TODO: FIXME: Use a environment variable or something like that.
-    private $host = "http://host.docker.internal:8081";
+    private $host = "http://cc-metric-store:8081";
 
     public function __construct(
         LoggerInterface $logger,
-        HttpClientInterface $client
+        HttpClientInterface $client,
+        RequestStack $requestStack
     )
     {
         $this->logger = $logger;
         $this->httpClient = $client;
+        $this->requestStack = $requestStack;
+
+        $host = getenv('CCMETRICSTORE_URL');
+        if ($host !== false)
+            $this->host = $host;
+
+        $jwt = getenv('CCMETRICSTORE_TOKEN');
+        if ($jwt !== false) {
+            $this->jwt = $jwt;
+        } else {
+            $req = $this->requestStack->getCurrentRequest();
+            if ($req != null)
+                $this->jwt = $req->getSession()->get('jwt');
+        }
     }
 
     // TODO: FIXME: Implement this. cc-metric-store could be extended by some special

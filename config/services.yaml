@@ -30,6 +30,7 @@ services:
     # configure which implementation of MetricDataRepository
     # to inject in other services such as JobData and JobStats
     App\Repository\MetricDataRepository: '@App\Repository\InfluxDBv2MetricDataRepository'
+    # App\Repository\MetricDataRepository: '@App\Repository\CCMetricStoreDataRepository'
 
     App\Resolver\RootResolverMap:
         tags:
