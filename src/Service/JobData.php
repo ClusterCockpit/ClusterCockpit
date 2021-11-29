@@ -59,6 +59,10 @@ class JobData
         $this->_cache = $cache;
     }
 
+    public function getArchive() {
+        return $this->_jobArchive;
+    }
+
     public function hasData($job)
     {
         // This will set $job->duration in case the job is still running.

@@ -304,12 +304,12 @@ class RootResolverMap extends ResolverMap
                     ];
                 },
 
-                'deleteTag' => function($value, Argument $args) {
-                    $this->checkIfActionAllowed(null);
-                    $tagId = $args['id'];
-                    $this->jobTagRepo->deleteTag($tagId);
-                    return $tagId;
-                },
+                // 'deleteTag' => function($value, Argument $args) {
+                //     $this->checkIfActionAllowed(null);
+                //     $tagId = $args['id'];
+                //     $this->jobTagRepo->deleteTag($tagId);
+                //     return $tagId;
+                // },
 
                 'addTagsToJob' => function($value, Argument $args) {
                     $tagIds = $args['tagIds'];
@@ -324,6 +324,7 @@ class RootResolverMap extends ResolverMap
                         $job->addTag($tag);
                     }
 
+                    $this->jobData->getArchive()->updateTags($job);
                     $this->jobRepo->persistJob($job);
                     return $this->getTagsArray($job->tags->getValues());
                 },
@@ -343,6 +344,7 @@ class RootResolverMap extends ResolverMap
                         }
                     }
 
+                    $this->jobData->getArchive()->updateTags($job);
                     $this->jobRepo->persistJob($job);
                     return $this->getTagsArray($job->tags->getValues());
                 },

@@ -101,6 +101,29 @@ class JobArchive {
         return json_decode($data, true);
     }
 
+    public function updateTags($job)
+    {
+        $path = $this->getJobDirectory($job).'/meta.json';
+        if (!file_exists($path)) {
+            $path = $this->getLegacyJobDirectory($job).'/meta.json';
+            if (!file_exists($path))
+                return false;
+        }
+
+        $metadata = json_decode(file_get_contents($path), true);
+        if ($metadata === false)
+            return false;
+
+        $metadata["tags"] = array_map(function($tag) {
+            return [
+                "name" => $tag["name"],
+                "type" => $tag["type"]
+            ];
+        }, $job->getTagsArray());
+
+        return file_put_contents($path, json_encode($metadata));
+    }
+
     /*
      * This function archives the job as JSON files data.json and meta.json.
      * $jobData must contain the jobs metrics data in the format returned by JobData::getData.
