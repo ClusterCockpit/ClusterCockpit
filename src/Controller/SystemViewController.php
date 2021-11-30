@@ -35,7 +35,6 @@ class SystemViewController extends AbstractController
 {
     public function system(
         Request $request,
-        string $clusterId,
         Configuration $configuration,
         ColorMap $colorMaps,
         $projectDir
@@ -49,8 +48,7 @@ class SystemViewController extends AbstractController
             array(
                 'jwt' => $request->getSession()->get('jwt'),
                 'config' => $config,
-                'colormap' => $colorMaps->getColorMap(),
-                'clusterId' => $clusterId
+                'colormap' => $colorMaps->getColorMap()
             ));
     }
 

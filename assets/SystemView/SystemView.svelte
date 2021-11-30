@@ -13,13 +13,12 @@
     import TimeseriesPlot from '../Plots/Timeseries.svelte';
     import RooflinePlot from '../Plots/Roofline.svelte';
 
-    export let clusterId;
-
     const metricConfig = {};
     $: Object.assign(metricConfig, $clustersQuery.metricConfig);
     setContext('metric-config', metricConfig);
     setContext('clusters-query', clustersQuery);
 
+    let clusterId = null;
     let selectedMetric = "flops_any";
     let plotsPerRow = 2;
     let from = new Date(Date.now() - 30 * 60 * 1000);
@@ -29,6 +28,18 @@
     $: cluster = $clustersQuery.clusters && clusterId
         ? $clustersQuery.clusters.find(c => c.clusterID == clusterId)
         : null;
+
+    $: {
+        // Initialization:
+        if (!$clustersQuery.fetching && !$clustersQuery.error && clusterId == null) {
+            clusterId = window.localStorage.getItem('cc-system-view-cluster');
+            if (clusterId == null || !$clustersQuery.clusters.find(c => c.clusterID == clusterId)) {
+                clusterId = $clustersQuery.clusters[0].clusterID;
+            }
+            $nodesQuery.context.pause = false;
+            $rooflineQuery.context.pause = false;
+        }
+    }
 
     const nodesQuery = operationStore(`
         query($cluster: ID!, $metrics: [String!], $from: Time!, $to: Time!) {
@@ -42,7 +53,7 @@
         metrics: [selectedMetric],
         from: from.toISOString(),
         to: to.toISOString()
-    });
+    }, { pause: true });
 
     // TODO: FIXME: Do this calculation server side?
     // TODO: FIXME: Refetch less often?
@@ -53,7 +64,11 @@
                 metrics { name, data }
             }
         }
-    `, { cluster: clusterId, from: from.toISOString(), to: to.toISOString() });
+    `, {
+        cluster: clusterId,
+        from: from.toISOString(),
+        to: to.toISOString()
+    }, { pause: true });
 
     function updateFilters() {
         if (from == null || to == null)
@@ -84,9 +99,6 @@
     // and render it to the roofline plot.
     function rooflineData(nodeMetrics) {
         let x = new Array(), y = new Array(), c = new Array();
-
-        console.log(nodeMetrics);
-
         for (let node of nodeMetrics) {
             const memBw = node.metrics.find(m => m.name == 'mem_bw')
             const flopsAny = node.metrics.find(m => m.name == 'flops_any')
@@ -134,7 +146,7 @@
             <Card body color="danger" class="mb-3">
                 <h2>Error: {$rooflineQuery.error.message}</h2>
             </Card>
-        {:else if !$clustersQuery.fetching}
+        {:else if !$clustersQuery.fetching && cluster != null}
             <Resizable let:width>
                 <RooflinePlot width={width} height={300}
                     cluster={cluster} colorDots={false}
@@ -160,7 +172,9 @@
                 <InputGroupText>
                     Cluster
                 </InputGroupText>
-                <select class="form-select" bind:value={clusterId}>
+                <select class="form-select" bind:value={clusterId} on:change={() =>
+                    window.localStorage.setItem('cc-system-view-cluster', clusterId)}>
+                    <option value={null}>None</option>
                     {#each $clustersQuery.clusters as cluster}
                         <option value={cluster.clusterID}>{cluster.clusterID}</option>
                     {/each}
@@ -195,7 +209,7 @@
             <Card body color="danger" class="mb-3">
                 <h2>Error: {$nodesQuery.error.message}</h2>
             </Card>
-        {:else if !$clustersQuery.fetching}
+        {:else if !$clustersQuery.fetching && cluster != null}
             <h5>{selectedMetric}</h5>
 
             <Row><Col>

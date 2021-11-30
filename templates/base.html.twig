@@ -40,6 +40,14 @@
                                     </a>
                                 </li>
                             {% endblock %}
+                            {% block navitem_systems %}
+                                <li class="nav-item">
+                                    <a class="nav-link fs-5" href="{{ path('systems') }}">
+                                        <span class="cc-nav-text">Systems</span>
+                                        <i class="bi-graph-up"></i>
+                                    </a>
+                                </li>
+                            {% endblock %}
                             {% block navitem_users %}
                                 <li class="nav-item">
                                     <a class="nav-link fs-5" href="{{ path('user_stat') }}">

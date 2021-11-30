@@ -7,15 +7,20 @@
 {% endblock %}
 
 {% block title %}
-    Cluster {{ clusterId }}
+    System View
+{% endblock %}
+
+{% block navitem_systems %}
+    <li class="nav-item">
+        <a class="nav-link active fs-5" style="color: {{ active_link_color }};" aria-current="page" href="{{ path('systems') }}">
+            <span class="cc-nav-text">Systems</span>
+            <i class="bi-card-list"></i>
+        </a>
+    </li>
 {% endblock %}
 
 {% block javascript %}
     <script type="text/javascript">
-        const clusterInfos = {
-            clusterId: "{{ clusterId }}"
-        };
-
         const clusterCockpitConfigPromise = Promise.resolve({
             jwt: "{{ jwt }}",
             plot_general_colorscheme: {{ colormap | json_encode | raw }},
