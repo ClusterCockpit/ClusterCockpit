@@ -197,10 +197,10 @@ class CCMetricStoreDataRepository implements MetricDataRepository
 
         $res = $this->httpClient->request(
             'POST',
-            $this->host.'/api/'.$cluster["clusterID"].'/'.($job->getStartTime()).'/'.($job->getStartTime() + $job->getDuration()).'/all-nodes',
+            $this->host.'/api/'.$cluster["clusterID"].'/'.($from).'/'.($to).'/all-nodes',
             [
                 'headers' => [ 'Authorization' => 'Bearer '.($this->jwt) ],
-                'json' => [ 'metrics' => array_map(function ($m) { return $m["name"]; }, $metrics) ]
+                'json' => [ 'metrics' => $metrics ]
             ]);
 
         if ($res->getStatusCode() != 200)

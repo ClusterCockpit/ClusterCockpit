@@ -40,6 +40,7 @@ use App\Service\Configuration;
 use App\Service\ClusterConfiguration;
 use App\Repository\JobRepository;
 use App\Repository\JobTagRepository;
+use App\Repository\MetricDataRepository;
 
 class RootResolverMap extends ResolverMap
 {
@@ -55,6 +56,7 @@ class RootResolverMap extends ResolverMap
     private $security;
     private $projectDir;
     private $scrambleNames;
+    private $metricDataRepository;
 
     public function __construct(
         JobRepository $jobRepo,
@@ -65,6 +67,7 @@ class RootResolverMap extends ResolverMap
         LoggerInterface $logger,
         Configuration $configuration,
         Security $security,
+        MetricDataRepository $metricRepo,
         $projectDir
     )
     {
@@ -76,6 +79,7 @@ class RootResolverMap extends ResolverMap
         $this->logger = $logger;
         $this->configuration = $configuration;
         $this->security = $security;
+        $this->metricDataRepository = $metricRepo;
         $this->projectDir = $projectDir;
         $this->scrambleNames = filter_var($this->configuration->getValue("general_user_scramble"), FILTER_VALIDATE_BOOLEAN);
     }
@@ -278,15 +282,13 @@ class RootResolverMap extends ResolverMap
                 },
 
                 'nodeMetrics' => function($value, Argument $args) {
-                    $clusterId = $args['cluster'];
+                    $cluster = $this->clusterCfg->getClusterConfiguration($args['cluster']);
                     $nodes = $args['nodes'];
                     $metrics = $args['metrics'];
-                    $from = $args['from'];
-                    $to = $args['to'];
-
-                    // TODO: FIXME: How to test this?
-                    // TODO: FIXME: Replace by actual implementation...
-                    return $this->mockingData($nodes, $metrics);
+                    $data = $this->metricDataRepository->getNodeMetrics($cluster, $nodes, $metrics, $args['from'], $args['to']);
+                    if ($data === false)
+                        throw new Error("The configured MetricDataRepository does not support this View/Query");
+                    return $data;
                 }
             ],
 
@@ -382,58 +384,5 @@ class RootResolverMap extends ResolverMap
                 self::PARSE_LITERAL => function ($valueNode) { return strtotime($valueNode->value); }
             ]
         ];
-    }
-
-    // TODO: FIXME:
-    private function mockingData($nodes, $metrics) {
-        $data = [
-            [
-                "id" => "host-1",
-                "metrics" => [
-                    ["name" => "cpu_load",  "data" => [ 2.5,  5., 10., 20., 40., 40. ]],
-                    ["name" => "flops_any", "data" => [ 100, 200, 300, 400, 500, 600 ]],
-                    ["name" => "mem_used",  "data" => [ 6, 5, 4, 3, 2, 1 ]],
-                    ["name" => "mem_bw",    "data" => [ 21, 22, 23, 34, 25, 26 ]],
-                ]
-            ],
-            [
-                "id" => "host-2",
-                "metrics" => [
-                    ["name" => "cpu_load",  "data" => [ 20, 20, 20, 20, 20, 20 ]],
-                    ["name" => "flops_any", "data" => [ 100, 200, 300, 200, 100, 0 ]],
-                    ["name" => "mem_used",  "data" => [ 1, 2, 3, 4, 5, 6 ]],
-                    ["name" => "mem_bw",    "data" => [ 21, 22, 23, 34, 25, 26 ]],
-                ]
-            ],
-            [
-                "id" => "host-3",
-                "metrics" => [
-                    ["name" => "cpu_load",  "data" => [ 20, 20, 20, 20, 20, 20 ]],
-                    ["name" => "flops_any", "data" => [ 100, 200, 300, 200, 100, 0 ]],
-                    ["name" => "mem_used",  "data" => [ 5, 4, 5, 4, 5, 4 ]],
-                    ["name" => "mem_bw",    "data" => [ 21, 22, 23, 34, 25, 26 ]],
-                ]
-            ],
-        ];
-
-        if ($metrics != null) {
-            foreach ($data as $key => &$value) {
-                $metricdata = [];
-                foreach ($value["metrics"] as $metric) {
-                    if (in_array($metric["name"], $metrics))
-                        $metricdata[] = $metric;
-                }
-
-                $value["metrics"] = $metricdata;
-            }
-        }
-
-        if ($nodes != null) {
-            return array_filter($data, function($node) use ($nodes) {
-                return in_array($node["id"], $nodes);
-            });
-        }
-
-        return $data;
     }
 }
