@@ -102,6 +102,10 @@ final class JobDataPersister implements ContextAwareDataPersisterInterface
             }
         }
 
+        $this->_eventDispatcher->addListener(KernelEvents::TERMINATE, function ($event) use ($job) {
+            $this->_jobArchive->updateTags($job);
+        });
+
         return $this->_decorated->persist($job, $context);
     }
 
