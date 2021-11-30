@@ -267,7 +267,7 @@
     export let height;
     export let tiles = null;
     export let colorDots = true;
-    export let data;
+    export let data = null;
 
     console.assert(data || tiles || (flopsAny && memBw), "you must provide flopsAny and memBw or tiles!");
 

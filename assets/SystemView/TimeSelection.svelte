@@ -15,10 +15,6 @@
             return;
         }
 
-        if (timeRange == (to.getTime() - from.getTime()) / 1000) {
-            return;
-        }
-
         let now = Date.now(), t = timeRange * 1000;
         from = new Date(now - t);
         to = new Date(now);

@@ -21,23 +21,25 @@
     let clusterId = null;
     let selectedMetric = "flops_any";
     let plotsPerRow = 2;
-    let from = new Date(Date.now() - 30 * 60 * 1000);
-    let to = new Date(Date.now());
+    let from = new Date(Date.now() - 30 * 60 * 1000); // new Date(Date.parse("2021-01-01T12:00:00.000")),
+    let to = new Date(Date.now()); // new Date(Date.parse("2021-01-01T12:05:00.000"));
     let cluster = null;
 
     $: cluster = $clustersQuery.clusters && clusterId
         ? $clustersQuery.clusters.find(c => c.clusterID == clusterId)
         : null;
 
+    let clusterSelected = false;
     $: {
         // Initialization:
-        if (!$clustersQuery.fetching && !$clustersQuery.error && clusterId == null) {
+        if (!$clustersQuery.fetching && !$clustersQuery.error && clusterSelected == false) {
             clusterId = window.localStorage.getItem('cc-system-view-cluster');
             if (clusterId == null || !$clustersQuery.clusters.find(c => c.clusterID == clusterId)) {
                 clusterId = $clustersQuery.clusters[0].clusterID;
             }
             $nodesQuery.context.pause = false;
             $rooflineQuery.context.pause = false;
+            clusterSelected = true;
         }
     }
 
@@ -105,7 +107,8 @@
             if (!memBw || !flopsAny || memBw.data.length < 1 || flopsAny.data.length < 1)
                 continue
 
-            const f = flopsAny.data[flopsAny.data.length - 1], m = memBw.data[memBw.data.length - 1];
+            const f = flopsAny.data[flopsAny.data.length - 1],
+                  m = memBw.data[memBw.data.length - 1];
             const intensity = f / m;
             if (Number.isNaN(intensity) || !Number.isFinite(intensity))
                 continue;
