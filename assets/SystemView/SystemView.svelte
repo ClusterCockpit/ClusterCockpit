@@ -11,6 +11,7 @@
     import TimeSelection from './TimeSelection.svelte';
     import Resizable from '../Common/Resizable.svelte';
     import TimeseriesPlot from '../Plots/Timeseries.svelte';
+    import ResizeableTable from '../Common/ResizeableTable.svelte';
     import RooflinePlot from '../Plots/Roofline.svelte';
 
     const metricConfig = {};
@@ -21,8 +22,8 @@
     let clusterId = null;
     let selectedMetric = "flops_any";
     let plotsPerRow = 2;
-    let from = new Date(Date.now() - 30 * 60 * 1000); // new Date(Date.parse("2021-01-01T12:00:00.000")),
-    let to = new Date(Date.now()); // new Date(Date.parse("2021-01-01T12:05:00.000"));
+    let from = new Date(Date.now() - 30 * 60 * 1000); // new Date(Date.parse("2021-01-01T12:00:00.000"));
+    let to = new Date(Date.now()); // new Date(Date.parse("2021-01-01T12:30:00.000"));
     let cluster = null;
 
     $: cluster = $clustersQuery.clusters && clusterId
@@ -86,9 +87,11 @@
             cluster: clusterId, metrics: [selectedMetric],
             from: from.toISOString(), to: to.toISOString()
         };
+
+        let rooflineFrom = new Date(to.getTime() - 5 * 60 * 1000)
         $rooflineQuery.variables = {
             cluster: clusterId,
-            from: from.toISOString(), to: to.toISOString()
+            from: rooflineFrom.toISOString(), to: to.toISOString()
         };
         console.log('query:', ...Object.entries($nodesQuery.variables).flat());
     }
@@ -216,45 +219,35 @@
             <h5>{selectedMetric}</h5>
 
             <Row><Col>
-                <table style="width: 100%; table-layout: fixed;">
-                    {#each tilePlots(plotsPerRow, $nodesQuery.data.nodeMetrics.map((node) => {
-                        let m = node.metrics.find(m => m.name == selectedMetric);
-                        if (m == null)
-                            return ({ id: node.id, metric: selectedMetric, data: null });
+                <ResizeableTable let:width let:item={node} itemsPerRow={plotsPerRow} items={$nodesQuery.data.nodeMetrics.map((node) => {
+                    let m = node.metrics.find(m => m.name == selectedMetric);
+                    if (m == null || m.data.length == 0)
+                        return ({ id: node.id, metric: selectedMetric, data: null });
 
-                        return {
-                            id: node.id,
-                            metric: m.name,
-                            data: {
-                                timestep: metricConfig[clusterId][selectedMetric].sampletime,
-                                series: [{ data: m.data }]
-                            }
-                        };
-                    })) as row}
-                    <tr>
-                        {#each row as node}
-                        <td>
-                            {#if node && node.data}
-                                <span class="plot-title"><a href={getNodeUrl(clusterId, node.id)}>{node.id}</a></span>
-                                <Resizable let:width>
-                                    {#key node}
-                                    <TimeseriesPlot
-                                        metric={node.metric}
-                                        clusterId={clusterId}
-                                        data={node.data}
-                                        height={200}
-                                        width={width} />
-                                    {/key}
-                                </Resizable>
-                            {:else if node}
-                                <span class="plot-title">{node.id}</span>
-                                <Card body color="warning">No Data</Card>
-                            {/if}
-                        </td>
-                        {/each}
-                    </tr>
-                    {/each}
-                </table>
+                    return {
+                        id: node.id,
+                        metric: m.name,
+                        data: {
+                            timestep: metricConfig[clusterId][selectedMetric].sampletime,
+                            series: [{ data: m.data }]
+                        }
+                    };
+                })}>
+                    {#if node && node.data}
+                        <span class="plot-title"><a href={getNodeUrl(clusterId, node.id)}>{node.id}</a></span>
+                        {#key node}
+                        <TimeseriesPlot
+                            metric={node.metric}
+                            clusterId={clusterId}
+                            data={node.data}
+                            height={200}
+                            width={width} />
+                        {/key}
+                    {:else if node}
+                        <span class="plot-title">{node.id}</span>
+                        <Card body color="warning">No Data</Card>
+                    {/if}
+                </ResizeableTable>
             </Col></Row>
         {/if}
     </Col>
