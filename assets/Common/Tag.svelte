@@ -3,7 +3,7 @@
 
     const getTagUrl = typeof TAG_URL !== 'undefined'
         ? TAG_URL
-        : tag => `/monitoring/user/${tag.id}`;
+        : tag => `/monitoring/tag/${tag.id}`;
 </script>
 
 <style>
