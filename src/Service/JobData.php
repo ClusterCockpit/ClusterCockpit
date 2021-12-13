@@ -39,7 +39,7 @@ class JobData
     const CACHE_EXPIRES_AFTER_RUNNING = 60; // 1min
     const CACHE_EXPIRES_AFTER_ARCHIVED = 60 * 60; // 1h
 
-    private $_metricDataRepository;
+    private $_defaultMetricDataRepository;
     private $_clusterCfg;
     private $_jobArchive;
     private $_logger;
@@ -52,14 +52,22 @@ class JobData
         CacheInterface $cache
     )
     {
-        $this->_metricDataRepository = $metricRepo;
+        $this->_defaultMetricDataRepository = $metricRepo;
         $this->_clusterCfg = $clusterCfg;
         $this->_jobArchive = $jobArchive;
         $this->_logger = $logger;
         $this->_cache = $cache;
     }
 
-    public function getArchive() {
+    public function getMetricDataRepository($cluster): MetricDataRepository
+    {
+        // TODO: Issue https://github.com/ClusterCockpit/ClusterCockpit/issues/104 should be adressed
+        // here, but it is much harder than anticipated.
+        return $this->_defaultMetricDataRepository;
+    }
+
+    public function getArchive()
+    {
         return $this->_jobArchive;
     }
 
@@ -76,7 +84,8 @@ class JobData
         }
 
         if (!$job->hasProfile){
-            $this->_metricDataRepository->hasProfile($job,
+            $cluster = $this->_clusterCfg->getClusterConfiguration($job->getClusterId());
+            $this->getMetricDataRepository($cluster)->hasProfile($job,
                 $this->_clusterCfg->getSingleMetric($job->getClusterId()));
         }
 
@@ -101,19 +110,20 @@ class JobData
 
     private function _getData($job, $metrics)
     {
+        $cluster = $this->_clusterCfg->getClusterConfiguration($job->getClusterId());
         if ($metrics == null) {
-            $cluster = $this->_clusterCfg->getClusterConfiguration($job->getClusterId());
             $metrics = array_keys($cluster['metricConfig']);
         }
 
         if (!$this->_jobArchive->isArchived($job) && !$this->_jobArchive->isLegacyArchived($job)) {
             $metricConfig = $this->_clusterCfg->getMetricConfiguration($job->getClusterId(), $metrics);
+            $repo = $this->getMetricDataRepository($cluster);
 
-            $data = $this->_metricDataRepository->getMetricData($job, $metricConfig);
+            $data = $repo->getMetricData($job, $metricConfig);
             if ($data === false)
                 return false;
 
-            $stats = $this->_metricDataRepository->getJobStats($job, $metricConfig);
+            $stats = $repo->getJobStats($job, $metricConfig);
             $res = [];
             foreach ( $metricConfig as $metricName => $metric) {
                 if (!isset($data[$metricName]))

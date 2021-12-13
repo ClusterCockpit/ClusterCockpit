@@ -192,8 +192,47 @@ class CCMetricStoreDataRepository implements MetricDataRepository
 
     public function getNodeMetrics($cluster, $nodes, $metrics, $from, $to)
     {
-        if ($nodes !== null)
-            throw new \Exception("TODO");
+        if ($nodes !== null) {
+            $request = ['selectors' => [], 'metrics' => $metrics];
+            foreach ($nodes as $node)
+                $request['selectors'][] = [$cluster["clusterID"], $node];
+    
+            $this->logger->info('CC_METRIC_STORE: '.json_encode($request));
+
+            $res = $this->httpClient->request(
+                'POST',
+                $this->host.'/api/'.$from.'/'.$to.'/timeseries',
+                [
+                    'headers' => [ 'Authorization' => 'Bearer '.($this->jwt) ],
+                    'json' => $request
+                ]);
+
+            if ($res->getStatusCode() != 200)
+                throw new \Exception("CCMetricStoreDataRepository: HTTP response status code: ".($res->getStatusCode()));
+            $res = $res->toArray();
+
+            $data = [];
+            foreach ($nodes as $idx => $node) {
+                $nodedata = [
+                    'id' => $node,
+                    'metrics' => []
+                ];
+
+                foreach ($res[$idx] as $metric => $metricData) {
+                    if (isset($metricData['error'])) {
+                        $this->logger->error("CCMetricStoreDataRepository: metric='".$metric."', error='".$metricData['error']."'");
+                        continue;
+                    }
+
+                    $nodedata['metrics'][] = [
+                        'name' => $metric,
+                        'data' => $metricData["data"]
+                    ];
+                }
+                $data[] = $nodedata;
+            }
+            return $data;
+        }
 
         $res = $this->httpClient->request(
             'POST',

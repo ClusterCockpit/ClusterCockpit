@@ -40,7 +40,6 @@ use App\Service\Configuration;
 use App\Service\ClusterConfiguration;
 use App\Repository\JobRepository;
 use App\Repository\JobTagRepository;
-use App\Repository\MetricDataRepository;
 
 class RootResolverMap extends ResolverMap
 {
@@ -56,7 +55,6 @@ class RootResolverMap extends ResolverMap
     private $security;
     private $projectDir;
     private $scrambleNames;
-    private $metricDataRepository;
 
     public function __construct(
         JobRepository $jobRepo,
@@ -67,7 +65,6 @@ class RootResolverMap extends ResolverMap
         LoggerInterface $logger,
         Configuration $configuration,
         Security $security,
-        MetricDataRepository $metricRepo,
         $projectDir
     )
     {
@@ -79,7 +76,6 @@ class RootResolverMap extends ResolverMap
         $this->logger = $logger;
         $this->configuration = $configuration;
         $this->security = $security;
-        $this->metricDataRepository = $metricRepo;
         $this->projectDir = $projectDir;
         $this->scrambleNames = filter_var($this->configuration->getValue("general_user_scramble"), FILTER_VALIDATE_BOOLEAN);
     }
@@ -283,9 +279,17 @@ class RootResolverMap extends ResolverMap
 
                 'nodeMetrics' => function($value, Argument $args) {
                     $cluster = $this->clusterCfg->getClusterConfiguration($args['cluster']);
-                    $nodes = $args['nodes'];
+                    $repo = $this->jobData->getMetricDataRepository($cluster);
                     $metrics = $args['metrics'];
-                    $data = $this->metricDataRepository->getNodeMetrics($cluster, $nodes, $metrics, $args['from'], $args['to']);
+                    if ($metrics == null) {
+                        $metrics = [];
+                        foreach ($cluster['metricConfig'] as $metric) {
+                            $metrics[] = $metric['name'];
+                        }
+
+                    }
+
+                    $data = $repo->getNodeMetrics($cluster, $args['nodes'], $metrics, $args['from'], $args['to']);
                     if ($data === false)
                         throw new Error("The configured MetricDataRepository does not support this View/Query");
                     return $data;
