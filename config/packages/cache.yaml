@@ -8,8 +8,3 @@ framework:
 
         # system: cache.adapter.redis
         app: cache.adapter.redis
-        pools:
-            doctrine.result_cache_pool:
-                adapter: cache.app
-            doctrine.system_cache_pool:
-                adapter: cache.system

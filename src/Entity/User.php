@@ -125,7 +125,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-
     public function getPlainPassword()
     {
         return $this->plainPassword;

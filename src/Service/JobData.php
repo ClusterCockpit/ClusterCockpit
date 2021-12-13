@@ -147,7 +147,7 @@ class JobData
                     'metric' => [
                         'unit' => $metric['unit'],
                         'scope' => 'node', // TODO: Add scope to cluster.json/metricConfig? // $metric['scope'],
-                        'timestep' => $metric['sampletime'],
+                        'timestep' => $metric['timestep'],
                         'series' => $series
                     ]
                 ];

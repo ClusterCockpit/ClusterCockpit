@@ -79,12 +79,12 @@ class JobRepository extends ServiceEntityRepository
             foreach ($filterList as $i => $filter) {
                 if (isset($filter['jobId']))
                     $this->addStringCondition($qb, 'jobId', $i, $filter['jobId']);
-                if (isset($filter['userId']))
-                    $this->addStringCondition($qb, 'userId', $i, $filter['userId']);
-                if (isset($filter['projectId']))
-                    $this->addStringCondition($qb, 'projectId', $i, $filter['projectId']);
-                if (isset($filter['clusterId']))
-                    $this->addStringCondition($qb, 'clusterId', $i, $filter['clusterId']);
+                if (isset($filter['user']))
+                    $this->addStringCondition($qb, 'user', $i, $filter['user']);
+                if (isset($filter['project']))
+                    $this->addStringCondition($qb, 'project', $i, $filter['project']);
+                if (isset($filter['cluster']))
+                    $this->addStringCondition($qb, 'cluster', $i, $filter['cluster']);
 
                 if (isset($filter['duration']))
                     $qb->andWhere("j.duration BETWEEN :duration_from_$i AND :duration_to_$i")
@@ -167,7 +167,7 @@ class JobRepository extends ServiceEntityRepository
         $stats = [];
         foreach ($clusters as &$cluster) {
             $filter = $filters; // PHP is strange
-            $filter[] = ['clusterId' => ['eq' => $cluster['clusterID']]];
+            $filter[] = ['cluster' => ['eq' => $cluster['cluster']]];
             $coresPerNode = $cluster['socketsPerNode'] * $cluster['coresPerSocket'];
             $qb = $this->createQueryBuilder('j');
             $this->buildJobFilter($qb, $filter, null);
@@ -186,12 +186,12 @@ class JobRepository extends ServiceEntityRepository
                 $qb->select([
                     'j.'.strtolower($groupBy).'Id AS gid', 'COUNT(j.id) AS jobs', 'SUM(j.duration) / 3600 AS walltime',
                     'SUM(j.duration * j.numNodes * '.$coresPerNode.') / 3600 AS corehours'])->groupBy('gid');
-                
+
                 $rows = $qb->getQuery()->getResult();
                 foreach ($rows as $row) {
                     $s = $stats[$row['gid']] ?? [ 'id' => $row['gid'], 'totalJobs' => 0,
                         'totalWalltime' => 0, 'totalCoreHours' => 0 ];
-                    
+
                     $s['totalJobs'] += intval($row['jobs']);
                     $s['totalWalltime'] += intval($row['walltime']);
                     $s['totalCoreHours'] += intval($row['corehours']);
@@ -208,7 +208,7 @@ class JobRepository extends ServiceEntityRepository
         } else {
             $qb->select(['j.'.strtolower($groupBy).'Id AS id', 'COUNT(j.'.strtolower($groupBy).'Id) AS count'])
                 ->andWhere('j.duration < 120')->groupBy('id');
-            
+
             $rows = $qb->getQuery()->getResult();
             foreach ($rows as $row) {
                 $stats[$row['id']]['shortJobs'] = $row['count'];
@@ -251,8 +251,8 @@ class JobRepository extends ServiceEntityRepository
         $qb->setParameter('jobId', $jobId);
 
         if ( $clusterId ){
-            $qb->andWhere("j.clusterId = :clusterId");
-            $qb->setParameter('clusterId', $clusterId);
+            $qb->andWhere("j.cluster = :cluster");
+            $qb->setParameter('cluster', $clusterId);
         }
         // if ( $startTime ){
         //     $qb->andWhere("j.startTime = $startTime");
