@@ -55,9 +55,9 @@ class JobViewController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
 
         if ( false === $authChecker->isGranted('ROLE_ADMIN') ) {
-            $userId = $this->getUser()->getUsername();
+            $user = $this->getUser()->getUsername();
             $job = $jobRepo->findOneBy(
-                ['jobId' => $searchId, 'userId' => $userId]
+                ['job' => $searchId, 'user' => $user]
             );
 
             if (!$job) {
@@ -69,7 +69,7 @@ class JobViewController extends AbstractController
                 return $this->redirectToRoute('show_job', array('id' => $job->id));
             }
         } else {
-            $job = $jobRepo->findOneBy(['jobId' => $searchId]);
+            $job = $jobRepo->findOneBy(['job' => $searchId]);
 
             if (!$job) {
                 $user = $userRepo->findOneBy(['username' => $searchId]);

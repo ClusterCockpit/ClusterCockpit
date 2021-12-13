@@ -149,7 +149,7 @@ class InfluxDBMetricDataRepository implements MetricDataRepository
                 MEAN({$metric['name']})  AS {$metric['name']}
                 FROM {$metric['measurement']}
                 WHERE  time >= {$job->startTime}s AND time <= {$stopTime}s
-                AND host =~ /$nodes/ GROUP BY time({$metric['sampletime']}s), host";
+                AND host =~ /$nodes/ GROUP BY time({$metric['timestep']}s), host";
 
             $this->_timer->start( 'InfluxDB');
             $result = $this->_database->query($query, ['epoch' => 's']);

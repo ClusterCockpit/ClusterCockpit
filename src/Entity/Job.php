@@ -33,43 +33,43 @@ use Symfony\Component\Validator\Constraints as Assert;
 use ApiPlatform\Core\Annotation\ApiResource;
 
 /**
-*  @ORM\Entity(repositoryClass="App\Repository\JobRepository")
-*  @ORM\Table(name="job",indexes={@ORM\Index(name="search_idx", columns={"is_running","cluster_id"})})
-*/
+ *  @ORM\Entity(repositoryClass="App\Repository\JobRepository")
+ *  @ORM\Table(name="job",indexes={@ORM\Index(name="search_idx", columns={"job_state","cluster"})})
+ */
 #[ApiResource(
-    attributes: [
-        'validation_groups' => ['start_validation', 'stop_validation']
+attributes: [
+    'validation_groups' => ['start_validation', 'stop_validation']
+],
+collectionOperations: [
+    'post' => [
+        'path' => '/jobs/start_job/',
+        'denormalization_context' => ['groups' => ['start']],
+        'validation_groups' => ['start_validation']
     ],
-    collectionOperations: [
-        'post' => [
-            'path' => '/jobs/start_job/',
-            'denormalization_context' => ['groups' => ['start']],
-            'validation_groups' => ['start_validation']
-        ],
+],
+itemOperations: [
+    'get' => [
+        'path' => '/jobs/{id}',
+        'normalization_context' => ['groups' => ['read']],
     ],
-    itemOperations: [
-        'get' => [
-            'path' => '/jobs/{id}',
-            'normalization_context' => ['groups' => ['read']],
-        ],
-        'put' => [
-            'path' => '/jobs/stop_job/{id}',
-            'denormalization_context' => ['groups' => ['stop']],
-            'validation_groups' => ['stop_validation']
-        ],
-        'patch' => [
-            'path' => '/jobs/tag_job/{id}',
-            'denormalization_context' => ['groups' => ['tag']],
-            'validation_groups' => []
-        ],
+    'put' => [
+        'path' => '/jobs/stop_job/{id}',
+        'denormalization_context' => ['groups' => ['stop']],
+        'validation_groups' => ['stop_validation']
     ],
+    'patch' => [
+        'path' => '/jobs/tag_job/{id}',
+        'denormalization_context' => ['groups' => ['tag']],
+        'validation_groups' => []
+    ],
+],
 )]
 class Job
 {
     /**
      *  The db id of this job.
      *
-     *  @ORM\Column(type="integer")
+     *  @ORM\Column(type="bigint")
      *  @ORM\Id
      *  @ORM\GeneratedValue(strategy="AUTO")
      *  @Groups({"read"})
@@ -79,21 +79,46 @@ class Job
     /**
      *  The jobId of this job.
      *
-     *  @ORM\Column(type="integer")
+     *  @ORM\Column(type="bigint")
      *  @Groups({"read","start"})
      *  @Assert\Positive
      *  @Assert\NotBlank(groups={"start_validation"})
      */
-    private int $jobId;
+    public int $jobId;
 
     /**
-     * The userId for this job.
+     * The batch job partition for this job.
      *
      *  @ORM\Column(type="string")
      *  @Groups({"read","start"})
      *  @Assert\NotBlank(groups={"start_validation"})
      */
-    private string $userId;
+    public string $partition;
+
+    /**
+     * The global array job ID if applicable.
+     *
+     *  @ORM\Column(type="bigint")
+     *  @Groups({"read","start"})
+     */
+    public int $arrayJobId = 0;
+
+    /**
+     * The requested walltime.
+     *
+     *  @ORM\Column(type="integer")
+     *  @Groups({"read","start"})
+     */
+    public int $walltime = 0;
+
+    /**
+     * The user for this job.
+     *
+     *  @ORM\Column(type="string")
+     *  @Groups({"read","start"})
+     *  @Assert\NotBlank(groups={"start_validation"})
+     */
+    public string $user;
 
     /**
      * The cluster on which the job was executed.
@@ -102,20 +127,20 @@ class Job
      *  @Groups({"read","start"})
      *  @Assert\NotBlank(groups={"start_validation"})
      */
-    private string $clusterId;
+    public string $cluster;
 
     /**
-     * The number of nodes used by the job.
+     * The project Id for this job.
      *
-     *  @ORM\Column(type="integer")
-     *  @Groups({"read"})
+     *  @ORM\Column(type="string")
+     *  @Groups({"start"})
      */
-    public int $numNodes = 0;
+    public string $project= "noProject";
 
     /**
      * When the job was started in unxi epoch time seconds.
      *
-     *  @ORM\Column(type="integer")
+     *  @ORM\Column(type="bigint")
      *  @Groups({"read","start"})
      *  @Assert\Positive
      *  @Assert\NotBlank(groups={"start_validation"})
@@ -123,8 +148,9 @@ class Job
     public int $startTime = 0;
 
     /**
-     * When the job was started in unix epoch time seconds.
+     * When the job was stopped in unix epoch time seconds.
      *
+     *  @ORM\Column(type="bigint")
      *  @Groups({"stop"})
      *  @Assert\Positive
      *  @Assert\NotBlank(groups={"stop_validation"})
@@ -137,39 +163,85 @@ class Job
      *  @ORM\Column(type="integer")
      *  @Groups({"read"})
      */
-    public int $duration = 0;
+    private int $duration = 0;
 
     /**
-     * The node list of the job as string list separated by | character.
+     * The number of nodes used by the job.
      *
-     *  @ORM\Column(type="text")
+     *  @ORM\Column(type="integer")
+     *  @Groups({"read"})
+     */
+    public int $numNodes = 0;
+
+    /**
+     * The number of hwthreads used by the job.
+     *
+     *  @ORM\Column(type="integer", options={"default":0})
+     *  @Groups({"read"})
+     */
+    public int $numHwthreads = 0;
+
+    /**
+     * The number of GPUs used by the job.
+     *
+     *  @ORM\Column(type="integer", options={"default":0})
+     *  @Groups({"read"})
+     */
+    public int $numAcc = 0;
+
+    /**
+     * Flag to indicate if SMT is used.
+     *
+     *  @ORM\Column(type="smallint", options={"default":1})
+     *  @Groups({"read"})
+     */
+    public $smt = 1;
+
+    /**
+     * Flag if nodes are used exclusive.
+     * Can be one of:
+     *  * 0 Shared among multiple jobs of multiple users
+     *  * 1 Job exclusive
+     *  * 2 Shared among multiple jobs of same user
+     *
+     *  @ORM\Column(type="smallint", options={"default":1})
+     *  @Groups({"read"})
+     */
+    public int $exclusive = 1;
+
+    /**
+     * The resources used by the job.
+     *
+     *  @ORM\Column(type="json")
      *  @Groups({"read","start"})
      *  @Assert\NotBlank(groups={"start_validation"})
      */
-    public string $nodeList;
+    public array $resources;
 
     /**
-     * Boolean flag if job is still running.
+     * Last jobstate according to batch scheduler
+     * Can be one of:
+     *  * CA canceled
+     *  * CD completed
+     *  * R  running
+     *  * F  failed
+     *  * S  suspended
+     *  * OOM out of memory
+     *  * NF node fail
+     *  * TO timeout
+     *  * ST stopped
      *
-     *  @ORM\Column(type="boolean")
+     *  @ORM\Column(type="string", options={"default":"running"})
      */
-    public $isRunning = true;
+    public $jobState = 'running';
 
     /**
-     * The job script.
+     *  Further textual information for job.
      *
      *  @ORM\Column(type="json", nullable=true)
      *  @Groups({"start"})
      */
-    private $metaData = null;
-
-    /**
-     * The project Id for this job.
-     *
-     *  @ORM\Column(type="text")
-     *  @Groups({"start"})
-     */
-    private string $projectId= "noProject";
+    public $metaData = null;
 
     /**
      * The maximum memory capacity used by the job.
@@ -207,11 +279,32 @@ class Job
     public $netBwAvg = 0;
 
     /**
+     * The maximum network data volume in timestep duration of the job.
+     *
+     *  @ORM\Column(type="float", options={"default":0})
+     */
+    public $netDataVolTotal = 0;
+
+    /**
      * The average file io bandwidth of the job.
      *
      *  @ORM\Column(type="float", options={"default":0})
      */
     public $fileBwAvg = 0;
+
+    /**
+     * The maximum file IO data volume in timestep duration of the job.
+     *
+     *  @ORM\Column(type="float", options={"default":0})
+     */
+    public $fileDataVolTotal = 0;
+
+    /**
+     * State of monitoring system during job run
+     *
+     *  @ORM\Column(type="smallint", options={"default":1})
+     */
+    public $monitoringStatus = 1;
 
     public $hasProfile;
 
@@ -223,94 +316,58 @@ class Job
      */
     public $tags;
 
-
     public function __construct() {
         $this->tags = new ArrayCollection();
     }
 
-    public function getJobId()
-    {
+    public function getJobId() {
         return $this->jobId;
     }
 
-    public function setJobId($jobId)
-    {
-        $this->jobId = $jobId;
+    public function getUserId() {
+        return $this->user;
     }
 
-    public function getUserId()
-    {
-        return $this->userId;
+    public function getClusterId() {
+        return $this->cluster;
     }
 
-    public function setUserId($userId)
-    {
-        $this->userId = $userId;
+    public function getStartTime() {
+        return $this->startTime;
     }
 
-    public function getClusterId()
-    {
-        return $this->clusterId;
+    public function getStopTime() {
+        return $this->stopTime;
     }
 
-    public function setClusterId($clusterId)
-    {
-        $this->clusterId = $clusterId;
-    }
-
-    public function getNumNodes()
-    {
+    public function getNumNodes() {
         return $this->numNodes;
     }
 
-    public function setNumNodes($numNodes)
-    {
-        $this->numNodes = $numNodes;
+    public function getProjectId() {
+        return $this->project;
     }
 
     public function getNodes($delimiter)
     {
-        if ( strcmp($delimiter,'|') === 0 ) {
-            return $this->nodeList;
-        } else {
-            $nodes = explode('|', $this->nodeList);
-            return implode($delimiter, $nodes);
+        $nodes = array();
+
+        foreach ( $this->resources as $node ){
+            $nodes[] = $node['hostname'];
         }
+
+        return implode($delimiter, $nodes);
     }
 
     public function getNodeArray()
     {
-        return explode('|', $this->nodeList);
-    }
+        $nodes = array();
 
-    public function getProjectId()
-    {
-        return $this->projectId;
-    }
+        foreach ( $this->resources as $node ){
+            $nodes[] = $node['hostname'];
+        }
 
-    public function setProjectId($projectId)
-    {
-        $this->projectId = $projectId;
-    }
-
-    public function getStartTime()
-    {
-        return $this->startTime;
-    }
-
-    public function setStartTime($startTime)
-    {
-        $this->startTime = $startTime;
-    }
-
-    public function getStopTime(): int
-    {
-        return $this->stopTime;
-    }
-
-    public function setStopTime($stopTime)
-    {
-        $this->stopTime = $stopTime;
+        return $nodes;
     }
 
     public function getDuration()
@@ -339,12 +396,9 @@ class Job
 
     public function isRunning()
     {
-        return $this->isRunning;
+        return ($this->jobState == 'running');
     }
 
-    /**
-     * @return Collection|JobTag[]
-     */
     public function getTags(): Collection
     {
         return $this->tags;

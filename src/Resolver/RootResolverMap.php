@@ -89,17 +89,18 @@ class RootResolverMap extends ResolverMap
         return [
             'id' => $job->id,
             'jobId' => $job->getJobId(),
-            'userId' => $this->scrambleNames
+            'user' => $this->scrambleNames
                 ? User::hideName($job->getUserId())
                 : $job->getUserId(),
-            'clusterId' => $job->getClusterId(),
+            'cluster' => $job->getClusterId(),
             'startTime' => $job->getStartTime(),
+            'stopTime' => $job->getStopTime(),
             'duration' => $job->getDuration(),
             'numNodes' => $job->getNumNodes(),
             'tags' => $this->getTagsArray($job->tags->getValues()),
             'hasProfile' => $this->jobData->hasData($job),
-            'state' => $job->isRunning ? 'running' : 'completed',
-            'projectId' => $job->getProjectId(),
+            'state' => $job->isRunning() ? 'running' : 'completed',
+            'project' => $job->getProjectId(),
 
             'loadAvg' => $job->loadAvg,
             'memUsedMax' => $job->memUsedMax,
