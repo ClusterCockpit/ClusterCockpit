@@ -47,7 +47,7 @@ export const clustersQuery = readable({ fetching: true }, (set) => {
             metricConfig {
                 name, unit, peak,
                 normal, caution, alert,
-                sampletime
+                timestep
             }
             filterRanges {
                 duration { from, to }

@@ -79,10 +79,10 @@ class JobRepository extends ServiceEntityRepository
             foreach ($filterList as $i => $filter) {
                 if (isset($filter['jobId']))
                     $this->addStringCondition($qb, 'jobId', $i, $filter['jobId']);
-                if (isset($filter['user']))
-                    $this->addStringCondition($qb, 'user', $i, $filter['user']);
-                if (isset($filter['project']))
-                    $this->addStringCondition($qb, 'project', $i, $filter['project']);
+                if (isset($filter['userId']))
+                    $this->addStringCondition($qb, 'user', $i, $filter['userId']);
+                if (isset($filter['projectId']))
+                    $this->addStringCondition($qb, 'project', $i, $filter['projectId']);
                 if (isset($filter['cluster']))
                     $this->addStringCondition($qb, 'cluster', $i, $filter['cluster']);
 
@@ -167,7 +167,7 @@ class JobRepository extends ServiceEntityRepository
         $stats = [];
         foreach ($clusters as &$cluster) {
             $filter = $filters; // PHP is strange
-            $filter[] = ['cluster' => ['eq' => $cluster['cluster']]];
+            $filter[] = ['cluster' => ['eq' => $cluster['clusterID']]];
             $coresPerNode = $cluster['socketsPerNode'] * $cluster['coresPerSocket'];
             $qb = $this->createQueryBuilder('j');
             $this->buildJobFilter($qb, $filter, null);

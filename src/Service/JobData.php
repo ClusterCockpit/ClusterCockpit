@@ -99,7 +99,7 @@ class JobData
 
         $key = $job->getClusterId()."-".$job->getJobId()."-".$job->getStartTime()."-".md5(serialize($metrics));
         return $this->_cache->get($key, function (ItemInterface $item) use ($job, $metrics) {
-            if ($job->isRunning)
+            if ($job->isRunning())
                 $item->expiresAfter(self::CACHE_EXPIRES_AFTER_RUNNING);
             else
                 $item->expiresAfter(self::CACHE_EXPIRES_AFTER_ARCHIVED);

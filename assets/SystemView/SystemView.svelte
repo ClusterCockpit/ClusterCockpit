@@ -228,7 +228,7 @@
                         id: node.id,
                         metric: m.name,
                         data: {
-                            timestep: metricConfig[clusterId][selectedMetric].sampletime,
+                            timestep: metricConfig[clusterId][selectedMetric].timestep,
                             series: [{ data: m.data }]
                         }
                     };

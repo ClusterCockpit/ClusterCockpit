@@ -34,9 +34,11 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 class ClusterConfigurationTest extends KernelTestCase
 {
     private $entityManager;
+    private $projectDir;
 
     protected function setUp():void
     {
+        $this->projectDir = '/var/www/symfony';
         $kernel = self::bootKernel();
 
         $this->entityManager = $kernel->getContainer()
@@ -46,14 +48,14 @@ class ClusterConfigurationTest extends KernelTestCase
 
     public function testReadConfiguration()
     {
-        $config = new ClusterConfiguration('/Users/jan/dev/web/ClusterCockpit');
+        $config = new ClusterConfiguration($this->projectDir);
         $cfg = $config->getClusterIds();
         $this->assertCount(2, $cfg);
     }
 
     public function testGetCluster()
     {
-        $config = new ClusterConfiguration('/Users/jan/dev/web/ClusterCockpit');
+        $config = new ClusterConfiguration($this->projectDir);
         $cfg = $config->getClusterConfiguration('emmy');
         /* var_dump($cfg); */
         $this->assertTrue($cfg['coresPerSocket'] === 10);
@@ -61,7 +63,7 @@ class ClusterConfigurationTest extends KernelTestCase
 
     public function testMetricConfig()
     {
-        $config = new ClusterConfiguration('/Users/jan/dev/web/ClusterCockpit');
+        $config = new ClusterConfiguration($this->projectDir);
         $cfg = $config->getClusterConfiguration('emmy');
         $this->assertTrue($cfg['metricConfig']['flops_any']['name'] === 'flops_any');
     }
@@ -69,21 +71,21 @@ class ClusterConfigurationTest extends KernelTestCase
     public function testMetricConfigException()
     {
         $this->expectExceptionMessage('No such cluster marta');
-        $config = new ClusterConfiguration('/Users/jan/dev/web/ClusterCockpit');
+        $config = new ClusterConfiguration($this->projectDir);
         $cfg = $config->getClusterConfiguration('marta');
     }
 
 
     public function testGetConfigurations()
     {
-        $config = new ClusterConfiguration('/Users/jan/dev/web/ClusterCockpit');
+        $config = new ClusterConfiguration($this->projectDir);
         $cfg = $config->getConfigurations();
         $this->assertTrue($cfg['woody']['metricConfig']['flops_any']['name'] === 'flops_any');
     }
 
     public function testSingleMetric()
     {
-        $config = new ClusterConfiguration('/Users/jan/dev/web/ClusterCockpit');
+        $config = new ClusterConfiguration($this->projectDir);
         $cfg = $config->getSingleMetric('emmy');
         $this->assertCount(8, $cfg);
     }

@@ -46,7 +46,7 @@ type Cluster {
 type MetricConfig {
   name: String!
   unit: String!
-  sampletime: Int!
+  timestep: Int!
   peak: Int!
   normal: Int!
   caution: Int!

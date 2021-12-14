@@ -96,7 +96,7 @@
             return {
                 name: metric.name,
                 data: {
-                    timestep: metricConfig[clusterId][metric.name].sampletime,
+                    timestep: metricConfig[clusterId][metric.name].timestep,
                     series: [{ data: metric.data }]
                 }
             };
