@@ -104,7 +104,8 @@ class JobRepository extends ServiceEntityRepository
                 }
 
                 if (isset($filter['isRunning']))
-                    $qb->andWhere('j.isRunning = '.($filter['isRunning'] ? 'true' : 'false'));
+                    $qb->andWhere("j.jobState = :state")
+                       ->setParameter('state', $filter['isRunning'] ? 'running' : 'completed');
 
                 if (isset($filter['tags']))
                     $qb->join('j.tags', 't')
@@ -184,7 +185,7 @@ class JobRepository extends ServiceEntityRepository
                 $stats[0]['totalCoreHours'] += intval($res[3]);
             } else {
                 $qb->select([
-                    'j.'.strtolower($groupBy).'Id AS gid', 'COUNT(j.id) AS jobs', 'SUM(j.duration) / 3600 AS walltime',
+                    'j.'.strtolower($groupBy).' AS gid', 'COUNT(j.id) AS jobs', 'SUM(j.duration) / 3600 AS walltime',
                     'SUM(j.duration * j.numNodes * '.$coresPerNode.') / 3600 AS corehours'])->groupBy('gid');
 
                 $rows = $qb->getQuery()->getResult();
@@ -206,7 +207,7 @@ class JobRepository extends ServiceEntityRepository
             $qb->select('COUNT(j.id)')->andWhere('j.duration < 120');
             $stats[0]['shortJobs'] = $qb->getQuery()->getSingleResult()[1];
         } else {
-            $qb->select(['j.'.strtolower($groupBy).'Id AS id', 'COUNT(j.'.strtolower($groupBy).'Id) AS count'])
+            $qb->select(['j.'.strtolower($groupBy).' AS id', 'COUNT(j.'.strtolower($groupBy).') AS count'])
                 ->andWhere('j.duration < 120')->groupBy('id');
 
             $rows = $qb->getQuery()->getResult();
@@ -224,9 +225,9 @@ class JobRepository extends ServiceEntityRepository
         } else {
             foreach ($stats as &$stat) {
                 $stat['histWalltime'] = $this->buildHistogram('ROUND(j.duration / 3600) as value',
-                    $filters, $stat['id'], 'j'.strtolower($groupBy).'Id');
+                    $filters, $stat['id'], 'j'.strtolower($groupBy));
                 $stat['histNumNodes'] = $this->buildHistogram('j.numModes as value',
-                    $filters, $stat['id'], 'j'.strtolower($groupBy).'Id');
+                    $filters, $stat['id'], 'j'.strtolower($groupBy));
             }
         }
 
