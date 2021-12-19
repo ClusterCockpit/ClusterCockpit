@@ -1,9 +1,9 @@
 type Job {
   id: ID!
   jobId: String!
-  userId: String!
-  projectId: String!
-  clusterId: String!
+  user: String!
+  project: String!
+  cluster: String!
   startTime: Time!
   duration: Int!
   numNodes: Int!
@@ -31,7 +31,7 @@ type JobTag {
 }
 
 type Cluster {
-  clusterID: String!
+  name: String!
   processorType: String!
   socketsPerNode: Int!
   coresPerSocket: Int!
@@ -67,7 +67,7 @@ enum JobMetricScope {
 }
 
 type JobMetricSeries {
-  node_id: String!
+  hostname: String!
   statistics: JobMetricStatistics
   data: [Float]!
 }
@@ -147,9 +147,9 @@ type FilterRanges {
 input JobFilter {
   tags: [ID!]
   jobId: StringInput
-  userId: StringInput
-  projectId: StringInput
-  clusterId: StringInput
+  user: StringInput
+  project: StringInput
+  cluster: StringInput
   duration: IntRange
   numNodes: IntRange
   startTime: TimeRange

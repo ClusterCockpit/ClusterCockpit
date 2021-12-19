@@ -78,13 +78,13 @@ final class JobDataPersister implements ContextAwareDataPersisterInterface
             throw new HttpException(500, "Unsupported job for persister");
         }
 
-        $nodes = explode('|', $job->nodeList);
+        $nodes =  $job->getNodeArray();
         $job->numNodes = count($nodes);
         if (($context['item_operation_name'] ?? null) === 'put') {
-            $job->isRunning = false;
+            $job->jobState = 'completed';
         }
 
-        if ($job->isRunning == false) {
+        if ($job->isRunning() == false) {
             if ($job->stopTime < $job->startTime) {
                 throw new HttpException(400, "Stop time earlier than start time");
             }

@@ -163,7 +163,7 @@ class Job
      *  @ORM\Column(type="integer")
      *  @Groups({"read"})
      */
-    private int $duration = 0;
+    public int $duration = 0;
 
     /**
      * The number of nodes used by the job.

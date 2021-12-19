@@ -35,6 +35,7 @@ use Overblog\GraphQLBundle\Resolver\ResolverMap;
 
 use App\Entity\User;
 use App\Service\JobData;
+use App\Service\JobArchive;
 use App\Service\JobStats;
 use App\Service\Configuration;
 use App\Service\ClusterConfiguration;
@@ -46,6 +47,7 @@ class RootResolverMap extends ResolverMap
     const ANALYSIS_MAX_JOBS = 500;
 
     private $jobRepo;
+    private $jobArchive;
     private $jobData;
     private $jobStats;
     private $clusterCfg;
@@ -59,6 +61,7 @@ class RootResolverMap extends ResolverMap
     public function __construct(
         JobRepository $jobRepo,
         JobData $jobData,
+        JobArchive $jobArchive,
         JobStats $jobStats,
         ClusterConfiguration $clusterCfg,
         JobTagRepository $jobTagRepo,
@@ -69,6 +72,7 @@ class RootResolverMap extends ResolverMap
     )
     {
         $this->jobRepo = $jobRepo;
+        $this->jobArchive = $jobArchive;
         $this->jobData = $jobData;
         $this->jobStats = $jobStats;
         $this->clusterCfg = $clusterCfg;
@@ -331,7 +335,7 @@ class RootResolverMap extends ResolverMap
                         $job->addTag($tag);
                     }
 
-                    $this->jobData->getArchive()->updateTags($job);
+                    $this->jobArchive->updateTags($job);
                     $this->jobRepo->persistJob($job);
                     return $this->getTagsArray($job->tags->getValues());
                 },
@@ -351,7 +355,7 @@ class RootResolverMap extends ResolverMap
                         }
                     }
 
-                    $this->jobData->getArchive()->updateTags($job);
+                    $this->jobArchive->updateTags($job);
                     $this->jobRepo->persistJob($job);
                     return $this->getTagsArray($job->tags->getValues());
                 },
