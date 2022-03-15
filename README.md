@@ -1,6 +1,12 @@
 ![ClusterCockpit banner](https://github.com/ClusterCockpit/ClusterCockpit/wiki/img/ClusterCockpit-banner-small.png)
 
 --------------------------------------------------------------------------------
+NOTICE
+--------------------------------------------------------------------------------
+The PHP Symfony based ClusterCockpit Webfrontend Implementation is deprecated
+and is replaced by [cc-backend](https://github.com/ClusterCockpit/cc-backend)!
+
+--------------------------------------------------------------------------------
 Introduction
 --------------------------------------------------------------------------------
 
