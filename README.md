@@ -5,7 +5,7 @@ NOTICE
 --------------------------------------------------------------------------------
 The PHP Symfony based ClusterCockpit Webfrontend Implementation is deprecated
 and is replaced by [cc-backend](https://github.com/ClusterCockpit/cc-backend)!
-
+[Here](https://github.com/ClusterCockpit/ClusterCockpit/wiki/Why-we-switched-from-PHP-Symfony-to-a-Golang-based-solution) are some thoughts on why we switched in case you care.
 --------------------------------------------------------------------------------
 Introduction
 --------------------------------------------------------------------------------
